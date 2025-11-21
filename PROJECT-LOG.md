@@ -3748,3 +3748,1066 @@ npm run build
 **Status**: ✅ D1 Complete - Ready for D2 (Automobile API Adapter)
 
 ---
+
+## Session 12: Milestone D2 - Automobile API Adapter
+**Date**: 2025-11-20
+**Branch**: `main`
+**Status**: ✅ Complete
+
+### Objective
+Implement API adapter for fetching automobile vehicle data from the backend API, including response transformation and cache key generation.
+
+### Implementation Details
+
+#### 1. API Adapter (`automobile-api.adapter.ts`)
+Created AutomobileApiAdapter implementing IApiAdapter interface:
+
+**Core Implementation**:
+```typescript
+@Injectable({ providedIn: 'root' })
+export class AutomobileApiAdapter
+  implements IApiAdapter<AutoSearchFilters, VehicleResult, VehicleStatistics>
+{
+  fetchData(filters: AutoSearchFilters):
+    Observable<ApiAdapterResponse<VehicleResult, VehicleStatistics>> {
+    // Convert filters to API params
+    // Call API service
+    // Transform response to domain models
+  }
+}
+```
+
+**API Methods**:
+
+1. **fetchData()**:
+   - Main data fetching method (implements IApiAdapter)
+   - Converts AutoSearchFilters to API query parameters
+   - Calls `/vehicles` endpoint via ApiService
+   - Transforms API response to VehicleResult models
+   - Extracts and transforms statistics if present
+   - Returns ApiAdapterResponse with results and total
+
+2. **fetchStatistics()**:
+   - Separate method for statistics-only queries
+   - Calls `/statistics` endpoint
+   - Transforms to VehicleStatistics model
+   - Useful for refreshing stats without reloading table
+
+3. **filtersToApiParams()** (private):
+   - Converts domain filter object to API parameters
+   - Maps camelCase to snake_case (manufacturer → manufacturer, yearMin → year_min)
+   - Removes undefined/null values
+   - Handles pagination (page, size)
+   - Handles sorting (sort, sort_direction)
+   - Handles search filters (manufacturer, model, year ranges, etc.)
+
+**API Endpoints**:
+- `/vehicles` - Main vehicle search endpoint
+- `/statistics` - Statistics endpoint
+
+**Parameter Mapping**:
+```typescript
+AutoSearchFilters         → API Parameters
+manufacturer              → manufacturer
+model                     → model
+yearMin                   → year_min
+yearMax                   → year_max
+bodyClass                 → body_class
+instanceCountMin          → instance_count_min
+instanceCountMax          → instance_count_max
+search                    → search
+page                      → page
+size                      → size
+sort                      → sort
+sortDirection             → sort_direction
+```
+
+**Response Transformation**:
+- Uses `VehicleResult.fromApiResponse()` to convert each result
+- Uses `VehicleStatistics.fromApiResponse()` for statistics
+- Handles both snake_case and camelCase API responses
+- Gracefully handles missing optional statistics
+
+#### 2. Cache Key Builder (`automobile-cache-key-builder.ts`)
+Created two cache key builders:
+
+**AutomobileCacheKeyBuilder** (Domain-specific):
+```typescript
+@Injectable({ providedIn: 'root' })
+export class AutomobileCacheKeyBuilder
+  implements ICacheKeyBuilder<AutoSearchFilters>
+{
+  buildKey(filters: AutoSearchFilters): string {
+    // Build deterministic cache key from filters
+    // Format: 'auto:key1=value1:key2=value2:...'
+  }
+}
+```
+
+**Features**:
+- Prefix: `'auto'` for automobile domain
+- Deterministic: same filters always produce same key
+- Sorted keys: ensures consistency regardless of filter order
+- Includes all non-null/undefined filter values
+- Serializes values to strings
+- Example: `'auto:manufacturer=Toyota:page=1:size=20'`
+
+**DefaultCacheKeyBuilder<TFilters>** (Generic):
+```typescript
+@Injectable({ providedIn: 'root' })
+export class DefaultCacheKeyBuilder<TFilters>
+  implements ICacheKeyBuilder<TFilters>
+{
+  buildKey(filters: TFilters): string {
+    // Use JSON serialization with simple hashing
+    // Format: 'cache:{hash}'
+  }
+}
+```
+
+**Features**:
+- Prefix: `'cache'` for generic usage
+- JSON serialization with sorted keys
+- Simple hash function (32-bit integer → base36)
+- Works with any filter object type
+- Fallback for domains that don't need custom cache keys
+
+**Cache Key Examples**:
+```typescript
+// AutomobileCacheKeyBuilder
+filters = { manufacturer: 'Toyota', page: 1, size: 20 }
+→ 'auto:manufacturer=Toyota:page=1:size=20'
+
+// DefaultCacheKeyBuilder
+filters = { manufacturer: 'Toyota', page: 1 }
+→ 'cache:abc123xyz' (hash of JSON)
+```
+
+**Helper Methods**:
+- `getFilterEntries()` - Extract [key, value] pairs from filters
+- `serializeValue()` - Convert values to strings (handles arrays, objects)
+- `simpleHash()` - Generate hash from string (DefaultCacheKeyBuilder)
+- `getPrefix()` - Get cache key prefix
+
+### Key Features
+
+1. **Clean API Integration**
+   - Uses framework's ApiService
+   - No direct HTTP calls
+   - Consistent error handling via interceptor
+   - Observable-based (RxJS)
+
+2. **Response Transformation**
+   - Converts API responses to domain models
+   - Uses model `fromApiResponse()` methods
+   - Type-safe throughout
+   - Handles optional fields gracefully
+
+3. **Flexible Parameter Mapping**
+   - Removes null/undefined values
+   - Maps domain names to API names
+   - Supports all filter types
+   - Clean separation of concerns
+
+4. **Deterministic Cache Keys**
+   - Same filters → same key
+   - Sorted for consistency
+   - Domain-prefixed
+   - Enables effective request deduplication
+
+5. **Generic Fallback**
+   - DefaultCacheKeyBuilder for any domain
+   - JSON-based serialization
+   - Simple but effective hashing
+   - No domain-specific logic needed
+
+### Usage Examples
+
+**API Adapter**:
+```typescript
+const adapter = new AutomobileApiAdapter(apiService);
+const filters = AutoSearchFilters.fromPartial({
+  manufacturer: 'Toyota',
+  yearMin: 2020,
+  page: 1,
+  size: 20
+});
+
+adapter.fetchData(filters).subscribe(response => {
+  console.log('Results:', response.results);        // VehicleResult[]
+  console.log('Total:', response.total);            // 1247
+  console.log('Stats:', response.statistics);       // VehicleStatistics
+});
+
+// Fetch statistics only
+adapter.fetchStatistics(filters).subscribe(stats => {
+  console.log('Total vehicles:', stats.totalVehicles);
+  console.log('Top manufacturers:', stats.topManufacturers);
+});
+```
+
+**Cache Key Builder**:
+```typescript
+const builder = new AutomobileCacheKeyBuilder();
+const filters = new AutoSearchFilters({ manufacturer: 'Toyota', page: 1 });
+
+const cacheKey = builder.buildKey(filters);
+// 'auto:manufacturer=Toyota:page=1'
+
+// Use in RequestCoordinatorService
+coordinator.coordinate(
+  cacheKey,
+  () => adapter.fetchData(filters),
+  { ttl: 60000 }
+);
+```
+
+### Files Created
+
+1. **`src/domain-config/automobile/adapters/automobile-api.adapter.ts`** (186 lines)
+   - AutomobileApiAdapter class
+   - fetchData() and fetchStatistics() methods
+   - filtersToApiParams() conversion
+   - API endpoint constants
+
+2. **`src/domain-config/automobile/adapters/automobile-cache-key-builder.ts`** (220 lines)
+   - AutomobileCacheKeyBuilder class
+   - DefaultCacheKeyBuilder<TFilters> generic class
+   - Cache key generation logic
+   - Value serialization helpers
+
+3. **`src/domain-config/automobile/adapters/index.ts`** (8 lines)
+   - Barrel export for adapters
+
+### Build Verification
+
+```bash
+npm run build
+# ✓ Build successful
+# Bundle size: 776.74 kB (within 5 MB budget)
+# Time: 1611ms
+```
+
+### Architecture Benefits
+
+1. **Adapter Pattern**
+   - Clean separation between framework and API
+   - Domain-specific API logic isolated
+   - Easy to mock for testing
+   - Swappable implementations
+
+2. **Type Safety**
+   - Generic types flow through adapter
+   - Compile-time type checking
+   - No `any` types in public API
+   - IDE autocomplete support
+
+3. **Request Coordination Ready**
+   - Deterministic cache keys enable deduplication
+   - Compatible with RequestCoordinatorService
+   - TTL-based caching support
+   - Prevents redundant API calls
+
+4. **Reusability**
+   - DefaultCacheKeyBuilder works for any domain
+   - Adapter pattern is domain-agnostic
+   - Clear interface contracts
+   - Easy to extend for new domains
+
+### Testing Policy
+
+**No unit tests per user directive** - focusing on implementation
+
+**Manual Testing Recommended**:
+- Test API parameter conversion with various filters
+- Verify response transformation with sample data
+- Test cache key generation with different filter combinations
+- Verify deterministic cache key behavior
+
+### Next Steps
+
+1. **D3: Automobile Filter URL Mapper** - Implement URL serialization/deserialization
+2. **D4: Automobile UI Configuration** - Define table, picker, filter, and chart configs
+3. **Assemble Domain Config** - Combine all pieces into complete configuration
+
+### Completion Summary
+
+- **Lines of Code**: ~406 lines (2 adapter files + barrel export)
+- **Files Created**: 3 files
+- **Files Updated**: 0 files
+- **Build Status**: ✅ Successful (776.74 kB)
+- **Breaking Changes**: None
+- **Dependencies Added**: None
+
+---
+
+**Session End**: Milestone D2 Complete
+**Date**: 2025-11-20
+**Status**: ✅ D2 Complete - Ready for D3 (Automobile Filter URL Mapper)
+
+---
+
+## Session 13: Milestone D3 - Automobile Filter URL Mapper
+**Date**: 2025-11-20
+**Branch**: `main`
+**Status**: ✅ Complete
+
+### Objective
+Implement bidirectional URL mapping for filter state, enabling URL-first state management and shareable filter configurations.
+
+### Implementation Details
+
+#### 1. URL Mapper (`automobile-url-mapper.ts`)
+Created AutomobileUrlMapper implementing IFilterUrlMapper interface:
+
+**Core Implementation**:
+```typescript
+@Injectable({ providedIn: 'root' })
+export class AutomobileUrlMapper
+  implements IFilterUrlMapper<AutoSearchFilters>
+{
+  toUrlParams(filters: AutoSearchFilters): Params {
+    // Convert filter object → URL query parameters
+  }
+
+  fromUrlParams(params: Params): AutoSearchFilters {
+    // Convert URL query parameters → filter object
+  }
+}
+```
+
+**URL Parameter Mapping** (Short names for clean URLs):
+
+| Filter Field | URL Parameter | Example |
+|--------------|---------------|---------|
+| manufacturer | mfr | `mfr=Toyota` |
+| model | mdl | `mdl=Camry` |
+| yearMin | y_min | `y_min=2020` |
+| yearMax | y_max | `y_max=2024` |
+| bodyClass | bc | `bc=Sedan` |
+| instanceCountMin | ic_min | `ic_min=10` |
+| instanceCountMax | ic_max | `ic_max=1000` |
+| search | q | `q=Toyota+Camry` |
+| page | p | `p=1` |
+| size | sz | `sz=20` |
+| sort | s | `s=manufacturer` |
+| sortDirection | sd | `sd=asc` |
+
+**Example URL**:
+```
+/discover?mfr=Toyota&y_min=2020&y_max=2024&bc=Sedan&p=1&sz=20&s=year&sd=desc
+```
+
+#### 2. Core Methods
+
+**toUrlParams(filters)**:
+- Converts AutoSearchFilters object to URL query parameters
+- Maps long field names to short URL parameter names
+- Removes null/undefined values (clean URLs)
+- Converts all values to strings for URL compatibility
+- Only includes defined filter values
+
+**fromUrlParams(params)**:
+- Converts URL query parameters to AutoSearchFilters object
+- Maps short URL parameter names back to field names
+- Performs type conversion (strings → numbers)
+- Validates numeric values (parseNumber)
+- Validates sortDirection ('asc' | 'desc')
+- Returns filter object with only valid values
+
+**Type Conversion**:
+```typescript
+private parseNumber(value: any): number | null {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+  const num = Number(value);
+  return isNaN(num) ? null : num;
+}
+```
+
+#### 3. Helper Methods
+
+**buildShareableUrl(baseUrl, filters)**:
+- Generates complete shareable URL with filters
+- Useful for creating links to share filter states
+- Example: `buildShareableUrl('/discover', filters)`
+  → `/discover?mfr=Toyota&y_min=2020&p=1`
+
+**validateUrlParams(params)**:
+- Validates URL parameters before conversion
+- Checks numeric fields are valid numbers
+- Validates sortDirection is 'asc' or 'desc'
+- Validates year/instance count ranges (min ≤ max)
+- Returns validation result with error messages
+- Useful for handling corrupted or tampered URLs
+
+**sanitizeUrlParams(params)**:
+- Removes invalid parameter names
+- Removes invalid numeric values
+- Fixes invalid sort direction
+- Returns cleaned parameter object
+- Useful for defensive URL handling
+
+**getParameterMapping()**:
+- Returns parameter name mapping object
+- Useful for debugging and documentation
+
+**getUrlParamName(filterField)**:
+- Get URL parameter name for specific filter field
+- Example: `getUrlParamName('manufacturer')` → `'mfr'`
+
+### Key Features
+
+1. **URL-First State Management**
+   - URL is single source of truth
+   - Browser back/forward works correctly
+   - Shareable filter states
+   - Bookmarkable searches
+
+2. **Clean URLs**
+   - Short parameter names (mfr vs manufacturer)
+   - Only includes active filters
+   - No null/undefined in URL
+   - Readable and shareable
+
+3. **Type Safety**
+   - Bidirectional conversion preserves types
+   - Number fields converted correctly
+   - Sort direction validated
+   - Type-safe throughout
+
+4. **Robust Validation**
+   - Validates numeric values
+   - Validates enums (sortDirection)
+   - Validates ranges (min ≤ max)
+   - Handles invalid/corrupted URLs gracefully
+
+5. **Developer-Friendly**
+   - Helper methods for common tasks
+   - Clear error messages in validation
+   - Parameter mapping for documentation
+   - Sanitization for defensive coding
+
+### Usage Examples
+
+**Convert Filters to URL**:
+```typescript
+const mapper = new AutomobileUrlMapper();
+const filters = new AutoSearchFilters({
+  manufacturer: 'Toyota',
+  yearMin: 2020,
+  yearMax: 2024,
+  page: 1,
+  size: 20,
+  sort: 'year',
+  sortDirection: 'desc'
+});
+
+const params = mapper.toUrlParams(filters);
+// {
+//   mfr: 'Toyota',
+//   y_min: '2020',
+//   y_max: '2024',
+//   p: '1',
+//   sz: '20',
+//   s: 'year',
+//   sd: 'desc'
+// }
+```
+
+**Convert URL to Filters**:
+```typescript
+const urlParams = {
+  mfr: 'Toyota',
+  y_min: '2020',
+  p: '1',
+  sz: '20'
+};
+
+const filters = mapper.fromUrlParams(urlParams);
+// AutoSearchFilters {
+//   manufacturer: 'Toyota',
+//   yearMin: 2020,
+//   page: 1,
+//   size: 20
+// }
+```
+
+**Build Shareable URL**:
+```typescript
+const url = mapper.buildShareableUrl('/discover', filters);
+// '/discover?mfr=Toyota&y_min=2020&y_max=2024&p=1&sz=20&s=year&sd=desc'
+```
+
+**Validate URL Parameters**:
+```typescript
+const result = mapper.validateUrlParams(urlParams);
+if (!result.valid) {
+  result.errors.forEach(error => {
+    console.error(error);
+  });
+}
+// {
+//   valid: false,
+//   errors: [
+//     'Invalid numeric value for y_min: abc',
+//     'Year minimum (2024) cannot be greater than maximum (2020)'
+//   ]
+// }
+```
+
+**Sanitize URL Parameters**:
+```typescript
+const dirty = {
+  mfr: 'Toyota',
+  y_min: 'invalid',
+  unknown_param: 'value',
+  sd: 'invalid'
+};
+
+const clean = mapper.sanitizeUrlParams(dirty);
+// { mfr: 'Toyota' }
+// Removed: invalid numeric, unknown param, invalid sortDirection
+```
+
+### Integration with Framework
+
+**UrlStateService Usage**:
+```typescript
+// URL state service uses mapper automatically
+const urlStateService = new UrlStateService<AutoSearchFilters>(
+  router,
+  mapper  // AutomobileUrlMapper
+);
+
+// Get filters from URL
+const filters = urlStateService.getState();
+
+// Update URL with filters
+urlStateService.setState(filters);
+
+// Watch for URL changes
+urlStateService.state$.subscribe(filters => {
+  console.log('Filters from URL:', filters);
+});
+```
+
+**ResourceManagementService Integration**:
+```typescript
+const resourceService = new ResourceManagementService<
+  AutoSearchFilters,
+  VehicleResult,
+  VehicleStatistics
+>({
+  filterMapper: new AutomobileUrlMapper(),  // Used for URL sync
+  apiAdapter: new AutomobileApiAdapter(),
+  cacheKeyBuilder: new AutomobileCacheKeyBuilder()
+});
+```
+
+### Files Created
+
+1. **`src/domain-config/automobile/adapters/automobile-url-mapper.ts`** (362 lines)
+   - AutomobileUrlMapper class
+   - toUrlParams() and fromUrlParams() methods
+   - Helper methods for validation and sanitization
+   - Shareable URL generation
+
+### Files Updated
+
+1. **`src/domain-config/automobile/adapters/index.ts`**
+   - Added: `export * from './automobile-url-mapper';`
+
+### Build Verification
+
+```bash
+npm run build
+# ✓ Build successful
+# Bundle size: 776.74 kB (within 5 MB budget)
+# Time: 1610ms
+```
+
+### Architecture Benefits
+
+1. **URL as Single Source of Truth**
+   - All application state flows from URL
+   - Browser back/forward works naturally
+   - Shareable, bookmarkable states
+   - No state synchronization bugs
+
+2. **Clean, Readable URLs**
+   - Short parameter names
+   - No clutter from null values
+   - Human-readable
+   - Easy to share and debug
+
+3. **Type-Safe Conversion**
+   - Bidirectional type preservation
+   - Compile-time type checking
+   - Runtime type conversion
+   - Validation at boundaries
+
+4. **Defensive Programming**
+   - Validates incoming URL parameters
+   - Sanitizes invalid values
+   - Graceful error handling
+   - Prevents URL injection attacks
+
+5. **Reusable Pattern**
+   - Clear interface contract (IFilterUrlMapper)
+   - Easy to implement for new domains
+   - Helper methods reduce boilerplate
+   - Consistent behavior across domains
+
+### Testing Policy
+
+**No unit tests per user directive** - focusing on implementation
+
+**Manual Testing Recommended**:
+- Test toUrlParams with various filter combinations
+- Test fromUrlParams with various URL parameters
+- Test validation with invalid URLs
+- Test sanitization with malformed parameters
+- Test browser back/forward navigation
+- Test shareable URL generation
+
+### Next Steps
+
+1. **D4: Automobile UI Configuration** - Define table, picker, filter, and chart configurations
+2. **Assemble Domain Config** - Combine models, adapters into complete DomainConfig
+3. **Wire Up Application** - Connect domain config to framework
+
+### Completion Summary
+
+- **Lines of Code**: ~362 lines (URL mapper)
+- **Files Created**: 1 file
+- **Files Updated**: 1 file (barrel export)
+- **Build Status**: ✅ Successful (776.74 kB)
+- **Breaking Changes**: None
+- **Dependencies Added**: None
+
+---
+
+**Session End**: Milestone D3 Complete
+**Date**: 2025-11-20
+**Status**: ✅ D3 Complete - Ready for D4 (Automobile UI Configuration)
+
+---
+
+## Session 14: Milestone D4 - Automobile UI Configuration
+**Date**: 2025-11-20
+**Branch**: `main`
+**Status**: ✅ Complete - **ALL DOMAIN MILESTONES (D1-D4) COMPLETE!**
+
+### Objective
+Define comprehensive UI configurations for the automobile domain, including table columns, filter controls, chart visualizations, and picker components.
+
+### Implementation Details
+
+#### 1. Table Configuration (`automobile.table-config.ts`)
+Created complete table configuration for vehicle display:
+
+**Core Configuration**:
+```typescript
+export const AUTOMOBILE_TABLE_CONFIG: TableConfig<VehicleResult> = {
+  tableId: 'automobile-vehicles-table',
+  stateKey: 'auto-vehicles-state',
+  dataKey: 'vehicle_id',
+
+  columns: [
+    { field: 'manufacturer', header: 'Manufacturer', sortable: true, filterable: true, width: '150px' },
+    { field: 'model', header: 'Model', sortable: true, filterable: true, width: '150px' },
+    { field: 'year', header: 'Year', sortable: true, filterable: true, width: '100px' },
+    { field: 'body_class', header: 'Body Class', sortable: true, filterable: true, width: '120px' },
+    { field: 'instance_count', header: 'VIN Count', sortable: true, filterable: false, width: '100px' }
+  ],
+
+  expandable: true,
+  selectable: false,
+  paginator: true,
+  rows: 20,
+  rowsPerPageOptions: [10, 20, 50, 100],
+  lazy: true,
+  stateStorage: 'local',
+  styleClass: 'p-datatable-striped p-datatable-gridlines',
+  responsiveLayout: 'scroll'
+};
+```
+
+**Additional Configurations**:
+
+1. **Column Visibility Presets**:
+   - `all` - All columns visible
+   - `minimal` - Core fields only (manufacturer, model, year, VIN count)
+   - `summary` - All except VIN count
+
+2. **Default Sort**:
+   - Field: `manufacturer`
+   - Order: Ascending
+
+3. **Export Configurations**:
+   - CSV export with 5 columns
+   - Excel export with 8 columns (includes timestamps)
+   - Custom filenames and sheet names
+
+**Table Features**:
+- Sortable columns (4 of 5)
+- Filterable columns (4 of 5)
+- Row expansion for VIN instances
+- Pagination with configurable page size
+- Lazy loading (fetch on demand)
+- State persistence to localStorage
+- Striped rows with gridlines
+- Responsive scrolling layout
+- Global filter across manufacturer, model, body class
+
+#### 2. Filter Definitions (`automobile.filter-definitions.ts`)
+Created filter controls for query panel:
+
+**AUTOMOBILE_FILTER_DEFINITIONS** (6 filters):
+
+1. **Manufacturer Filter**:
+   - Type: text
+   - Operators: contains, equals, startsWith
+   - Validation: 1-100 characters
+
+2. **Model Filter**:
+   - Type: text
+   - Operators: contains, equals, startsWith
+   - Validation: 1-100 characters
+
+3. **Year Range Filter**:
+   - Type: range
+   - Min: 1900
+   - Max: Current year + 1
+   - Step: 1
+
+4. **Body Class Filter**:
+   - Type: select
+   - Options: Sedan, SUV, Truck, Coupe, Wagon, Van, Minivan, Convertible, Hatchback
+
+5. **Instance Count Range Filter**:
+   - Type: range
+   - Min: 0
+   - Max: 10000
+   - Step: 1
+
+6. **Global Search Filter**:
+   - Type: text
+   - Searches across manufacturer, model, body class
+   - Validation: 1-200 characters
+
+**Quick Filter Presets** (6 presets):
+- Recent Vehicles (last 5 years)
+- Popular Vehicles (100+ VINs)
+- Classic Vehicles (pre-2000)
+- SUVs only
+- Trucks only
+- Sedans only
+
+**Filter Groups**:
+- Identification (manufacturer, model, bodyClass)
+- Temporal (yearRange)
+- Quantity (instanceCountRange)
+- General (search)
+
+**Validation Functions**:
+- `yearRange()` - Validates year min ≤ max, within 1900 to current+1
+- `instanceCountRange()` - Validates count min ≤ max, non-negative
+
+#### 3. Chart Configurations (`automobile.chart-configs.ts`)
+Created 5 chart visualizations for statistics panel:
+
+**AUTOMOBILE_CHART_CONFIGS** (5 charts):
+
+1. **Manufacturer Distribution** (Horizontal Bar Chart):
+   - Shows top 10 manufacturers by vehicle count
+   - Horizontal bars for better label readability
+   - Includes percentage in tooltips
+   - Height: 400px
+
+2. **Body Class Distribution** (Pie Chart):
+   - Shows distribution across body classes
+   - Legend on right side
+   - Semantic colors per body class
+   - Height: 350px
+
+3. **Year Distribution** (Line Chart):
+   - Shows vehicle count over time
+   - Filled area under line
+   - Sorted by year ascending
+   - Height: 350px
+
+4. **Top Models** (Horizontal Bar Chart):
+   - Shows top 10 models by VIN instance count
+   - Format: "Manufacturer Model"
+   - Instance count with formatting
+   - Height: 400px
+
+5. **Instance Count Histogram** (Histogram):
+   - Distribution of VIN counts
+   - Hidden by default (advanced)
+   - Collapsible panel
+   - Height: 350px
+
+**Chart Visibility Presets**:
+- `default` - Manufacturer, body class, year distributions
+- `all` - All charts visible
+- `distributions` - Distribution-focused charts
+- `top` - Top performers charts
+- `temporal` - Time-based analysis
+
+**Color Schemes**:
+- Primary: 10-color palette for general use
+- Body Class: Semantic colors per body type
+- Gradient: Low/medium/high for heatmaps
+
+**Data Transformers**:
+- `manufacturerStats()` - Transform to bar chart data
+- `bodyClassStats()` - Transform to pie chart data
+- `yearStats()` - Transform to line chart data
+- `topModelsStats()` - Transform to bar chart data
+
+**Chart Options**:
+- Responsive layouts
+- Configurable aspect ratios
+- Custom tooltips with percentages
+- Axis labels and titles
+- Legend positioning
+
+#### 4. Picker Configurations (`automobile.picker-configs.ts`)
+Created picker framework (currently empty):
+
+**AUTOMOBILE_PICKER_CONFIGS**: Empty array with placeholder comments
+
+**Placeholder Pickers** (commented out for future use):
+- Manufacturer Picker (multi-select from manufacturers)
+- Body Class Picker (multi-select from body classes)
+
+**Picker Helpers**:
+- `getPickerById()` - Find picker by ID
+- `getAllPickerIds()` - Get all picker IDs
+
+**Future Picker Support**:
+- Manufacturer selection with vehicle counts
+- Body class selection with counts
+- Year selection
+- Multi-select with max selections
+- Pagination in picker dialogs
+- Custom display templates
+
+### Key Features
+
+1. **Comprehensive Table Config**
+   - 5 well-defined columns
+   - Sortable and filterable fields
+   - Row expansion for details
+   - Pagination and lazy loading
+   - State persistence
+   - Export-ready
+
+2. **Rich Filter System**
+   - 6 filter controls (text, range, select)
+   - Quick filter presets for common searches
+   - Filter grouping for better UX
+   - Validation functions for ranges
+   - Global search support
+
+3. **Data Visualization**
+   - 5 chart types (bar, pie, line, histogram)
+   - Responsive and collapsible
+   - Custom tooltips and formatting
+   - Color schemes and presets
+   - Data transformation utilities
+
+4. **Extensible Pickers**
+   - Framework in place for future pickers
+   - Helper functions ready
+   - Clear patterns for implementation
+
+5. **Export Support**
+   - CSV export configuration
+   - Excel export with multiple columns
+   - Custom filenames and sheet names
+
+### Usage Examples
+
+**Table Configuration**:
+```typescript
+<p-table
+  [value]="vehicles"
+  [columns]="AUTOMOBILE_TABLE_CONFIG.columns"
+  [dataKey]="AUTOMOBILE_TABLE_CONFIG.dataKey"
+  [reorderableColumns]="true"
+  [stateStorage]="AUTOMOBILE_TABLE_CONFIG.stateStorage"
+  [stateKey]="AUTOMOBILE_TABLE_CONFIG.stateKey"
+  [lazy]="AUTOMOBILE_TABLE_CONFIG.lazy"
+  [paginator]="AUTOMOBILE_TABLE_CONFIG.paginator"
+  [rows]="AUTOMOBILE_TABLE_CONFIG.rows"
+  [(expandedRowKeys)]="expandedRows">
+</p-table>
+```
+
+**Filter Controls**:
+```typescript
+<div class="filter-panel">
+  <div *ngFor="let filter of AUTOMOBILE_FILTER_DEFINITIONS"
+       class="filter-control">
+    <label>{{filter.label}}</label>
+    <input *ngIf="filter.type === 'text'"
+           [placeholder]="filter.placeholder"
+           [(ngModel)]="filters[filter.id]">
+    <p-slider *ngIf="filter.type === 'range'"
+              [(ngModel)]="filters[filter.id]"
+              [min]="filter.min"
+              [max]="filter.max"
+              [step]="filter.step">
+    </p-slider>
+  </div>
+</div>
+```
+
+**Chart Display**:
+```typescript
+<div class="statistics-panel">
+  <div *ngFor="let chart of AUTOMOBILE_CHART_CONFIGS"
+       [hidden]="!chart.visible"
+       class="chart-container">
+    <p-panel [header]="chart.title" [toggleable]="chart.collapsible">
+      <canvas [id]="chart.id"
+              [height]="chart.height">
+      </canvas>
+    </p-panel>
+  </div>
+</div>
+```
+
+**Quick Filters**:
+```typescript
+<div class="quick-filters">
+  <button *ngFor="let preset of AUTOMOBILE_QUICK_FILTERS | keyvalue"
+          (click)="applyQuickFilter(preset.value.filters)">
+    {{preset.value.label}}
+  </button>
+</div>
+```
+
+### Files Created
+
+1. **`src/domain-config/automobile/configs/automobile.table-config.ts`** (191 lines)
+   - Table configuration with 5 columns
+   - Column visibility presets (3 presets)
+   - Export configurations (CSV, Excel)
+   - Default sort configuration
+
+2. **`src/domain-config/automobile/configs/automobile.filter-definitions.ts`** (214 lines)
+   - 6 filter definitions
+   - 6 quick filter presets
+   - 4 filter groups
+   - 2 validation functions
+
+3. **`src/domain-config/automobile/configs/automobile.chart-configs.ts`** (311 lines)
+   - 5 chart configurations
+   - 5 visibility presets
+   - Color schemes (primary, semantic, gradient)
+   - 4 data transformer functions
+
+4. **`src/domain-config/automobile/configs/automobile.picker-configs.ts`** (136 lines)
+   - Empty picker array (extensible)
+   - 2 placeholder picker configs
+   - Helper functions
+
+5. **`src/domain-config/automobile/configs/index.ts`** (9 lines)
+   - Barrel export for configs
+
+### Build Verification
+
+```bash
+npm run build
+# ✓ Build successful
+# Bundle size: 776.74 kB (within 5 MB budget)
+# Time: 1598ms
+```
+
+### Architecture Benefits
+
+1. **Configuration-Driven UI**
+   - All UI defined in configuration
+   - No hardcoded columns or filters in components
+   - Easy to modify without touching component code
+   - Consistent across application
+
+2. **Separation of Concerns**
+   - UI config separate from business logic
+   - Data models separate from presentation
+   - Easy to test and maintain
+
+3. **Reusable Patterns**
+   - Chart configurations follow consistent pattern
+   - Filter definitions share common structure
+   - Table config matches framework interface
+   - Easy to add new configurations
+
+4. **Extensibility**
+   - Quick filter presets easily added
+   - Chart configurations modular
+   - Column visibility presets for different views
+   - Picker framework ready for implementation
+
+5. **PrimeNG Integration**
+   - Configurations map directly to PrimeNG components
+   - No custom wrappers needed
+   - Leverage PrimeNG's built-in features
+   - State persistence, sorting, filtering all supported
+
+### Testing Policy
+
+**No unit tests per user directive** - focusing on implementation
+
+**Manual Testing Recommended**:
+- Test table with various data sets
+- Test all filter types (text, range, select)
+- Verify quick filter presets
+- Test chart rendering with sample statistics
+- Verify column visibility presets
+- Test export configurations
+- Validate filter validation functions
+
+### Next Steps
+
+**ALL DOMAIN MILESTONES COMPLETE!**
+
+Ready for:
+1. **Assemble Domain Config** - Combine D1-D4 into complete DomainConfig
+2. **Validate Configuration** - Run through DomainConfigValidator
+3. **Register Domain** - Register with framework
+4. **A1-A3: Application Implementation** - Wire up and deploy
+
+### Completion Summary
+
+- **Lines of Code**: ~852 lines (4 config files + barrel export)
+- **Files Created**: 5 files
+- **Files Updated**: 0 files
+- **Build Status**: ✅ Successful (776.74 kB)
+- **Breaking Changes**: None
+- **Dependencies Added**: None
+
+### Domain Milestones Summary
+
+| Milestone | Status | Lines | Description |
+|-----------|--------|-------|-------------|
+| **D1** | ✅ | 882 | Automobile Domain Models (filters, data, statistics) |
+| **D2** | ✅ | 414 | API Adapter & Cache Key Builder |
+| **D3** | ✅ | 362 | URL Mapper (bidirectional URL state) |
+| **D4** | ✅ | 852 | UI Configuration (table, filters, charts, pickers) |
+| **TOTAL** | **✅** | **2,510** | **Complete Automobile Domain** |
+
+---
+
+**Session End**: Milestone D4 Complete
+**Date**: 2025-11-20
+**Status**: ✅ **ALL DOMAIN MILESTONES (D1-D4) COMPLETE!**
+**Next**: Assemble Complete Domain Configuration
+
+---
