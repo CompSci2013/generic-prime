@@ -1,0 +1,366 @@
+import { Injectable, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { Observable, Subject } from 'rxjs';
+import {
+  PopOutMessage,
+  PopOutMessageType,
+  PopOutContext,
+  parsePopOutRoute
+} from '../models/popout.interface';
+
+/**
+ * PopOut Context Service
+ *
+ * Centralized service for pop-out window detection and cross-window communication.
+ * Uses BroadcastChannel API for efficient cross-window messaging.
+ *
+ * **Architecture**:
+ * - One BroadcastChannel per panel: `panel-${panelId}`
+ * - Main window creates channel when opening pop-out
+ * - Pop-out window creates channel in ngOnInit
+ * - Both windows communicate via same channel name
+ *
+ * **Usage in Pop-Out Window**:
+ * ```typescript
+ * ngOnInit(): void {
+ *   this.popOutContext.initializeAsPopOut(panelId);
+ *   this.popOutContext.getMessages$()
+ *     .subscribe(msg => this.handleMessage(msg));
+ * }
+ * ```
+ *
+ * **Usage in Main Window**:
+ * ```typescript
+ * ngOnInit(): void {
+ *   this.popOutContext.initializeAsParent();
+ *   this.popOutContext.getMessages$()
+ *     .subscribe(msg => this.handlePopOutMessage(msg));
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Check if current window is a pop-out
+ * if (this.popOutContext.isInPopOut()) {
+ *   console.log('Running in pop-out window');
+ * }
+ *
+ * // Send message from pop-out to main
+ * this.popOutContext.sendMessage({
+ *   type: PopOutMessageType.PANEL_READY
+ * });
+ *
+ * // Send message from main to pop-out
+ * this.popOutContext.sendMessage({
+ *   type: PopOutMessageType.STATE_UPDATE,
+ *   payload: { state: currentState }
+ * });
+ * ```
+ */
+@Injectable({
+  providedIn: 'root'
+})
+export class PopOutContextService implements OnDestroy {
+  /**
+   * BroadcastChannel for cross-window communication
+   * Null when not initialized
+   */
+  private channel: BroadcastChannel | null = null;
+
+  /**
+   * Subject for received messages
+   * Emits all messages received via BroadcastChannel
+   */
+  private messagesSubject = new Subject<PopOutMessage>();
+
+  /**
+   * Current pop-out context
+   * Cached result of parsePopOutRoute()
+   */
+  private context: PopOutContext | null = null;
+
+  /**
+   * Is service initialized?
+   * Prevents double initialization
+   */
+  private initialized = false;
+
+  constructor(private router: Router) {
+    // Parse context on service creation
+    this.context = parsePopOutRoute(this.router.url);
+  }
+
+  /**
+   * Check if current window is a pop-out
+   *
+   * Detection: Checks if router.url starts with '/panel/'
+   *
+   * @returns True if current window is a pop-out
+   *
+   * @example
+   * ```typescript
+   * if (this.popOutContext.isInPopOut()) {
+   *   // Hide certain UI elements in pop-out
+   *   this.showNavigation = false;
+   * }
+   * ```
+   */
+  isInPopOut(): boolean {
+    if (!this.context) {
+      this.context = parsePopOutRoute(this.router.url);
+    }
+    return this.context?.isPopOut || false;
+  }
+
+  /**
+   * Get current pop-out context
+   *
+   * @returns Pop-out context or null if not a pop-out
+   *
+   * @example
+   * ```typescript
+   * const context = this.popOutContext.getContext();
+   * if (context) {
+   *   console.log(`Panel: ${context.panelId}, Type: ${context.panelType}`);
+   * }
+   * ```
+   */
+  getContext(): PopOutContext | null {
+    if (!this.context) {
+      this.context = parsePopOutRoute(this.router.url);
+    }
+    return this.context;
+  }
+
+  /**
+   * Initialize as pop-out window
+   *
+   * Called in PanelPopoutComponent ngOnInit.
+   * Sets up BroadcastChannel and announces readiness to main window.
+   *
+   * @param panelId - Panel identifier
+   *
+   * @example
+   * ```typescript
+   * // In PanelPopoutComponent
+   * ngOnInit(): void {
+   *   this.route.params.subscribe(params => {
+   *     const panelId = params['panelId'];
+   *     this.popOutContext.initializeAsPopOut(panelId);
+   *   });
+   * }
+   * ```
+   */
+  initializeAsPopOut(panelId: string): void {
+    if (this.initialized) {
+      console.warn('PopOutContextService already initialized');
+      return;
+    }
+
+    this.initialized = true;
+    this.setupChannel(panelId);
+
+    // Announce readiness to main window
+    this.sendMessage({
+      type: PopOutMessageType.PANEL_READY,
+      timestamp: Date.now()
+    });
+
+    console.log(`[PopOut] Initialized as pop-out for panel: ${panelId}`);
+  }
+
+  /**
+   * Initialize as parent (main) window
+   *
+   * Called in DiscoverComponent ngOnInit.
+   * Prepares service to handle messages from multiple pop-outs.
+   *
+   * Note: Actual BroadcastChannel instances are created per pop-out
+   * in the component's popOutPanel() method.
+   *
+   * @example
+   * ```typescript
+   * // In DiscoverComponent
+   * ngOnInit(): void {
+   *   this.popOutContext.initializeAsParent();
+   * }
+   * ```
+   */
+  initializeAsParent(): void {
+    if (this.initialized) {
+      console.warn('PopOutContextService already initialized');
+      return;
+    }
+
+    this.initialized = true;
+    console.log('[PopOut] Initialized as parent window');
+  }
+
+  /**
+   * Set up BroadcastChannel for a specific panel
+   *
+   * @param panelId - Panel identifier
+   * @private
+   */
+  private setupChannel(panelId: string): void {
+    const channelName = `panel-${panelId}`;
+
+    // Close existing channel if any
+    if (this.channel) {
+      this.channel.close();
+    }
+
+    // Create new channel
+    this.channel = new BroadcastChannel(channelName);
+
+    // Set up message handler
+    this.channel.onmessage = (event: MessageEvent) => {
+      const message = event.data as PopOutMessage;
+
+      console.log(`[PopOut] Received message:`, message.type, message.payload);
+
+      this.messagesSubject.next(message);
+    };
+
+    // Set up error handler
+    this.channel.onmessageerror = (event: MessageEvent) => {
+      console.error('[PopOut] Message error:', event);
+    };
+
+    console.log(`[PopOut] Channel created: ${channelName}`);
+  }
+
+  /**
+   * Send message to other window
+   *
+   * Uses BroadcastChannel.postMessage() for efficient cross-window communication.
+   *
+   * @param message - Message to send
+   *
+   * @example
+   * ```typescript
+   * // Send picker selection change
+   * this.popOutContext.sendMessage({
+   *   type: PopOutMessageType.PICKER_SELECTION_CHANGE,
+   *   payload: {
+   *     configId: 'vehicle-picker',
+   *     urlParam: 'selectedVehicles',
+   *     urlValue: '1,2,3'
+   *   },
+   *   timestamp: Date.now()
+   * });
+   * ```
+   */
+  sendMessage<T = any>(message: PopOutMessage<T>): void {
+    if (!this.channel) {
+      console.warn('[PopOut] No channel available, cannot send message');
+      return;
+    }
+
+    // Add timestamp if not present
+    if (!message.timestamp) {
+      message.timestamp = Date.now();
+    }
+
+    console.log(`[PopOut] Sending message:`, message.type, message.payload);
+
+    try {
+      this.channel.postMessage(message);
+    } catch (error) {
+      console.error('[PopOut] Failed to send message:', error);
+    }
+  }
+
+  /**
+   * Get observable of received messages
+   *
+   * @returns Observable that emits received messages
+   *
+   * @example
+   * ```typescript
+   * // Subscribe to all messages
+   * this.popOutContext.getMessages$()
+   *   .pipe(takeUntil(this.destroy$))
+   *   .subscribe(msg => {
+   *     switch (msg.type) {
+   *       case PopOutMessageType.STATE_UPDATE:
+   *         this.handleStateUpdate(msg.payload);
+   *         break;
+   *       case PopOutMessageType.PANEL_READY:
+   *         this.sendInitialState();
+   *         break;
+   *     }
+   *   });
+   *
+   * // Subscribe to specific message type
+   * this.popOutContext.getMessages$()
+   *   .pipe(
+   *     filter(msg => msg.type === PopOutMessageType.PICKER_SELECTION_CHANGE),
+   *     takeUntil(this.destroy$)
+   *   )
+   *   .subscribe(msg => {
+   *     this.handlePickerChange(msg.payload);
+   *   });
+   * ```
+   */
+  getMessages$(): Observable<PopOutMessage> {
+    return this.messagesSubject.asObservable();
+  }
+
+  /**
+   * Create a channel for a specific panel (used by main window)
+   *
+   * Returns the BroadcastChannel instance so main window can manage
+   * multiple channels (one per pop-out).
+   *
+   * @param panelId - Panel identifier
+   * @returns BroadcastChannel instance
+   *
+   * @example
+   * ```typescript
+   * // In DiscoverComponent.popOutPanel()
+   * const channel = this.popOutContext.createChannelForPanel(panelId);
+   * channel.onmessage = (event) => {
+   *   this.handlePopOutMessage(panelId, event.data);
+   * };
+   * ```
+   */
+  createChannelForPanel(panelId: string): BroadcastChannel {
+    const channelName = `panel-${panelId}`;
+    const channel = new BroadcastChannel(channelName);
+
+    console.log(`[PopOut] Created channel for panel: ${channelName}`);
+
+    return channel;
+  }
+
+  /**
+   * Close channel and clean up
+   *
+   * Automatically called on service destroy.
+   * Can also be called manually for cleanup.
+   *
+   * @example
+   * ```typescript
+   * // Manual cleanup
+   * this.popOutContext.close();
+   * ```
+   */
+  close(): void {
+    if (this.channel) {
+      console.log('[PopOut] Closing channel');
+      this.channel.close();
+      this.channel = null;
+    }
+
+    this.initialized = false;
+  }
+
+  /**
+   * Angular lifecycle hook - cleanup on destroy
+   */
+  ngOnDestroy(): void {
+    this.close();
+    this.messagesSubject.complete();
+  }
+}

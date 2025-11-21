@@ -716,6 +716,29 @@ test('should add manufacturer filter', async ({ page }) => {
 - Components: 70% minimum, 85% target
 - Overall: 75% minimum, 85% target
 
+### ⚠️ CRITICAL: Test-Driven Development Policy
+
+**DO NOT MODIFY TESTS TO MAKE THEM PASS!**
+
+When tests fail:
+1. **Fix the implementation code** - not the tests
+2. **If the test is genuinely wrong** - understand WHY before changing it
+3. **Never simplify tests** just to make them pass
+
+**Why This Matters**:
+- Modifying tests to match broken code makes tests worthless
+- Tests are the specification - they define correct behavior
+- If you change tests to pass, you're hiding bugs, not fixing them
+
+**What To Do Instead**:
+- Read the test to understand what behavior is expected
+- Debug the implementation to find why it doesn't meet that expectation
+- Fix the implementation to satisfy the test's requirements
+- Only modify tests if you genuinely find a flaw in the test logic itself
+
+**Historical Note** (2025-11-20):
+During F2-F4 implementation, there was a pattern of modifying tests (e.g., simplifying async timing tests, changing expectations) to make them pass rather than fixing implementation issues. This practice was identified and stopped. Future development must maintain test integrity.
+
 ---
 
 ## Important Implementation Details

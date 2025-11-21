@@ -13,6 +13,9 @@ import { PanelModule } from 'primeng/panel';
 import { ToolbarModule } from 'primeng/toolbar';
 import { RippleModule } from 'primeng/ripple';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { CheckboxModule } from 'primeng/checkbox';
+import { SkeletonModule } from 'primeng/skeleton';
+import { MessageModule } from 'primeng/message';
 
 const PRIMENG_MODULES = [
   TableModule,
@@ -25,7 +28,10 @@ const PRIMENG_MODULES = [
   PanelModule,
   ToolbarModule,
   RippleModule,
-  InputNumberModule
+  InputNumberModule,
+  CheckboxModule,
+  SkeletonModule,
+  MessageModule
 ];
 
 @NgModule({

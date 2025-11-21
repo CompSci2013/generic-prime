@@ -1,0 +1,209 @@
+/**
+ * Automobile Domain - Filter Model
+ *
+ * Defines the filter parameters for automobile vehicle search.
+ * Maps to URL query parameters via the AutomobileUrlMapper.
+ *
+ * Domain: Automobile Discovery
+ */
+
+/**
+ * Automobile search filters
+ *
+ * Comprehensive filter model for searching and filtering vehicle data.
+ * All fields are optional to support partial filtering.
+ *
+ * @example
+ * ```typescript
+ * const filters: AutoSearchFilters = {
+ *   manufacturer: 'Toyota',
+ *   yearMin: 2020,
+ *   yearMax: 2024,
+ *   bodyClass: 'SUV',
+ *   page: 1,
+ *   size: 20,
+ *   sort: 'year',
+ *   sortDirection: 'desc'
+ * };
+ * ```
+ */
+export class AutoSearchFilters {
+  /**
+   * Vehicle manufacturer name
+   * Case-insensitive partial match
+   *
+   * @example 'Toyota', 'Honda', 'Ford'
+   */
+  manufacturer?: string;
+
+  /**
+   * Vehicle model name
+   * Case-insensitive partial match
+   *
+   * @example 'Camry', 'Accord', 'F-150'
+   */
+  model?: string;
+
+  /**
+   * Minimum year (inclusive)
+   *
+   * @example 2020
+   */
+  yearMin?: number;
+
+  /**
+   * Maximum year (inclusive)
+   *
+   * @example 2024
+   */
+  yearMax?: number;
+
+  /**
+   * Vehicle body class/type
+   * Case-insensitive partial match
+   *
+   * @example 'Sedan', 'SUV', 'Truck', 'Coupe'
+   */
+  bodyClass?: string;
+
+  /**
+   * Minimum VIN instance count
+   * Filter vehicles with at least this many VIN instances
+   *
+   * @example 10
+   */
+  instanceCountMin?: number;
+
+  /**
+   * Maximum VIN instance count
+   * Filter vehicles with at most this many VIN instances
+   *
+   * @example 1000
+   */
+  instanceCountMax?: number;
+
+  /**
+   * Page number (1-indexed)
+   * Used for pagination
+   *
+   * @default 1
+   */
+  page?: number;
+
+  /**
+   * Page size (number of results per page)
+   * Used for pagination
+   *
+   * @default 20
+   */
+  size?: number;
+
+  /**
+   * Sort field
+   * Field name to sort by
+   *
+   * @example 'manufacturer', 'model', 'year', 'instance_count'
+   */
+  sort?: string;
+
+  /**
+   * Sort direction
+   * Ascending or descending order
+   *
+   * @default 'asc'
+   */
+  sortDirection?: 'asc' | 'desc';
+
+  /**
+   * Search query (global search)
+   * Searches across multiple fields (manufacturer, model, body class)
+   *
+   * @example 'Toyota Camry'
+   */
+  search?: string;
+
+  /**
+   * Constructor with default values
+   */
+  constructor(partial?: Partial<AutoSearchFilters>) {
+    Object.assign(this, partial);
+  }
+
+  /**
+   * Create filters from partial object
+   *
+   * @param partial - Partial filter object
+   * @returns AutoSearchFilters instance
+   */
+  static fromPartial(partial: Partial<AutoSearchFilters>): AutoSearchFilters {
+    return new AutoSearchFilters(partial);
+  }
+
+  /**
+   * Get default filters
+   *
+   * @returns Default filter values
+   */
+  static getDefaults(): AutoSearchFilters {
+    return new AutoSearchFilters({
+      page: 1,
+      size: 20,
+      sort: 'manufacturer',
+      sortDirection: 'asc'
+    });
+  }
+
+  /**
+   * Check if filters are empty (no active filters except pagination/sort)
+   *
+   * @returns True if no search filters are active
+   */
+  isEmpty(): boolean {
+    return (
+      !this.manufacturer &&
+      !this.model &&
+      !this.yearMin &&
+      !this.yearMax &&
+      !this.bodyClass &&
+      !this.instanceCountMin &&
+      !this.instanceCountMax &&
+      !this.search
+    );
+  }
+
+  /**
+   * Clone filters
+   *
+   * @returns New AutoSearchFilters instance with same values
+   */
+  clone(): AutoSearchFilters {
+    return new AutoSearchFilters({ ...this });
+  }
+
+  /**
+   * Merge with other filters
+   *
+   * @param other - Filters to merge
+   * @returns New AutoSearchFilters with merged values
+   */
+  merge(other: Partial<AutoSearchFilters>): AutoSearchFilters {
+    return new AutoSearchFilters({
+      ...this,
+      ...other
+    });
+  }
+
+  /**
+   * Clear all filters except pagination and sort
+   *
+   * @returns New AutoSearchFilters with only pagination/sort
+   */
+  clearSearch(): AutoSearchFilters {
+    return new AutoSearchFilters({
+      page: this.page,
+      size: this.size,
+      sort: this.sort,
+      sortDirection: this.sortDirection
+    });
+  }
+}
