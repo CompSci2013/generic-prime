@@ -123,6 +123,14 @@ export class AutoSearchFilters {
   search?: string;
 
   /**
+   * Model combinations (from picker)
+   * Comma-separated manufacturer:model pairs
+   *
+   * @example 'Ford:F-150,Toyota:Camry,Honda:Accord'
+   */
+  modelCombos?: string;
+
+  /**
    * Constructor with default values
    */
   constructor(partial?: Partial<AutoSearchFilters>) {

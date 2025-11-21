@@ -165,6 +165,12 @@ export class AutomobileApiAdapter
       params['search'] = filters.search;
     }
 
+    // Model combinations (from picker)
+    // Convert modelCombos (Buick:Century,Ford:F-150) to API's 'models' parameter
+    if (filters.modelCombos) {
+      params['models'] = filters.modelCombos;
+    }
+
     // Pagination
     if (filters.page !== undefined && filters.page !== null) {
       params['page'] = filters.page;

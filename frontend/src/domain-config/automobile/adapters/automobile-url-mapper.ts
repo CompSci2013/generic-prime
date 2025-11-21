@@ -69,6 +69,7 @@ export class AutomobileUrlMapper implements IFilterUrlMapper<AutoSearchFilters> 
     instanceCountMin: 'instanceCountMin',
     instanceCountMax: 'instanceCountMax',
     search: 'search',
+    modelCombos: 'modelCombos', // From picker
     page: 'page',
     size: 'size',
     sort: 'sortBy',
@@ -119,6 +120,10 @@ export class AutomobileUrlMapper implements IFilterUrlMapper<AutoSearchFilters> 
 
     if (filters.search !== undefined && filters.search !== null) {
       params[this.PARAM_NAMES.search] = filters.search;
+    }
+
+    if (filters.modelCombos !== undefined && filters.modelCombos !== null) {
+      params[this.PARAM_NAMES.modelCombos] = filters.modelCombos;
     }
 
     // Pagination
@@ -198,6 +203,10 @@ export class AutomobileUrlMapper implements IFilterUrlMapper<AutoSearchFilters> 
 
     if (params[this.PARAM_NAMES.search]) {
       filters.search = String(params[this.PARAM_NAMES.search]);
+    }
+
+    if (params[this.PARAM_NAMES.modelCombos]) {
+      filters.modelCombos = String(params[this.PARAM_NAMES.modelCombos]);
     }
 
     // Pagination
