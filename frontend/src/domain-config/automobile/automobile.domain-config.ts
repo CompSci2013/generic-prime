@@ -8,6 +8,7 @@
 import { Injector } from '@angular/core';
 import { DomainConfig } from '../../framework/models';
 import { ApiService } from '../../framework/services';
+import { environment } from '../../environments/environment';
 import {
   AutoSearchFilters,
   VehicleResult,
@@ -50,12 +51,13 @@ export function createAutomobileDomainConfig(injector: Injector): DomainConfig<
   VehicleStatistics
 > {
   const apiService = injector.get(ApiService);
+  const apiBaseUrl = environment.apiBaseUrl;
 
   return {
     // ==================== Identity ====================
     domainName: 'automobile',
     domainLabel: 'Automobile Discovery',
-    apiBaseUrl: 'http://auto-discovery.minilab/api/specs/v1',
+    apiBaseUrl: apiBaseUrl,
 
     // ==================== Type Models ====================
     filterModel: AutoSearchFilters,
@@ -63,7 +65,7 @@ export function createAutomobileDomainConfig(injector: Injector): DomainConfig<
     statisticsModel: VehicleStatistics,
 
     // ==================== Adapters ====================
-    apiAdapter: new AutomobileApiAdapter(apiService, 'http://auto-discovery.minilab/api/specs/v1'),
+    apiAdapter: new AutomobileApiAdapter(apiService, apiBaseUrl),
     urlMapper: new AutomobileUrlMapper(),
     cacheKeyBuilder: new AutomobileCacheKeyBuilder(),
 

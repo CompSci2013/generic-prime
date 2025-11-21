@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  apiBaseUrl: 'http://auto-discovery.minilab/api/specs/v1'
 };
