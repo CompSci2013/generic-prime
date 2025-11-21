@@ -61,6 +61,9 @@ export const AUTOMOBILE_FILTER_DEFINITIONS: FilterDefinition[] = [
 
   /**
    * Year range filter
+   *
+   * Uses format.number.useGrouping: false to prevent thousand separators
+   * (displays "1980" instead of "1,980")
    */
   {
     id: 'yearRange',
@@ -68,17 +71,31 @@ export const AUTOMOBILE_FILTER_DEFINITIONS: FilterDefinition[] = [
     type: 'range',
     min: 1900,
     max: new Date().getFullYear() + 1, // Include next year for upcoming models
-    step: 1
+    step: 1,
+    format: {
+      number: {
+        useGrouping: false, // No commas in years
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }
+    }
   },
 
   /**
    * Body class filter
+   *
+   * Uses caseSensitive: false and transform: 'titlecase' to handle
+   * user input like "coupe", "COUPE", or "Coupe" consistently
    */
   {
     id: 'bodyClass',
     label: 'Body Class',
     type: 'select',
     placeholder: 'Select body class...',
+    format: {
+      caseSensitive: false, // Match "Coupe", "coupe", "COUPE" equally
+      transform: 'titlecase' // Normalize to "Coupe" format
+    },
     options: [
       { value: 'Sedan', label: 'Sedan' },
       { value: 'SUV', label: 'SUV' },
@@ -94,6 +111,9 @@ export const AUTOMOBILE_FILTER_DEFINITIONS: FilterDefinition[] = [
 
   /**
    * Instance count range filter
+   *
+   * Uses format.number.useGrouping: true to show thousand separators
+   * (displays "1,000" instead of "1000")
    */
   {
     id: 'instanceCountRange',
@@ -101,7 +121,14 @@ export const AUTOMOBILE_FILTER_DEFINITIONS: FilterDefinition[] = [
     type: 'range',
     min: 0,
     max: 10000,
-    step: 1
+    step: 1,
+    format: {
+      number: {
+        useGrouping: true, // Show commas for VIN counts
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }
+    }
   },
 
   /**

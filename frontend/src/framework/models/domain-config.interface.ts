@@ -227,18 +227,200 @@ export interface DomainMetadata {
 }
 
 /**
+ * Filter format configuration
+ *
+ * Controls how filter values are displayed and processed.
+ * Allows domain-specific customization of filter behavior on a per-filter basis.
+ *
+ * @example
+ * ```typescript
+ * // Year filter without thousand separators
+ * format: {
+ *   number: { useGrouping: false }
+ * }
+ *
+ * // Case-insensitive text matching
+ * format: {
+ *   caseSensitive: false,
+ *   transform: 'lowercase'
+ * }
+ *
+ * // Custom date format
+ * format: {
+ *   date: { pattern: 'MM/DD/YYYY' }
+ * }
+ * ```
+ */
+export interface FilterFormat {
+  /**
+   * Number formatting options
+   * Controls decimal places, thousand separators, etc.
+   */
+  number?: FilterNumberFormat;
+
+  /**
+   * Date formatting options
+   * Controls date display pattern
+   */
+  date?: FilterDateFormat;
+
+  /**
+   * Whether string matching is case-sensitive
+   * @default true
+   */
+  caseSensitive?: boolean;
+
+  /**
+   * Text transformation to apply before sending to API
+   * Applied to filter values before URL/API submission
+   */
+  transform?: 'lowercase' | 'uppercase' | 'titlecase' | 'trim' | 'none';
+
+  /**
+   * Custom formatting function
+   * Takes raw value and returns formatted value for display
+   *
+   * @param value - Raw filter value
+   * @returns Formatted value for display
+   */
+  displayFormatter?: (value: any) => string;
+
+  /**
+   * Custom parsing function
+   * Takes user input and returns parsed value for storage/API
+   *
+   * @param input - User input string
+   * @returns Parsed value
+   */
+  valueParser?: (input: string) => any;
+}
+
+/**
+ * Number formatting options
+ *
+ * Based on Intl.NumberFormat options for consistency with browser standards
+ *
+ * @example
+ * ```typescript
+ * // Year: no commas, no decimals
+ * { useGrouping: false, minimumFractionDigits: 0, maximumFractionDigits: 0 }
+ *
+ * // Currency: 2 decimals, with commas
+ * { useGrouping: true, minimumFractionDigits: 2, maximumFractionDigits: 2 }
+ *
+ * // VIN count: commas, no decimals
+ * { useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 0 }
+ * ```
+ */
+export interface FilterNumberFormat {
+  /**
+   * Use thousand separators (commas)
+   * @default true (browser default)
+   */
+  useGrouping?: boolean;
+
+  /**
+   * Minimum decimal places
+   * @default 0
+   */
+  minimumFractionDigits?: number;
+
+  /**
+   * Maximum decimal places
+   * @default 0 for integers, 2 for decimals
+   */
+  maximumFractionDigits?: number;
+
+  /**
+   * Locale for number formatting
+   * @default 'en-US'
+   */
+  locale?: string;
+
+  /**
+   * Custom format pattern (alternative to Intl options)
+   * Examples: '#,##0', '#,##0.00', '0000' (zero-padded)
+   */
+  pattern?: string;
+}
+
+/**
+ * Date formatting options
+ *
+ * @example
+ * ```typescript
+ * // US format
+ * { pattern: 'MM/DD/YYYY', locale: 'en-US' }
+ *
+ * // ISO format
+ * { pattern: 'YYYY-MM-DD' }
+ *
+ * // European format
+ * { pattern: 'DD.MM.YYYY', locale: 'de-DE' }
+ * ```
+ */
+export interface FilterDateFormat {
+  /**
+   * Date format pattern
+   * Supports common tokens: YYYY, MM, DD, HH, mm, ss
+   * @default 'YYYY-MM-DD'
+   */
+  pattern?: string;
+
+  /**
+   * Locale for date formatting
+   * @default 'en-US'
+   */
+  locale?: string;
+
+  /**
+   * Whether to show time component
+   * @default false
+   */
+  includeTime?: boolean;
+}
+
+/**
  * Filter definition interface
  *
  * Defines a single filter control in the query UI
  *
  * @example
  * ```typescript
+ * // Basic text filter
  * const MANUFACTURER_FILTER: FilterDefinition = {
  *   id: 'manufacturer',
  *   label: 'Manufacturer',
  *   type: 'text',
  *   placeholder: 'Enter manufacturer name...',
  *   operators: ['equals', 'contains', 'startsWith']
+ * };
+ *
+ * // Year range filter without thousand separators
+ * const YEAR_FILTER: FilterDefinition = {
+ *   id: 'yearRange',
+ *   label: 'Year Range',
+ *   type: 'range',
+ *   min: 1900,
+ *   max: 2025,
+ *   format: {
+ *     number: { useGrouping: false }
+ *   }
+ * };
+ *
+ * // Case-insensitive body class filter
+ * const BODY_CLASS_FILTER: FilterDefinition = {
+ *   id: 'bodyClass',
+ *   label: 'Body Class',
+ *   type: 'select',
+ *   format: {
+ *     caseSensitive: false,
+ *     transform: 'titlecase'
+ *   },
+ *   options: [
+ *     { value: 'Sedan', label: 'Sedan' },
+ *     { value: 'SUV', label: 'SUV' }
+ *   ]
  * };
  * ```
  */
@@ -302,6 +484,22 @@ export interface FilterDefinition {
    * Whether filter is disabled
    */
   disabled?: boolean;
+
+  /**
+   * Format configuration
+   * Controls how filter values are displayed and processed.
+   * Allows per-filter customization of display and matching behavior.
+   *
+   * @example
+   * ```typescript
+   * // Year without commas
+   * format: { number: { useGrouping: false } }
+   *
+   * // Case-insensitive matching
+   * format: { caseSensitive: false, transform: 'titlecase' }
+   * ```
+   */
+  format?: FilterFormat;
 
   /**
    * Validation rules

@@ -502,6 +502,192 @@ const BODY_CLASS_FILTER: FilterDefinition = {
 - `boolean` - Checkbox
 - `range` - Numeric range slider
 
+### Filter Formatting
+
+Control how filter values are displayed and processed using the `format` property:
+
+#### Number Formatting
+
+Customize number display (thousand separators, decimals):
+
+```typescript
+// Year filter - NO commas
+{
+  id: 'yearRange',
+  label: 'Year Range',
+  type: 'range',
+  min: 1900,
+  max: 2025,
+  format: {
+    number: {
+      useGrouping: false,           // No commas: "1980" not "1,980"
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }
+  }
+}
+
+// VIN count filter - WITH commas
+{
+  id: 'vinCount',
+  label: 'VIN Count',
+  type: 'range',
+  min: 0,
+  max: 10000,
+  format: {
+    number: {
+      useGrouping: true,            // Show commas: "1,000"
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }
+  }
+}
+
+// Price filter - currency format
+{
+  id: 'price',
+  label: 'Price',
+  type: 'number',
+  format: {
+    number: {
+      useGrouping: true,
+      minimumFractionDigits: 2,     // Always show 2 decimals
+      maximumFractionDigits: 2
+    }
+  }
+}
+```
+
+#### Case-Insensitive Matching
+
+Make text/select filters case-insensitive:
+
+```typescript
+{
+  id: 'bodyClass',
+  label: 'Body Class',
+  type: 'select',
+  format: {
+    caseSensitive: false,     // Match "Coupe", "coupe", "COUPE" equally
+    transform: 'titlecase'    // Normalize to "Coupe" before sending to API
+  },
+  options: [
+    { value: 'Sedan', label: 'Sedan' },
+    { value: 'Coupe', label: 'Coupe' },
+    { value: 'SUV', label: 'SUV' }
+  ]
+}
+```
+
+#### Text Transformation
+
+Transform filter values before sending to API:
+
+```typescript
+{
+  id: 'manufacturer',
+  label: 'Manufacturer',
+  type: 'text',
+  format: {
+    transform: 'uppercase'    // Convert to uppercase before API call
+  }
+}
+```
+
+**Available Transforms**:
+- `lowercase` - Convert to lowercase
+- `uppercase` - Convert to UPPERCASE
+- `titlecase` - Convert to Title Case
+- `trim` - Remove leading/trailing whitespace
+- `none` - No transformation (default)
+
+#### Date Formatting
+
+Customize date display patterns:
+
+```typescript
+{
+  id: 'registrationDate',
+  label: 'Registration Date',
+  type: 'date',
+  format: {
+    date: {
+      pattern: 'MM/DD/YYYY',  // US format
+      locale: 'en-US',
+      includeTime: false
+    }
+  }
+}
+
+// European format
+{
+  id: 'inspectionDate',
+  label: 'Inspection Date',
+  type: 'date',
+  format: {
+    date: {
+      pattern: 'DD.MM.YYYY',
+      locale: 'de-DE'
+    }
+  }
+}
+```
+
+#### Custom Formatters
+
+Use custom functions for advanced formatting:
+
+```typescript
+{
+  id: 'vin',
+  label: 'VIN',
+  type: 'text',
+  format: {
+    // Custom display formatter
+    displayFormatter: (value: string) => {
+      // Format VIN in groups: ABC-123-XYZ-456
+      return value.match(/.{1,3}/g)?.join('-') || value;
+    },
+
+    // Custom value parser (reverse of display)
+    valueParser: (input: string) => {
+      // Remove dashes before sending to API
+      return input.replace(/-/g, '');
+    }
+  }
+}
+```
+
+#### Format Options Reference
+
+```typescript
+interface FilterFormat {
+  // Number formatting
+  number?: {
+    useGrouping?: boolean;           // Thousand separators (default: true)
+    minimumFractionDigits?: number;  // Min decimals (default: 0)
+    maximumFractionDigits?: number;  // Max decimals (default: 0)
+    locale?: string;                 // Locale (default: 'en-US')
+    pattern?: string;                // Custom pattern: '#,##0.00'
+  };
+
+  // Date formatting
+  date?: {
+    pattern?: string;       // Date pattern: 'YYYY-MM-DD'
+    locale?: string;        // Locale (default: 'en-US')
+    includeTime?: boolean;  // Show time (default: false)
+  };
+
+  // Text matching
+  caseSensitive?: boolean;  // Case-sensitive matching (default: true)
+  transform?: 'lowercase' | 'uppercase' | 'titlecase' | 'trim' | 'none';
+
+  // Custom formatters
+  displayFormatter?: (value: any) => string;
+  valueParser?: (input: string) => any;
+}
+```
+
 ---
 
 ## Chart Configurations
