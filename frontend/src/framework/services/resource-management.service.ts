@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+// No Angular imports needed - this is a plain TypeScript class
 import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
 import {
   map,
@@ -49,13 +49,16 @@ import {
  * // Update filters (triggers URL update → data fetch)
  * service.updateFilters({ search: 'test', page: 1 });
  * ```
+ *
+ * NOTE: This is a plain TypeScript class, NOT an Angular service.
+ * Create instances manually in your components by passing urlState and config.
+ * Call destroy() in your component's ngOnDestroy() to clean up subscriptions.
  */
-@Injectable()
-export class ResourceManagementService<TFilters, TData, TStatistics = any>
-  implements OnDestroy
-{
+export class ResourceManagementService<TFilters, TData, TStatistics = any> {
+  private urlState: UrlStateService;
   private stateSubject: BehaviorSubject<ResourceState<TFilters, TData, TStatistics>>;
   private destroy$ = new Subject<void>();
+  private config: ResourceManagementConfig<TFilters, TData, TStatistics>;
 
   /**
    * Observable of complete state
@@ -93,9 +96,11 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
   public statistics$: Observable<TStatistics | undefined>;
 
   constructor(
-    private urlState: UrlStateService,
-    private config: ResourceManagementConfig<TFilters, TData, TStatistics>
+    urlState: UrlStateService,
+    config: ResourceManagementConfig<TFilters, TData, TStatistics>
   ) {
+    this.urlState = urlState;
+    this.config = config;
     // Initialize state
     this.stateSubject = new BehaviorSubject<
       ResourceState<TFilters, TData, TStatistics>
@@ -287,9 +292,10 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
   }
 
   /**
-   * Cleanup on destroy
+   * Clean up subscriptions and resources
+   * Call this in your component's ngOnDestroy()
    */
-  ngOnDestroy(): void {
+  destroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }

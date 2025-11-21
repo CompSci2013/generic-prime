@@ -7,11 +7,11 @@
  * Domain: Automobile Discovery
  */
 
-import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { IApiAdapter, ApiAdapterResponse } from '../../../framework/models/resource-management.interface';
-import { ApiService, ApiResponse } from '../../../framework/services/api.service';
+import { ApiResponse } from '../../../framework/models/api-response.interface';
+import { ApiService } from '../../../framework/services/api.service';
 import { AutoSearchFilters } from '../models/automobile.filters';
 import { VehicleResult } from '../models/automobile.data';
 import { VehicleStatistics } from '../models/automobile.statistics';
@@ -22,9 +22,12 @@ import { VehicleStatistics } from '../models/automobile.statistics';
  * Fetches vehicle data from the automobile discovery API.
  * Transforms API responses into domain models.
  *
+ * NOTE: This is NOT an Angular service. It's instantiated manually
+ * in the domain config factory with the base URL.
+ *
  * @example
  * ```typescript
- * const adapter = new AutomobileApiAdapter(apiService);
+ * const adapter = new AutomobileApiAdapter(apiService, 'http://api.example.com/v1');
  * const filters = new AutoSearchFilters({ manufacturer: 'Toyota' });
  *
  * adapter.fetchData(filters).subscribe(response => {
@@ -34,23 +37,30 @@ import { VehicleStatistics } from '../models/automobile.statistics';
  * });
  * ```
  */
-@Injectable({
-  providedIn: 'root'
-})
 export class AutomobileApiAdapter
   implements IApiAdapter<AutoSearchFilters, VehicleResult, VehicleStatistics>
 {
   /**
    * API endpoint for vehicle search
    */
-  private readonly VEHICLES_ENDPOINT = '/vehicles';
+  private readonly VEHICLES_ENDPOINT = '/vehicles/details';
 
   /**
    * API endpoint for statistics
    */
   private readonly STATISTICS_ENDPOINT = '/statistics';
 
-  constructor(private apiService: ApiService) {}
+  /**
+   * Base URL for API requests
+   */
+  private baseUrl: string;
+
+  private apiService: ApiService;
+
+  constructor(apiService: ApiService, baseUrl: string) {
+    this.apiService = apiService;
+    this.baseUrl = baseUrl;
+  }
 
   /**
    * Fetch vehicle data from API
@@ -66,7 +76,7 @@ export class AutomobileApiAdapter
 
     // Fetch vehicle data
     return this.apiService
-      .get<VehicleResult>(this.VEHICLES_ENDPOINT, params)
+      .get<VehicleResult>(`${this.baseUrl}${this.VEHICLES_ENDPOINT}`, params)
       .pipe(
         map((apiResponse: ApiResponse<VehicleResult>) => {
           // Transform API response to adapter response
@@ -98,7 +108,7 @@ export class AutomobileApiAdapter
     const params = this.filtersToApiParams(filters);
 
     return this.apiService
-      .get<VehicleStatistics>(this.STATISTICS_ENDPOINT, params)
+      .get<VehicleStatistics>(`${this.baseUrl}${this.STATISTICS_ENDPOINT}`, params)
       .pipe(
         map((response: any) => {
           // API might return statistics directly or wrapped
@@ -174,19 +184,5 @@ export class AutomobileApiAdapter
     }
 
     return params;
-  }
-
-  /**
-   * Get API base URL from environment or config
-   *
-   * This would typically come from the domain configuration,
-   * but can be overridden here for testing or development.
-   *
-   * @returns API base URL
-   */
-  getApiBaseUrl(): string {
-    // This will be configured in the domain config
-    // For now, return placeholder
-    return 'http://auto-discovery.minilab/api/v1';
   }
 }

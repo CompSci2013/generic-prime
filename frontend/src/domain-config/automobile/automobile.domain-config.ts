@@ -1,0 +1,99 @@
+/**
+ * Automobile Domain Configuration
+ *
+ * Complete domain configuration combining all models, adapters, and UI configs
+ * from milestones D1-D4.
+ */
+
+import { Injector } from '@angular/core';
+import { DomainConfig } from '../../framework/models';
+import { ApiService } from '../../framework/services';
+import {
+  AutoSearchFilters,
+  VehicleResult,
+  VehicleStatistics
+} from './models';
+import {
+  AutomobileApiAdapter,
+  AutomobileUrlMapper,
+  AutomobileCacheKeyBuilder
+} from './adapters';
+import {
+  AUTOMOBILE_TABLE_CONFIG,
+  AUTOMOBILE_FILTER_DEFINITIONS,
+  AUTOMOBILE_CHART_CONFIGS,
+  AUTOMOBILE_PICKER_CONFIGS
+} from './configs';
+
+/**
+ * Factory function to create Automobile Domain Configuration
+ *
+ * This factory creates the domain configuration with properly injected dependencies.
+ * Must be called with Angular's Injector to resolve service dependencies.
+ *
+ * @param injector - Angular injector for resolving dependencies
+ * @returns Complete automobile domain configuration
+ *
+ * @example
+ * // In app module
+ * providers: [
+ *   {
+ *     provide: DOMAIN_CONFIG,
+ *     useFactory: createAutomobileDomainConfig,
+ *     deps: [Injector]
+ *   }
+ * ]
+ */
+export function createAutomobileDomainConfig(injector: Injector): DomainConfig<
+  AutoSearchFilters,
+  VehicleResult,
+  VehicleStatistics
+> {
+  const apiService = injector.get(ApiService);
+
+  return {
+    // ==================== Identity ====================
+    domainName: 'automobile',
+    domainLabel: 'Automobile Discovery',
+    apiBaseUrl: 'http://auto-discovery.minilab/api/specs/v1',
+
+    // ==================== Type Models ====================
+    filterModel: AutoSearchFilters,
+    dataModel: VehicleResult,
+    statisticsModel: VehicleStatistics,
+
+    // ==================== Adapters ====================
+    apiAdapter: new AutomobileApiAdapter(apiService, 'http://auto-discovery.minilab/api/specs/v1'),
+    urlMapper: new AutomobileUrlMapper(),
+    cacheKeyBuilder: new AutomobileCacheKeyBuilder(),
+
+  // ==================== UI Configuration ====================
+  tableConfig: AUTOMOBILE_TABLE_CONFIG,
+  pickers: AUTOMOBILE_PICKER_CONFIGS,
+  filters: AUTOMOBILE_FILTER_DEFINITIONS,
+  charts: AUTOMOBILE_CHART_CONFIGS,
+
+  // ==================== Feature Flags ====================
+  features: {
+    // Required features
+    highlights: true,
+    popOuts: true,
+    rowExpansion: true,
+
+    // Optional features
+    statistics: true,
+    export: true,
+    columnManagement: true,
+    statePersistence: true
+  },
+
+    // ==================== Metadata ====================
+    metadata: {
+      version: '1.0.0',
+      description: 'Automobile vehicle discovery and analysis',
+      author: 'Generic Discovery Framework Team',
+      createdAt: '2025-11-20',
+      updatedAt: '2025-11-20'
+    }
+  };
+}

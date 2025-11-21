@@ -1,0 +1,233 @@
+.discover-container {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  .discover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--text-color);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
+
+  // Filter Panel
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1rem 0;
+
+    .filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--text-color);
+      }
+
+      &.filter-field-wide {
+        grid-column: span 2;
+      }
+    }
+  }
+
+  // Table Container
+  .table-container {
+    margin-top: 1.5rem;
+
+    .table-caption {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+
+      .caption-text {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+
+        i {
+          color: var(--primary-color);
+        }
+      }
+
+      .caption-count {
+        font-size: 0.9rem;
+        color: var(--text-color-secondary);
+      }
+    }
+
+    // Empty message styling
+    .empty-message {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-color-secondary);
+
+      i {
+        color: var(--text-color-secondary);
+        opacity: 0.5;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        margin: 0.5rem 0;
+      }
+
+      .empty-hint {
+        font-size: 0.875rem;
+        color: var(--text-color-secondary);
+      }
+    }
+
+    // Row expansion
+    .row-expansion {
+      padding: 1.5rem;
+      background-color: var(--surface-50);
+      border-left: 3px solid var(--primary-color);
+
+      h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+      }
+
+      .expansion-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+
+        .expansion-field {
+          strong {
+            color: var(--text-color);
+            margin-right: 0.5rem;
+          }
+
+          color: var(--text-color-secondary);
+        }
+      }
+    }
+  }
+
+  // Statistics Panel
+  .statistics-panel {
+    margin-top: 1.5rem;
+
+    .statistics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      padding: 1rem 0;
+
+      .stat-card {
+        text-align: center;
+        padding: 1.5rem;
+        background: var(--surface-50);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--surface-200);
+        transition: all 0.2s;
+
+        &:hover {
+          border-color: var(--primary-color);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+          font-size: 2rem;
+          font-weight: 700;
+          color: var(--primary-color);
+          margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+          font-size: 0.875rem;
+          color: var(--text-color-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .discover-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .filter-grid {
+      grid-template-columns: 1fr;
+
+      .filter-field-wide {
+        grid-column: span 1;
+      }
+    }
+
+    .statistics-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+}
+
+// PrimeNG overrides for better integration
+::ng-deep {
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 600;
+    }
+
+    .p-datatable-tbody > tr {
+      &:hover {
+        background-color: var(--primary-50);
+      }
+
+      &.p-highlight {
+        background-color: var(--primary-100);
+      }
+    }
+
+    .p-paginator {
+      border-top: 1px solid var(--surface-200);
+    }
+  }
+
+  .p-panel {
+    margin-bottom: 1.5rem;
+
+    .p-panel-header {
+      background-color: var(--surface-100);
+      border-color: var(--surface-200);
+      font-weight: 600;
+    }
+
+    .p-panel-content {
+      border-color: var(--surface-200);
+    }
+  }
+}

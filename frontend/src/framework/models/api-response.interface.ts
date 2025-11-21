@@ -45,6 +45,11 @@ export interface ApiResponse<TData> {
    * Total number of pages
    */
   totalPages: number;
+
+  /**
+   * Optional statistics data (domain-specific)
+   */
+  statistics?: any;
 }
 
 /**
