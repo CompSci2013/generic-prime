@@ -79,10 +79,32 @@ export function createManufacturerModelPickerConfig(
         });
       },
 
-      responseTransformer: (response) => ({
-        results: response.results || response.data || [],
-        total: response.total || 0
-      })
+      responseTransformer: (response) => {
+        // API returns nested structure: { data: [{ manufacturer, count, models: [...] }] }
+        // Need to flatten to: { results: [{ manufacturer, model, count }] }
+        const flatResults: ManufacturerModelRow[] = [];
+
+        if (response.data && Array.isArray(response.data)) {
+          response.data.forEach((manufacturerGroup: any) => {
+            const manufacturer = manufacturerGroup.manufacturer;
+
+            if (manufacturerGroup.models && Array.isArray(manufacturerGroup.models)) {
+              manufacturerGroup.models.forEach((modelItem: any) => {
+                flatResults.push({
+                  manufacturer: manufacturer,
+                  model: modelItem.model,
+                  count: modelItem.count
+                });
+              });
+            }
+          });
+        }
+
+        return {
+          results: flatResults,
+          total: flatResults.length // Total flattened count
+        };
+      }
     },
 
     // Row key configuration
