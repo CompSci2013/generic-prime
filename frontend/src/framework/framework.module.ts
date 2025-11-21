@@ -5,6 +5,7 @@ import { PrimengModule } from '../app/primeng.module';
 
 // Components
 import { BasePickerComponent } from './components/base-picker/base-picker.component';
+import { ResultsTableComponent } from './components/results-table/results-table.component';
 
 /**
  * Framework Module
@@ -25,7 +26,8 @@ import { BasePickerComponent } from './components/base-picker/base-picker.compon
  */
 @NgModule({
   declarations: [
-    BasePickerComponent
+    BasePickerComponent,
+    ResultsTableComponent
   ],
   imports: [
     CommonModule,
@@ -34,6 +36,7 @@ import { BasePickerComponent } from './components/base-picker/base-picker.compon
   ],
   exports: [
     BasePickerComponent,
+    ResultsTableComponent,
     // Re-export common modules for convenience
     CommonModule,
     FormsModule,

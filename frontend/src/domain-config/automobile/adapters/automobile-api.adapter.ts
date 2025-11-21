@@ -76,7 +76,7 @@ export class AutomobileApiAdapter
 
     // Fetch vehicle data
     return this.apiService
-      .get<VehicleResult>(`${this.baseUrl}${this.VEHICLES_ENDPOINT}`, params)
+      .get<VehicleResult>(`${this.baseUrl}${this.VEHICLES_ENDPOINT}`, { params })
       .pipe(
         map((apiResponse: ApiResponse<VehicleResult>) => {
           // Transform API response to adapter response
@@ -142,23 +142,23 @@ export class AutomobileApiAdapter
     }
 
     if (filters.yearMin !== undefined && filters.yearMin !== null) {
-      params['year_min'] = filters.yearMin;
+      params['yearMin'] = filters.yearMin;
     }
 
     if (filters.yearMax !== undefined && filters.yearMax !== null) {
-      params['year_max'] = filters.yearMax;
+      params['yearMax'] = filters.yearMax;
     }
 
     if (filters.bodyClass) {
-      params['body_class'] = filters.bodyClass;
+      params['bodyClass'] = filters.bodyClass;
     }
 
     if (filters.instanceCountMin !== undefined && filters.instanceCountMin !== null) {
-      params['instance_count_min'] = filters.instanceCountMin;
+      params['instanceCountMin'] = filters.instanceCountMin;
     }
 
     if (filters.instanceCountMax !== undefined && filters.instanceCountMax !== null) {
-      params['instance_count_max'] = filters.instanceCountMax;
+      params['instanceCountMax'] = filters.instanceCountMax;
     }
 
     if (filters.search) {
@@ -176,11 +176,11 @@ export class AutomobileApiAdapter
 
     // Sorting
     if (filters.sort) {
-      params['sort'] = filters.sort;
+      params['sortBy'] = filters.sort;
     }
 
     if (filters.sortDirection) {
-      params['sort_direction'] = filters.sortDirection;
+      params['sortOrder'] = filters.sortDirection;
     }
 
     return params;

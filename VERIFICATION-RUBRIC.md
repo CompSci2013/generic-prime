@@ -286,6 +286,13 @@ For each feature component, verify:
 - [ ] **Change Detection**:
   - [ ] Uses `ChangeDetectionStrategy.OnPush` (performance optimization)
   - [ ] Calls `cdr.markForCheck()` when needed
+- [ ] **🔴 CRITICAL: Domain-Agnostic Template**:
+  - [ ] Template uses `*ngFor` to dynamically render filters from `domainConfig.filters`
+  - [ ] NO hardcoded filter field names (manufacturer, model, yearMin, etc.)
+  - [ ] NO hardcoded filter types (specific to one domain)
+  - [ ] Reads FilterDefinition properties: `id`, `label`, `type`, `placeholder`, `format`
+  - [ ] Applies `format` configuration to PrimeNG components (useGrouping, etc.)
+  - [ ] Works with ANY domain configuration, not just automobile
 
 **Red Flags** (FAIL if found):
 - ❌ Component imports `HttpClient`
@@ -293,6 +300,9 @@ For each feature component, verify:
 - ❌ Component maintains complex state without using ResourceManagementService
 - ❌ Component calls `router.navigate()` with `queryParams` directly
 - ❌ Component has `apiService.getVehicles()` calls
+- ❌ **CRITICAL**: Template has hardcoded field names like `currentFilters.manufacturer`
+- ❌ **CRITICAL**: Template has hardcoded filters not from `domainConfig.filters`
+- ❌ **CRITICAL**: Template only works with automobile domain
 
 **Success Criteria**:
 - [ ] All components follow the required pattern
@@ -500,6 +510,9 @@ Use these severity levels to prioritize issues:
 - Framework services containing domain-specific logic
 - Missing environment configuration
 - Data flow bypassing URL-First architecture
+- **Component templates with hardcoded domain-specific field names**
+- **Component templates not dynamically rendering filters from config**
+- **Components that only work with one specific domain**
 
 ### 🟡 HIGH (Fix before next release)
 - Hardcoded configuration values (non-URL)

@@ -8,6 +8,7 @@ import { MessageService } from 'primeng/api';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PrimengModule } from './primeng.module';
+import { FrameworkModule } from '../framework/framework.module';
 import { GlobalErrorHandler } from '../framework/services/global-error.handler';
 import { DOMAIN_CONFIG } from '../framework/services/domain-config-registry.service';
 import { createAutomobileDomainConfig } from '../domain-config/automobile';
@@ -24,7 +25,8 @@ import { DiscoverComponent } from './features/discover/discover.component';
     HttpClientModule,
     FormsModule,
     AppRoutingModule,
-    PrimengModule
+    PrimengModule,
+    FrameworkModule
   ],
   providers: [
     MessageService,

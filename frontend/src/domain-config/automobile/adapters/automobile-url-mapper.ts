@@ -16,21 +16,22 @@ import { AutoSearchFilters } from '../models/automobile.filters';
  * Automobile filter URL mapper
  *
  * Bidirectional conversion between filter objects and URL query parameters.
- * Uses short parameter names to keep URLs clean and readable.
+ * URL parameter names MUST match backend API parameter names (camelCase).
+ * See: frontend/src/domain-config/automobile/API-DOCUMENTATION.md
  *
- * URL Parameter Mapping:
- * - mfr = manufacturer
- * - mdl = model
- * - y_min = yearMin
- * - y_max = yearMax
- * - bc = bodyClass
- * - ic_min = instanceCountMin
- * - ic_max = instanceCountMax
- * - q = search
- * - p = page
- * - sz = size
- * - s = sort
- * - sd = sortDirection
+ * URL Parameter Mapping (matches backend API):
+ * - manufacturer = manufacturer
+ * - model = model
+ * - yearMin = yearMin
+ * - yearMax = yearMax
+ * - bodyClass = bodyClass
+ * - instanceCountMin = instanceCountMin
+ * - instanceCountMax = instanceCountMax
+ * - search = search
+ * - page = page
+ * - size = size
+ * - sortBy = sort (filter property)
+ * - sortOrder = sortDirection (filter property)
  *
  * @example
  * ```typescript
@@ -43,10 +44,10 @@ import { AutoSearchFilters } from '../models/automobile.filters';
  *   page: 1
  * });
  * const params = mapper.toUrlParams(filters);
- * // { mfr: 'Toyota', y_min: '2020', p: '1' }
+ * // { manufacturer: 'Toyota', yearMin: '2020', page: '1' }
  *
  * // From URL
- * const urlParams = { mfr: 'Toyota', y_min: '2020', p: '1' };
+ * const urlParams = { manufacturer: 'Toyota', yearMin: '2020', page: '1' };
  * const filters = mapper.fromUrlParams(urlParams);
  * // AutoSearchFilters { manufacturer: 'Toyota', yearMin: 2020, page: 1 }
  * ```
@@ -56,21 +57,22 @@ import { AutoSearchFilters } from '../models/automobile.filters';
 })
 export class AutomobileUrlMapper implements IFilterUrlMapper<AutoSearchFilters> {
   /**
-   * URL parameter names (short for clean URLs)
+   * URL parameter names (must match backend API parameter names)
+   * See: frontend/src/domain-config/automobile/API-DOCUMENTATION.md
    */
   private readonly PARAM_NAMES = {
-    manufacturer: 'mfr',
-    model: 'mdl',
-    yearMin: 'y_min',
-    yearMax: 'y_max',
-    bodyClass: 'bc',
-    instanceCountMin: 'ic_min',
-    instanceCountMax: 'ic_max',
-    search: 'q',
-    page: 'p',
-    size: 'sz',
-    sort: 's',
-    sortDirection: 'sd'
+    manufacturer: 'manufacturer',
+    model: 'model',
+    yearMin: 'yearMin',
+    yearMax: 'yearMax',
+    bodyClass: 'bodyClass',
+    instanceCountMin: 'instanceCountMin',
+    instanceCountMax: 'instanceCountMax',
+    search: 'search',
+    page: 'page',
+    size: 'size',
+    sort: 'sortBy',
+    sortDirection: 'sortOrder'
   };
 
   /**
