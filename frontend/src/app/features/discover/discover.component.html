@@ -4,6 +4,16 @@
     <h1>{{ domainConfig.domainLabel }}</h1>
   </div>
 
+  <hr/>
+
+  <!-- Manufacturer-Model Picker (Configuration-Driven) -->
+  <app-base-picker
+    [configId]="'manufacturer-model-picker'"
+    (selectionChange)="onPickerSelectionChange($event)">
+  </app-base-picker>
+
+  <hr/>
+
   <!-- Results Table Component (Configuration-Driven) -->
   <app-results-table [domainConfig]="domainConfig"></app-results-table>
 </div>

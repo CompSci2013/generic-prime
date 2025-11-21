@@ -2,186 +2,152 @@
  * Automobile Domain - Picker Configurations
  *
  * Defines picker components for selecting related data.
- * Pickers are modal dialogs with searchable tables for multi-select.
+ * Pickers are searchable tables with multi-select capabilities.
  *
  * Domain: Automobile Discovery
  */
 
 import { PickerConfig } from '../../../framework/models/picker-config.interface';
+import { Injector } from '@angular/core';
+import { ApiService } from '../../../framework/services';
+import { environment } from '../../../environments/environment';
 
 /**
- * Automobile picker configurations
+ * Manufacturer/Model row data type
  *
- * Array of picker definitions for selecting related entities.
- * Currently empty - add pickers as needed for the application.
- *
- * Example picker types:
- * - Manufacturer picker (select from list of manufacturers)
- * - Body class picker (select from list of body classes)
- * - Year picker (select from available years)
- *
- * @example
- * ```typescript
- * // Example manufacturer picker configuration
- * {
- *   id: 'manufacturer-picker',
- *   displayName: 'Select Manufacturer',
- *   columns: [
- *     {
- *       field: 'name',
- *       header: 'Manufacturer',
- *       sortable: true,
- *       filterable: true,
- *       width: '200px'
- *     },
- *     {
- *       field: 'vehicle_count',
- *       header: 'Vehicle Count',
- *       sortable: true,
- *       width: '150px'
- *     }
- *   ],
- *   api: {
- *     endpoint: '/manufacturers',
- *     method: 'GET',
- *     dataKey: 'results'
- *   },
- *   row: {
- *     dataKey: 'name',
- *     displayTemplate: '{{name}} ({{vehicle_count}} vehicles)'
- *   },
- *   selection: {
- *     mode: 'multiple',
- *     showSelectedCount: true,
- *     maxSelections: 10
- *   },
- *   pagination: {
- *     enabled: true,
- *     rows: 10,
- *     rowsPerPageOptions: [10, 20, 50]
- *   }
- * }
- * ```
+ * Represents a manufacturer-model combination with count
  */
-export const AUTOMOBILE_PICKER_CONFIGS: PickerConfig<any>[] = [
-  // TODO: Add picker configurations as needed
-  // Examples:
-  // - manufacturerPicker
-  // - bodyClassPicker
-  // - yearPicker
-];
+export interface ManufacturerModelRow {
+  manufacturer: string;
+  model: string;
+  count: number;
+}
 
 /**
- * Manufacturer picker configuration (placeholder)
+ * Create Manufacturer-Model Picker Configuration
  *
- * Uncomment and implement when manufacturer picker is needed
+ * Factory function that creates picker config with injected dependencies.
+ * Allows selection of manufacturer-model combinations for filtering.
+ *
+ * @param apiService - Injected API service
+ * @returns Configured picker
  */
-/*
-export const MANUFACTURER_PICKER_CONFIG: PickerConfig<any> = {
-  id: 'manufacturer-picker',
-  displayName: 'Select Manufacturer',
-  columns: [
-    {
-      field: 'name',
-      header: 'Manufacturer',
-      sortable: true,
-      filterable: true,
-      width: '200px'
+export function createManufacturerModelPickerConfig(
+  apiService: ApiService
+): PickerConfig<ManufacturerModelRow> {
+  return {
+    id: 'manufacturer-model-picker',
+    displayName: 'Select Manufacturer & Model',
+
+    // Column definitions (PrimeNGColumn format)
+    columns: [
+      {
+        field: 'manufacturer',
+        header: 'Manufacturer',
+        sortable: true,
+        filterable: true,
+        width: '40%'
+      },
+      {
+        field: 'model',
+        header: 'Model',
+        sortable: true,
+        filterable: true,
+        width: '40%'
+      },
+      {
+        field: 'count',
+        header: 'Count',
+        sortable: true,
+        filterable: false,
+        width: '20%'
+      }
+    ],
+
+    // API configuration
+    api: {
+      fetchData: (params) => {
+        const endpoint = `${environment.apiBaseUrl}/manufacturer-model-combinations`;
+        return apiService.get<ManufacturerModelRow>(endpoint, {
+          params: {
+            page: params.page + 1, // API uses 1-indexed pages
+            size: params.size,
+            search: params.search,
+            sortBy: params.sortField,
+            sortOrder: params.sortOrder === 1 ? 'asc' : 'desc'
+          }
+        });
+      },
+
+      responseTransformer: (response) => ({
+        results: response.results || response.data || [],
+        total: response.total || 0
+      })
     },
-    {
-      field: 'vehicle_count',
-      header: 'Vehicles',
-      sortable: true,
-      width: '100px'
+
+    // Row key configuration
+    row: {
+      keyGenerator: (row) => `${row.manufacturer}:${row.model}`,
+      keyParser: (key) => {
+        const [manufacturer, model] = key.split(':');
+        return { manufacturer, model } as Partial<ManufacturerModelRow>;
+      }
     },
-    {
-      field: 'instance_count',
-      header: 'VINs',
-      sortable: true,
-      width: '100px'
-    }
-  ],
-  api: {
-    endpoint: '/manufacturers',
-    method: 'GET',
-    dataKey: 'results'
-  },
-  row: {
-    dataKey: 'name',
-    displayTemplate: '{{name}}'
-  },
-  selection: {
-    mode: 'multiple',
-    showSelectedCount: true,
-    maxSelections: 10
-  },
-  pagination: {
-    enabled: true,
-    rows: 10,
-    rowsPerPageOptions: [10, 20, 50]
-  }
-};
-*/
+
+    // Selection configuration
+    selection: {
+      mode: 'multiple',
+      urlParam: 'modelCombos',
+
+      // Serialize selected items to URL
+      serializer: (items) => {
+        if (!items || items.length === 0) return '';
+        return items.map(item => `${item.manufacturer}:${item.model}`).join(',');
+      },
+
+      // Deserialize URL to partial items (for hydration)
+      deserializer: (urlValue) => {
+        if (!urlValue) return [];
+        return urlValue.split(',').map(combo => {
+          const [manufacturer, model] = combo.split(':');
+          return { manufacturer, model } as Partial<ManufacturerModelRow>;
+        });
+      },
+
+      // Optional: Custom key generator (defaults to row.keyGenerator)
+      keyGenerator: (item) => `${item.manufacturer}:${item.model}`
+    },
+
+    // Pagination configuration
+    pagination: {
+      mode: 'server',
+      defaultPageSize: 20,
+      pageSizeOptions: [10, 20, 50, 100]
+    },
+
+    // Search configuration
+    showSearch: true,
+    searchPlaceholder: 'Search manufacturer or model...'
+  };
+}
 
 /**
- * Body class picker configuration (placeholder)
+ * Register all automobile picker configurations
  *
- * Uncomment and implement when body class picker is needed
+ * @param injector - Angular injector for dependency resolution
+ * @returns Array of picker configurations
  */
-/*
-export const BODY_CLASS_PICKER_CONFIG: PickerConfig<any> = {
-  id: 'body-class-picker',
-  displayName: 'Select Body Class',
-  columns: [
-    {
-      field: 'name',
-      header: 'Body Class',
-      sortable: true,
-      filterable: true,
-      width: '150px'
-    },
-    {
-      field: 'vehicle_count',
-      header: 'Vehicles',
-      sortable: true,
-      width: '100px'
-    }
-  ],
-  api: {
-    endpoint: '/body-classes',
-    method: 'GET',
-    dataKey: 'results'
-  },
-  row: {
-    dataKey: 'name',
-    displayTemplate: '{{name}}'
-  },
-  selection: {
-    mode: 'multiple',
-    showSelectedCount: true,
-    maxSelections: 5
-  },
-  pagination: {
-    enabled: false
-  }
-};
-*/
+export function createAutomobilePickerConfigs(injector: Injector): PickerConfig<any>[] {
+  const apiService = injector.get(ApiService);
+
+  return [
+    createManufacturerModelPickerConfig(apiService)
+    // Add more pickers here as needed
+  ];
+}
 
 /**
- * Picker helper functions
+ * Static export for backwards compatibility
+ * Populated dynamically by domain config factory
  */
-export const AUTOMOBILE_PICKER_HELPERS = {
-  /**
-   * Get picker by ID
-   */
-  getPickerById: (id: string): PickerConfig<any> | undefined => {
-    return AUTOMOBILE_PICKER_CONFIGS.find((picker) => picker.id === id);
-  },
-
-  /**
-   * Get all picker IDs
-   */
-  getAllPickerIds: (): string[] => {
-    return AUTOMOBILE_PICKER_CONFIGS.map((picker) => picker.id);
-  }
-};
+export const AUTOMOBILE_PICKER_CONFIGS: PickerConfig<any>[] = [];
