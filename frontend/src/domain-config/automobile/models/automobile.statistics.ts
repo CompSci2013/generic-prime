@@ -141,10 +141,20 @@ export class VehicleStatistics {
   /**
    * Create VehicleStatistics from API response
    *
+   * Handles two formats:
+   * 1. Segmented statistics from /vehicles/details (byManufacturer, modelsByManufacturer, etc.)
+   * 2. Array-based statistics (top_manufacturers, top_models, etc.)
+   *
    * @param data - Raw API response data
    * @returns VehicleStatistics instance
    */
   static fromApiResponse(data: any): VehicleStatistics {
+    // Check if this is the segmented statistics format from /vehicles/details
+    if (data.byManufacturer || data.modelsByManufacturer || data.byBodyClass || data.byYearRange) {
+      return VehicleStatistics.fromSegmentedStats(data);
+    }
+
+    // Otherwise use the array-based format
     return new VehicleStatistics({
       totalVehicles: Number(data.total_vehicles || data.totalVehicles || 0),
       totalInstances: Number(data.total_instances || data.totalInstances || 0),
@@ -188,6 +198,169 @@ export class VehicleStatistics {
         ManufacturerStat.fromApiResponse(m)
       )
     });
+  }
+
+  /**
+   * Create VehicleStatistics from segmented API statistics
+   *
+   * Transforms the /vehicles/details statistics format:
+   * { byManufacturer: { Ford: { total, highlighted } }, ... }
+   *
+   * @param data - Segmented statistics data
+   * @returns VehicleStatistics instance
+   */
+  private static fromSegmentedStats(data: any): VehicleStatistics {
+    // Transform API's segmented statistics structure to arrays
+    const topManufacturers = VehicleStatistics.transformByManufacturer(data.byManufacturer);
+    const topModels = VehicleStatistics.transformModelsByManufacturer(data.modelsByManufacturer);
+    const bodyClassDistribution = VehicleStatistics.transformByBodyClass(data.byBodyClass);
+    const yearDistribution = VehicleStatistics.transformByYearRange(data.byYearRange);
+
+    // Calculate totals
+    const totalVehicles = data.totalCount || 0;
+    const manufacturerCount = topManufacturers?.length || 0;
+    const modelCount = topModels?.length || 0;
+    const bodyClassCount = bodyClassDistribution?.length || 0;
+
+    // Calculate year range from yearDistribution
+    const years = yearDistribution?.map(y => y.year) || [];
+    const yearRange = years.length > 0
+      ? { min: Math.min(...years), max: Math.max(...years) }
+      : { min: 0, max: 0 };
+
+    return new VehicleStatistics({
+      totalVehicles,
+      totalInstances: totalVehicles,
+      manufacturerCount,
+      modelCount,
+      bodyClassCount,
+      yearRange,
+      averageInstancesPerVehicle: 0,
+      topManufacturers,
+      topModels,
+      bodyClassDistribution,
+      yearDistribution,
+      manufacturerDistribution: topManufacturers
+    });
+  }
+
+  /**
+   * Transform API's byManufacturer object to ManufacturerStat array
+   */
+  private static transformByManufacturer(byManufacturer: Record<string, { total: number; highlighted: number }> | undefined): ManufacturerStat[] | undefined {
+    if (!byManufacturer) return undefined;
+
+    const stats = Object.entries(byManufacturer).map(([name, counts]) => {
+      const total = counts.total || 0;
+      return new ManufacturerStat({
+        name,
+        count: total,
+        instanceCount: total,
+        percentage: 0,
+        modelCount: 0
+      });
+    });
+
+    // Sort by count descending
+    stats.sort((a, b) => b.count - a.count);
+
+    // Calculate percentages
+    const totalCount = stats.reduce((sum, s) => sum + s.count, 0);
+    stats.forEach(s => {
+      s.percentage = totalCount > 0 ? (s.count / totalCount) * 100 : 0;
+    });
+
+    return stats.slice(0, 10);
+  }
+
+  /**
+   * Transform API's modelsByManufacturer object to ModelStat array
+   */
+  private static transformModelsByManufacturer(modelsByManufacturer: Record<string, Record<string, { total: number; highlighted: number }>> | undefined): ModelStat[] | undefined {
+    if (!modelsByManufacturer) return undefined;
+
+    const stats: ModelStat[] = [];
+    let totalCount = 0;
+
+    Object.entries(modelsByManufacturer).forEach(([manufacturer, models]) => {
+      Object.entries(models).forEach(([modelName, counts]) => {
+        const instanceCount = counts.total || 0;
+        totalCount += instanceCount;
+        stats.push(new ModelStat({
+          name: modelName,
+          manufacturer,
+          count: 1,
+          instanceCount,
+          percentage: 0
+        }));
+      });
+    });
+
+    // Sort by instance count descending
+    stats.sort((a, b) => b.instanceCount - a.instanceCount);
+
+    // Calculate percentages
+    stats.forEach(s => {
+      s.percentage = totalCount > 0 ? (s.instanceCount / totalCount) * 100 : 0;
+    });
+
+    return stats.slice(0, 10);
+  }
+
+  /**
+   * Transform API's byBodyClass object to BodyClassStat array
+   */
+  private static transformByBodyClass(byBodyClass: Record<string, { total: number; highlighted: number }> | undefined): BodyClassStat[] | undefined {
+    if (!byBodyClass) return undefined;
+
+    const stats = Object.entries(byBodyClass).map(([name, counts]) => {
+      const total = counts.total || 0;
+      return new BodyClassStat({
+        name,
+        count: total,
+        instanceCount: total,
+        percentage: 0
+      });
+    });
+
+    // Calculate percentages
+    const totalCount = stats.reduce((sum, s) => sum + s.count, 0);
+    stats.forEach(s => {
+      s.percentage = totalCount > 0 ? (s.count / totalCount) * 100 : 0;
+    });
+
+    // Sort by count descending
+    stats.sort((a, b) => b.count - a.count);
+
+    return stats;
+  }
+
+  /**
+   * Transform API's byYearRange object to YearStat array
+   */
+  private static transformByYearRange(byYearRange: Record<string, { total: number; highlighted: number }> | undefined): YearStat[] | undefined {
+    if (!byYearRange) return undefined;
+
+    const stats = Object.entries(byYearRange).map(([yearStr, counts]) => {
+      const total = counts.total || 0;
+      return new YearStat({
+        year: parseInt(yearStr, 10),
+        count: total,
+        instanceCount: total,
+        percentage: 0
+      });
+    });
+
+    // Calculate percentages
+    const totalCount = stats.reduce((sum, s) => sum + s.count, 0);
+    stats.forEach(s => {
+      s.percentage = totalCount > 0 ? (s.count / totalCount) * 100 : 0;
+    });
+
+    // Sort by year ascending
+    stats.sort((a, b) => a.year - b.year);
+
+    return stats;
   }
 
   /**

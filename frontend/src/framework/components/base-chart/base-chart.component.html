@@ -1,0 +1,18 @@
+<!-- Base Chart Component Template -->
+<div class="chart-wrapper">
+  <!-- Chart title -->
+  <div class="chart-header" *ngIf="chartTitle">
+    <h3 class="chart-title">{{ chartTitle }}</h3>
+    <span class="highlight-indicator" *ngIf="isHighlightModeActive">
+      Highlight Mode Active
+    </span>
+  </div>
+
+  <!-- Plotly chart container -->
+  <div #chartContainer class="chart-container"></div>
+
+  <!-- No data message -->
+  <div class="no-data-message" *ngIf="!statistics">
+    <p>No data available</p>
+  </div>
+</div>

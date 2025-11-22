@@ -7,6 +7,8 @@ import { PrimengModule } from '../app/primeng.module';
 import { BasePickerComponent } from './components/base-picker/base-picker.component';
 import { ResultsTableComponent } from './components/results-table/results-table.component';
 import { QueryControlComponent } from './components/query-control/query-control.component';
+import { BaseChartComponent } from './components/base-chart/base-chart.component';
+import { StatisticsPanelComponent } from './components/statistics-panel/statistics-panel.component';
 
 /**
  * Framework Module
@@ -29,7 +31,9 @@ import { QueryControlComponent } from './components/query-control/query-control.
   declarations: [
     BasePickerComponent,
     ResultsTableComponent,
-    QueryControlComponent
+    QueryControlComponent,
+    BaseChartComponent,
+    StatisticsPanelComponent
   ],
   imports: [
     CommonModule,
@@ -40,6 +44,8 @@ import { QueryControlComponent } from './components/query-control/query-control.
     BasePickerComponent,
     ResultsTableComponent,
     QueryControlComponent,
+    BaseChartComponent,
+    StatisticsPanelComponent,
     // Re-export common modules for convenience
     CommonModule,
     FormsModule,

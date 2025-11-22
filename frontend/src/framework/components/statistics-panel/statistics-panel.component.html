@@ -1,0 +1,39 @@
+<!-- Statistics Panel Component Template -->
+<p-panel
+  [toggleable]="true"
+  [(collapsed)]="panelCollapsed"
+  [style]="{'margin-bottom': '1rem'}">
+
+  <ng-template pTemplate="header">
+    <div class="panel-header">
+      <i class="pi pi-chart-bar"></i>
+      <span class="panel-title">Statistics & Distributions</span>
+      <span class="chart-count">({{ visibleCharts.length }} charts)</span>
+    </div>
+  </ng-template>
+
+  <div class="statistics-content" *ngIf="!panelCollapsed">
+    <!-- No data message -->
+    <div class="no-data-message" *ngIf="!statistics">
+      <i class="pi pi-info-circle"></i>
+      <p>No statistics available. Add filters or select data to view distributions.</p>
+    </div>
+
+    <!-- Charts grid -->
+    <div class="charts-grid" *ngIf="statistics">
+      <div
+        *ngFor="let item of visibleCharts; trackBy: trackByChartId"
+        class="chart-container"
+        [style.height.px]="item.config.height || 400">
+
+        <app-base-chart
+          [dataSource]="item.dataSource"
+          [statistics]="statistics"
+          [highlights]="{}"
+          [selectedValue]="null"
+          (chartClick)="onChartClick($event)">
+        </app-base-chart>
+      </div>
+    </div>
+  </div>
+</p-panel>

@@ -136,6 +136,21 @@ export interface DomainConfig<TFilters, TData, TStatistics = any> {
   charts: ChartConfig[];
 
   /**
+   * Chart data sources map
+   * Maps dataSourceId to ChartDataSource instances
+   * Used by StatisticsPanelComponent to instantiate charts
+   *
+   * @example
+   * ```typescript
+   * chartDataSources: {
+   *   'manufacturer': new ManufacturerChartDataSource(),
+   *   'top-models': new TopModelsChartDataSource()
+   * }
+   * ```
+   */
+  chartDataSources?: Record<string, any>;
+
+  /**
    * Feature flags
    * Controls which framework features are enabled for this domain
    */

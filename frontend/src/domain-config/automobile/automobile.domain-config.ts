@@ -26,6 +26,12 @@ import {
   AUTOMOBILE_CHART_CONFIGS,
   AUTOMOBILE_PICKER_CONFIGS
 } from './configs';
+import {
+  ManufacturerChartDataSource,
+  TopModelsChartDataSource,
+  BodyClassChartDataSource,
+  YearChartDataSource
+} from './chart-sources';
 
 /**
  * Factory function to create Automobile Domain Configuration
@@ -76,6 +82,12 @@ export function createAutomobileDomainConfig(injector: Injector): DomainConfig<
   filters: AUTOMOBILE_FILTER_DEFINITIONS,
   queryControlFilters: AUTOMOBILE_QUERY_CONTROL_FILTERS,
   charts: AUTOMOBILE_CHART_CONFIGS,
+  chartDataSources: {
+    'manufacturer': new ManufacturerChartDataSource(),
+    'top-models': new TopModelsChartDataSource(),
+    'body-class': new BodyClassChartDataSource(),
+    'year': new YearChartDataSource()
+  },
 
   // ==================== Feature Flags ====================
   features: {

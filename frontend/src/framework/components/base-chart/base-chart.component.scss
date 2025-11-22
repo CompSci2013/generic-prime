@@ -1,0 +1,49 @@
+/**
+ * Base Chart Component Styles
+ */
+
+.chart-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+}
+
+.chart-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.highlight-indicator {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--primary-color);
+  background-color: var(--primary-color-alpha);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.chart-container {
+  flex: 1;
+  min-height: 300px;
+  width: 100%;
+}
+
+.no-data-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  color: var(--text-color-secondary);
+  font-style: italic;
+}
