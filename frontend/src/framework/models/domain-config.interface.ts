@@ -2,6 +2,7 @@ import { Type } from '@angular/core';
 import { IApiAdapter, IFilterUrlMapper, ICacheKeyBuilder } from './resource-management.interface';
 import { TableConfig } from './table-config.interface';
 import { PickerConfig } from './picker-config.interface';
+import { FilterDefinition as QueryFilterDefinition } from './filter-definition.interface';
 
 /**
  * Domain configuration interface
@@ -33,6 +34,7 @@ import { PickerConfig } from './picker-config.interface';
  *   tableConfig: AUTOMOBILE_TABLE_CONFIG,
  *   pickers: AUTOMOBILE_PICKER_CONFIGS,
  *   filters: AUTOMOBILE_FILTER_DEFINITIONS,
+ *   queryControlFilters: AUTOMOBILE_QUERY_CONTROL_FILTERS,
  *   charts: AUTOMOBILE_CHART_CONFIGS,
  *   features: {
  *     highlights: true,
@@ -116,10 +118,16 @@ export interface DomainConfig<TFilters, TData, TStatistics = any> {
   pickers: PickerConfig<any>[];
 
   /**
-   * Filter definitions for query controls
-   * Defines available filters in the UI
+   * Inline filter definitions for results table
+   * Defines inline filter controls displayed above the results table
    */
   filters: FilterDefinition[];
+
+  /**
+   * Query Control filter definitions
+   * Defines filters available in the Query Control component dialogs
+   */
+  queryControlFilters: QueryFilterDefinition<TFilters>[];
 
   /**
    * Chart configurations

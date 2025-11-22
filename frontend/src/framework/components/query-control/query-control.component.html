@@ -1,0 +1,179 @@
+<div class="query-control-panel">
+  <div class="query-control-header">
+    <h3>Query Control</h3>
+  </div>
+
+  <!-- Filter Field Selector -->
+  <div class="filter-field-selector">
+    <p-dropdown
+      [options]="filterFieldOptions"
+      [(ngModel)]="selectedField"
+      placeholder="Add filter by field..."
+      [filter]="true"
+      filterPlaceholder="Search fields..."
+      (onChange)="onFieldSelected($event)"
+      [showClear]="false"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="filter-field-dropdown">
+    </p-dropdown>
+  </div>
+
+  <!-- Active Filters -->
+  <div class="active-filters" *ngIf="activeFilters.length > 0">
+    <label class="active-filters-label">Active Filters:</label>
+    <div class="filter-chips">
+      <p-chip
+        *ngFor="let filter of activeFilters"
+        [label]="getChipLabel(filter)"
+        [removable]="true"
+        (onRemove)="removeFilter(filter)"
+        (click)="editFilter(filter)"
+        styleClass="filter-chip"
+        [pTooltip]="getChipTooltip(filter)"
+        tooltipPosition="top">
+      </p-chip>
+    </div>
+  </div>
+
+  <!-- Multiselect Filter Dialog -->
+  <p-dialog
+    [(visible)]="showMultiselectDialog"
+    [header]="multiselectDialogTitle"
+    [modal]="true"
+    [style]="{width: '50vw', minWidth: '400px'}"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="onDialogHide()">
+
+    <ng-template pTemplate="header">
+      <span>{{ multiselectDialogTitle }}</span>
+    </ng-template>
+
+    <p class="dialog-subtitle">{{ multiselectDialogSubtitle }}</p>
+
+    <!-- Search Box -->
+    <div class="p-input-icon-left search-box" *ngIf="!loadingOptions && !optionsError">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="searchQuery"
+        [placeholder]="currentFilterDef?.searchPlaceholder || 'Search...'"
+        (ngModelChange)="onSearchChange($event)"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loadingOptions" class="loading-state">
+      <p-progressSpinner [style]="{width: '50px', height: '50px'}"></p-progressSpinner>
+      <p>Loading options...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="optionsError" class="error-state">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>{{ optionsError }}</p>
+      <p-button
+        label="Retry"
+        icon="pi pi-refresh"
+        (onClick)="retryLoadOptions()"
+        styleClass="p-button-sm">
+      </p-button>
+    </div>
+
+    <!-- Options List -->
+    <div class="options-list" *ngIf="!loadingOptions && !optionsError">
+      <div *ngFor="let option of filteredOptions" class="option-item">
+        <p-checkbox
+          [(ngModel)]="selectedOptions"
+          [label]="option.label"
+          [value]="option.value"
+          [binary]="false">
+        </p-checkbox>
+      </div>
+      <div *ngIf="filteredOptions.length === 0" class="no-results">
+        <p>No options found</p>
+      </div>
+    </div>
+
+    <!-- Selection Summary -->
+    <div class="selection-summary" *ngIf="selectedOptions.length > 0 && !loadingOptions">
+      <span>Selected ({{ selectedOptions.length }}): {{ getSelectionSummary() }}</span>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        (onClick)="cancelDialog()"
+        styleClass="p-button-text p-button-secondary">
+      </p-button>
+      <p-button
+        label="Apply"
+        (onClick)="applyFilter()"
+        styleClass="p-button-danger"
+        [disabled]="selectedOptions.length === 0">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Year Range Filter Dialog -->
+  <p-dialog
+    [(visible)]="showYearRangeDialog"
+    header="Select Year Range"
+    [modal]="true"
+    [style]="{width: '500px'}"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="onDialogHide()">
+
+    <p class="dialog-subtitle">Select a year range to filter results. You can select just a start year, end year, or both.</p>
+
+    <!-- Year Inputs (MVP - simple number inputs) -->
+    <div class="year-inputs">
+      <div class="p-field">
+        <label for="yearMin">Start Year</label>
+        <p-inputNumber
+          id="yearMin"
+          [(ngModel)]="yearMin"
+          [min]="availableYearRange.min"
+          [max]="availableYearRange.max"
+          [useGrouping]="false"
+          placeholder="e.g., 1980"
+          [showButtons]="true"
+          [step]="1">
+        </p-inputNumber>
+      </div>
+      <div class="p-field">
+        <label for="yearMax">End Year</label>
+        <p-inputNumber
+          id="yearMax"
+          [(ngModel)]="yearMax"
+          [min]="yearMin || availableYearRange.min"
+          [max]="availableYearRange.max"
+          [useGrouping]="false"
+          placeholder="e.g., 2003"
+          [showButtons]="true"
+          [step]="1">
+        </p-inputNumber>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        (onClick)="cancelDialog()"
+        styleClass="p-button-text p-button-secondary">
+      </p-button>
+      <p-button
+        label="Apply"
+        (onClick)="applyYearRange()"
+        styleClass="p-button-danger"
+        [disabled]="!yearMin && !yearMax">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+</div>

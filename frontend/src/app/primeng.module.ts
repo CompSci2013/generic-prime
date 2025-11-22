@@ -16,6 +16,9 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageModule } from 'primeng/message';
+import { ChipModule } from 'primeng/chip';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
 
 const PRIMENG_MODULES = [
   TableModule,
@@ -31,7 +34,10 @@ const PRIMENG_MODULES = [
   InputNumberModule,
   CheckboxModule,
   SkeletonModule,
-  MessageModule
+  MessageModule,
+  ChipModule,
+  ProgressSpinnerModule,
+  TooltipModule
 ];
 
 @NgModule({

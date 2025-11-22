@@ -22,6 +22,7 @@ import {
 import {
   AUTOMOBILE_TABLE_CONFIG,
   AUTOMOBILE_FILTER_DEFINITIONS,
+  AUTOMOBILE_QUERY_CONTROL_FILTERS,
   AUTOMOBILE_CHART_CONFIGS,
   AUTOMOBILE_PICKER_CONFIGS
 } from './configs';
@@ -73,6 +74,7 @@ export function createAutomobileDomainConfig(injector: Injector): DomainConfig<
   tableConfig: AUTOMOBILE_TABLE_CONFIG,
   pickers: AUTOMOBILE_PICKER_CONFIGS,
   filters: AUTOMOBILE_FILTER_DEFINITIONS,
+  queryControlFilters: AUTOMOBILE_QUERY_CONTROL_FILTERS,
   charts: AUTOMOBILE_CHART_CONFIGS,
 
   // ==================== Feature Flags ====================
