@@ -13,11 +13,13 @@ import { GlobalErrorHandler } from '../framework/services/global-error.handler';
 import { DOMAIN_CONFIG } from '../framework/services/domain-config-registry.service';
 import { createAutomobileDomainConfig } from '../domain-config/automobile';
 import { DiscoverComponent } from './features/discover/discover.component';
+import { PanelPopoutComponent } from './features/panel-popout/panel-popout.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    DiscoverComponent
+    DiscoverComponent,
+    PanelPopoutComponent
   ],
   imports: [
     BrowserModule,

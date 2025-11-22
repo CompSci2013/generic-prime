@@ -1,0 +1,44 @@
+<div class="panel-popout-container">
+  <!-- Header -->
+  <div class="popout-header">
+    <h2>{{ getPanelTitle() }}</h2>
+    <p class="popout-subtitle">{{ domainConfig.domainLabel }}</p>
+  </div>
+
+  <hr/>
+
+  <!-- Panel Content - Render based on type -->
+  <div class="popout-content" [ngSwitch]="panelType">
+    <!-- Query Control -->
+    <app-query-control
+      *ngSwitchCase="'query-control'"
+      [domainConfig]="domainConfig"
+      (urlParamsChange)="onUrlParamsChange($event)">
+    </app-query-control>
+
+    <!-- Picker (Manufacturer-Model Picker) -->
+    <app-base-picker
+      *ngSwitchCase="'picker'"
+      [configId]="getPickerConfigId()"
+      (selectionChange)="onPickerSelectionChange($event)">
+    </app-base-picker>
+
+    <!-- Statistics Panel -->
+    <app-statistics-panel
+      *ngSwitchCase="'statistics'"
+      [domainConfig]="domainConfig">
+    </app-statistics-panel>
+
+    <!-- Results Table -->
+    <app-results-table
+      *ngSwitchCase="'results'"
+      [domainConfig]="domainConfig">
+    </app-results-table>
+
+    <!-- Unknown panel type -->
+    <div *ngSwitchDefault class="unknown-panel">
+      <p>Unknown panel type: {{ panelType }}</p>
+      <p>Panel ID: {{ panelId }}</p>
+    </div>
+  </div>
+</div>

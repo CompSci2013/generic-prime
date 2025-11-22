@@ -366,13 +366,11 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
   }
 
   /**
-   * Apply selections (update URL)
+   * Apply selections (emit event for parent to handle)
    */
   applySelections(): void {
-    const config = this.activeConfig!;
-    const urlValue = config.selection.serializer(this.state.selectedItems);
-
-    this.urlState.setParam(config.selection.urlParam, urlValue || null);
+    // Emit selection change event - parent will handle URL update
+    this.emitSelectionChange();
   }
 
   /**

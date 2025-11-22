@@ -110,6 +110,20 @@ export enum PopOutMessageType {
    * Payload: none
    */
   CLEAR_HIGHLIGHTS = 'CLEAR_HIGHLIGHTS',
+
+  /**
+   * URL parameters changed in pop-out
+   * Pop-out sends to main window to update URL
+   * Payload: { params: Params }
+   */
+  URL_PARAMS_CHANGED = 'URL_PARAMS_CHANGED',
+
+  /**
+   * URL parameters updated from main window
+   * Main window broadcasts to pop-outs after URL change
+   * Payload: { params: Params }
+   */
+  URL_PARAMS_SYNC = 'URL_PARAMS_SYNC',
 }
 
 /**

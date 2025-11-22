@@ -13,13 +13,13 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  Inject
 } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ChartConfig, DomainConfig } from '../../models/domain-config.interface';
 import { ChartDataSource } from '../base-chart/base-chart.component';
-import { UrlStateService } from '../../services/url-state.service';
-import { ResourceManagementService } from '../../services/resource-management.service';
+import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
 
 /**
  * Statistics Panel Component
@@ -65,14 +65,12 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
    */
   statistics: any | null = null;
 
-  // State management service
-  private resourceService!: ResourceManagementService<any, any, any>;
-
   // Observable for statistics
   statistics$!: Observable<any | undefined>;
 
   constructor(
-    private urlStateService: UrlStateService,
+    @Inject(RESOURCE_MANAGEMENT_SERVICE)
+    private resourceService: ResourceManagementService<any, any, any>,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -82,18 +80,7 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Create resource management service
-    this.resourceService = new ResourceManagementService<any, any, any>(
-      this.urlStateService,
-      {
-        filterMapper: this.domainConfig.urlMapper,
-        apiAdapter: this.domainConfig.apiAdapter,
-        cacheKeyBuilder: this.domainConfig.cacheKeyBuilder,
-        defaultFilters: {} as any
-      }
-    );
-
-    // Subscribe to statistics stream
+    // Subscribe to statistics stream (service injected via constructor)
     this.statistics$ = this.resourceService.statistics$;
     this.statistics$.subscribe(statistics => {
       this.statistics = statistics || null;

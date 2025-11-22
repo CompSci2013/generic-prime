@@ -4,12 +4,12 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectorRef,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  Inject
 } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DomainConfig } from '../../models/domain-config.interface';
-import { UrlStateService } from '../../services/url-state.service';
-import { ResourceManagementService } from '../../services/resource-management.service';
+import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
 
 /**
  * Results Table Component
@@ -43,9 +43,6 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
    */
   @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
 
-  // State management service
-  private resourceService!: ResourceManagementService<TFilters, TData, TStatistics>;
-
   // Observables from resource service
   filters$!: Observable<TFilters>;
   results$!: Observable<TData[]>;
@@ -64,8 +61,21 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
   // Expose Object for template use (for dynamic rendering)
   Object = Object;
 
+  /**
+   * Calculate the first index for the paginator
+   * Converts 1-indexed page number to 0-indexed first record position
+   *
+   * @returns First record index for current page
+   */
+  get paginatorFirst(): number {
+    const page = this.currentFilters['page'] || 1;
+    const size = this.currentFilters['size'] || 20;
+    return (page - 1) * size;
+  }
+
   constructor(
-    private urlStateService: UrlStateService,
+    @Inject(RESOURCE_MANAGEMENT_SERVICE)
+    private resourceService: ResourceManagementService<TFilters, TData, TStatistics>,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -74,18 +84,7 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
       throw new Error('ResultsTableComponent requires domainConfig input');
     }
 
-    // Create resource management service
-    this.resourceService = new ResourceManagementService<TFilters, TData, TStatistics>(
-      this.urlStateService,
-      {
-        filterMapper: this.domainConfig.urlMapper,
-        apiAdapter: this.domainConfig.apiAdapter,
-        cacheKeyBuilder: this.domainConfig.cacheKeyBuilder,
-        defaultFilters: {} as TFilters
-      }
-    );
-
-    // Subscribe to state streams
+    // Subscribe to state streams (service injected via constructor)
     this.filters$ = this.resourceService.filters$;
     this.results$ = this.resourceService.results$;
     this.totalResults$ = this.resourceService.totalResults$;

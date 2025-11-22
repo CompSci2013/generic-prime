@@ -7,23 +7,118 @@
   <hr/>
 
   <!-- Query Control (Manual Filter Management) -->
-  <app-query-control [domainConfig]="domainConfig"></app-query-control>
+  <div class="panel-wrapper">
+    <div class="panel-header">
+      <h3 class="panel-title">Query Control</h3>
+      <button
+        *ngIf="!isPanelPoppedOut('query-control')"
+        pButton
+        type="button"
+        icon="pi pi-external-link"
+        class="p-button-sm p-button-text"
+        (click)="popOutPanel('query-control', 'query-control')"
+        pTooltip="Pop out to separate window"
+        tooltipPosition="left">
+      </button>
+    </div>
+    <div *ngIf="!isPanelPoppedOut('query-control'); else queryControlPlaceholder">
+      <app-query-control
+        [domainConfig]="domainConfig"
+        (urlParamsChange)="onUrlParamsChange($event)">
+      </app-query-control>
+    </div>
+    <ng-template #queryControlPlaceholder>
+      <div class="popout-placeholder">
+        <i class="pi pi-external-link"></i>
+        <span>Query Control is open in a separate window</span>
+      </div>
+    </ng-template>
+  </div>
 
   <hr/>
 
   <!-- Manufacturer-Model Picker (Configuration-Driven) -->
-  <app-base-picker
-    [configId]="'manufacturer-model-picker'"
-    (selectionChange)="onPickerSelectionChange($event)">
-  </app-base-picker>
+  <div class="panel-wrapper">
+    <div class="panel-header">
+      <h3 class="panel-title">Manufacturer-Model Picker</h3>
+      <button
+        *ngIf="!isPanelPoppedOut('manufacturer-model-picker')"
+        pButton
+        type="button"
+        icon="pi pi-external-link"
+        class="p-button-sm p-button-text"
+        (click)="popOutPanel('manufacturer-model-picker', 'picker')"
+        pTooltip="Pop out to separate window"
+        tooltipPosition="left">
+      </button>
+    </div>
+    <div *ngIf="!isPanelPoppedOut('manufacturer-model-picker'); else pickerPlaceholder">
+      <app-base-picker
+        [configId]="'manufacturer-model-picker'"
+        (selectionChange)="onPickerSelectionChangeAndUpdateUrl($event)">
+      </app-base-picker>
+    </div>
+    <ng-template #pickerPlaceholder>
+      <div class="popout-placeholder">
+        <i class="pi pi-external-link"></i>
+        <span>Manufacturer-Model Picker is open in a separate window</span>
+      </div>
+    </ng-template>
+  </div>
 
   <hr/>
 
   <!-- Statistics Panel (Charts) -->
-  <app-statistics-panel [domainConfig]="domainConfig"></app-statistics-panel>
+  <div class="panel-wrapper">
+    <div class="panel-header">
+      <h3 class="panel-title">Statistics</h3>
+      <button
+        *ngIf="!isPanelPoppedOut('statistics-panel')"
+        pButton
+        type="button"
+        icon="pi pi-external-link"
+        class="p-button-sm p-button-text"
+        (click)="popOutPanel('statistics-panel', 'statistics')"
+        pTooltip="Pop out to separate window"
+        tooltipPosition="left">
+      </button>
+    </div>
+    <div *ngIf="!isPanelPoppedOut('statistics-panel'); else statsPlaceholder">
+      <app-statistics-panel [domainConfig]="domainConfig"></app-statistics-panel>
+    </div>
+    <ng-template #statsPlaceholder>
+      <div class="popout-placeholder">
+        <i class="pi pi-external-link"></i>
+        <span>Statistics Panel is open in a separate window</span>
+      </div>
+    </ng-template>
+  </div>
 
   <hr/>
 
   <!-- Results Table Component (Configuration-Driven) -->
-  <app-results-table [domainConfig]="domainConfig"></app-results-table>
+  <div class="panel-wrapper">
+    <div class="panel-header">
+      <h3 class="panel-title">Results</h3>
+      <button
+        *ngIf="!isPanelPoppedOut('results-table')"
+        pButton
+        type="button"
+        icon="pi pi-external-link"
+        class="p-button-sm p-button-text"
+        (click)="popOutPanel('results-table', 'results')"
+        pTooltip="Pop out to separate window"
+        tooltipPosition="left">
+      </button>
+    </div>
+    <div *ngIf="!isPanelPoppedOut('results-table'); else resultsPlaceholder">
+      <app-results-table [domainConfig]="domainConfig"></app-results-table>
+    </div>
+    <ng-template #resultsPlaceholder>
+      <div class="popout-placeholder">
+        <i class="pi pi-external-link"></i>
+        <span>Results Table is open in a separate window</span>
+      </div>
+    </ng-template>
+  </div>
 </div>

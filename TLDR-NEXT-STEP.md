@@ -40,7 +40,7 @@
    - Template: 14 lines, TypeScript: 298 lines
 
 5. **StatisticsPanelComponent** - Statistics visualization panel (⚠️ Partial)
-   - Self-contained with own ResourceManagementService instance
+   - Injects shared ResourceManagementService instance (proper Angular DI)
    - Renders multiple BaseChartComponents based on domain config
    - Collapsible PrimeNG Panel
    - Automatically fetches statistics from API
@@ -104,19 +104,23 @@ All F1-F10 milestones complete:
 
 ---
 
-### Option 2: Pop-Out Window System (NEW FEATURE)
+### ✅ Option 2: Pop-Out Window System (COMPLETED 2025-11-22)
 
-**Priority**: MEDIUM (Adds useful UI capability)
-**Component**: Pop-out buttons + routing
-**Estimated Effort**: 2-3 days
+**Status**: ✅ COMPLETE
+**Component**: Pop-out buttons + routing + messaging
+**Completed Features**:
+- ✅ Pop-out buttons on all panels (Statistics, Results, Query Control, Pickers)
+- ✅ Pop-out routing (`/panel/:gridId/:panelId/:type`)
+- ✅ `PanelPopoutComponent` container component
+- ✅ BroadcastChannel cross-window messaging
+- ✅ URL parameter synchronization
+- ✅ MOVE semantics (panel disappears when popped out)
+- ✅ Automatic restoration when pop-out closed
 
-**What to Build**:
-- Add pop-out buttons to panels (Statistics, Results Table)
-- Create pop-out routes (e.g., `/panel/statistics`)
-- Use existing PopOutContextService (366 lines already implemented)
-- BroadcastChannel messaging for cross-window sync
-
-**Note**: PopOutContextService infrastructure exists, just needs UI integration
+**Recent Bug Fixes**:
+- ✅ Fixed duplicate API calls (proper DI with InjectionToken)
+- ✅ Fixed paginator display (removed stateStorage conflict)
+- ✅ Fixed pagination indexing (1-indexed API compliance)
 
 ---
 

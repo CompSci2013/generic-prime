@@ -4,6 +4,8 @@ import {
   OnDestroy,
   ChangeDetectionStrategy,
   Input,
+  Output,
+  EventEmitter,
   ChangeDetectorRef
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
@@ -55,6 +57,9 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
 
   /** Domain configuration with filter definitions */
   @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
+
+  /** Emits when URL parameters should be updated */
+  @Output() urlParamsChange = new EventEmitter<{ [key: string]: any }>();
 
   // ==================== Dropdown State ====================
 
@@ -244,11 +249,14 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
       return;
     }
 
-    // Update URL with new filter
+    // Update URL with new filter and reset pagination
     const paramName = this.currentFilterDef.urlParams as string;
     const paramValue = this.selectedOptions.join(',');
 
-    this.urlState.setParams({ [paramName]: paramValue });
+    this.urlParamsChange.emit({
+      [paramName]: paramValue,
+      page: 1 // Reset to first page when filter changes (1-indexed)
+    });
 
     this.showMultiselectDialog = false;
     this.currentFilterDef = null;
@@ -304,7 +312,9 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     }
 
     const urlParamsConfig = this.currentFilterDef.urlParams as { min: string; max: string };
-    const params: any = {};
+    const params: any = {
+      page: 1 // Reset to first page when year range changes (1-indexed)
+    };
 
     if (this.yearMin !== null) {
       params[urlParamsConfig.min] = this.yearMin.toString();
@@ -313,10 +323,8 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
       params[urlParamsConfig.max] = this.yearMax.toString();
     }
 
-    // Only apply if at least one value is set
-    if (Object.keys(params).length > 0) {
-      this.urlState.setParams(params);
-    }
+    // Emit URL params (page reset is always included)
+    this.urlParamsChange.emit(params);
 
     this.showYearRangeDialog = false;
     this.currentFilterDef = null;
@@ -356,15 +364,19 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    */
   removeFilter(filter: ActiveFilter): void {
     if (filter.definition.type === 'range') {
-      // For range filters, clear both min and max params
+      // For range filters, clear both min and max params and reset pagination
       const urlParamsConfig = filter.definition.urlParams as { min: string; max: string };
-      this.urlState.setParams({
+      this.urlParamsChange.emit({
         [urlParamsConfig.min]: null,
-        [urlParamsConfig.max]: null
+        [urlParamsConfig.max]: null,
+        page: 1 // Reset to first page when filter removed (1-indexed)
       } as any);
     } else {
       const paramName = filter.definition.urlParams as string;
-      this.urlState.setParams({ [paramName]: null } as any);
+      this.urlParamsChange.emit({
+        [paramName]: null,
+        page: 1 // Reset to first page when filter removed (1-indexed)
+      } as any);
     }
   }
 

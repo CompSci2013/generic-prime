@@ -65,7 +65,7 @@
    - Template: 14 lines, TypeScript: 298 lines
 
 5. `StatisticsPanelComponent` - Statistics visualization panel
-   - Self-contained with own ResourceManagementService instance
+   - Injects shared ResourceManagementService instance (proper Angular DI)
    - Renders multiple BaseChartComponents based on domain config
    - Collapsible PrimeNG Panel
    - Automatically fetches statistics from API
@@ -211,11 +211,31 @@
 - **Cause**: API statistics transformation issue - VehicleStatistics.fromSegmentedStats() may have incorrect field mapping
 - **Investigation**: Need to log raw API response to verify structure
 
-### ❌ Not Implemented Yet
+### ✅ Recently Completed (2025-11-22)
 
 **Pop-Out Windows:**
-- `PopOutContextService` exists (366 lines) but NO UI integration
-- BroadcastChannel messaging implemented but no pop-out buttons/routes
+- ✅ Pop-out buttons on all panels (Statistics, Results, Query Control, Pickers)
+- ✅ Pop-out routing (`/panel/:gridId/:panelId/:type`)
+- ✅ `PanelPopoutComponent` container component
+- ✅ BroadcastChannel cross-window messaging
+- ✅ URL parameter synchronization between main window and pop-outs
+- ✅ MOVE semantics (panel disappears from main window when popped out)
+- ✅ Automatic panel restoration when pop-out closed
+
+**Bug Fixes:**
+- ✅ Fixed duplicate API calls (ResourceManagementService DI refactoring)
+  - Changed from manual instantiation to proper Angular InjectionToken pattern
+  - Single shared instance per page (DiscoverComponent, PanelPopoutComponent)
+  - Eliminated duplicate data fetches from ResultsTableComponent and StatisticsPanelComponent
+- ✅ Fixed paginator display issue (URL-first state management)
+  - Removed PrimeNG `stateStorage` conflicting with URL state
+  - Added `paginatorFirst` computed getter for proper change detection
+  - URL is now single source of truth for pagination state
+- ✅ Fixed pagination indexing (1-indexed API compliance)
+  - Changed all `page: 0` resets to `page: 1` (API uses 1-indexed pagination)
+  - Fixed in discover.component.ts and query-control.component.ts
+
+### ❌ Not Implemented Yet
 
 **Highlights System:**
 - No highlight filters (`h_*` params)

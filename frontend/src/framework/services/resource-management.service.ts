@@ -1,4 +1,4 @@
-// No Angular imports needed - this is a plain TypeScript class
+import { InjectionToken } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
 import {
   map,
@@ -300,3 +300,37 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
     this.destroy$.complete();
   }
 }
+
+/**
+ * Injection token for ResourceManagementService
+ *
+ * Use this token to provide and inject a shared instance of ResourceManagementService.
+ * Typically provided at the page component level (DiscoverComponent, PanelPopoutComponent)
+ * and injected into child components that need access to shared state.
+ *
+ * @example
+ * ```typescript
+ * // In parent component (DiscoverComponent)
+ * providers: [{
+ *   provide: RESOURCE_MANAGEMENT_SERVICE,
+ *   useFactory: (urlState: UrlStateService, domainConfig: DomainConfig) => {
+ *     return new ResourceManagementService(urlState, {
+ *       filterMapper: domainConfig.urlMapper,
+ *       apiAdapter: domainConfig.apiAdapter,
+ *       cacheKeyBuilder: domainConfig.cacheKeyBuilder,
+ *       defaultFilters: {}
+ *     });
+ *   },
+ *   deps: [UrlStateService, DOMAIN_CONFIG]
+ * }]
+ *
+ * // In child component
+ * constructor(
+ *   @Inject(RESOURCE_MANAGEMENT_SERVICE)
+ *   private resourceService: ResourceManagementService<TFilters, TData, TStatistics>
+ * ) {}
+ * ```
+ */
+export const RESOURCE_MANAGEMENT_SERVICE = new InjectionToken<ResourceManagementService<any, any, any>>(
+  'ResourceManagementService'
+);
