@@ -79,6 +79,14 @@ export class AutomobileApiAdapter
       .get<VehicleResult>(`${this.baseUrl}${this.VEHICLES_ENDPOINT}`, { params })
       .pipe(
         map((apiResponse: ApiResponse<VehicleResult>) => {
+          // DEBUG: Log raw statistics structure
+          if (apiResponse.statistics) {
+            console.log('=== RAW API STATISTICS ===');
+            console.log('Full statistics object:', JSON.stringify(apiResponse.statistics, null, 2));
+            console.log('Keys:', Object.keys(apiResponse.statistics));
+            console.log('=========================');
+          }
+
           // Transform API response to adapter response
           return {
             results: apiResponse.results.map((item) =>

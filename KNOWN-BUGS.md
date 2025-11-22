@@ -4,11 +4,17 @@ This document tracks known issues that need to be fixed.
 
 ## Active Bugs
 
-### 1. Chart Data Shows All Zero Values (2025-11-22)
+_(No active bugs)_
+
+---
+
+## Fixed Bugs
+
+### 1. Chart Data Shows All Zero Values (2025-11-22, FIXED 2025-11-22)
 
 **Component**: StatisticsPanelComponent / VehicleStatistics transformer
 **Severity**: High
-**Status**: Investigating
+**Status**: ✅ FIXED
 
 **Description**:
 Charts are rendering with correct structure (manufacturer names, model names, years visible) but all percentage values show as "0.0%" and counts appear to be zero or near-zero.
@@ -39,12 +45,15 @@ Charts should show actual distribution percentages and counts from the API stati
 3. [ ] Check if `byManufacturer`, `modelsByManufacturer`, etc. have actual count data
 4. [ ] Verify transformation logic correctly extracts counts from API response
 
-**Workaround**: None currently
+**Root Cause**: API returns statistics as simple numbers (e.g., `"Ford": 665`) but transformation code expected objects with `{ total, highlighted }` structure.
 
-**Priority**: High (blocks chart functionality)
+**Fix**: Updated all four transformation methods in `VehicleStatistics` class:
+- `transformByManufacturer()`: Changed type from `Record<string, { total: number; highlighted: number }>` to `Record<string, number>`
+- `transformModelsByManufacturer()`: Changed nested type from `Record<string, { total: number; highlighted: number }>` to `Record<string, number>`
+- `transformByBodyClass()`: Changed type from `Record<string, { total: number; highlighted: number }>` to `Record<string, number>`
+- `transformByYearRange()`: Changed type from `Record<string, { total: number; highlighted: number }>` to `Record<string, number>`
 
----
+**Files Changed**:
+- `frontend/src/domain-config/automobile/models/automobile.statistics.ts:250-361`
 
-## Fixed Bugs
-
-_(No bugs fixed yet)_
+**Verified**: Build compiles successfully after fix.

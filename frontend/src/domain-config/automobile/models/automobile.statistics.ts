@@ -247,15 +247,14 @@ export class VehicleStatistics {
   /**
    * Transform API's byManufacturer object to ManufacturerStat array
    */
-  private static transformByManufacturer(byManufacturer: Record<string, { total: number; highlighted: number }> | undefined): ManufacturerStat[] | undefined {
+  private static transformByManufacturer(byManufacturer: Record<string, number> | undefined): ManufacturerStat[] | undefined {
     if (!byManufacturer) return undefined;
 
-    const stats = Object.entries(byManufacturer).map(([name, counts]) => {
-      const total = counts.total || 0;
+    const stats = Object.entries(byManufacturer).map(([name, count]) => {
       return new ManufacturerStat({
         name,
-        count: total,
-        instanceCount: total,
+        count: count || 0,
+        instanceCount: count || 0,
         percentage: 0,
         modelCount: 0
       });
@@ -276,15 +275,15 @@ export class VehicleStatistics {
   /**
    * Transform API's modelsByManufacturer object to ModelStat array
    */
-  private static transformModelsByManufacturer(modelsByManufacturer: Record<string, Record<string, { total: number; highlighted: number }>> | undefined): ModelStat[] | undefined {
+  private static transformModelsByManufacturer(modelsByManufacturer: Record<string, Record<string, number>> | undefined): ModelStat[] | undefined {
     if (!modelsByManufacturer) return undefined;
 
     const stats: ModelStat[] = [];
     let totalCount = 0;
 
     Object.entries(modelsByManufacturer).forEach(([manufacturer, models]) => {
-      Object.entries(models).forEach(([modelName, counts]) => {
-        const instanceCount = counts.total || 0;
+      Object.entries(models).forEach(([modelName, count]) => {
+        const instanceCount = count || 0;
         totalCount += instanceCount;
         stats.push(new ModelStat({
           name: modelName,
@@ -310,15 +309,14 @@ export class VehicleStatistics {
   /**
    * Transform API's byBodyClass object to BodyClassStat array
    */
-  private static transformByBodyClass(byBodyClass: Record<string, { total: number; highlighted: number }> | undefined): BodyClassStat[] | undefined {
+  private static transformByBodyClass(byBodyClass: Record<string, number> | undefined): BodyClassStat[] | undefined {
     if (!byBodyClass) return undefined;
 
-    const stats = Object.entries(byBodyClass).map(([name, counts]) => {
-      const total = counts.total || 0;
+    const stats = Object.entries(byBodyClass).map(([name, count]) => {
       return new BodyClassStat({
         name,
-        count: total,
-        instanceCount: total,
+        count: count || 0,
+        instanceCount: count || 0,
         percentage: 0
       });
     });
@@ -338,15 +336,14 @@ export class VehicleStatistics {
   /**
    * Transform API's byYearRange object to YearStat array
    */
-  private static transformByYearRange(byYearRange: Record<string, { total: number; highlighted: number }> | undefined): YearStat[] | undefined {
+  private static transformByYearRange(byYearRange: Record<string, number> | undefined): YearStat[] | undefined {
     if (!byYearRange) return undefined;
 
-    const stats = Object.entries(byYearRange).map(([yearStr, counts]) => {
-      const total = counts.total || 0;
+    const stats = Object.entries(byYearRange).map(([yearStr, count]) => {
       return new YearStat({
         year: parseInt(yearStr, 10),
-        count: total,
-        instanceCount: total,
+        count: count || 0,
+        instanceCount: count || 0,
         percentage: 0
       });
     });
