@@ -1,0 +1,441 @@
+# TLDR-NEXT-STEP.md - Implementation Roadmap
+
+**Last Updated:** 2025-11-22
+**Purpose:** Machine-readable guide for implementing next features
+
+---
+
+## Current State (What's Done)
+
+### ✅ Framework Components Implemented (5/7 Panels)
+
+1. **BasePickerComponent** - Configuration-driven multi-select table
+   - Server/client pagination support
+   - Search and sorting
+   - URL synchronization
+   - Template: 157 lines of PrimeNG markup
+
+2. **ResultsTableComponent** - Domain-agnostic data table
+   - Dynamic filter panel (renders from FilterDefinition[])
+   - PrimeNG Table with lazy loading, pagination, sorting
+   - Row expansion
+   - Statistics panel support
+   - Template: 233 lines
+
+3. **QueryControlComponent** - Manual filter management via dialogs
+   - Dropdown field selector (dynamically populated from domain config)
+   - Multiselect dialog for list-based filters
+   - Range dialog for numeric filters
+   - Active filter chips with edit/remove functionality
+   - URL-first architecture
+   - Fully domain-agnostic
+   - Template: 179 lines, TypeScript: 467 lines
+   - **Unit tests purposefully skipped** (not cost-effective for UI components)
+
+4. **BaseChartComponent** - Generic Plotly.js chart container
+   - ChartDataSource pattern for domain-specific data transformation
+   - Supports any Plotly.js chart type (bar, line, pie, scatter, etc.)
+   - Interactive click events for filtering/highlighting
+   - Responsive resizing with window resize handler
+   - Template: 14 lines, TypeScript: 298 lines
+
+5. **StatisticsPanelComponent** - Statistics visualization panel (⚠️ Partial)
+   - Self-contained with own ResourceManagementService instance
+   - Renders multiple BaseChartComponents based on domain config
+   - Collapsible PrimeNG Panel
+   - Automatically fetches statistics from API
+   - Template: 40 lines, TypeScript: 115 lines
+   - ✅ Framework implementation complete
+   - ⚠️ **KNOWN ISSUE**: Chart data shows all zeros (KNOWN-BUGS.md #1)
+   - **Investigation needed**: API statistics transformation
+
+### ✅ Framework Services Complete (9 Services, ~3,139 Lines)
+
+All F1-F10 milestones complete:
+- UrlStateService (289 lines)
+- RequestCoordinatorService (304 lines)
+- ResourceManagementService (302 lines)
+- ApiService (282 lines)
+- PopOutContextService (366 lines)
+- PickerConfigRegistry (207 lines)
+- DomainConfigRegistry (281 lines)
+- DomainConfigValidator (540 lines)
+- ErrorNotificationService (368 lines)
+
+### ✅ Automobile Domain Complete (D1-D5 Milestones)
+
+- Models: AutoSearchFilters, VehicleResult, VehicleStatistics (with segmented stats transformation)
+- Adapters: AutomobileApiAdapter, AutomobileUrlMapper, AutomobileCacheKeyBuilder
+- Configs: Table, Picker, Filters, Charts
+- Chart Data Sources: ManufacturerChartDataSource, TopModelsChartDataSource, BodyClassChartDataSource, YearChartDataSource
+- Domain factory: createAutomobileDomainConfig() with chartDataSources map
+
+---
+
+## Next Implementation Options
+
+### Option 1: Debug Chart Data Issue (RECOMMENDED - High Value)
+
+**Priority**: HIGH (Completes statistics panel feature)
+**Component**: VehicleStatistics.fromSegmentedStats() transformation
+**Estimated Effort**: 1-2 hours
+
+**Current Issue** (KNOWN-BUGS.md #1):
+- ✅ Charts render correctly (4 charts visible)
+- ✅ Chart structure works (manufacturer names, model names, years showing)
+- ❌ All data shows as 0.0% or zero counts
+- **Root Cause**: API statistics transformation logic extracting wrong fields
+
+**Investigation Steps**:
+1. Add console.log to see raw API response statistics structure
+2. Verify API field names match transformation logic expectations
+3. Check if API uses `total` vs `count` vs different field names
+4. Fix VehicleStatistics transformation methods:
+   - `transformByManufacturer()` - Check `counts.total` field
+   - `transformModelsByManufacturer()` - Check nested structure
+   - `transformByBodyClass()` - Check field mapping
+   - `transformByYearRange()` - Check year key/value structure
+
+**Expected Outcome**:
+- Charts display actual distribution data with correct percentages
+- Manufacturer chart shows real manufacturer counts
+- Year chart shows timeline distribution
+- Body class pie chart shows proportions
+
+---
+
+### Option 2: Pop-Out Window System (NEW FEATURE)
+
+**Priority**: MEDIUM (Adds useful UI capability)
+**Component**: Pop-out buttons + routing
+**Estimated Effort**: 2-3 days
+
+**What to Build**:
+- Add pop-out buttons to panels (Statistics, Results Table)
+- Create pop-out routes (e.g., `/panel/statistics`)
+- Use existing PopOutContextService (366 lines already implemented)
+- BroadcastChannel messaging for cross-window sync
+
+**Note**: PopOutContextService infrastructure exists, just needs UI integration
+
+---
+
+### Option 3: VIN Browser Panel (NEW FEATURE)
+
+**Priority**: MEDIUM (Adds drill-down capability)
+**Component**: VIN instance browser
+**Estimated Effort**: 3-4 days
+
+**What to Build**:
+- Browse individual VINs for selected vehicle specs
+- Drill-down from specs to instances
+- Integration with VINs API (`/api/vins/v1/*`)
+- Display VIN details (mileage, condition, value, etc.)
+
+---
+
+## Alternative Next Steps
+
+If Statistics Panel seems too complex, consider these alternatives:
+
+1. **Pop-Out Window System** - Add UI for popping out panels to separate windows
+   - PopOutContextService already exists
+   - Just needs UI buttons and routing
+
+2. **Row Expansion Details** - Custom expansion templates for ResultsTable
+   - Show VIN instance details
+   - Link to VIN API endpoints
+
+3. **Column Management** - UI for show/hide and reorder columns
+   - PrimeNG supports this natively
+   - Just needs UI controls
+
+---
+
+## Critical Architecture Constraints
+
+### 🔴 DO NOT VIOLATE THESE
+
+1. **Domain-Agnostic Component**
+   - Component MUST work with ANY domain configuration
+   - NO hardcoded field names (manufacturer, model, etc.)
+   - ALL filter definitions from `domainConfig.filters`
+   ```typescript
+   // ✅ CORRECT
+   *ngFor="let filterDef of domainConfig.filters"
+
+   // ❌ WRONG
+   <option value="manufacturer">Manufacturer</option>
+   ```
+
+2. **PrimeNG-First**
+   - Use PrimeNG Dialog, Dropdown, Checkbox directly
+   - DO NOT create custom modal component
+   - DO NOT create custom dropdown component
+   - DO NOT create custom chip component
+
+3. **URL-First State**
+   - ALL state changes via UrlStateService
+   - NO direct router.navigate() with queryParams
+   - URL is single source of truth
+   ```typescript
+   // ✅ CORRECT
+   this.urlState.setQueryParams({ bodyClass: 'Sedan,SUV' }).subscribe();
+
+   // ❌ WRONG
+   this.router.navigate([], { queryParams: { bodyClass: 'Sedan,SUV' } });
+   ```
+
+4. **OnPush Change Detection**
+   ```typescript
+   @Component({
+     changeDetection: ChangeDetectionStrategy.OnPush  // REQUIRED
+   })
+
+   // MUST call after async updates
+   this.apiService.get(...).subscribe(data => {
+     this.data = data;
+     this.cdr.markForCheck();  // REQUIRED
+   });
+   ```
+
+5. **Test-Driven Development**
+   - Write tests FIRST
+   - DO NOT modify tests to make them pass
+   - Fix implementation, not tests
+
+---
+
+## API Endpoints Needed
+
+All endpoints exist in backend (Specs API):
+
+```typescript
+// Filter options endpoints
+GET /api/specs/v1/filters/manufacturers?limit=1000
+// Response: { success: true, manufacturers: ["Ford", "Toyota", ...] }
+
+GET /api/specs/v1/filters/models?limit=1000
+// Response: { success: true, models: ["F-150", "Camry", ...] }
+
+GET /api/specs/v1/filters/body-classes?limit=1000
+// Response: { success: true, body_classes: ["Sedan", "SUV", ...] }
+
+GET /api/specs/v1/filters/data-sources?limit=1000
+// Response: { success: true, data_sources: ["nhtsa_vpic", ...] }
+
+GET /api/specs/v1/filters/year-range
+// Response: { success: true, min: 1908, max: 2024 }
+```
+
+All endpoints are already implemented and working.
+
+---
+
+## PrimeNG Modules to Add
+
+Add to `primeng.module.ts`:
+```typescript
+import { DropdownModule } from 'primeng/dropdown';
+import { DialogModule } from 'primeng/dialog';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ChipModule } from 'primeng/chip';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
+```
+
+---
+
+## Success Criteria
+
+### MVP (Minimum Viable Product)
+- ✅ Query Control panel renders with dropdown
+- ✅ Can add Manufacturer filter (multiselect)
+- ✅ Can add Body Class filter (multiselect)
+- ✅ Can add Year filter (range - simple inputs OK)
+- ✅ Active filters display as chips
+- ✅ Can remove filters via chip X button
+- ✅ Can edit filters by clicking chip
+- ✅ URL updates correctly
+- ✅ Results table filters correctly
+- ✅ Filters persist across refresh
+
+### Full Implementation
+- ✅ All MVP features
+- ✅ Year range picker with grid UI
+- ✅ Search in multiselect dialogs
+- ✅ Loading states
+- ✅ Error handling with retry
+- ✅ Accessibility (keyboard nav, screen reader)
+- ✅ Unit tests (80%+ coverage)
+- ✅ E2E tests (all workflows)
+
+---
+
+## Reference Documents
+
+**MUST READ BEFORE CODING**:
+1. [docs/components/query-control/specification.md](docs/components/query-control/specification.md) - PRIMARY SPEC
+   - Complete wireframes
+   - 12 Gherkin acceptance criteria
+   - 10 detailed manual test cases
+   - Edge cases and error handling
+
+2. [docs/components/query-control/NEXT_SESSION.md](docs/components/query-control/NEXT_SESSION.md) - IMPLEMENTATION GUIDE
+   - Complete code examples
+   - Step-by-step implementation
+   - Troubleshooting
+
+3. [VERIFICATION-RUBRIC.md](VERIFICATION-RUBRIC.md) - ARCHITECTURE COMPLIANCE
+   - 7-step verification process
+   - Critical red flags
+   - Valid vs invalid patterns
+
+**Architecture References**:
+- [plan/02-PRIMENG-NATIVE-FEATURES.md](plan/02-PRIMENG-NATIVE-FEATURES.md) - What PrimeNG provides
+- [plan/03-REVISED-ARCHITECTURE.md](plan/03-REVISED-ARCHITECTURE.md) - Clean architecture
+- [plan/05-IMPLEMENTATION-GUIDE.md](plan/05-IMPLEMENTATION-GUIDE.md) - Code patterns
+
+**Example Components**:
+- [frontend/src/framework/components/base-picker/](frontend/src/framework/components/base-picker/) - Configuration-driven approach
+- [frontend/src/framework/components/results-table/](frontend/src/framework/components/results-table/) - PrimeNG integration
+
+---
+
+## After Query Control: Next Components
+
+### Priority 2 (After Query Control Works)
+1. **Interactive Charts Panel** (Panel #4)
+   - Manufacturer distribution chart
+   - Year distribution chart
+   - Click-to-highlight interaction
+   - Requires: BaseChartComponent, chart configs
+
+2. **VIN Browser Panel** (Panel #5)
+   - Browse individual VINs for selected vehicles
+   - Drill-down from specs to instances
+   - Integration with VINs API
+
+### Priority 3 (Future)
+3. **Dual Picker Variants** (Panel #2, #3)
+   - Alternative picker UIs
+   - Same data, different visualizations
+
+4. **Panel Container System**
+   - Drag-drop reordering
+   - Collapse/expand
+   - Pop-out to separate windows
+
+---
+
+## Quick Start Commands
+
+### Start Development Container
+```bash
+# On host machine
+cd ~/projects/generic-prime
+podman run -d --name generic-prime-dev \
+  --network host \
+  -v $(pwd)/frontend:/app:z \
+  -w /app \
+  localhost/generic-prime-frontend:dev
+
+# Enter container
+podman exec -it generic-prime-dev sh
+
+# Inside container - start dev server
+npm start
+```
+
+Access at: http://localhost:4205
+
+### Generate Component (Inside Container)
+```bash
+ng generate component framework/components/query-control --skip-tests
+```
+
+### Run Tests (Inside Container)
+```bash
+# Unit tests
+npm test
+
+# Specific test file
+npm test -- --include='**/query-control.component.spec.ts'
+
+# E2E tests
+npm run e2e
+
+# Coverage
+npm run test:coverage
+```
+
+---
+
+## Troubleshooting
+
+### Backend Services Not Responding
+See [docs/components/query-control/SERVICE-TROUBLESHOOTING.md](docs/components/query-control/SERVICE-TROUBLESHOOTING.md)
+
+Quick fix:
+```bash
+# 1. Start Elasticsearch first
+kubectl scale deployment elasticsearch -n data --replicas=1
+sleep 30
+
+# 2. Start Backend
+kubectl scale deployment autos-backend -n autos --replicas=2
+sleep 30
+
+# 3. Verify
+curl http://auto-discovery.minilab/api/specs/v1/filters/manufacturers
+```
+
+### Container Not Running
+```bash
+podman ps | grep generic-prime-dev
+# If not running, start it (see Quick Start Commands above)
+```
+
+---
+
+## Implementation Timeline
+
+| Day | Phase | Hours | Tasks |
+|-----|-------|-------|-------|
+| 1 | Setup & Structure | 6-8h | Component files, interfaces, domain config, basic UI |
+| 2 | Dialogs & Integration | 6-8h | Multiselect dialogs, chip management, discover integration |
+| 3 | Polish & Unit Tests | 6-8h | Year picker, error handling, loading states, unit tests |
+| 4 | E2E & Documentation | 4-6h | E2E tests, bug fixes, TLDR.md updates |
+
+**Total**: 3-4 days (22-30 hours)
+
+---
+
+## Key Differences: Query Control vs BasePickerComponent
+
+### Why Not Reuse BasePickerComponent?
+
+| Feature | BasePickerComponent | QueryControlComponent |
+|---------|---------------------|------------------------|
+| **Purpose** | Reusable multi-select table | Panel orchestrating multiple filter types |
+| **UI** | Table with checkboxes | Chips + Dialogs |
+| **Filter Types** | Single type (multiselect) | Multiple types (multiselect, range, text) |
+| **Configuration** | PickerConfig<T> | FilterDefinition<T>[] |
+| **Reusability** | Highly reusable | Panel-specific |
+| **Data Source** | Single API endpoint | Multiple endpoints (one per field) |
+
+---
+
+## Post-Implementation: Update These Files
+
+After implementing Query Control, update:
+- [ ] [TLDR.md](TLDR.md) - Add Query Control to "✅ COMPLETED" section
+- [ ] [TLDR-NEXT-STEP.md](TLDR-NEXT-STEP.md) - Move to next component (Charts or VIN Browser)
+- [ ] [framework/framework.module.ts](frontend/src/framework/framework.module.ts) - Export QueryControlComponent
+- [ ] [README.md](README.md) - Update progress (if exists)
+
+---
+
+**End of TLDR-NEXT-STEP.md**
