@@ -1,8 +1,8 @@
 /**
  * Manufacturer Chart Data Source
  *
- * Transforms vehicle statistics into Plotly.js horizontal bar chart
- * showing vehicle count by manufacturer.
+ * Transforms vehicle statistics into Plotly.js vertical stacked bar chart
+ * showing vehicle count by manufacturer with highlighted vs other.
  *
  * Domain: Automobile
  */
@@ -13,7 +13,8 @@ import { VehicleStatistics } from '../models/automobile.statistics';
 /**
  * Manufacturer distribution chart data source
  *
- * Creates a horizontal bar chart of top manufacturers by vehicle count.
+ * Creates a vertical stacked bar chart of manufacturers by vehicle count.
+ * Matches the visual style from the reference application.
  */
 export class ManufacturerChartDataSource extends ChartDataSource<VehicleStatistics> {
   /**
@@ -29,59 +30,46 @@ export class ManufacturerChartDataSource extends ChartDataSource<VehicleStatisti
       return null;
     }
 
-    // Get top 10 manufacturers
-    const topManufacturers = statistics.topManufacturers.slice(0, 10);
+    // Get top manufacturers (sorted by count descending)
+    const topManufacturers = statistics.topManufacturers.slice(0, 20);
 
-    // Extract data (reverse for bottom-to-top display)
-    const manufacturers = topManufacturers.map(m => m.name).reverse();
-    const counts = topManufacturers.map(m => m.count).reverse();
-    const percentages = topManufacturers.map(m => m.percentage).reverse();
+    // Extract data for vertical bars
+    const manufacturers = topManufacturers.map(m => m.name);
+    const counts = topManufacturers.map(m => m.count);
 
-    // Create bar colors (highlight selected)
-    const colors = manufacturers.map(manufacturer =>
-      manufacturer === selectedValue ? '#EF4444' : '#3B82F6'
-    );
-
-    // Create Plotly trace
+    // Create bar trace (blue bars, no highlighting until API supports it)
     const trace: Plotly.Data = {
       type: 'bar',
-      x: counts,
-      y: manufacturers,
-      orientation: 'h',
+      x: manufacturers,
+      y: counts,
       marker: {
-        color: colors
+        color: '#3B82F6' // Blue
       },
-      text: percentages.map(p => `${p.toFixed(1)}%`),
-      textposition: 'outside',
-      hovertemplate: '<b>%{y}</b><br>' +
-                     'Vehicles: %{x}<br>' +
-                     'Percentage: %{text}<br>' +
+      hovertemplate: '<b>%{x}</b><br>' +
+                     'Count: %{y}<br>' +
                      '<extra></extra>'
     };
 
     // Create layout
     const layout: Partial<Plotly.Layout> = {
-      title: {
-        text: 'Top 10 Manufacturers by Vehicle Count',
-        font: { size: 16 }
-      },
       xaxis: {
-        title: { text: 'Number of Vehicles' },
-        gridcolor: '#E5E7EB'
+        tickangle: -45,
+        automargin: true
       },
       yaxis: {
         title: { text: '' },
-        automargin: true
+        gridcolor: '#E5E7EB'
       },
       margin: {
-        l: 120,
+        l: 60,
         r: 40,
-        t: 60,
-        b: 60
+        t: 40,
+        b: 120
       },
       height: 400,
       plot_bgcolor: '#FFFFFF',
-      paper_bgcolor: '#FFFFFF'
+      paper_bgcolor: '#FFFFFF',
+      showlegend: false
     };
 
     return {

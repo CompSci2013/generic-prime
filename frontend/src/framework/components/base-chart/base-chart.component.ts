@@ -269,7 +269,9 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
     // Plotly configuration
     const config: Partial<any> = {
       responsive: true,
-      displayModeBar: false // Hide mode bar for cleaner UI
+      displayModeBar: true,
+      displaylogo: false,
+      modeBarButtonsToRemove: ['sendDataToCloud', 'lasso2d']
     };
 
     // Render or update chart

@@ -37,9 +37,9 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
    */
   transform(
     statistics: VehicleStatistics | null,
-    highlights: any,
-    selectedValue: string | null,
-    containerWidth: number
+    _highlights: any,
+    _selectedValue: string | null,
+    _containerWidth: number
   ): ChartData | null {
     if (!statistics || !statistics.bodyClassDistribution || statistics.bodyClassDistribution.length === 0) {
       return null;
@@ -47,52 +47,43 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
 
     const distribution = statistics.bodyClassDistribution;
 
-    // Extract data
+    // Extract data for vertical bars
     const labels = distribution.map(b => b.name);
-    const values = distribution.map(b => b.count);
-    const percentages = distribution.map(b => b.percentage);
+    const counts = distribution.map(b => b.count);
 
-    // Assign colors
-    const colors = labels.map(label =>
-      this.BODY_CLASS_COLORS[label] || '#94A3B8'
-    );
-
-    // Create Plotly trace
+    // Create bar trace (blue bars, no highlighting until API supports it)
     const trace: Plotly.Data = {
-      type: 'pie',
-      labels: labels,
-      values: values,
+      type: 'bar',
+      x: labels,
+      y: counts,
       marker: {
-        colors: colors
+        color: '#3B82F6' // Blue
       },
-      textinfo: 'label+percent',
-      hovertemplate: '<b>%{label}</b><br>' +
-                     'Vehicles: %{value}<br>' +
-                     'Percentage: %{percent}<br>' +
+      hovertemplate: '<b>%{x}</b><br>' +
+                     'Count: %{y}<br>' +
                      '<extra></extra>'
     };
 
     // Create layout
     const layout: Partial<Plotly.Layout> = {
-      title: {
-        text: 'Distribution by Body Class',
-        font: { size: 16 }
+      xaxis: {
+        tickangle: -45,
+        automargin: true
       },
-      height: 350,
-      showlegend: true,
-      legend: {
-        orientation: 'v',
-        x: 1,
-        y: 0.5
+      yaxis: {
+        title: { text: '' },
+        gridcolor: '#E5E7EB'
       },
       margin: {
-        l: 20,
-        r: 150,
-        t: 60,
-        b: 20
+        l: 60,
+        r: 40,
+        t: 40,
+        b: 100
       },
+      height: 400,
       plot_bgcolor: '#FFFFFF',
-      paper_bgcolor: '#FFFFFF'
+      paper_bgcolor: '#FFFFFF',
+      showlegend: false
     };
 
     return {

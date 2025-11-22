@@ -26,11 +26,11 @@ import { ChartConfig } from '../../../framework/models/domain-config.interface';
  */
 export const AUTOMOBILE_CHART_CONFIGS: ChartConfig[] = [
   /**
-   * Manufacturer distribution (horizontal bar chart)
+   * Manufacturer distribution (vertical stacked bar chart)
    */
   {
     id: 'manufacturer-distribution',
-    title: 'Vehicles by Manufacturer',
+    title: 'Manufacturers',
     type: 'bar',
     dataSourceId: 'manufacturer',
     height: 400,
@@ -40,11 +40,11 @@ export const AUTOMOBILE_CHART_CONFIGS: ChartConfig[] = [
   },
 
   /**
-   * Top models by VIN count (horizontal bar chart)
+   * Top models by VIN count (vertical stacked bar chart)
    */
   {
     id: 'top-models',
-    title: 'Top Models by VIN Count',
+    title: 'Models',
     type: 'bar',
     dataSourceId: 'top-models',
     height: 400,
@@ -54,28 +54,28 @@ export const AUTOMOBILE_CHART_CONFIGS: ChartConfig[] = [
   },
 
   /**
-   * Body class distribution (pie chart)
+   * Year distribution (vertical stacked bar chart)
    */
   {
-    id: 'body-class-distribution',
-    title: 'Vehicles by Body Class',
-    type: 'pie',
-    dataSourceId: 'body-class',
-    height: 350,
+    id: 'year-distribution',
+    title: 'Year',
+    type: 'bar',
+    dataSourceId: 'year',
+    height: 400,
     width: '100%',
     visible: true,
     collapsible: true
   },
 
   /**
-   * Year distribution (line chart)
+   * Body class distribution (vertical stacked bar chart)
    */
   {
-    id: 'year-distribution',
-    title: 'Vehicles by Year',
-    type: 'line',
-    dataSourceId: 'year',
-    height: 350,
+    id: 'body-class-distribution',
+    title: 'Body Class',
+    type: 'bar',
+    dataSourceId: 'body-class',
+    height: 400,
     width: '100%',
     visible: true,
     collapsible: true

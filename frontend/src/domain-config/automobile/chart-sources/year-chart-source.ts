@@ -21,9 +21,9 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
    */
   transform(
     statistics: VehicleStatistics | null,
-    highlights: any,
-    selectedValue: string | null,
-    containerWidth: number
+    _highlights: any,
+    _selectedValue: string | null,
+    _containerWidth: number
   ): ChartData | null {
     if (!statistics || !statistics.yearDistribution || statistics.yearDistribution.length === 0) {
       return null;
@@ -32,56 +32,45 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
     // Sort by year
     const sortedData = [...statistics.yearDistribution].sort((a, b) => a.year - b.year);
 
-    // Extract data
+    // Extract data for vertical bars
     const years = sortedData.map(y => y.year.toString());
     const counts = sortedData.map(y => y.count);
 
-    // Create Plotly trace
+    // Create bar trace (blue bars, no highlighting until API supports it)
     const trace: Plotly.Data = {
-      type: 'scatter',
-      mode: 'lines+markers',
+      type: 'bar',
       x: years,
       y: counts,
-      line: {
-        color: '#3B82F6',
-        width: 2
-      },
       marker: {
-        size: 6,
-        color: '#3B82F6'
+        color: '#3B82F6' // Blue
       },
-      fill: 'tozeroy',
-      fillcolor: 'rgba(59, 130, 246, 0.1)',
-      hovertemplate: '<b>Year %{x}</b><br>' +
-                     'Vehicles: %{y}<br>' +
+      hovertemplate: '<b>%{x}</b><br>' +
+                     'Count: %{y}<br>' +
                      '<extra></extra>'
     };
 
     // Create layout
     const layout: Partial<Plotly.Layout> = {
-      title: {
-        text: 'Vehicle Distribution Over Time',
-        font: { size: 16 }
-      },
       xaxis: {
-        title: { text: 'Year' },
+        title: { text: '' },
         gridcolor: '#E5E7EB',
-        type: 'category' // Treat years as categories for even spacing
+        type: 'category'
       },
       yaxis: {
-        title: { text: 'Number of Vehicles' },
+        title: { text: '' },
         gridcolor: '#E5E7EB',
         rangemode: 'tozero'
       },
       margin: {
         l: 60,
         r: 40,
-        t: 60,
+        t: 40,
         b: 60
       },
-      height: 350,
+      height: 400,
       plot_bgcolor: '#FFFFFF',
-      paper_bgcolor: '#FFFFFF'
+      paper_bgcolor: '#FFFFFF',
+      showlegend: false
     };
 
     return {
