@@ -26,35 +26,36 @@ export class ManufacturerChartDataSource extends ChartDataSource<VehicleStatisti
     _selectedValue: string | null,
     _containerWidth: number
   ): ChartData | null {
-    if (!statistics || !statistics.topManufacturers || statistics.topManufacturers.length === 0) {
+    if (!statistics || !statistics.byManufacturer) {
       return null;
     }
 
-    // Check if we have highlight filters active (client-side highlighting)
-    const hasHighlights = highlights && highlights.manufacturer;
+    const entries = Object.entries(statistics.byManufacturer);
+
+    // Check if data has server-side segmented format ({total, highlighted})
+    const isSegmented = entries.length > 0 &&
+      typeof entries[0][1] === 'object' &&
+      'total' in entries[0][1];
 
     let traces: Plotly.Data[] = [];
 
-    if (hasHighlights && statistics.byManufacturer) {
-      // Client-side segmentation: compute highlighted vs other counts
-      const entries = Object.entries(statistics.byManufacturer)
-        .map(([name, value]) => {
-          // Handle both simple numbers and {total, highlighted} objects
-          const count = typeof value === 'object' ? value.total : value;
-          return [name, count] as [string, number];
+    if (isSegmented) {
+      // Server-side segmented statistics: use backend data directly
+      const sorted = entries
+        .sort((a, b) => {
+          const aTotal = (a[1] as any).total || 0;
+          const bTotal = (b[1] as any).total || 0;
+          return bTotal - aTotal;
         })
-        .sort((a, b) => b[1] - a[1])
         .slice(0, 20);
 
-      const manufacturers = entries.map(([name]) => name);
-      const highlightedCounts = entries.map(([name, count]) =>
-        name === highlights.manufacturer ? count : 0
-      );
-      const otherCounts = entries.map(([name, count]) =>
-        name === highlights.manufacturer ? 0 : count
+      const manufacturers = sorted.map(([name]) => name);
+      const highlightedCounts = sorted.map(([, stats]: [string, any]) => stats.highlighted || 0);
+      const otherCounts = sorted.map(([, stats]: [string, any]) =>
+        (stats.total || 0) - (stats.highlighted || 0)
       );
 
-      // Create stacked bar traces
+      // Create stacked bar traces (Other first, then Highlighted on top)
       traces = [
         {
           type: 'bar',
@@ -74,10 +75,14 @@ export class ManufacturerChartDataSource extends ChartDataSource<VehicleStatisti
         }
       ];
     } else {
-      // No highlights: simple blue bars using topManufacturers
-      const topManufacturers = statistics.topManufacturers.slice(0, 20);
-      const manufacturers = topManufacturers.map(m => m.name);
-      const counts = topManufacturers.map(m => m.count);
+      // No highlights: simple blue bars using simple number format
+      const sorted = entries
+        .map(([name, count]) => [name, typeof count === 'number' ? count : 0] as [string, number])
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 20);
+
+      const manufacturers = sorted.map(([name]) => name);
+      const counts = sorted.map(([, count]) => count);
 
       traces = [{
         type: 'bar',
@@ -90,7 +95,7 @@ export class ManufacturerChartDataSource extends ChartDataSource<VehicleStatisti
 
     // Create layout
     const layout: Partial<Plotly.Layout> = {
-      barmode: hasHighlights ? 'stack' : undefined,
+      barmode: isSegmented ? 'stack' : undefined,
       xaxis: {
         tickangle: -45,
         automargin: true
@@ -108,7 +113,7 @@ export class ManufacturerChartDataSource extends ChartDataSource<VehicleStatisti
       height: 400,
       plot_bgcolor: '#FFFFFF',
       paper_bgcolor: '#FFFFFF',
-      showlegend: hasHighlights
+      showlegend: isSegmented
     };
 
     return {

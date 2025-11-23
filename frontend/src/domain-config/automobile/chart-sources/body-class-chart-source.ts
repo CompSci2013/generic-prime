@@ -37,38 +37,39 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
    */
   transform(
     statistics: VehicleStatistics | null,
-    highlights: any,
+    _highlights: any,
     _selectedValue: string | null,
     _containerWidth: number
   ): ChartData | null {
-    if (!statistics || !statistics.bodyClassDistribution || statistics.bodyClassDistribution.length === 0) {
+    if (!statistics || !statistics.byBodyClass) {
       return null;
     }
 
-    // Check if we have highlight filters active (client-side highlighting)
-    const hasHighlights = highlights && highlights.bodyClass;
+    const entries = Object.entries(statistics.byBodyClass);
+
+    // Check if data has server-side segmented format ({total, highlighted})
+    const isSegmented = entries.length > 0 &&
+      typeof entries[0][1] === 'object' &&
+      'total' in entries[0][1];
 
     let traces: Plotly.Data[] = [];
 
-    if (hasHighlights && statistics.byBodyClass) {
-      // Client-side segmentation: compute highlighted vs other counts
-      const entries = Object.entries(statistics.byBodyClass)
-        .map(([name, value]) => {
-          // Handle both simple numbers and {total, highlighted} objects
-          const count = typeof value === 'object' ? value.total : value;
-          return [name, count] as [string, number];
-        })
-        .sort((a, b) => b[1] - a[1]);
+    if (isSegmented) {
+      // Server-side segmented statistics: use backend data directly
+      const sorted = entries
+        .sort((a, b) => {
+          const aTotal = (a[1] as any).total || 0;
+          const bTotal = (b[1] as any).total || 0;
+          return bTotal - aTotal;
+        });
 
-      const labels = entries.map(([name]) => name);
-      const highlightedCounts = entries.map(([name, count]) =>
-        name === highlights.bodyClass ? count : 0
-      );
-      const otherCounts = entries.map(([name, count]) =>
-        name === highlights.bodyClass ? 0 : count
+      const labels = sorted.map(([name]) => name);
+      const highlightedCounts = sorted.map(([, stats]: [string, any]) => stats.highlighted || 0);
+      const otherCounts = sorted.map(([, stats]: [string, any]) =>
+        (stats.total || 0) - (stats.highlighted || 0)
       );
 
-      // Create stacked bar traces
+      // Create stacked bar traces (Other first, then Highlighted on top)
       traces = [
         {
           type: 'bar',
@@ -88,10 +89,13 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
         }
       ];
     } else {
-      // No highlights: simple blue bars using bodyClassDistribution
-      const distribution = statistics.bodyClassDistribution;
-      const labels = distribution.map(b => b.name);
-      const counts = distribution.map(b => b.count);
+      // No highlights: simple blue bars using simple number format
+      const sorted = entries
+        .map(([name, count]) => [name, typeof count === 'number' ? count : 0] as [string, number])
+        .sort((a, b) => b[1] - a[1]);
+
+      const labels = sorted.map(([name]) => name);
+      const counts = sorted.map(([, count]) => count);
 
       traces = [{
         type: 'bar',
@@ -104,7 +108,7 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
 
     // Create layout
     const layout: Partial<Plotly.Layout> = {
-      barmode: hasHighlights ? 'stack' : undefined,
+      barmode: isSegmented ? 'stack' : undefined,
       xaxis: {
         tickangle: -45,
         automargin: true
@@ -122,7 +126,7 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
       height: 400,
       plot_bgcolor: '#FFFFFF',
       paper_bgcolor: '#FFFFFF',
-      showlegend: hasHighlights
+      showlegend: isSegmented
     };
 
     return {

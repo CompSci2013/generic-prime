@@ -21,50 +21,36 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
    */
   transform(
     statistics: VehicleStatistics | null,
-    highlights: any,
+    _highlights: any,
     _selectedValue: string | null,
     _containerWidth: number
   ): ChartData | null {
-    if (!statistics || !statistics.yearDistribution || statistics.yearDistribution.length === 0) {
+    if (!statistics || !statistics.byYearRange) {
       return null;
     }
 
-    // Check if we have highlight filters active (client-side highlighting)
-    const hasHighlights = highlights && (highlights.yearMin !== undefined || highlights.yearMax !== undefined);
+    const entries = Object.entries(statistics.byYearRange);
+
+    // Check if data has server-side segmented format ({total, highlighted})
+    const isSegmented = entries.length > 0 &&
+      typeof entries[0][1] === 'object' &&
+      'total' in entries[0][1];
 
     let traces: Plotly.Data[] = [];
 
-    if (hasHighlights && statistics.byYearRange) {
-      // Client-side segmentation: compute highlighted vs other counts based on year range
-      const yearMin = highlights.yearMin ?? -Infinity;
-      const yearMax = highlights.yearMax ?? Infinity;
+    if (isSegmented) {
+      // Server-side segmented statistics: use backend data directly
+      const sorted = entries
+        .sort((a, b) => parseInt(a[0], 10) - parseInt(b[0], 10)); // Sort by year ascending
 
-      const entries = Object.entries(statistics.byYearRange)
-        .map(([year, value]) => {
-          // Handle both simple numbers and {total, highlighted} objects
-          const count = typeof value === 'object' ? value.total : value;
-          return [parseInt(year, 10), count] as [number, number];
-        })
-        .sort((a, b) => a[0] - b[0]); // Sort by year ascending
-
-      const years = entries.map(([year]) => year.toString());
-      const highlightedCounts = entries.map(([year, count]) =>
-        year >= yearMin && year <= yearMax ? count : 0
-      );
-      const otherCounts = entries.map(([year, count]) =>
-        year >= yearMin && year <= yearMax ? 0 : count
+      const years = sorted.map(([year]) => year);
+      const highlightedCounts = sorted.map(([, stats]: [string, any]) => stats.highlighted || 0);
+      const otherCounts = sorted.map(([, stats]: [string, any]) =>
+        (stats.total || 0) - (stats.highlighted || 0)
       );
 
-      // Create stacked bar traces
+      // Create stacked bar traces (Highlighted first at bottom, then Other on top)
       traces = [
-        {
-          type: 'bar',
-          name: 'Other',
-          x: years,
-          y: otherCounts,
-          marker: { color: '#9CA3AF' },
-          hovertemplate: '<b>%{x}</b><br>Other: %{y}<extra></extra>'
-        },
         {
           type: 'bar',
           name: 'Highlighted',
@@ -72,13 +58,24 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
           y: highlightedCounts,
           marker: { color: '#3B82F6' },
           hovertemplate: '<b>%{x}</b><br>Highlighted: %{y}<extra></extra>'
+        },
+        {
+          type: 'bar',
+          name: 'Other',
+          x: years,
+          y: otherCounts,
+          marker: { color: '#9CA3AF' },
+          hovertemplate: '<b>%{x}</b><br>Other: %{y}<extra></extra>'
         }
       ];
     } else {
-      // No highlights: simple blue bars using yearDistribution
-      const sortedData = [...statistics.yearDistribution].sort((a, b) => a.year - b.year);
-      const years = sortedData.map(y => y.year.toString());
-      const counts = sortedData.map(y => y.count);
+      // No highlights: simple blue bars using simple number format
+      const sorted = entries
+        .map(([year, count]) => [year, typeof count === 'number' ? count : 0] as [string, number])
+        .sort((a, b) => parseInt(a[0], 10) - parseInt(b[0], 10));
+
+      const years = sorted.map(([year]) => year);
+      const counts = sorted.map(([, count]) => count);
 
       traces = [{
         type: 'bar',
@@ -91,7 +88,7 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
 
     // Create layout
     const layout: Partial<Plotly.Layout> = {
-      barmode: hasHighlights ? 'stack' : undefined,
+      barmode: isSegmented ? 'stack' : undefined,
       xaxis: {
         title: { text: '' },
         gridcolor: '#E5E7EB',
@@ -111,7 +108,7 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
       height: 400,
       plot_bgcolor: '#FFFFFF',
       paper_bgcolor: '#FFFFFF',
-      showlegend: hasHighlights
+      showlegend: isSegmented
     };
 
     return {
