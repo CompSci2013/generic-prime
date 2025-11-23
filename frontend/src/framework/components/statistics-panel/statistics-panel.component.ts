@@ -206,7 +206,7 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
   private getHighlightParamName(chartId: string): string | null {
     const mapping: Record<string, string> = {
       'manufacturer-distribution': 'h_manufacturer',
-      'top-models': 'h_model',
+      'top-models': 'h_modelCombos',
       'body-class-distribution': 'h_bodyClass'
       // year-distribution handled separately (uses h_yearMin and h_yearMax)
     };
