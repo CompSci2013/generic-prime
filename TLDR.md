@@ -1,6 +1,6 @@
 # TLDR.md - Implementation Status
 
-**Last Updated:** 2025-11-22
+**Last Updated:** 2025-11-23
 **Purpose:** Quick reference for Claude Code sessions to understand current implementation state
 
 ---
@@ -102,7 +102,8 @@
 **Domain Configuration** (`domain-config/automobile/`):
 
 **Models** (4 files, ~1,004 lines):
-- `automobile.filters.ts` (217 lines) - `AutoSearchFilters` interface (manufacturer, model, year range, body class, etc.)
+- `automobile.filters.ts` (273 lines) - `AutoSearchFilters` interface (manufacturer, model, year range, body class, etc.)
+  - Also defines `HighlightFilters` interface (h_yearMin, h_yearMax, h_manufacturer, h_modelCombos, h_bodyClass)
 - `automobile.data.ts` (329 lines) - `VehicleResult` interface (vehicle_id, manufacturer, model, year, body_class, instance_count, etc.)
 - `automobile.statistics.ts` (443 lines) - `VehicleStatistics` interface (byManufacturer, modelsByManufacturer, byYearRange, byBodyClass)
 
@@ -116,7 +117,7 @@
 - `automobile-cache-key-builder.ts` (233 lines) - `AutomobileCacheKeyBuilder` implements `ICacheKeyBuilder`
   - Generates stable cache keys from filter objects
 
-**Configs** (5 files, ~1,262 lines):
+**Configs** (6 files, ~1,381 lines):
 - `automobile.table-config.ts` (240 lines) - `AUTOMOBILE_TABLE_CONFIG`
   - Columns: manufacturer, model, year, body_class, data_source, instance_count
   - PrimeNG table settings (paginator, lazy, expandable, etc.)
@@ -126,9 +127,13 @@
   - Inline filters for ResultsTable: manufacturerSearch, modelSearch, yearMin, yearMax, bodyClassSearch, dataSourceSearch
   - Number formatting config (e.g., year without commas)
 - `automobile.query-control-filters.ts` (106 lines) - `AUTOMOBILE_QUERY_CONTROL_FILTERS[]`
-  - Dialog-based filters for QueryControl: manufacturer, model, bodyClass, yearMin/yearMax
+  - Dialog-based regular filters for QueryControl: manufacturer, model, bodyClass, yearMin/yearMax
   - API endpoints for fetching filter options
   - Response transformers for each filter
+- `automobile.highlight-filters.ts` (119 lines) - `AUTOMOBILE_HIGHLIGHT_FILTERS[]`
+  - Dialog-based highlight filters for QueryControl: h_manufacturer, h_modelCombos, h_bodyClass, h_yearMin/h_yearMax
+  - Same API endpoints as regular filters
+  - ✅ **NEW in v0.3.0** (2025-11-23)
 - `automobile.chart-configs.ts` (71 lines) - `AUTOMOBILE_CHART_CONFIGS[]`
   - 4 chart definitions: manufacturer, top-models, body-class, year
   - ✅ Fully implemented and working (v0.2.0)
@@ -194,11 +199,15 @@
 ### ✅ Automobile Domain
 1. **Filter System** - Inline filters (text search, year range) + Query Control (multiselect dialogs)
 2. **Query Control Filters** - Manufacturer, Model, Body Class (multiselect), Year Range (dialog-based)
-3. **Data Table** - Vehicle specs display with pagination, sorting
-4. **Picker** - Manufacturer-Model combination picker
-5. **API Integration** - `/api/specs/v1/vehicles/details` endpoint + filter option endpoints
-6. **URL Serialization** - Filters persist in URL query params
-7. **Charts & Highlighting** - 4 interactive Plotly.js charts with server-side segmented statistics
+3. **Query Control Highlights** - Separate highlight filters (h_manufacturer, h_modelCombos, h_bodyClass, h_yearMin/Max)
+   - Yellow/amber chips to distinguish from regular filters
+   - "Clear All Highlights" link to remove only highlights
+   - "Clear All" button to remove both filters and highlights
+4. **Data Table** - Vehicle specs display with pagination, sorting
+5. **Picker** - Manufacturer-Model combination picker
+6. **API Integration** - `/api/specs/v1/vehicles/details` endpoint + filter option endpoints
+7. **URL Serialization** - Filters persist in URL query params (regular: `manufacturer`, highlights: `h_manufacturer`)
+8. **Charts & Highlighting** - 4 interactive Plotly.js charts with server-side segmented statistics
    - Click/box selection to add highlight filters (h_manufacturer, h_modelCombos, h_bodyClass, h_yearMin/Max)
    - Stacked bars showing highlighted (blue) vs other (gray) data
    - Top 20 items for manufacturer and models charts
@@ -210,6 +219,16 @@
 ## What's NOT Working / Not Implemented
 
 ### ✅ Recently Completed
+
+**Query Control Highlights (v0.3.0 - 2025-11-23)**:
+- ✅ Created highlight filter definitions (h_manufacturer, h_modelCombos, h_bodyClass, h_yearMin/Max)
+- ✅ Added "Active Highlights" section in Query Control (separate from Active Filters)
+- ✅ Yellow/amber chip styling for highlight filters
+- ✅ "Clear All Highlights" link to remove only highlights
+- ✅ "Clear All" button to remove both filters and highlights
+- ✅ Domain-agnostic implementation (works with any domain config)
+- ✅ URL-First architecture (h_* URL parameters)
+- **Documentation**: [QUERY-CONTROL-HIGHLIGHTS-SUMMARY.md](QUERY-CONTROL-HIGHLIGHTS-SUMMARY.md)
 
 **Charts & Highlighting System (v0.2.0 - 2025-11-23)**:
 - ✅ URL-First architecture compliance (UrlStateService, not router.navigate)

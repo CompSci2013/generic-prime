@@ -116,6 +116,25 @@ All F1-F10 milestones complete:
 
 ---
 
+### ✅ Option 4: Query Control Highlights (COMPLETED v0.3.0 - 2025-11-23)
+
+**Status**: ✅ COMPLETE
+**Component**: Query Control with Active Highlights section
+**Completed Features**:
+- ✅ Created highlight filter definitions (h_manufacturer, h_modelCombos, h_bodyClass, h_yearMin/Max)
+- ✅ Added "Active Highlights" section (separate from Active Filters)
+- ✅ Yellow/amber chip styling for highlight filters
+- ✅ "Clear All Highlights" link to remove only highlights
+- ✅ "Clear All" button to remove both filters and highlights
+- ✅ Domain-agnostic implementation (works with any domain config)
+- ✅ URL-First architecture (h_* URL parameters)
+
+**Documentation**: [QUERY-CONTROL-HIGHLIGHTS-SUMMARY.md](QUERY-CONTROL-HIGHLIGHTS-SUMMARY.md)
+
+**Git Tag**: v0.3.0 (2025-11-23) - 1 file created, 7 files modified, ~318 lines added
+
+---
+
 ### Option 3: VIN Browser Panel (RECOMMENDED - High Value)
 
 **Priority**: HIGH (Adds drill-down capability to complete data exploration)

@@ -69,10 +69,16 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   /** Currently selected field (temporary selection) */
   selectedField: FilterDefinition | null = null;
 
+  /** Whether we're currently editing a highlight filter (vs regular filter) */
+  isHighlightFilter = false;
+
   // ==================== Active Filters ====================
 
   /** List of currently active filters */
   activeFilters: ActiveFilter[] = [];
+
+  /** List of currently active highlight filters */
+  activeHighlights: ActiveFilter[] = [];
 
   // ==================== Dialog State ====================
 
@@ -133,11 +139,19 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   ) {}
 
   ngOnInit(): void {
-    // Build filter field dropdown options from domain config
-    this.filterFieldOptions = this.domainConfig.queryControlFilters.map(f => ({
-      label: f.label,
-      value: f
-    }));
+    // Build filter field dropdown options from domain config (regular filters + highlight filters)
+    this.filterFieldOptions = [
+      // Regular filters
+      ...this.domainConfig.queryControlFilters.map(f => ({
+        label: f.label,
+        value: f
+      })),
+      // Highlight filters (if defined)
+      ...(this.domainConfig.highlightFilters || []).map(f => ({
+        label: f.label,
+        value: f
+      }))
+    ];
 
     console.log('QueryControl: Filter field options:', this.filterFieldOptions);
 
@@ -166,6 +180,9 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     console.log('QueryControl: Filter definition:', filterDef);
     this.currentFilterDef = filterDef;
 
+    // Determine if this is a highlight filter by checking if urlParams starts with 'h_'
+    this.isHighlightFilter = this.isHighlightFilterDef(filterDef);
+
     if (filterDef.type === 'multiselect') {
       this.openMultiselectDialog(filterDef);
     } else if (filterDef.type === 'range') {
@@ -175,6 +192,19 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     // Reset dropdown selection
     this.selectedField = null;
     this.cdr.markForCheck();
+  }
+
+  /**
+   * Check if a filter definition is a highlight filter
+   */
+  private isHighlightFilterDef(filterDef: FilterDefinition): boolean {
+    if (typeof filterDef.urlParams === 'string') {
+      return filterDef.urlParams.startsWith('h_');
+    } else if (typeof filterDef.urlParams === 'object') {
+      // For range filters, check if min param starts with 'h_'
+      return filterDef.urlParams.min?.startsWith('h_') || false;
+    }
+    return false;
   }
 
   // ==================== Multiselect Dialog ====================
@@ -193,8 +223,9 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     this.showMultiselectDialog = true;
     this.cdr.markForCheck();
 
-    // Check if editing existing filter
-    const existingFilter = this.activeFilters.find(f => f.definition.field === filterDef.field);
+    // Check if editing existing filter (check both regular filters and highlights)
+    const filterList = this.isHighlightFilter ? this.activeHighlights : this.activeFilters;
+    const existingFilter = filterList.find(f => f.definition.field === filterDef.field);
     if (existingFilter) {
       this.selectedOptions = [...existingFilter.values];
     }
@@ -385,12 +416,117 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    */
   editFilter(filter: ActiveFilter): void {
     this.currentFilterDef = filter.definition;
+    this.isHighlightFilter = false; // Regular filter
 
     if (filter.definition.type === 'multiselect') {
       this.openMultiselectDialog(filter.definition);
     } else if (filter.definition.type === 'range') {
       this.openYearRangeDialog(filter.definition);
     }
+  }
+
+  /**
+   * Edit existing highlight filter
+   */
+  editHighlight(filter: ActiveFilter): void {
+    this.currentFilterDef = filter.definition;
+    this.isHighlightFilter = true; // Highlight filter
+
+    if (filter.definition.type === 'multiselect') {
+      this.openMultiselectDialog(filter.definition);
+    } else if (filter.definition.type === 'range') {
+      this.openYearRangeDialog(filter.definition);
+    }
+  }
+
+  /**
+   * Remove highlight filter chip
+   */
+  removeHighlight(filter: ActiveFilter): void {
+    if (filter.definition.type === 'range') {
+      // For range filters, clear both min and max params and reset pagination
+      const urlParamsConfig = filter.definition.urlParams as { min: string; max: string };
+      this.urlParamsChange.emit({
+        [urlParamsConfig.min]: null,
+        [urlParamsConfig.max]: null,
+        page: 1 // Reset to first page when filter removed (1-indexed)
+      } as any);
+    } else {
+      const paramName = filter.definition.urlParams as string;
+      this.urlParamsChange.emit({
+        [paramName]: null,
+        page: 1 // Reset to first page when filter removed (1-indexed)
+      } as any);
+    }
+  }
+
+  /**
+   * Clear all highlight filters
+   */
+  clearAllHighlights(): void {
+    if (this.activeHighlights.length === 0) {
+      return; // Nothing to clear
+    }
+
+    const params: any = { page: 1 }; // Reset to first page
+
+    // Collect all highlight URL params to clear
+    for (const highlight of this.activeHighlights) {
+      if (highlight.definition.type === 'range') {
+        const urlParamsConfig = highlight.definition.urlParams as { min: string; max: string };
+        params[urlParamsConfig.min] = null;
+        params[urlParamsConfig.max] = null;
+      } else {
+        const paramName = highlight.definition.urlParams as string;
+        params[paramName] = null;
+      }
+    }
+
+    this.urlParamsChange.emit(params);
+  }
+
+  /**
+   * Clear all filters (both regular filters AND highlights)
+   */
+  clearAll(): void {
+    if (this.activeFilters.length === 0 && this.activeHighlights.length === 0) {
+      return; // Nothing to clear
+    }
+
+    const params: any = { page: 1 }; // Reset to first page
+
+    // Collect all regular filter URL params to clear
+    for (const filter of this.activeFilters) {
+      if (filter.definition.type === 'range') {
+        const urlParamsConfig = filter.definition.urlParams as { min: string; max: string };
+        params[urlParamsConfig.min] = null;
+        params[urlParamsConfig.max] = null;
+      } else {
+        const paramName = filter.definition.urlParams as string;
+        params[paramName] = null;
+      }
+    }
+
+    // Collect all highlight filter URL params to clear
+    for (const highlight of this.activeHighlights) {
+      if (highlight.definition.type === 'range') {
+        const urlParamsConfig = highlight.definition.urlParams as { min: string; max: string };
+        params[urlParamsConfig.min] = null;
+        params[urlParamsConfig.max] = null;
+      } else {
+        const paramName = highlight.definition.urlParams as string;
+        params[paramName] = null;
+      }
+    }
+
+    this.urlParamsChange.emit(params);
+  }
+
+  /**
+   * Check if there are any active filters or highlights
+   */
+  hasActiveFiltersOrHighlights(): boolean {
+    return this.activeFilters.length > 0 || this.activeHighlights.length > 0;
   }
 
   // ==================== URL Sync ====================
@@ -400,38 +536,54 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    */
   private syncFiltersFromUrl(params: any): void {
     this.activeFilters = [];
+    this.activeHighlights = [];
 
+    // Sync regular filters
     for (const filterDef of this.domainConfig.queryControlFilters) {
-      if (filterDef.type === 'range') {
-        // Handle range filters (yearMin, yearMax)
-        const urlParamsConfig = filterDef.urlParams as { min: string; max: string };
-        const minValue = params[urlParamsConfig.min];
-        const maxValue = params[urlParamsConfig.max];
+      this.syncFilterFromUrl(params, filterDef, this.activeFilters);
+    }
 
-        if (minValue || maxValue) {
-          const values: (string | number)[] = [];
-          if (minValue) values.push(minValue);
-          if (maxValue) values.push(maxValue);
+    // Sync highlight filters
+    if (this.domainConfig.highlightFilters) {
+      for (const filterDef of this.domainConfig.highlightFilters) {
+        this.syncFilterFromUrl(params, filterDef, this.activeHighlights);
+      }
+    }
+  }
 
-          this.activeFilters.push({
-            definition: filterDef,
-            values: values,
-            urlValue: `${minValue || ''}-${maxValue || ''}`
-          });
-        }
-      } else {
-        // Handle multiselect/text filters
-        const paramName = filterDef.urlParams as string;
-        const paramValue = params[paramName];
+  /**
+   * Sync a single filter from URL params
+   */
+  private syncFilterFromUrl(params: any, filterDef: FilterDefinition, targetArray: ActiveFilter[]): void {
+    if (filterDef.type === 'range') {
+      // Handle range filters (yearMin, yearMax or h_yearMin, h_yearMax)
+      const urlParamsConfig = filterDef.urlParams as { min: string; max: string };
+      const minValue = params[urlParamsConfig.min];
+      const maxValue = params[urlParamsConfig.max];
 
-        if (paramValue) {
-          const values = paramValue.split(',');
-          this.activeFilters.push({
-            definition: filterDef,
-            values: values,
-            urlValue: paramValue
-          });
-        }
+      if (minValue || maxValue) {
+        const values: (string | number)[] = [];
+        if (minValue) values.push(minValue);
+        if (maxValue) values.push(maxValue);
+
+        targetArray.push({
+          definition: filterDef,
+          values: values,
+          urlValue: `${minValue || ''}-${maxValue || ''}`
+        });
+      }
+    } else {
+      // Handle multiselect/text filters
+      const paramName = filterDef.urlParams as string;
+      const paramValue = params[paramName];
+
+      if (paramValue) {
+        const values = paramValue.split(',');
+        targetArray.push({
+          definition: filterDef,
+          values: values,
+          urlValue: paramValue
+        });
       }
     }
   }

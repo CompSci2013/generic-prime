@@ -33,16 +33,19 @@ So that I can refine my search beyond manufacturer-model selections
 ### Panel Collapsed/Expanded State
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  Query Control                                      [−] │
-├─────────────────────────────────────────────────────────┤
-│  [Add filter by field...                           ▼]  │
-│                                                         │
-│  Active Filters:                                        │
-│    [Manufacturer: Buick                             ⊗]  │
-│    [Model: Cascada, Century, Coachbuilder           ⊗]  │
-│    [Body Class                                   ▼  ⊗]  │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│  Query Control                            [Clear All]       [−] │
+├─────────────────────────────────────────────────────────────────┤
+│  [Add filter by field...                                   ▼]  │
+│                                                                 │
+│  Active Filters:                                                │
+│    [Manufacturer: Buick                                     ⊗]  │
+│    [Model: Cascada, Century, Coachbuilder                   ⊗]  │
+│    [Body Class                                           ▼  ⊗]  │
+│                                                                 │
+│  Active Highlights:                         [Clear All Highlights] │
+│    [Highlight Models: Buick:Regal,Jeep:Cherokee,Ford:F-150  ⊗]  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Filter Selection Dropdown (Expanded)
@@ -375,24 +378,44 @@ So that I can refine my search beyond manufacturer-model selections
 
 ---
 
-### Action 10: Clear All Filters
+### Action 10: Clear All Highlights
 
-**Trigger**: User clicks "Clear All" button (red button in top-right corner of page)
-**Location**: Top-right of Vehicle Discovery page header, next to "Reset Panel Order"
+**Trigger**: User clicks "Clear All Highlights" link (in Active Highlights section)
+**Location**: Top-right of Active Highlights section in Query Control panel
 **Validation**: None (immediate action, no confirmation)
 **Result**:
-- All filter chips disappear immediately
+- All highlight filter chips disappear immediately
+- URL highlight parameters removed (h_manufacturer, h_modelCombos, h_bodyClass, h_yearMin, h_yearMax)
+- Regular filters remain unchanged
+- Statistics recalculate without highlighting (charts show all data in single color)
+- Charts update to remove highlighted segments
+
+**Visual Feedback**:
+- Link styled as blue text with underline
+- Link only visible when one or more highlight filters active
+- No visual change to regular filters
+
+---
+
+### Action 11: Clear All Filters
+
+**Trigger**: User clicks "Clear All" button (red button in Query Control panel header)
+**Location**: Top-right of Query Control panel header, next to collapse button
+**Validation**: None (immediate action, no confirmation)
+**Result**:
+- All filter chips disappear immediately (both regular filters AND highlights)
+- All highlight chips disappear immediately
 - URL parameters reset to defaults (`?page=1&size=20`)
 - Results table shows all 4,887 vehicles
 - Statistics recalculate for full dataset
-- Charts update to show complete distribution
+- Charts update to show complete distribution without highlighting
 
 **Visual Feedback**:
 - Button is red with white text
-- Button disabled/greyed when no filters active
-- Button enabled when one or more filters active
+- Button disabled/greyed when no filters OR highlights active
+- Button enabled when one or more filters OR highlights active
 
-**Confirmed**: Screenshot shows "Clear All" button in page header
+**Confirmed**: Screenshot shows "Clear All" button in Query Control header
 
 ---
 

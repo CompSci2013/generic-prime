@@ -1,6 +1,13 @@
 <div class="query-control-panel">
   <div class="query-control-header">
     <h3>Query Control</h3>
+    <p-button
+      label="Clear All"
+      icon="pi pi-times"
+      (onClick)="clearAll()"
+      styleClass="p-button-danger p-button-sm"
+      [disabled]="!hasActiveFiltersOrHighlights()">
+    </p-button>
   </div>
 
   <!-- Filter Field Selector -->
@@ -31,6 +38,31 @@
         (click)="editFilter(filter)"
         styleClass="filter-chip"
         [pTooltip]="getChipTooltip(filter)"
+        tooltipPosition="top">
+      </p-chip>
+    </div>
+  </div>
+
+  <!-- Active Highlights -->
+  <div class="active-highlights" *ngIf="activeHighlights.length > 0">
+    <div class="highlights-header">
+      <label class="active-highlights-label">Active Highlights:</label>
+      <a
+        href="javascript:void(0)"
+        class="clear-highlights-link"
+        (click)="clearAllHighlights()">
+        Clear All Highlights
+      </a>
+    </div>
+    <div class="highlight-chips">
+      <p-chip
+        *ngFor="let highlight of activeHighlights"
+        [label]="getChipLabel(highlight)"
+        [removable]="true"
+        (onRemove)="removeHighlight(highlight)"
+        (click)="editHighlight(highlight)"
+        styleClass="highlight-chip"
+        [pTooltip]="getChipTooltip(highlight)"
         tooltipPosition="top">
       </p-chip>
     </div>

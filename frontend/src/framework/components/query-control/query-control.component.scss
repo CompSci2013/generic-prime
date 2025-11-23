@@ -7,6 +7,9 @@
 }
 
 .query-control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1rem;
 
   h3 {
@@ -46,6 +49,58 @@
 
       &:hover {
         background-color: #e3f2fd;
+      }
+    }
+  }
+}
+
+.active-highlights {
+  margin-top: 1rem;
+
+  .highlights-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    .active-highlights-label {
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .clear-highlights-link {
+      font-size: 0.9rem;
+      color: #2196f3;
+      text-decoration: none;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .highlight-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    ::ng-deep .highlight-chip {
+      cursor: pointer;
+      user-select: none;
+      background-color: #fff3cd;
+      border-color: #ffc107;
+
+      &:hover {
+        background-color: #ffe69c;
+      }
+
+      .p-chip-text {
+        color: #856404;
+      }
+
+      .p-chip-remove-icon {
+        color: #856404;
       }
     }
   }

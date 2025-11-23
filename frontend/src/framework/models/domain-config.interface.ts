@@ -130,6 +130,21 @@ export interface DomainConfig<TFilters, TData, TStatistics = any> {
   queryControlFilters: QueryFilterDefinition<TFilters>[];
 
   /**
+   * Highlight filter definitions (optional)
+   * Defines highlight filters available in the Query Control component
+   * These filters add h_* URL parameters for segmented statistics in charts
+   *
+   * @example
+   * ```typescript
+   * highlightFilters: [
+   *   { field: 'manufacturer', label: 'Highlight Manufacturer', type: 'multiselect', urlParams: 'h_manufacturer', ... },
+   *   { field: 'yearMin', label: 'Highlight Year', type: 'range', urlParams: { min: 'h_yearMin', max: 'h_yearMax' }, ... }
+   * ]
+   * ```
+   */
+  highlightFilters?: QueryFilterDefinition<any>[];
+
+  /**
    * Chart configurations
    * Defines available charts and their data sources
    */
