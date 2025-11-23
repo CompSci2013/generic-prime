@@ -69,16 +69,8 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
         (stats.total || 0) - (stats.highlighted || 0)
       );
 
-      // Create stacked bar traces (Other first, then Highlighted on top)
+      // Create stacked bar traces (Highlighted first at bottom, then Other on top)
       traces = [
-        {
-          type: 'bar',
-          name: 'Other',
-          x: labels,
-          y: otherCounts,
-          marker: { color: '#9CA3AF' },
-          hovertemplate: '<b>%{x}</b><br>Other: %{y}<extra></extra>'
-        },
         {
           type: 'bar',
           name: 'Highlighted',
@@ -86,6 +78,14 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
           y: highlightedCounts,
           marker: { color: '#3B82F6' },
           hovertemplate: '<b>%{x}</b><br>Highlighted: %{y}<extra></extra>'
+        },
+        {
+          type: 'bar',
+          name: 'Other',
+          x: labels,
+          y: otherCounts,
+          marker: { color: '#9CA3AF' },
+          hovertemplate: '<b>%{x}</b><br>Other: %{y}<extra></extra>'
         }
       ];
     } else {
