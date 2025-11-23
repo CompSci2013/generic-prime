@@ -60,8 +60,9 @@
 4. `BaseChartComponent` - Generic Plotly.js chart container
    - ChartDataSource pattern for data transformation
    - Supports any Plotly.js chart type (bar, line, pie, scatter, etc.)
-   - Interactive click events for filtering/highlighting
+   - Interactive click events for filtering/highlighting (single-click and box selection)
    - Responsive resizing
+   - Delegation pattern for chart-specific formatting
    - Template: 14 lines, TypeScript: 298 lines
 
 5. `StatisticsPanelComponent` - Statistics visualization panel
@@ -69,8 +70,9 @@
    - Renders multiple BaseChartComponents based on domain config
    - Collapsible PrimeNG Panel
    - Automatically fetches statistics from API
-   - Template: 40 lines, TypeScript: 115 lines
-   - **KNOWN ISSUE**: Chart data shows all zero values (see KNOWN-BUGS.md #1)
+   - URL-First architecture for chart interactions
+   - Template: 40 lines, TypeScript: 215 lines
+   - ✅ **Fully functional** (v0.2.0 - 2025-11-23)
 
 **Framework Models/Interfaces** (13 files):
 1. `domain-config.interface.ts` (763 lines) - Complete domain config schema
@@ -129,14 +131,15 @@
   - Response transformers for each filter
 - `automobile.chart-configs.ts` (71 lines) - `AUTOMOBILE_CHART_CONFIGS[]`
   - 4 chart definitions: manufacturer, top-models, body-class, year
-  - ✅ Implemented in UI via StatisticsPanelComponent
-  - ⚠️ Known issue: Chart data shows all zeros (KNOWN-BUGS.md #1)
+  - ✅ Fully implemented and working (v0.2.0)
+  - ✅ Complete documentation: [docs/components/charts/](docs/components/charts/)
 
-**Chart Data Sources** (4 files, ~386 lines):
-- `manufacturer-chart-source.ts` (110 lines) - Horizontal bar chart (top 10 manufacturers)
-- `top-models-chart-source.ts` (110 lines) - Horizontal bar chart (top 10 models by VIN count)
-- `body-class-chart-source.ts` (121 lines) - Pie chart with semantic color mapping
-- `year-chart-source.ts` (110 lines) - Line chart with area fill (vehicle distribution over time)
+**Chart Data Sources** (4 files, ~640 lines):
+- `manufacturer-chart-source.ts` (156 lines) - Stacked bar chart (top 20 manufacturers, highlighted vs other)
+- `top-models-chart-source.ts` (160 lines) - Stacked bar chart (top 20 models by VIN count, highlighted vs other)
+- `body-class-chart-source.ts` (162 lines) - Stacked bar chart (all body classes, highlighted vs other)
+- `year-chart-source.ts` (162 lines) - Stacked bar chart (all years, highlighted vs other)
+- **Features**: Server-side segmented statistics, URL-First architecture, box selection, consistent stacking order
 
 **Domain Config Factory:**
 - `automobile.domain-config.ts` (102 lines) - `createAutomobileDomainConfig()`
@@ -186,7 +189,7 @@
 6. **Results Table** - Configuration-driven data table with filters, pagination, sorting
 7. **Error Handling** - Global error handler, user-facing notifications
 8. **Domain Config Registry** - Injectable domain configuration with validation
-9. **Charts & Statistics** - Plotly.js-based visualization (⚠️ data issue - see KNOWN-BUGS.md #1)
+9. **Charts & Statistics** - Plotly.js-based visualization with interactive highlighting (✅ v0.2.0)
 
 ### ✅ Automobile Domain
 1. **Filter System** - Inline filters (text search, year range) + Query Control (multiselect dialogs)
@@ -195,25 +198,35 @@
 4. **Picker** - Manufacturer-Model combination picker
 5. **API Integration** - `/api/specs/v1/vehicles/details` endpoint + filter option endpoints
 6. **URL Serialization** - Filters persist in URL query params
-7. **Charts** - 4 Plotly.js charts (manufacturer, top-models, body-class, year) with statistics transformation (⚠️ data shows zeros)
+7. **Charts & Highlighting** - 4 interactive Plotly.js charts with server-side segmented statistics
+   - Click/box selection to add highlight filters (h_manufacturer, h_modelCombos, h_bodyClass, h_yearMin/Max)
+   - Stacked bars showing highlighted (blue) vs other (gray) data
+   - Top 20 items for manufacturer and models charts
+   - URL-First architecture compliance
+   - Complete specification: [docs/components/charts/](docs/components/charts/)
 
 ---
 
 ## What's NOT Working / Not Implemented
 
-### ⚠️ Known Issues
+### ✅ Recently Completed
 
-**Charts Data Issue (KNOWN-BUGS.md #1)**:
-- ✅ BaseChartComponent exists (Plotly.js integration complete)
-- ✅ Chart rendering works (4 charts display)
-- ✅ Statistics panel integrated
-- ❌ Chart data shows all zero values (percentages 0.0%)
-- **Cause**: API statistics transformation issue - VehicleStatistics.fromSegmentedStats() may have incorrect field mapping
-- **Investigation**: Need to log raw API response to verify structure
+**Charts & Highlighting System (v0.2.0 - 2025-11-23)**:
+- ✅ URL-First architecture compliance (UrlStateService, not router.navigate)
+- ✅ Server-side segmented statistics support ({total, highlighted} format)
+- ✅ Consistent stacking order across all charts (Highlighted bottom, Other top)
+- ✅ Pipe-to-comma separator normalization for backend compatibility
+- ✅ Box selection deduplication (using Set to remove duplicates from stacked bars)
+- ✅ Box selection delegation pattern (chart-specific formatting)
+- ✅ Models chart parameter mapping (h_modelCombos not h_model)
+- ✅ Models chart format conversion (space to colon for "Manufacturer:Model")
+- ✅ Statistics transform limits (20 items not 10)
+- ✅ Comprehensive component specification created (430 lines + README)
+- **Documentation**: [docs/components/charts/specification.md](docs/components/charts/specification.md)
 
-### ✅ Recently Completed (2025-11-22)
+**Pop-Out Windows (2025-11-22)**:
 
-**Pop-Out Windows:**
+**System Features**:
 - ✅ Pop-out buttons on all panels (Statistics, Results, Query Control, Pickers)
 - ✅ Pop-out routing (`/panel/:gridId/:panelId/:type`)
 - ✅ `PanelPopoutComponent` container component
@@ -236,11 +249,6 @@
   - Fixed in discover.component.ts and query-control.component.ts
 
 ### ❌ Not Implemented Yet
-
-**Highlights System:**
-- No highlight filters (`h_*` params)
-- No highlight visualization in charts/tables
-- API supports it, UI does not
 
 **Row Expansion Details:**
 - Basic row expansion works (shows all fields)

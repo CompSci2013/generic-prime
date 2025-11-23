@@ -35,19 +35,19 @@
 4. **BaseChartComponent** - Generic Plotly.js chart container
    - ChartDataSource pattern for domain-specific data transformation
    - Supports any Plotly.js chart type (bar, line, pie, scatter, etc.)
-   - Interactive click events for filtering/highlighting
+   - Interactive click events for filtering/highlighting (single-click and box selection)
    - Responsive resizing with window resize handler
+   - Delegation pattern for chart-specific formatting
    - Template: 14 lines, TypeScript: 298 lines
 
-5. **StatisticsPanelComponent** - Statistics visualization panel (⚠️ Partial)
+5. **StatisticsPanelComponent** - Statistics visualization panel
    - Injects shared ResourceManagementService instance (proper Angular DI)
    - Renders multiple BaseChartComponents based on domain config
    - Collapsible PrimeNG Panel
    - Automatically fetches statistics from API
-   - Template: 40 lines, TypeScript: 115 lines
-   - ✅ Framework implementation complete
-   - ⚠️ **KNOWN ISSUE**: Chart data shows all zeros (KNOWN-BUGS.md #1)
-   - **Investigation needed**: API statistics transformation
+   - URL-First architecture for chart interactions
+   - Template: 40 lines, TypeScript: 215 lines
+   - ✅ **Fully functional** (v0.2.0 - 2025-11-23)
 
 ### ✅ Framework Services Complete (9 Services, ~3,139 Lines)
 
@@ -74,33 +74,25 @@ All F1-F10 milestones complete:
 
 ## Next Implementation Options
 
-### Option 1: Debug Chart Data Issue (RECOMMENDED - High Value)
+### ✅ Option 1: Charts & Highlighting System (COMPLETED v0.2.0 - 2025-11-23)
 
-**Priority**: HIGH (Completes statistics panel feature)
-**Component**: VehicleStatistics.fromSegmentedStats() transformation
-**Estimated Effort**: 1-2 hours
+**Status**: ✅ COMPLETE
+**Component**: Statistics Panel with interactive chart highlighting
+**Completed Features**:
+- ✅ URL-First architecture compliance (UrlStateService, not router.navigate)
+- ✅ Server-side segmented statistics support ({total, highlighted} format)
+- ✅ Consistent stacking order across all charts (Highlighted bottom, Other top)
+- ✅ Pipe-to-comma separator normalization for backend compatibility
+- ✅ Box selection deduplication (using Set to remove duplicates from stacked bars)
+- ✅ Box selection delegation pattern (chart-specific formatting)
+- ✅ Models chart parameter mapping (h_modelCombos not h_model)
+- ✅ Models chart format conversion (space to colon for "Manufacturer:Model")
+- ✅ Statistics transform limits (20 items not 10)
+- ✅ Comprehensive component specification created (430 lines + README)
 
-**Current Issue** (KNOWN-BUGS.md #1):
-- ✅ Charts render correctly (4 charts visible)
-- ✅ Chart structure works (manufacturer names, model names, years showing)
-- ❌ All data shows as 0.0% or zero counts
-- **Root Cause**: API statistics transformation logic extracting wrong fields
+**Documentation**: [docs/components/charts/specification.md](docs/components/charts/specification.md)
 
-**Investigation Steps**:
-1. Add console.log to see raw API response statistics structure
-2. Verify API field names match transformation logic expectations
-3. Check if API uses `total` vs `count` vs different field names
-4. Fix VehicleStatistics transformation methods:
-   - `transformByManufacturer()` - Check `counts.total` field
-   - `transformModelsByManufacturer()` - Check nested structure
-   - `transformByBodyClass()` - Check field mapping
-   - `transformByYearRange()` - Check year key/value structure
-
-**Expected Outcome**:
-- Charts display actual distribution data with correct percentages
-- Manufacturer chart shows real manufacturer counts
-- Year chart shows timeline distribution
-- Body class pie chart shows proportions
+**Git Tag**: v0.2.0 (2025-11-23) - 11 commits, 760 lines of documentation
 
 ---
 
@@ -124,9 +116,9 @@ All F1-F10 milestones complete:
 
 ---
 
-### Option 3: VIN Browser Panel (NEW FEATURE)
+### Option 3: VIN Browser Panel (RECOMMENDED - High Value)
 
-**Priority**: MEDIUM (Adds drill-down capability)
+**Priority**: HIGH (Adds drill-down capability to complete data exploration)
 **Component**: VIN instance browser
 **Estimated Effort**: 3-4 days
 
@@ -134,25 +126,45 @@ All F1-F10 milestones complete:
 - Browse individual VINs for selected vehicle specs
 - Drill-down from specs to instances
 - Integration with VINs API (`/api/vins/v1/*`)
-- Display VIN details (mileage, condition, value, etc.)
+- Display VIN details (mileage, condition, value, estimated_value, registered_state, exterior_color, etc.)
+- Row expansion integration in ResultsTable
+- URL-First architecture for VIN filtering
+
+**API Endpoints Available**:
+```typescript
+// Get all VIN instances
+GET /api/vins/v1/vins?manufacturer=Ford&yearMin=2020&page=1&size=20
+
+// Get VINs for specific vehicle specification
+GET /api/vins/v1/vehicles/:vehicleId/instances?page=1&pageSize=20
+```
+
+**Expected Outcome**:
+- Users can click on vehicle spec row to see individual VIN instances
+- VIN details displayed in row expansion panel
+- VIN filtering capabilities (by condition, mileage range, value range, state, etc.)
+- Complete data lineage: Specs → VINs → Details
 
 ---
 
 ## Alternative Next Steps
 
-If Statistics Panel seems too complex, consider these alternatives:
+If VIN Browser Panel seems too complex, consider these alternatives:
 
-1. **Pop-Out Window System** - Add UI for popping out panels to separate windows
-   - PopOutContextService already exists
-   - Just needs UI buttons and routing
+1. **Row Expansion Details** - Custom expansion templates for ResultsTable
+   - Show vehicle specification details inline
+   - Preview VIN instances for a spec
+   - Link to full VIN browser
 
-2. **Row Expansion Details** - Custom expansion templates for ResultsTable
-   - Show VIN instance details
-   - Link to VIN API endpoints
-
-3. **Column Management** - UI for show/hide and reorder columns
+2. **Column Management** - UI for show/hide and reorder columns
    - PrimeNG supports this natively
-   - Just needs UI controls
+   - Just needs UI controls (MultiSelect for column toggle)
+   - State persistence via localStorage
+
+3. **Export Functionality** - CSV/Excel export for filtered data
+   - Export current results to CSV
+   - Export charts as images
+   - PrimeNG provides exportCSV() method on Table
 
 ---
 
