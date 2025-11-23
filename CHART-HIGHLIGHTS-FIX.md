@@ -35,7 +35,7 @@ This bypassed the URL-First architecture and prevented:
 
 ## Solution
 
-### Fix Applied
+### Fix #1: URL-First Architecture Compliance
 Changed `StatisticsPanelComponent.onChartClick()` to use `UrlStateService`:
 
 ```typescript
@@ -47,11 +47,46 @@ this.urlState.setParams(newParams);
 
 **Lines Modified**: 173-202
 
-### Changes Summary
+**Changes**:
 1. Replaced `router.navigate()` with `urlState.setParams()` (line 194)
 2. Removed unused `Router` import (line 19)
 3. Removed unused `router` constructor parameter (line 87)
 4. Added debug logging (line 193)
+
+### Fix #2: Server-Side Segmented Statistics
+Chart data sources were doing **client-side highlighting** instead of using the **server-side segmented statistics** from the backend.
+
+**Problem**: Client-side comparison `name === highlights.manufacturer` fails for:
+- Comma-separated values (`h_manufacturer=Ford,Buick`)
+- Multiple selections
+- Year ranges (`h_yearMin`/`h_yearMax`)
+
+**Solution**: Check if backend returned segmented format `{total, highlighted}` and use it directly.
+
+**Files Changed**:
+1. `manufacturer-chart-source.ts` - Lines 23-93
+2. `body-class-chart-source.ts` - Lines 38-130
+3. `year-chart-source.ts` - Lines 22-112
+4. `top-models-chart-source.ts` - Already correct (no changes)
+
+**Key Pattern**:
+```typescript
+// Check if data has server-side segmented format
+const isSegmented = entries.length > 0 &&
+  typeof entries[0][1] === 'object' &&
+  'total' in entries[0][1];
+
+if (isSegmented) {
+  // Use backend data directly
+  const highlightedCounts = sorted.map(([, stats]) => stats.highlighted || 0);
+  const otherCounts = sorted.map(([, stats]) =>
+    (stats.total || 0) - (stats.highlighted || 0)
+  );
+  // Create stacked bars
+} else {
+  // Simple blue bars for non-highlighted data
+}
+```
 
 ---
 
