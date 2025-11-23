@@ -132,10 +132,20 @@ export class TopModelsChartDataSource extends ChartDataSource<VehicleStatistics>
 
   /**
    * Handle chart click event
+   *
+   * Supports both single-click and box selection.
+   * For box selection, returns comma-separated list of unique models.
    */
   handleClick(event: any): string | null {
     if (event.points && event.points.length > 0) {
-      return event.points[0].x; // Return full model name (Manufacturer Model)
+      // Extract all model names from selected points
+      const models = event.points.map((point: any) => point.x as string);
+
+      // Remove duplicates (box selection may select both stacked bars)
+      const uniqueModels = [...new Set(models)];
+
+      // Return comma-separated list (or single value)
+      return uniqueModels.join(',');
     }
     return null;
   }

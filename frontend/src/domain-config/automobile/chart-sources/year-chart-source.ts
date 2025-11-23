@@ -126,10 +126,27 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
 
   /**
    * Handle chart click event
+   *
+   * Supports both single-click and box selection.
+   * For box selection, returns year range as "min|max".
    */
   handleClick(event: any): string | null {
     if (event.points && event.points.length > 0) {
-      return event.points[0].x; // Return year
+      // Extract all years from selected points
+      const years: number[] = event.points.map((point: any) => parseInt(point.x, 10));
+
+      // Remove duplicates (box selection may select both stacked bars)
+      const uniqueYears: number[] = [...new Set(years)].sort((a, b) => a - b);
+
+      if (uniqueYears.length === 1) {
+        // Single year selected
+        return uniqueYears[0].toString();
+      } else {
+        // Multiple years: return as range min|max
+        const min = uniqueYears[0];
+        const max = uniqueYears[uniqueYears.length - 1];
+        return `${min}|${max}`;
+      }
     }
     return null;
   }

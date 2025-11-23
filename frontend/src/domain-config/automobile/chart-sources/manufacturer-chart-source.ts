@@ -131,10 +131,20 @@ export class ManufacturerChartDataSource extends ChartDataSource<VehicleStatisti
 
   /**
    * Handle chart click event
+   *
+   * Supports both single-click and box selection.
+   * For box selection, returns comma-separated list of unique manufacturers.
    */
   handleClick(event: any): string | null {
     if (event.points && event.points.length > 0) {
-      return event.points[0].x; // Return manufacturer name (x-axis value)
+      // Extract all manufacturer names from selected points
+      const manufacturers = event.points.map((point: any) => point.x as string);
+
+      // Remove duplicates (box selection may select both stacked bars)
+      const uniqueManufacturers = [...new Set(manufacturers)];
+
+      // Return comma-separated list (or single value)
+      return uniqueManufacturers.join(',');
     }
     return null;
   }

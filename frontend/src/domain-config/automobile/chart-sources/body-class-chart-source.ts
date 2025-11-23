@@ -144,10 +144,20 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
 
   /**
    * Handle chart click event
+   *
+   * Supports both single-click and box selection.
+   * For box selection, returns comma-separated list of unique body classes.
    */
   handleClick(event: any): string | null {
     if (event.points && event.points.length > 0) {
-      return event.points[0].x; // Return body class name (x-axis value)
+      // Extract all body class names from selected points
+      const bodyClasses = event.points.map((point: any) => point.x as string);
+
+      // Remove duplicates (box selection may select both stacked bars)
+      const uniqueBodyClasses = [...new Set(bodyClasses)];
+
+      // Return comma-separated list (or single value)
+      return uniqueBodyClasses.join(',');
     }
     return null;
   }
