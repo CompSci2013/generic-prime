@@ -1,7 +1,35 @@
 # TLDR-NEXT-STEP.md - Implementation Roadmap
 
-**Last Updated:** 2025-11-22
+**Last Updated:** 2025-11-23
 **Purpose:** Machine-readable guide for implementing next features
+
+---
+
+## 🔥 Latest Session Summary (2025-11-23)
+
+**What Just Happened:**
+- Fixed 3 critical pop-out bugs (Clear button, modelCombos chips, focus/change detection)
+- Discovered 2 new pop-out bugs (pagination zero rows, checkbox visual state)
+- **CRITICAL ARCHITECTURAL DISCOVERY**: OnPush change detection in unfocused browser windows
+  - `markForCheck()` doesn't work in unfocused windows (only schedules, never runs)
+  - Must use `detectChanges()` for pop-out window state synchronization
+  - Changed in 3 locations: URL sync, URL hydration, selection hydration
+
+**Files Modified:**
+1. [panel-popout.component.ts:214](frontend/src/app/features/panel-popout/panel-popout.component.ts#L214) - Added `urlState.setParams()` for pop-out URL sync
+2. [automobile.query-control-filters.ts:113-137](frontend/src/domain-config/automobile/configs/automobile.query-control-filters.ts#L113-L137) - Added modelCombos filter definition
+3. [base-picker.component.ts:147,175,204](frontend/src/framework/components/base-picker/base-picker.component.ts#L147) - Changed `markForCheck()` to `detectChanges()` in 3 places
+
+**Key Pattern Learned:**
+```typescript
+// ❌ WRONG for pop-out windows
+this.cdr.markForCheck();  // Only schedules, doesn't run in unfocused windows
+
+// ✅ CORRECT for pop-out windows
+this.cdr.detectChanges();  // Forces immediate update, works in unfocused windows
+```
+
+**Next Recommended Task**: Fix Bug #6 and #7 (see PRIORITY 0 below)
 
 ---
 
@@ -74,6 +102,27 @@ All F1-F10 milestones complete:
 
 ## Next Implementation Options
 
+### ⚠️ PRIORITY 0: Fix Active Pop-Out Bugs (RECOMMENDED NEXT)
+
+**Estimated Effort**: 1-2 hours
+**Priority**: HIGH (blocking smooth pop-out experience)
+
+**Bug #6: Popped-out picker shows zero rows after pagination**
+- Investigation: Check if pagination handler uses `markForCheck()` instead of `detectChanges()`
+- Likely location: [base-picker.component.ts](frontend/src/framework/components/base-picker/base-picker.component.ts) onLazyLoad() handler
+- Expected fix: Replace `markForCheck()` with `detectChanges()` in pagination logic
+- Test: Pop out picker → change page → verify rows display without needing to focus window
+
+**Bug #7: Checkboxes remain visually checked after clearing selections**
+- Investigation: Check PrimeNG Table selection state management
+- Likely issue: `selectedKeys` Set not syncing with PrimeNG's internal selection array
+- Possible fix: Explicitly set `selection` to empty array after clearing `selectedKeys`
+- Test: Select items → clear via Query Control → verify checkboxes uncheck in pop-out
+
+**Reference**: See [KNOWN-BUGS.md](KNOWN-BUGS.md) for detailed reproduction steps
+
+---
+
 ### ✅ Option 1: Charts & Highlighting System (COMPLETED v0.2.0 - 2025-11-23)
 
 **Status**: ✅ COMPLETE
@@ -96,9 +145,9 @@ All F1-F10 milestones complete:
 
 ---
 
-### ✅ Option 2: Pop-Out Window System (COMPLETED 2025-11-22)
+### ✅ Option 2: Pop-Out Window System (COMPLETED 2025-11-22, REFINEMENTS 2025-11-23)
 
-**Status**: ✅ COMPLETE
+**Status**: ✅ CORE COMPLETE, ⚠️ 2 ACTIVE BUGS
 **Component**: Pop-out buttons + routing + messaging
 **Completed Features**:
 - ✅ Pop-out buttons on all panels (Statistics, Results, Query Control, Pickers)
@@ -109,10 +158,39 @@ All F1-F10 milestones complete:
 - ✅ MOVE semantics (panel disappears when popped out)
 - ✅ Automatic restoration when pop-out closed
 
-**Recent Bug Fixes**:
+**Bug Fixes (2025-11-22)**:
 - ✅ Fixed duplicate API calls (proper DI with InjectionToken)
 - ✅ Fixed paginator display (removed stateStorage conflict)
 - ✅ Fixed pagination indexing (1-indexed API compliance)
+
+**Bug Fixes (2025-11-23 Session)**:
+- ✅ **Bug #1**: Clear button in pop-out Query Control not updating URL
+  - Fixed: [panel-popout.component.ts:214](frontend/src/app/features/panel-popout/panel-popout.component.ts#L214)
+  - Added `urlState.setParams()` call before broadcasting to main window
+- ✅ **Bug #4**: Query Control not showing modelCombos selection chips
+  - Fixed: [automobile.query-control-filters.ts:113-137](frontend/src/domain-config/automobile/configs/automobile.query-control-filters.ts#L113-L137)
+  - Added modelCombos filter definition to AUTOMOBILE_QUERY_CONTROL_FILTERS
+- ✅ **Bug #5**: Pop-out picker not updating when filters cleared until window focused
+  - Fixed: [base-picker.component.ts:147,175,204](frontend/src/framework/components/base-picker/base-picker.component.ts#L147)
+  - **CRITICAL LEARNING**: Use `detectChanges()` instead of `markForCheck()` for unfocused pop-out windows
+  - OnPush + markForCheck() only schedules change detection, doesn't run in unfocused windows
+  - Changed 3 locations: URL sync handler, hydrateFromUrl(), hydrateSelections()
+
+**Active Bugs (Needs Investigation)**:
+- ❌ **Bug #6**: Popped-out picker shows zero rows after pagination change
+  - Likely same change detection issue as Bug #5
+  - May need `detectChanges()` in pagination handler
+- ❌ **Bug #7**: Checkboxes remain visually checked after clearing selections
+  - Count shows correct value (0) but checkboxes still appear checked
+  - PrimeNG Table selection state sync issue
+
+**Key Architectural Learning**:
+- **OnPush Change Detection in Pop-Outs**: Unfocused browser windows don't run scheduled change detection cycles
+- **Pattern**: Use `detectChanges()` instead of `markForCheck()` for:
+  1. URL parameter change handlers (syncing from main window)
+  2. BroadcastChannel message handlers (cross-window communication)
+  3. Selection hydration (restoring state from URL)
+- **Reference**: See [TLDR.md](TLDR.md) section "6. OnPush Change Detection in Pop-Out Windows" for detailed analysis
 
 ---
 

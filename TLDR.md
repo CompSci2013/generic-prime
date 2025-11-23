@@ -243,7 +243,7 @@
 - ✅ Comprehensive component specification created (430 lines + README)
 - **Documentation**: [docs/components/charts/specification.md](docs/components/charts/specification.md)
 
-**Pop-Out Windows (2025-11-22)**:
+**Pop-Out Windows (2025-11-22 - 2025-11-23)**:
 
 **System Features**:
 - ✅ Pop-out buttons on all panels (Statistics, Results, Query Control, Pickers)
@@ -254,7 +254,7 @@
 - ✅ MOVE semantics (panel disappears from main window when popped out)
 - ✅ Automatic panel restoration when pop-out closed
 
-**Bug Fixes:**
+**Bug Fixes (2025-11-22)**:
 - ✅ Fixed duplicate API calls (ResourceManagementService DI refactoring)
   - Changed from manual instantiation to proper Angular InjectionToken pattern
   - Single shared instance per page (DiscoverComponent, PanelPopoutComponent)
@@ -266,6 +266,34 @@
 - ✅ Fixed pagination indexing (1-indexed API compliance)
   - Changed all `page: 0` resets to `page: 1` (API uses 1-indexed pagination)
   - Fixed in discover.component.ts and query-control.component.ts
+
+**Bug Fixes (2025-11-23 Session)**:
+- ✅ **Bug #1**: Clear button in pop-out Query Control not updating URL ([panel-popout.component.ts:214](frontend/src/app/features/panel-popout/panel-popout.component.ts#L214))
+  - Root cause: PanelPopoutComponent.onUrlParamsChange() only broadcasted to main window but didn't update pop-out's own URL
+  - Fix: Added `this.urlState.setParams(params)` call to update pop-out's URL before broadcasting
+  - Pattern: Pop-outs must update their own URL first, then broadcast to main window
+- ✅ **Bug #4**: Query Control not showing modelCombos selection chips ([automobile.query-control-filters.ts:113-137](frontend/src/domain-config/automobile/configs/automobile.query-control-filters.ts#L113-L137))
+  - Root cause: modelCombos parameter not defined in AUTOMOBILE_QUERY_CONTROL_FILTERS
+  - Fix: Added modelCombos filter definition with manufacturer-model-combinations API endpoint
+  - Pattern: All URL parameters used by pickers must have corresponding filter definitions in Query Control
+- ✅ **Bug #5**: Pop-out picker not updating when filters cleared until window focused ([base-picker.component.ts:147,175,204](frontend/src/framework/components/base-picker/base-picker.component.ts#L147))
+  - Root cause: OnPush change detection + `cdr.markForCheck()` only schedules change detection, doesn't run in unfocused windows
+  - Fix: Replaced `markForCheck()` with `detectChanges()` in 3 locations (URL sync, hydration)
+  - Pattern: **CRITICAL** - Use `detectChanges()` instead of `markForCheck()` for pop-out windows that need immediate UI updates
+
+### ❌ Known Active Bugs (2025-11-23)
+
+**Pop-Out Window Bugs**:
+- ❌ **Bug #6**: Popped-out picker shows zero rows after pagination change
+  - Status: Documented in KNOWN-BUGS.md, needs investigation
+  - Likely related to same change detection issue as Bug #5
+  - May require `detectChanges()` in pagination handler
+- ❌ **Bug #7**: Checkboxes remain visually checked after clearing selections
+  - Status: Documented in KNOWN-BUGS.md, needs investigation
+  - Count shows correct value (0) but checkboxes still appear checked
+  - PrimeNG Table selection state sync issue
+
+**Tracking**: See [KNOWN-BUGS.md](KNOWN-BUGS.md) for detailed reproduction steps and analysis
 
 ### ❌ Not Implemented Yet
 
@@ -385,6 +413,59 @@ Components observe state$ and re-render
 <!-- WRONG: Custom table wrapper (DELETED in revision) -->
 <app-base-data-table [config]="..."></app-base-data-table>  ❌
 ```
+
+### 6. OnPush Change Detection in Pop-Out Windows
+
+**⚠️ CRITICAL PATTERN** (Discovered 2025-11-23):
+
+Pop-out windows (unfocused browser windows) require special change detection handling:
+
+```typescript
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush  // Required for performance
+})
+export class BasePickerComponent {
+
+  // ❌ WRONG: markForCheck() doesn't work in unfocused windows
+  private subscribeToUrlChanges(): void {
+    this.route.queryParams.subscribe(params => {
+      this.selections = this.parseUrl(params);
+      this.cdr.markForCheck();  // ❌ Only schedules - won't run if window unfocused
+    });
+  }
+
+  // ✅ CORRECT: detectChanges() forces immediate update
+  private subscribeToUrlChanges(): void {
+    this.route.queryParams.subscribe(params => {
+      this.selections = this.parseUrl(params);
+      this.cdr.detectChanges();  // ✅ Forces immediate update, works in unfocused windows
+    });
+  }
+}
+```
+
+**When to Use Each**:
+- **`markForCheck()`**: Use in main window components (normal case)
+  - Schedules change detection for next cycle
+  - More efficient (batches updates)
+  - Works fine for focused windows
+
+- **`detectChanges()`**: Use in pop-out window components
+  - Forces immediate change detection
+  - Required for unfocused browser windows
+  - Necessary for cross-window state synchronization via BroadcastChannel
+
+**Real-World Bug Example**:
+- Bug #5: Pop-out picker didn't update when filter cleared in main window until user clicked on pop-out
+- Root Cause: `markForCheck()` scheduled change detection, but unfocused window never ran the cycle
+- Fix: Changed to `detectChanges()` in URL sync handlers ([base-picker.component.ts:147,175,204](frontend/src/framework/components/base-picker/base-picker.component.ts#L147))
+
+**Pop-Out-Specific Locations** (use `detectChanges()`):
+1. URL parameter change handlers (when syncing from main window)
+2. BroadcastChannel message handlers (cross-window communication)
+3. Selection hydration (restoring state from URL)
+
+**Reference**: See [KNOWN-BUGS.md](KNOWN-BUGS.md) Bug #5 for detailed analysis
 
 ---
 
