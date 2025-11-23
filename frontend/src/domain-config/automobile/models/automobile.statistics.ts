@@ -286,7 +286,7 @@ export class VehicleStatistics {
       s.percentage = totalCount > 0 ? (s.count / totalCount) * 100 : 0;
     });
 
-    return stats.slice(0, 10);
+    return stats.slice(0, 20);
   }
 
   /**
@@ -321,7 +321,7 @@ export class VehicleStatistics {
       s.percentage = totalCount > 0 ? (s.instanceCount / totalCount) * 100 : 0;
     });
 
-    return stats.slice(0, 10);
+    return stats.slice(0, 20);
   }
 
   /**
