@@ -60,16 +60,8 @@ export class TopModelsChartDataSource extends ChartDataSource<VehicleStatistics>
         (stats.total || 0) - (stats.highlighted || 0)
       );
 
-      // Create stacked bar traces
+      // Create stacked bar traces (Highlighted first at bottom, then Other on top)
       traces = [
-        {
-          type: 'bar',
-          name: 'Other',
-          x: modelLabels,
-          y: otherCounts,
-          marker: { color: '#9CA3AF' },
-          hovertemplate: '<b>%{x}</b><br>Other: %{y}<extra></extra>'
-        },
         {
           type: 'bar',
           name: 'Highlighted',
@@ -77,6 +69,14 @@ export class TopModelsChartDataSource extends ChartDataSource<VehicleStatistics>
           y: highlightedCounts,
           marker: { color: '#3B82F6' },
           hovertemplate: '<b>%{x}</b><br>Highlighted: %{y}<extra></extra>'
+        },
+        {
+          type: 'bar',
+          name: 'Other',
+          x: modelLabels,
+          y: otherCounts,
+          marker: { color: '#9CA3AF' },
+          hovertemplate: '<b>%{x}</b><br>Other: %{y}<extra></extra>'
         }
       ];
     } else {
