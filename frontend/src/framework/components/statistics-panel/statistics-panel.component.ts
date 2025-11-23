@@ -16,7 +16,7 @@ import {
   ChangeDetectorRef,
   Inject
 } from '@angular/core';
-import { ActivatedRoute, Router, Params } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ChartConfig, DomainConfig } from '../../models/domain-config.interface';
@@ -85,7 +85,6 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
     @Inject(RESOURCE_MANAGEMENT_SERVICE)
     private resourceService: ResourceManagementService<any, any, any>,
     private route: ActivatedRoute,
-    private router: Router,
     private urlState: UrlStateService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -173,26 +172,25 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
   onChartClick(event: { value: string; isHighlightMode: boolean }, chartId: string): void {
     if (event.isHighlightMode) {
       // Highlight mode: Add h_* URL parameter based on chart type
-      const currentParams = { ...this.route.snapshot.queryParams };
+      const newParams: Record<string, any> = {};
 
       // Handle range selections (value contains min|max)
       if (chartId === 'year-distribution' && event.value.includes('|')) {
         const [min, max] = event.value.split('|');
-        currentParams['h_yearMin'] = min;
-        currentParams['h_yearMax'] = max;
+        newParams['h_yearMin'] = min;
+        newParams['h_yearMax'] = max;
       } else {
         // Single value or other chart types
         const paramName = this.getHighlightParamName(chartId);
         if (paramName) {
-          currentParams[paramName] = event.value;
+          newParams[paramName] = event.value;
         }
       }
 
-      this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: currentParams,
-        queryParamsHandling: 'merge'
-      });
+      // Use UrlStateService instead of router.navigate() directly
+      // This ensures URL-First architecture compliance
+      console.log('[StatisticsPanel] Setting highlight params:', newParams);
+      this.urlState.setParams(newParams);
     } else {
       // Normal mode: Update filters
       // This would trigger a data refetch

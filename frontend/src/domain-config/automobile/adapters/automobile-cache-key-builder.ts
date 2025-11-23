@@ -43,14 +43,37 @@ export class AutomobileCacheKeyBuilder
    * Creates a unique, deterministic cache key by serializing
    * all non-null/undefined filter values in sorted order.
    *
+   * IMPORTANT: Highlights MUST be included in cache key to prevent
+   * stale data when highlight parameters change.
+   *
    * @param filters - Filter object
+   * @param highlights - Optional highlight filters (h_* parameters)
    * @returns Cache key string
    */
-  buildKey(filters: AutoSearchFilters): string {
+  buildKey(filters: AutoSearchFilters, highlights?: any): string {
     const parts: string[] = [this.PREFIX];
 
     // Collect all defined filter values
     const entries = this.getFilterEntries(filters);
+
+    // Add highlight parameters with h_ prefix
+    if (highlights) {
+      if (highlights.yearMin !== undefined && highlights.yearMin !== null) {
+        entries.push(['h_yearMin', highlights.yearMin]);
+      }
+      if (highlights.yearMax !== undefined && highlights.yearMax !== null) {
+        entries.push(['h_yearMax', highlights.yearMax]);
+      }
+      if (highlights.manufacturer) {
+        entries.push(['h_manufacturer', highlights.manufacturer]);
+      }
+      if (highlights.modelCombos) {
+        entries.push(['h_modelCombos', highlights.modelCombos]);
+      }
+      if (highlights.bodyClass) {
+        entries.push(['h_bodyClass', highlights.bodyClass]);
+      }
+    }
 
     // Sort by key for deterministic ordering
     entries.sort((a, b) => a[0].localeCompare(b[0]));
@@ -190,12 +213,16 @@ export class DefaultCacheKeyBuilder<TFilters>
    * Build cache key from filters using JSON serialization
    *
    * @param filters - Filter object
+   * @param highlights - Optional highlight filters (h_* parameters)
    * @returns Cache key string
    */
-  buildKey(filters: TFilters): string {
+  buildKey(filters: TFilters, highlights?: any): string {
+    // Combine filters and highlights for cache key
+    const combined = { filters, highlights };
+
     // Simple implementation using JSON serialization
     // Sort keys for deterministic output
-    const json = JSON.stringify(filters, Object.keys(filters as any).sort());
+    const json = JSON.stringify(combined, Object.keys(combined as any).sort());
 
     // Create hash from JSON (simple implementation)
     const hash = this.simpleHash(json);

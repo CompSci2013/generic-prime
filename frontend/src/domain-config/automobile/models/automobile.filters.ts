@@ -10,11 +10,12 @@
 /**
  * Highlight Filters
  *
- * UI-only state for client-side data highlighting in charts.
+ * Highlight parameters for segmented statistics computation.
  * Corresponds to URL parameters with 'h_' prefix (e.g., h_yearMin, h_yearMax).
  *
- * Purpose: Visual emphasis of data subsets in charts through client-side
- * rendering logic. NOT sent to backend API.
+ * Purpose: Sent to backend API as h_* query parameters to request segmented
+ * statistics with {total, highlighted} format. This allows charts to render
+ * stacked bars showing highlighted vs other data.
  *
  * @example
  * ```typescript
@@ -24,7 +25,8 @@
  *   yearMax: 2024
  * };
  * // URL: ?h_manufacturer=Ford&h_yearMin=2020&h_yearMax=2024
- * // Charts use these values for visual highlighting (client-side only)
+ * // API receives: GET /vehicles/details?h_manufacturer=Ford&h_yearMin=2020&h_yearMax=2024
+ * // Returns: {"Ford": {"total": 665, "highlighted": 665}, "Chevrolet": {"total": 849, "highlighted": 0}}
  * ```
  */
 export interface HighlightFilters {

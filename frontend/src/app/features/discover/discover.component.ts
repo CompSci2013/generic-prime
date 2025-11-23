@@ -44,7 +44,9 @@ import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../..
           filterMapper: domainConfig.urlMapper,
           apiAdapter: domainConfig.apiAdapter,
           cacheKeyBuilder: domainConfig.cacheKeyBuilder,
-          defaultFilters: {} as any
+          defaultFilters: {} as any,
+          supportsHighlights: domainConfig.features?.highlights ?? false,
+          highlightPrefix: 'h_'
         });
       },
       deps: [UrlStateService, DOMAIN_CONFIG]

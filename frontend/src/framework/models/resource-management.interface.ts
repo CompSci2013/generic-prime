@@ -56,10 +56,12 @@ export interface IApiAdapter<TFilters, TData, TStatistics = any> {
    * Fetch data from API based on filters
    *
    * @param filters - Filter object
+   * @param highlights - Optional highlight filters (h_* parameters for segmented statistics)
    * @returns Observable of API response
    */
   fetchData(
-    filters: TFilters
+    filters: TFilters,
+    highlights?: any
   ): Observable<ApiAdapterResponse<TData, TStatistics>>;
 }
 
@@ -73,9 +75,10 @@ export interface ICacheKeyBuilder<TFilters> {
    * Build a unique cache key from filters
    *
    * @param filters - Filter object
+   * @param highlights - Optional highlight filters (must be included in cache key)
    * @returns Cache key string
    */
-  buildKey(filters: TFilters): string;
+  buildKey(filters: TFilters, highlights?: any): string;
 }
 
 /**

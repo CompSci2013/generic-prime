@@ -280,8 +280,11 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
     // Set loading state
     this.updateState({ loading: true, error: null });
 
+    // Get current highlights from state
+    const highlights = this.stateSubject.value.highlights;
+
     this.config.apiAdapter
-      .fetchData(filters)
+      .fetchData(filters, highlights)
       .pipe(
         takeUntil(this.destroy$),
         catchError(error => {

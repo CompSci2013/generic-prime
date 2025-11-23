@@ -66,13 +66,15 @@ export class AutomobileApiAdapter
    * Fetch vehicle data from API
    *
    * @param filters - Search filters
+   * @param highlights - Optional highlight filters (h_* parameters for segmented statistics)
    * @returns Observable of vehicle results with statistics
    */
   fetchData(
-    filters: AutoSearchFilters
+    filters: AutoSearchFilters,
+    highlights?: any
   ): Observable<ApiAdapterResponse<VehicleResult, VehicleStatistics>> {
     // Convert filters to API parameters
-    const params = this.filtersToApiParams(filters);
+    const params = this.filtersToApiParams(filters, highlights);
 
     // Fetch vehicle data
     return this.apiService
@@ -133,10 +135,12 @@ export class AutomobileApiAdapter
    * Removes undefined/null values.
    *
    * @param filters - Domain filters
+   * @param highlights - Optional highlight filters (h_* parameters)
    * @returns API query parameters
    */
   private filtersToApiParams(
-    filters: AutoSearchFilters
+    filters: AutoSearchFilters,
+    highlights?: any
   ): Record<string, any> {
     const params: Record<string, any> = {};
 
@@ -195,6 +199,29 @@ export class AutomobileApiAdapter
 
     if (filters.sortDirection) {
       params['sortOrder'] = filters.sortDirection;
+    }
+
+    // Highlight parameters (h_* prefix for segmented statistics)
+    if (highlights) {
+      if (highlights.yearMin !== undefined && highlights.yearMin !== null) {
+        params['h_yearMin'] = highlights.yearMin.toString();
+      }
+
+      if (highlights.yearMax !== undefined && highlights.yearMax !== null) {
+        params['h_yearMax'] = highlights.yearMax.toString();
+      }
+
+      if (highlights.manufacturer) {
+        params['h_manufacturer'] = highlights.manufacturer;
+      }
+
+      if (highlights.modelCombos) {
+        params['h_modelCombos'] = highlights.modelCombos;
+      }
+
+      if (highlights.bodyClass) {
+        params['h_bodyClass'] = highlights.bodyClass;
+      }
     }
 
     return params;
