@@ -215,6 +215,9 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
    * Extract highlight filters from URL parameters
    * Extracts parameters with h_ prefix (e.g., h_yearMin, h_manufacturer)
    *
+   * Normalizes separators: Converts pipes (|) to commas (,) for backend compatibility.
+   * Backend expects comma-separated values: h_manufacturer=Ford,Buick
+   *
    * @param urlParams - URL parameters
    * @returns Highlight filters object
    */
@@ -229,7 +232,15 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
     Object.keys(urlParams).forEach(key => {
       if (key.startsWith(prefix)) {
         const highlightKey = key.substring(prefix.length);
-        highlights[highlightKey] = urlParams[key];
+        let value = urlParams[key];
+
+        // Normalize separators: Convert pipes to commas for backend compatibility
+        // Supports both h_manufacturer=Ford,Buick and h_manufacturer=Ford|Buick
+        if (typeof value === 'string' && value.includes('|')) {
+          value = value.replace(/\|/g, ',');
+        }
+
+        highlights[highlightKey] = value;
       }
     });
 
