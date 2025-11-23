@@ -58,7 +58,9 @@ export interface IApiAdapter<TFilters, TData, TStatistics = any> {
    * @param filters - Filter object
    * @returns Observable of API response
    */
-  fetchData(filters: TFilters): Observable<ApiAdapterResponse<TData, TStatistics>>;
+  fetchData(
+    filters: TFilters
+  ): Observable<ApiAdapterResponse<TData, TStatistics>>;
 }
 
 /**
@@ -111,6 +113,18 @@ export interface ResourceManagementConfig<TFilters, TData, TStatistics = any> {
    * Default: 30000 (30 seconds)
    */
   cacheTTL?: number;
+
+  /**
+   * Whether to support highlight filters (h_* parameters)
+   * Default: false
+   */
+  supportsHighlights?: boolean;
+
+  /**
+   * Prefix for highlight parameters in URL
+   * Default: 'h_'
+   */
+  highlightPrefix?: string;
 }
 
 /**
@@ -146,4 +160,10 @@ export interface ResourceState<TFilters, TData, TStatistics = any> {
    * Optional statistics/aggregations
    */
   statistics?: TStatistics;
+
+  /**
+   * Optional highlight filters (h_* parameters)
+   * UI-only state for data highlighting
+   */
+  highlights?: any;
 }

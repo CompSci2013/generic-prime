@@ -29,28 +29,74 @@ export class TopModelsChartDataSource extends ChartDataSource<VehicleStatistics>
       return null;
     }
 
-    // Get top models (sorted by count descending)
-    const topModels = statistics.topModels.slice(0, 20);
+    // Check if we have segmented statistics from API (with total/highlighted counts)
+    const hasSegmentedStats = statistics.modelsByManufacturer &&
+      Object.values(statistics.modelsByManufacturer).some(models =>
+        typeof models === 'object' && Object.values(models).some(v =>
+          typeof v === 'object' && 'total' in v
+        )
+      );
 
-    // Extract data for vertical bars
-    const modelLabels = topModels.map(m => `${m.manufacturer} ${m.name}`);
-    const counts = topModels.map(m => m.instanceCount);
+    let traces: any[] = [];
 
-    // Create bar trace (blue bars, no highlighting until API supports it)
-    const trace: any = {
-      type: 'bar',
-      x: modelLabels,
-      y: counts,
-      marker: {
-        color: '#3B82F6' // Blue
-      },
-      hovertemplate: '<b>%{x}</b><br>' +
-                     'Count: %{y}<br>' +
-                     '<extra></extra>'
-    };
+    if (hasSegmentedStats && statistics.modelsByManufacturer) {
+      // Use API's segmented statistics with {total, highlighted}
+      const modelEntries: Array<[string, any]> = [];
+
+      Object.entries(statistics.modelsByManufacturer).forEach(([manufacturer, models]) => {
+        Object.entries(models).forEach(([modelName, stats]) => {
+          modelEntries.push([`${manufacturer} ${modelName}`, stats]);
+        });
+      });
+
+      // Sort by total count descending and take top 20
+      const sorted = modelEntries
+        .sort((a, b) => ((b[1] as any).total || 0) - ((a[1] as any).total || 0))
+        .slice(0, 20);
+
+      const modelLabels = sorted.map(([label]) => label);
+      const highlightedCounts = sorted.map(([, stats]: [string, any]) => stats.highlighted || 0);
+      const otherCounts = sorted.map(([, stats]: [string, any]) =>
+        (stats.total || 0) - (stats.highlighted || 0)
+      );
+
+      // Create stacked bar traces
+      traces = [
+        {
+          type: 'bar',
+          name: 'Other',
+          x: modelLabels,
+          y: otherCounts,
+          marker: { color: '#9CA3AF' },
+          hovertemplate: '<b>%{x}</b><br>Other: %{y}<extra></extra>'
+        },
+        {
+          type: 'bar',
+          name: 'Highlighted',
+          x: modelLabels,
+          y: highlightedCounts,
+          marker: { color: '#3B82F6' },
+          hovertemplate: '<b>%{x}</b><br>Highlighted: %{y}<extra></extra>'
+        }
+      ];
+    } else {
+      // Fallback: simple blue bars using topModels
+      const topModels = statistics.topModels.slice(0, 20);
+      const modelLabels = topModels.map(m => `${m.manufacturer} ${m.name}`);
+      const counts = topModels.map(m => m.instanceCount);
+
+      traces = [{
+        type: 'bar',
+        x: modelLabels,
+        y: counts,
+        marker: { color: '#3B82F6' },
+        hovertemplate: '<b>%{x}</b><br>Count: %{y}<br><extra></extra>'
+      }];
+    }
 
     // Create layout
     const layout: Partial<any> = {
+      barmode: hasSegmentedStats ? 'stack' : undefined,
       xaxis: {
         tickangle: -45,
         automargin: true
@@ -68,11 +114,11 @@ export class TopModelsChartDataSource extends ChartDataSource<VehicleStatistics>
       height: 400,
       plot_bgcolor: '#FFFFFF',
       paper_bgcolor: '#FFFFFF',
-      showlegend: false
+      showlegend: hasSegmentedStats
     };
 
     return {
-      traces: [trace],
+      traces: traces,
       layout: layout
     };
   }
@@ -89,7 +135,7 @@ export class TopModelsChartDataSource extends ChartDataSource<VehicleStatistics>
    */
   handleClick(event: any): string | null {
     if (event.points && event.points.length > 0) {
-      return event.points[0].y; // Return full model name (Manufacturer Model)
+      return event.points[0].x; // Return full model name (Manufacturer Model)
     }
     return null;
   }

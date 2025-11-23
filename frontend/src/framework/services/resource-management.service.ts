@@ -95,6 +95,11 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
    */
   public statistics$: Observable<TStatistics | undefined>;
 
+  /**
+   * Observable of highlight filters
+   */
+  public highlights$: Observable<any>;
+
   constructor(
     urlState: UrlStateService,
     config: ResourceManagementConfig<TFilters, TData, TStatistics>
@@ -144,6 +149,11 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
     this.statistics$ = this.state$.pipe(
       map(state => state.statistics),
       distinctUntilChanged()
+    );
+
+    this.highlights$ = this.state$.pipe(
+      map(state => state.highlights || {}),
+      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
     );
 
     // Initialize from URL and watch for changes
@@ -202,13 +212,39 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
   }
 
   /**
+   * Extract highlight filters from URL parameters
+   * Extracts parameters with h_ prefix (e.g., h_yearMin, h_manufacturer)
+   *
+   * @param urlParams - URL parameters
+   * @returns Highlight filters object
+   */
+  private extractHighlights(urlParams: Record<string, any>): any {
+    if (!this.config.supportsHighlights) {
+      return {};
+    }
+
+    const prefix = this.config.highlightPrefix || 'h_';
+    const highlights: Record<string, any> = {};
+
+    Object.keys(urlParams).forEach(key => {
+      if (key.startsWith(prefix)) {
+        const highlightKey = key.substring(prefix.length);
+        highlights[highlightKey] = urlParams[key];
+      }
+    });
+
+    return highlights;
+  }
+
+  /**
    * Initialize filters from current URL
    */
   private initializeFromUrl(): void {
     const urlParams = this.urlState.getParams();
     const filters = this.config.filterMapper.fromUrlParams(urlParams);
+    const highlights = this.extractHighlights(urlParams);
 
-    this.updateState({ filters });
+    this.updateState({ filters, highlights });
 
     // Fetch data if auto-fetch is enabled
     if (this.config.autoFetch !== false) {
@@ -225,7 +261,8 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
       .pipe(takeUntil(this.destroy$))
       .subscribe(urlParams => {
         const filters = this.config.filterMapper.fromUrlParams(urlParams);
-        this.updateState({ filters });
+        const highlights = this.extractHighlights(urlParams);
+        this.updateState({ filters, highlights });
 
         // Fetch data if auto-fetch is enabled
         if (this.config.autoFetch !== false) {

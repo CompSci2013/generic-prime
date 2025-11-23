@@ -16,10 +16,13 @@ import {
   ChangeDetectorRef,
   Inject
 } from '@angular/core';
-import { Observable } from 'rxjs';
+import { ActivatedRoute, Router, Params } from '@angular/router';
+import { Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ChartConfig, DomainConfig } from '../../models/domain-config.interface';
 import { ChartDataSource } from '../base-chart/base-chart.component';
 import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
+import { UrlStateService } from '../../services/url-state.service';
 
 /**
  * Statistics Panel Component
@@ -65,12 +68,25 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
    */
   statistics: any | null = null;
 
+  /**
+   * Highlight filters (from resource service)
+   */
+  highlights: any = {};
+
   // Observable for statistics
   statistics$!: Observable<any | undefined>;
+
+  /**
+   * Destroy subject for cleanup
+   */
+  private destroy$ = new Subject<void>();
 
   constructor(
     @Inject(RESOURCE_MANAGEMENT_SERVICE)
     private resourceService: ResourceManagementService<any, any, any>,
+    private route: ActivatedRoute,
+    private router: Router,
+    private urlState: UrlStateService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -80,12 +96,22 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Subscribe to statistics stream (service injected via constructor)
+    // Subscribe to statistics stream
     this.statistics$ = this.resourceService.statistics$;
-    this.statistics$.subscribe(statistics => {
-      this.statistics = statistics || null;
-      this.cdr.markForCheck();
-    });
+    this.statistics$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(statistics => {
+        this.statistics = statistics || null;
+        this.cdr.markForCheck();
+      });
+
+    // Subscribe to URL params to extract highlights (h_* parameters)
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        this.highlights = this.extractHighlightsFromParams(params);
+        this.cdr.markForCheck();
+      });
 
     // Filter visible charts and map to data sources
     this.visibleCharts = (this.domainConfig.charts || [])
@@ -98,6 +124,9 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+
     if (this.resourceService) {
       this.resourceService.destroy();
     }
@@ -122,12 +151,69 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Extract highlight parameters from URL (h_* parameters)
+   */
+  private extractHighlightsFromParams(params: Params): any {
+    const highlights: any = {};
+
+    // Extract all h_* parameters
+    Object.keys(params).forEach(key => {
+      if (key.startsWith('h_')) {
+        const filterKey = key.substring(2); // Remove 'h_' prefix
+        highlights[filterKey] = params[key];
+      }
+    });
+
+    return highlights;
+  }
+
+  /**
    * Handle chart click event
    */
-  onChartClick(event: { value: string; isHighlightMode: boolean }): void {
-    console.log('Chart clicked:', event);
-    // TODO: Implement chart click handling (add filters or highlights)
-    // This will be wired up when we integrate with the state management
+  onChartClick(event: { value: string; isHighlightMode: boolean }, chartId: string): void {
+    if (event.isHighlightMode) {
+      // Highlight mode: Add h_* URL parameter based on chart type
+      const currentParams = { ...this.route.snapshot.queryParams };
+
+      // Handle range selections (value contains min|max)
+      if (chartId === 'year-distribution' && event.value.includes('|')) {
+        const [min, max] = event.value.split('|');
+        currentParams['h_yearMin'] = min;
+        currentParams['h_yearMax'] = max;
+      } else {
+        // Single value or other chart types
+        const paramName = this.getHighlightParamName(chartId);
+        if (paramName) {
+          currentParams[paramName] = event.value;
+        }
+      }
+
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: currentParams,
+        queryParamsHandling: 'merge'
+      });
+    } else {
+      // Normal mode: Update filters
+      // This would trigger a data refetch
+      console.log('Normal click - would update filters with:', event.value);
+      // In a complete implementation, this would call:
+      // this.resourceService.updateFilters({ /* appropriate filter */ });
+    }
+  }
+
+  /**
+   * Map chart ID to highlight URL parameter name
+   */
+  private getHighlightParamName(chartId: string): string | null {
+    const mapping: Record<string, string> = {
+      'manufacturer-distribution': 'h_manufacturer',
+      'top-models': 'h_model',
+      'body-class-distribution': 'h_bodyClass'
+      // year-distribution handled separately (uses h_yearMin and h_yearMax)
+    };
+
+    return mapping[chartId] || null;
   }
 
   /**

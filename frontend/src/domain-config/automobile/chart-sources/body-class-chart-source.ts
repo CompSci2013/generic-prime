@@ -37,7 +37,7 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
    */
   transform(
     statistics: VehicleStatistics | null,
-    _highlights: any,
+    highlights: any,
     _selectedValue: string | null,
     _containerWidth: number
   ): ChartData | null {
@@ -45,27 +45,66 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
       return null;
     }
 
-    const distribution = statistics.bodyClassDistribution;
+    // Check if we have highlight filters active (client-side highlighting)
+    const hasHighlights = highlights && highlights.bodyClass;
 
-    // Extract data for vertical bars
-    const labels = distribution.map(b => b.name);
-    const counts = distribution.map(b => b.count);
+    let traces: Plotly.Data[] = [];
 
-    // Create bar trace (blue bars, no highlighting until API supports it)
-    const trace: Plotly.Data = {
-      type: 'bar',
-      x: labels,
-      y: counts,
-      marker: {
-        color: '#3B82F6' // Blue
-      },
-      hovertemplate: '<b>%{x}</b><br>' +
-                     'Count: %{y}<br>' +
-                     '<extra></extra>'
-    };
+    if (hasHighlights && statistics.byBodyClass) {
+      // Client-side segmentation: compute highlighted vs other counts
+      const entries = Object.entries(statistics.byBodyClass)
+        .map(([name, value]) => {
+          // Handle both simple numbers and {total, highlighted} objects
+          const count = typeof value === 'object' ? value.total : value;
+          return [name, count] as [string, number];
+        })
+        .sort((a, b) => b[1] - a[1]);
+
+      const labels = entries.map(([name]) => name);
+      const highlightedCounts = entries.map(([name, count]) =>
+        name === highlights.bodyClass ? count : 0
+      );
+      const otherCounts = entries.map(([name, count]) =>
+        name === highlights.bodyClass ? 0 : count
+      );
+
+      // Create stacked bar traces
+      traces = [
+        {
+          type: 'bar',
+          name: 'Other',
+          x: labels,
+          y: otherCounts,
+          marker: { color: '#9CA3AF' },
+          hovertemplate: '<b>%{x}</b><br>Other: %{y}<extra></extra>'
+        },
+        {
+          type: 'bar',
+          name: 'Highlighted',
+          x: labels,
+          y: highlightedCounts,
+          marker: { color: '#3B82F6' },
+          hovertemplate: '<b>%{x}</b><br>Highlighted: %{y}<extra></extra>'
+        }
+      ];
+    } else {
+      // No highlights: simple blue bars using bodyClassDistribution
+      const distribution = statistics.bodyClassDistribution;
+      const labels = distribution.map(b => b.name);
+      const counts = distribution.map(b => b.count);
+
+      traces = [{
+        type: 'bar',
+        x: labels,
+        y: counts,
+        marker: { color: '#3B82F6' },
+        hovertemplate: '<b>%{x}</b><br>Count: %{y}<br><extra></extra>'
+      }];
+    }
 
     // Create layout
     const layout: Partial<Plotly.Layout> = {
+      barmode: hasHighlights ? 'stack' : undefined,
       xaxis: {
         tickangle: -45,
         automargin: true
@@ -83,11 +122,11 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
       height: 400,
       plot_bgcolor: '#FFFFFF',
       paper_bgcolor: '#FFFFFF',
-      showlegend: false
+      showlegend: hasHighlights
     };
 
     return {
-      traces: [trace],
+      traces: traces,
       layout: layout
     };
   }
@@ -104,7 +143,7 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
    */
   handleClick(event: any): string | null {
     if (event.points && event.points.length > 0) {
-      return event.points[0].label; // Return body class name
+      return event.points[0].x; // Return body class name (x-axis value)
     }
     return null;
   }

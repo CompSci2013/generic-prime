@@ -8,6 +8,59 @@
  */
 
 /**
+ * Highlight Filters
+ *
+ * UI-only state for client-side data highlighting in charts.
+ * Corresponds to URL parameters with 'h_' prefix (e.g., h_yearMin, h_yearMax).
+ *
+ * Purpose: Visual emphasis of data subsets in charts through client-side
+ * rendering logic. NOT sent to backend API.
+ *
+ * @example
+ * ```typescript
+ * const highlights: HighlightFilters = {
+ *   manufacturer: 'Ford',
+ *   yearMin: 2020,
+ *   yearMax: 2024
+ * };
+ * // URL: ?h_manufacturer=Ford&h_yearMin=2020&h_yearMax=2024
+ * // Charts use these values for visual highlighting (client-side only)
+ * ```
+ */
+export interface HighlightFilters {
+  /**
+   * Year range highlighting (minimum)
+   * URL parameter: h_yearMin
+   */
+  yearMin?: number;
+
+  /**
+   * Year range highlighting (maximum)
+   * URL parameter: h_yearMax
+   */
+  yearMax?: number;
+
+  /**
+   * Manufacturer highlighting
+   * URL parameter: h_manufacturer
+   */
+  manufacturer?: string;
+
+  /**
+   * Model combinations highlighting
+   * Format: Manufacturer:Model,Manufacturer:Model
+   * URL parameter: h_modelCombos
+   */
+  modelCombos?: string;
+
+  /**
+   * Body class highlighting
+   * URL parameter: h_bodyClass
+   */
+  bodyClass?: string;
+}
+
+/**
  * Automobile search filters
  *
  * Comprehensive filter model for searching and filtering vehicle data.

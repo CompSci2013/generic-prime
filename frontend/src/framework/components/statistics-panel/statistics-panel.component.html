@@ -29,9 +29,9 @@
         <app-base-chart
           [dataSource]="item.dataSource"
           [statistics]="statistics"
-          [highlights]="{}"
+          [highlights]="highlights"
           [selectedValue]="null"
-          (chartClick)="onChartClick($event)">
+          (chartClick)="onChartClick($event, item.config.id)">
         </app-base-chart>
       </div>
     </div>

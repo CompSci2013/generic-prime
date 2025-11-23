@@ -293,6 +293,42 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
             });
           }
         });
+
+        // Attach selection handler (box select, lasso)
+        gd.on('plotly_selected', (data: any) => {
+          if (data && data.points && data.points.length > 0) {
+            // Extract all selected values (x or y depending on chart orientation)
+            const selectedValues = data.points.map((p: any) => p.x || p.y);
+
+            // For ranges (multiple consecutive values), extract min and max
+            let rangeValue: string;
+            if (selectedValues.length > 1) {
+              // Assume numeric or sortable values for range
+              const sorted = selectedValues.sort((a: any, b: any) => {
+                // Try numeric sort first
+                const aNum = parseFloat(a);
+                const bNum = parseFloat(b);
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                  return aNum - bNum;
+                }
+                // Fall back to string sort
+                return String(a).localeCompare(String(b));
+              });
+
+              // Emit as min|max for range
+              rangeValue = `${sorted[0]}|${sorted[sorted.length - 1]}`;
+            } else {
+              // Single value selection
+              rangeValue = selectedValues[0];
+            }
+
+            // Emit selection (parent will handle converting to h_* params)
+            this.chartClick.emit({
+              value: rangeValue,
+              isHighlightMode: this.isHighlightModeActive
+            });
+          }
+        });
       });
     }
   }
