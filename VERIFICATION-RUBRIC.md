@@ -436,6 +436,348 @@ Imagine adding a new domain (e.g., "agriculture" for crop discovery). Answer the
 
 ---
 
+### Step 8: Pop-Out Window Architecture ⚠️ CRITICAL
+
+**Objective**: Verify pop-out window patterns follow cross-window synchronization requirements
+
+**Background**: Pop-out windows introduce unique challenges:
+- Unfocused browser windows don't run scheduled Angular change detection
+- State must synchronize bidirectionally (main ↔ pop-out)
+- Components must initialize properly in pop-out context
+- BroadcastChannel API enables cross-window messaging
+
+**Importance**: 71% of recent bugs (5 out of 7) were pop-out related. This step catches critical issues that only manifest in multi-window scenarios.
+
+---
+
+#### 8.1 Bidirectional URL Synchronization
+
+**Pattern**: Pop-out windows must update BOTH their own URL AND broadcast to main window.
+
+**Required Implementation**:
+```typescript
+// ✅ CORRECT: Update own URL first, then broadcast
+onUrlParamsChange(params: Params): void {
+  // Step 1: Update pop-out's own URL (single source of truth)
+  this.urlState.setParams(params);
+
+  // Step 2: Broadcast to main window
+  this.popOutContext.sendMessage({
+    type: PopOutMessageType.URL_PARAMS_CHANGED,
+    payload: { params },
+    timestamp: Date.now()
+  });
+}
+
+// ❌ WRONG: Only broadcast, don't update own URL
+onUrlParamsChange(params: Params): void {
+  this.popOutContext.sendMessage({
+    type: PopOutMessageType.URL_PARAMS_CHANGED,
+    payload: { params },
+    timestamp: Date.now()
+  });
+  // Missing: this.urlState.setParams(params);
+}
+```
+
+**Verification Checklist**:
+- [ ] `PanelPopoutComponent.onUrlParamsChange()` calls `urlState.setParams()` first
+- [ ] `PanelPopoutComponent.onUrlParamsChange()` sends BroadcastChannel message second
+- [ ] `StatisticsPanelComponent.onChartClick()` updates URL when in pop-out context
+- [ ] `StatisticsPanelComponent` broadcasts changes to main window when in pop-out
+- [ ] Main window receives messages and updates its own URL
+- [ ] Pop-out receives messages and updates its own URL
+
+**Test Scenarios**:
+1. Pop out Query Control → Click "Clear All" → Verify pop-out URL updates
+2. Pop out Statistics → Click chart bar → Verify main window URL updates
+3. Main window → Clear filter → Verify pop-out URL updates
+
+---
+
+#### 8.2 OnPush Change Detection in Unfocused Windows ⚠️ CRITICAL
+
+**Pattern**: Unfocused windows require `detectChanges()` instead of `markForCheck()`.
+
+**Why This Matters**:
+- `markForCheck()` only **schedules** change detection for next cycle
+- Unfocused browser windows **don't run** scheduled change detection cycles
+- `detectChanges()` **forces immediate** execution regardless of focus
+
+**Required Implementation**:
+```typescript
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush  // Required for performance
+})
+export class BasePickerComponent {
+
+  // ❌ WRONG: markForCheck() doesn't work in unfocused windows
+  private subscribeToUrlChanges(): void {
+    this.route.queryParams.subscribe(params => {
+      this.selections = this.parseUrl(params);
+      this.cdr.markForCheck();  // ❌ Only schedules - won't run if window unfocused
+    });
+  }
+
+  // ✅ CORRECT: detectChanges() forces immediate update
+  private subscribeToUrlChanges(): void {
+    this.route.queryParams.subscribe(params => {
+      this.selections = this.parseUrl(params);
+      this.cdr.detectChanges();  // ✅ Forces immediate update, works in unfocused windows
+    });
+  }
+}
+```
+
+**When to Use Each**:
+- **`markForCheck()`**: Main window components (normal case)
+  - Schedules change detection for next cycle
+  - More efficient (batches updates)
+  - Works fine for focused windows
+
+- **`detectChanges()`**: Pop-out window components
+  - Forces immediate change detection
+  - Required for unfocused browser windows
+  - Necessary for cross-window state synchronization
+
+**Pop-Out-Specific Locations** (use `detectChanges()`):
+1. **URL parameter change handlers** (when syncing from main window)
+2. **BroadcastChannel message handlers** (cross-window communication)
+3. **Selection hydration** (restoring state from URL)
+4. **Pagination handlers** (loading new data)
+5. **Data load completion** (after API calls)
+
+**Verification Checklist**:
+- [ ] Search for `markForCheck()` in components used in pop-outs:
+  ```bash
+  grep -n "markForCheck()" frontend/src/framework/components/base-picker/*.ts
+  grep -n "markForCheck()" frontend/src/framework/components/statistics-panel/*.ts
+  grep -n "markForCheck()" frontend/src/framework/components/query-control/*.ts
+  ```
+- [ ] For each `markForCheck()` found, verify:
+  - [ ] Is this component used in pop-out windows? (Check `panel-popout.component.html`)
+  - [ ] If YES → Must use `detectChanges()` instead
+  - [ ] If NO (main window only) → `markForCheck()` is acceptable
+- [ ] `BasePickerComponent.subscribeToUrlChanges()` uses `detectChanges()`
+- [ ] `BasePickerComponent.hydrateFromUrl()` uses `detectChanges()`
+- [ ] `BasePickerComponent.hydrateSelections()` uses `detectChanges()`
+- [ ] `BasePickerComponent.onLazyLoad()` uses `detectChanges()` after data loads
+- [ ] `StatisticsPanelComponent` uses `detectChanges()` in BroadcastChannel handlers
+- [ ] `QueryControlComponent` uses `detectChanges()` when used in pop-out
+
+**Test Scenarios** (CRITICAL):
+1. Pop out picker → Don't focus it → Clear filter in main window → Verify picker updates immediately
+2. Pop out picker → Don't focus it → Change page → Verify new page data displays
+3. Pop out statistics → Don't focus it → Add highlight in main window → Verify charts update
+
+**Red Flags** (FAIL if found):
+- ❌ `markForCheck()` in URL sync handlers in pop-out components
+- ❌ `markForCheck()` in BroadcastChannel message handlers
+- ❌ `markForCheck()` in pagination handlers in pop-out components
+
+---
+
+#### 8.3 Component Initialization in Pop-Out Context
+
+**Pattern**: All configurations must be registered in `PanelPopoutComponent.ngOnInit()`.
+
+**Required Implementation**:
+```typescript
+// PanelPopoutComponent.ngOnInit()
+ngOnInit(): void {
+  // ✅ REQUIRED: Register picker configurations
+  const pickerConfigs = createAutomobilePickerConfigs(this.injector);
+  this.pickerRegistry.registerMultiple(pickerConfigs);
+
+  // ✅ REQUIRED: Chart data sources registered via domain config
+  // (Already handled by DOMAIN_CONFIG injection)
+
+  // Extract route parameters and initialize
+  this.route.params.subscribe(params => {
+    this.gridId = params['gridId'];
+    this.panelId = params['panelId'];
+    this.panelType = params['type'];
+
+    // ✅ Initialize as pop-out
+    this.popOutContext.initializeAsPopOut(this.panelId);
+  });
+}
+```
+
+**Verification Checklist**:
+- [ ] `PanelPopoutComponent` registers picker configs in `ngOnInit()`
+- [ ] `PanelPopoutComponent` has `DOMAIN_CONFIG` injected
+- [ ] `PanelPopoutComponent` provides `RESOURCE_MANAGEMENT_SERVICE` via factory
+- [ ] `PanelPopoutComponent` calls `popOutContext.initializeAsPopOut()`
+- [ ] All pop-out components can access same data as main window
+- [ ] No "empty content" when pop-out opens (all data loads correctly)
+
+**Test Scenarios**:
+1. Pop out Manufacturer-Model Picker → Verify table shows data (not empty)
+2. Pop out Statistics → Verify charts render (not blank)
+3. Pop out Query Control → Verify filter options load in dialogs
+
+**Red Flags** (FAIL if found):
+- ❌ Pop-out shows empty content (white/blank area)
+- ❌ Pop-out shows "Loading..." indefinitely
+- ❌ Console errors about missing configurations
+
+---
+
+#### 8.4 BroadcastChannel Message Handling
+
+**Pattern**: Pop-outs must subscribe to messages and respond appropriately.
+
+**Required Implementation**:
+```typescript
+// Main window broadcasts URL changes
+broadcastUrlParamsToPopOuts(params: Params): void {
+  if (this.popOuts.size > 0) {
+    this.popOutContext.sendMessage({
+      type: PopOutMessageType.URL_PARAMS_SYNC,
+      payload: { params },
+      timestamp: Date.now()
+    });
+  }
+}
+
+// Pop-out subscribes to messages
+ngOnInit(): void {
+  this.popOutContext.getMessages$()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(message => this.handleMessage(message));
+}
+
+private handleMessage(message: PopOutMessage): void {
+  switch (message.type) {
+    case PopOutMessageType.CLOSE_POPOUT:
+      window.close();
+      break;
+    case PopOutMessageType.URL_PARAMS_SYNC:
+      this.syncUrlParams(message.payload.params);
+      break;
+    case PopOutMessageType.URL_PARAMS_CHANGED:
+      this.syncUrlParams(message.payload.params);
+      break;
+  }
+}
+```
+
+**Message Types** (verify all are defined):
+- `CLOSE_POPOUT` - Main window requests pop-out to close
+- `URL_PARAMS_SYNC` - Main window sends URL params to pop-out
+- `URL_PARAMS_CHANGED` - Pop-out sends URL params to main window
+- `PICKER_SELECTION_CHANGE` - Picker selection changed
+
+**Verification Checklist**:
+- [ ] `PopOutMessageType` enum defines all message types
+- [ ] `PanelPopoutComponent` subscribes to `popOutContext.getMessages$()`
+- [ ] `PanelPopoutComponent.handleMessage()` handles all message types
+- [ ] Main window broadcasts URL changes when filters update
+- [ ] Pop-out broadcasts URL changes when user interacts with charts/pickers
+- [ ] Messages include `timestamp` field for debugging
+- [ ] `takeUntil(destroy$)` pattern used for subscription cleanup
+
+**Test Scenarios**:
+1. Open pop-out → Main window adds filter → Pop-out receives message
+2. Open pop-out → Pop-out adds highlight → Main window receives message
+3. Open pop-out → Main window closes pop-out → Pop-out window closes
+
+---
+
+#### 8.5 Configuration Completeness
+
+**Pattern**: All URL parameters must have corresponding filter definitions.
+
+**Required Mappings**:
+```typescript
+// Picker URL parameter → Query Control filter definition
+// Example: modelCombos parameter needs filter definition
+
+// ✅ CORRECT: modelCombos filter defined
+AUTOMOBILE_QUERY_CONTROL_FILTERS = [
+  {
+    field: 'modelCombos',
+    label: 'Manufacturer & Model',
+    type: 'multiselect',
+    urlParams: 'modelCombos',
+    optionsEndpoint: '${environment.apiBaseUrl}/manufacturer-model-combinations',
+    // ... transformer and other config
+  }
+];
+
+// ❌ WRONG: Picker uses modelCombos parameter but no filter definition exists
+// Result: Query Control won't show chips when picker selection made
+```
+
+**Verification Checklist**:
+- [ ] List all URL parameters used by pickers:
+  ```bash
+  grep -n "urlParams:" frontend/src/domain-config/*/configs/*.picker-configs.ts
+  ```
+- [ ] For each URL parameter, verify corresponding filter definition exists:
+  ```bash
+  grep -n "urlParams:" frontend/src/domain-config/*/configs/*.query-control-filters.ts
+  ```
+- [ ] All picker URL params have Query Control filter definitions
+- [ ] All chart click parameters map to highlight filter definitions
+- [ ] Filter definitions have correct `optionsEndpoint` (matches picker data source)
+- [ ] Filter definitions have correct `optionsTransformer` (matches picker format)
+
+**Common Missing Definitions**:
+- `modelCombos` - Manufacturer-Model picker combinations
+- Chart-specific highlight parameters (`h_manufacturer`, `h_modelCombos`, etc.)
+
+**Test Scenarios**:
+1. Select item in picker → Verify chip appears in Query Control
+2. Click chart bar → Verify highlight chip appears in Query Control
+3. Edit chip in Query Control → Verify picker/chart reflects change
+
+**Red Flags** (FAIL if found):
+- ❌ URL parameter exists but no chip displayed in Query Control
+- ❌ Picker selection updates URL but Query Control doesn't reflect it
+- ❌ Chart click adds highlight parameter but no chip shown
+
+---
+
+#### 8.6 Pop-Out State Persistence
+
+**Pattern**: Pop-outs must survive browser unfocus and maintain state.
+
+**Verification Checklist**:
+- [ ] Pop-out URL is single source of truth (not component state)
+- [ ] Pop-out reads URL on init to restore state
+- [ ] Pop-out subscribes to URL changes continuously
+- [ ] Pop-out selections persist when main window updates
+- [ ] Pop-out doesn't lose data when window unfocused
+
+**Test Scenarios**:
+1. Open pop-out → Make selection → Switch to another app → Return → Verify selection persists
+2. Open pop-out → Main window updates filter → Pop-out unfocused → Verify pop-out updates
+3. Open pop-out → Refresh pop-out window → Verify state restored from URL
+
+---
+
+## Step 8 Success Criteria
+
+**Must Pass All**:
+- [ ] Pop-outs update own URL before broadcasting to main window
+- [ ] Pop-outs use `detectChanges()` instead of `markForCheck()` in critical paths
+- [ ] All configurations registered in `PanelPopoutComponent.ngOnInit()`
+- [ ] BroadcastChannel messages handled correctly in both directions
+- [ ] All URL parameters have corresponding filter definitions
+- [ ] Pop-outs maintain state when unfocused
+- [ ] No "empty content" bugs in pop-outs
+- [ ] No "stale state" bugs (updates only on focus)
+
+**Critical Red Flags** (FAIL immediately):
+- ❌ Pop-out uses `markForCheck()` in URL sync handlers
+- ❌ Pop-out doesn't update own URL (only broadcasts)
+- ❌ Pop-out shows empty content on open
+- ❌ Pop-out doesn't update when unfocused
+
+---
+
 ## VERIFICATION RESULTS TEMPLATE
 
 Use this template to document verification results:
@@ -483,6 +825,15 @@ Use this template to document verification results:
 - [x] Can add new domain without modifying framework: YES/NO
 - [x] Framework is truly domain-agnostic: YES/NO
 
+## Step 8: Pop-Out Window Architecture ⚠️ CRITICAL
+- [x] Pop-outs update own URL before broadcasting: YES/NO
+- [x] Pop-outs use detectChanges() in critical paths: YES/NO
+- [x] All configurations registered in PanelPopoutComponent: YES/NO
+- [x] BroadcastChannel messages handled bidirectionally: YES/NO
+- [x] All URL params have filter definitions: YES/NO
+- [x] Pop-outs maintain state when unfocused: YES/NO
+- [ ] Issues found: [List any issues]
+
 ## Overall Result
 - [ ] ✅ PASS - All checks passed
 - [ ] ⚠️ PASS WITH WARNINGS - Minor issues found
@@ -513,6 +864,10 @@ Use these severity levels to prioritize issues:
 - **Component templates with hardcoded domain-specific field names**
 - **Component templates not dynamically rendering filters from config**
 - **Components that only work with one specific domain**
+- **⚠️ NEW: Pop-out windows using `markForCheck()` instead of `detectChanges()` in URL sync handlers**
+- **⚠️ NEW: Pop-out windows not updating own URL (only broadcasting to main window)**
+- **⚠️ NEW: Pop-out windows showing empty content on open (missing configuration registration)**
+- **⚠️ NEW: Pop-out windows not updating when unfocused (stale state bug)**
 
 ### 🟡 HIGH (Fix before next release)
 - Hardcoded configuration values (non-URL)
@@ -520,6 +875,8 @@ Use these severity levels to prioritize issues:
 - Direct router navigation with queryParams
 - Missing adapter implementations
 - Incomplete domain configurations
+- **⚠️ NEW: Missing filter definitions for picker URL parameters** (causes Query Control not to show chips)
+- **⚠️ NEW: Missing highlight filter definitions for chart click parameters**
 
 ### 🟠 MEDIUM (Fix in next sprint)
 - Incomplete picker configurations
@@ -643,6 +1000,12 @@ return this.apiService.get('http://example.com/api/v1/vehicles');
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: 2025-11-21
+**Document Version**: 2.0
+**Last Updated**: 2025-11-23
+**Changes in v2.0**:
+- Added Step 8: Pop-Out Window Architecture (6 subsections, ~330 lines)
+- Added pop-out specific severity levels (4 CRITICAL, 2 HIGH)
+- Updated verification results template to include Step 8
+- Addresses 71% of recent bugs (5 out of 7 were pop-out related)
+
 **Next Review**: After major releases or architecture changes
