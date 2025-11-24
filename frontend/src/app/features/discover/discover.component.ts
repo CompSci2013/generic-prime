@@ -234,9 +234,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
         break;
 
       case PopOutMessageType.PANEL_READY:
-        // Pop-out is ready - current state will be broadcast automatically
-        // via the state$ subscription in ngOnInit
-        console.log('[Discover] Pop-out ready, state will be broadcast automatically');
+        // Pop-out is ready - broadcast current state immediately
+        // (state$ subscription only fires on changes, not on initial subscription)
+        console.log('[Discover] Pop-out ready, broadcasting current state');
+        const currentState = this.resourceService.getCurrentState();
+        this.broadcastStateToPopOuts(currentState);
         break;
 
       // Removed: URL_PARAMS_CHANGED - pop-outs no longer sync URL params

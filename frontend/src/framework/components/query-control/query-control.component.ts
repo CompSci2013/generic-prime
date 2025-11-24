@@ -6,13 +6,16 @@ import {
   Input,
   Output,
   EventEmitter,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  Optional,
+  Inject
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { DomainConfig } from '../../models/domain-config.interface';
 import { FilterDefinition, FilterOption } from '../../models/filter-definition.interface';
 import { UrlStateService } from '../../services/url-state.service';
 import { ApiService } from '../../services/api.service';
+import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
 
 /**
  * Active filter representation
@@ -135,7 +138,8 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   constructor(
     private urlState: UrlStateService,
     private apiService: ApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    @Optional() @Inject(RESOURCE_MANAGEMENT_SERVICE) private resourceService?: ResourceManagementService<any, any, any>
   ) {}
 
   ngOnInit(): void {
@@ -155,13 +159,32 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
 
     console.log('QueryControl: Filter field options:', this.filterFieldOptions);
 
-    // Subscribe to URL changes to sync active filters
-    this.urlState.params$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-        this.syncFiltersFromUrl(params);
-        this.cdr.markForCheck();
-      });
+    // Subscribe to filter changes for chip synchronization
+    //
+    // Architecture: Works in both main window and pop-out
+    // - Main window: URL → ResourceManagementService.filters$ → chip sync
+    // - Pop-out: BroadcastChannel → ResourceManagementService.filters$ → chip sync
+    // - Single subscription works for both cases!
+    if (this.resourceService) {
+      // Use ResourceManagementService.filters$ (works in pop-outs)
+      this.resourceService.filters$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(filters => {
+          // Convert filters object to params format for syncFiltersFromUrl
+          // (syncFiltersFromUrl expects params format, filters$ provides filter object)
+          const params = { ...filters };
+          this.syncFiltersFromUrl(params);
+          this.cdr.markForCheck();
+        });
+    } else {
+      // Fallback: watch URL params directly (legacy mode)
+      this.urlState.params$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(params => {
+          this.syncFiltersFromUrl(params);
+          this.cdr.markForCheck();
+        });
+    }
   }
 
   ngOnDestroy(): void {

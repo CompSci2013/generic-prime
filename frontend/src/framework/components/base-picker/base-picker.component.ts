@@ -155,15 +155,9 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
         )
         .subscribe(filterValue => {
           if (filterValue) {
-            // Convert filter value to URL string format if needed
-            const urlValue = Array.isArray(filterValue)
-              ? filterValue.map(item =>
-                  typeof item === 'object'
-                    ? `${item.manufacturer}:${item.model}`
-                    : String(item)
-                ).join(',')
-              : String(filterValue);
-
+            // Filter value is already in URL string format (e.g., "Ford:F-150,RAM:OEM Trailer")
+            // No conversion needed - pass directly to hydration
+            const urlValue = String(filterValue);
             this.hydrateFromUrl(urlValue);
           } else {
             // Clear selections if filter value is removed
@@ -220,30 +214,46 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
 
   /**
    * Hydrate selections with loaded data
+   *
+   * Preserves selections from other pages during pagination.
+   * When hydrating "A,B,C,D" but current page only has D:
+   * - Searches current page for D (fresh data)
+   * - Preserves A,B,C from cache (previous pages)
+   * - Result: selectedItems = [A, B, C, D]
    */
   private hydrateSelections(keys: string[]): void {
     const config = this.activeConfig!;
 
-    // Create new Set to trigger object identity change detection
-    this.state.selectedKeys = new Set<string>();
-    this.state.selectedItems = [];
+    // Update selectedKeys with all keys from URL
+    this.state.selectedKeys = new Set<string>(keys);
 
-    // Find matching items in loaded data
+    // Build a map of existing selected items by key (to preserve items not on current page)
+    const existingItemsByKey = new Map<string, T>();
+    this.state.selectedItems.forEach(item => {
+      const key = config.row.keyGenerator(item);
+      existingItemsByKey.set(key, item);
+    });
+
+    // Build new selectedItems array
+    const newSelectedItems: T[] = [];
     keys.forEach(key => {
-      const item = this.state.data.find(
+      // First try to find in current page data
+      const itemInCurrentPage = this.state.data.find(
         row => config.row.keyGenerator(row) === key
       );
 
-      if (item) {
-        this.state.selectedKeys.add(key);
-        this.state.selectedItems.push(item);
-      } else {
-        // Key exists in URL but item not in current data
-        // Keep in selectedKeys for display
-        this.state.selectedKeys.add(key);
+      if (itemInCurrentPage) {
+        // Item is on current page, use fresh data
+        newSelectedItems.push(itemInCurrentPage);
+      } else if (existingItemsByKey.has(key)) {
+        // Item not on current page, but we have it cached from previous page
+        newSelectedItems.push(existingItemsByKey.get(key)!);
       }
+      // else: Key exists in URL but we don't have the item data
+      // Keep in selectedKeys but not in selectedItems
     });
 
+    this.state.selectedItems = newSelectedItems;
     this.cdr.markForCheck();
   }
 
@@ -352,6 +362,13 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
    * Handle pagination change
    */
   onPageChange(event: any): void {
+    // Ignore page changes while loading to prevent race conditions
+    // (e.g., hydration updating selectedItems might trigger PrimeNG pagination event)
+    if (this.state.loading) {
+      console.warn('[BasePickerComponent] Ignoring page change while loading', event);
+      return;
+    }
+
     this.state.currentPage = event.first / event.rows;
     this.state.pageSize = event.rows;
     this.loadData();
