@@ -75,12 +75,22 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
   private destroy$ = new Subject<void>();
 
   /**
+   * RxJS Subject for pop-out messages (Observable Pattern)
+   * Pushes browser API events into Angular zone for change detection
+   */
+  private popoutMessages$ = new Subject<{
+    panelId: string;
+    event: MessageEvent;
+  }>();
+
+  /**
    * Grid identifier for routing
    */
   private readonly gridId = 'discover';
 
   constructor(
     @Inject(DOMAIN_CONFIG) domainConfig: DomainConfig<any, any, any>,
+    @Inject(RESOURCE_MANAGEMENT_SERVICE) private resourceService: ResourceManagementService<TFilters, TData, TStatistics>,
     private pickerRegistry: PickerConfigRegistry,
     private injector: Injector,
     private popOutContext: PopOutContextService,
@@ -107,11 +117,20 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
         this.handlePopOutMessage('', message);
       });
 
-    // Subscribe to URL changes to broadcast to pop-outs
-    this.urlStateService.params$
+    // Subscribe to pop-out messages (RxJS Observable Pattern)
+    // This brings BroadcastChannel events into Angular zone for change detection
+    this.popoutMessages$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-        this.broadcastUrlParamsToPopOuts(params);
+      .subscribe(({ panelId, event }) => {
+        this.handlePopOutMessage(panelId, event.data);
+      });
+
+    // Subscribe to state changes and broadcast to ALL pop-outs
+    // URL-First: Main window URL → state$ → BroadcastChannel → pop-out components
+    this.resourceService.state$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(state => {
+        this.broadcastStateToPopOuts(state);
       });
   }
 
@@ -138,12 +157,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
       return;
     }
 
-    // Build pop-out URL
+    // Build pop-out URL (NO query params - state comes via BroadcastChannel)
     const url = `/panel/${this.gridId}/${panelId}/${panelType}`;
-
-    // Get current URL parameters to pass to pop-out
-    const currentParams = window.location.search;
-    const fullUrl = url + currentParams;
 
     // Window features
     const features = buildWindowFeatures({
@@ -155,8 +170,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
       scrollbars: true
     });
 
-    // Open window
-    const popoutWindow = window.open(fullUrl, `panel-${panelId}`, features);
+    // Open window (state will be broadcast via BroadcastChannel, not URL)
+    const popoutWindow = window.open(url, `panel-${panelId}`, features);
 
     if (!popoutWindow) {
       // Pop-up blocked
@@ -175,9 +190,10 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
     // Set up BroadcastChannel for this panel
     const channel = this.popOutContext.createChannelForPanel(panelId);
 
-    // Listen for messages from pop-out
+    // Listen for messages from pop-out (Observable Pattern)
+    // Push browser API events to RxJS Subject for handling in Angular zone
     channel.onmessage = (event) => {
-      this.handlePopOutMessage(panelId, event.data);
+      this.popoutMessages$.next({ panelId, event });
     };
 
     // Monitor for window close
@@ -212,21 +228,19 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
     console.log(`[Discover] Message from pop-out:`, message.type, message.payload);
 
     switch (message.type) {
-      case PopOutMessageType.URL_PARAMS_CHANGED:
-        // Update URL in main window
-        this.onUrlParamsChange(message.payload.params);
-        break;
-
       case PopOutMessageType.PICKER_SELECTION_CHANGE:
         // Handle picker selection from pop-out
         this.onPickerSelectionChangeAndUpdateUrl(message.payload);
         break;
 
       case PopOutMessageType.PANEL_READY:
-        // Send current URL params to newly opened pop-out
-        const currentParams = this.urlStateService.getParams();
-        this.broadcastUrlParamsToPopOuts(currentParams);
+        // Pop-out is ready - current state will be broadcast automatically
+        // via the state$ subscription in ngOnInit
+        console.log('[Discover] Pop-out ready, state will be broadcast automatically');
         break;
+
+      // Removed: URL_PARAMS_CHANGED - pop-outs no longer sync URL params
+      // Pop-outs send action messages (PICKER_SELECTION_CHANGE, etc.) instead
     }
   }
 
@@ -281,16 +295,31 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
   }
 
   /**
-   * Broadcast URL parameters to all pop-out windows
+   * Broadcast full state to all pop-out windows
+   * This is called whenever main window state changes
    *
-   * @param params - URL parameters to broadcast
+   * Architecture: Main window URL is the single source of truth.
+   * URL → ResourceManagementService → state$ → BroadcastChannel → pop-out windows
+   * Pop-outs receive state and sync to their ResourceManagementService (no API calls)
+   *
+   * @param state - Current resource state
    */
-  private broadcastUrlParamsToPopOuts(params: Params): void {
-    // Send to all pop-outs
+  private broadcastStateToPopOuts(state: any): void {
+    if (this.popoutWindows.size === 0) {
+      return; // No pop-outs, skip broadcast
+    }
+
+    console.log('[Discover] Broadcasting state to all pop-outs:', {
+      resultsCount: state.results?.length,
+      filters: state.filters,
+      popoutsCount: this.popoutWindows.size
+    });
+
+    // Send STATE_UPDATE to all pop-outs
     this.popoutWindows.forEach(({ channel }) => {
       channel.postMessage({
-        type: PopOutMessageType.URL_PARAMS_SYNC,
-        payload: { params },
+        type: PopOutMessageType.STATE_UPDATE,
+        payload: { state },
         timestamp: Date.now()
       });
     });

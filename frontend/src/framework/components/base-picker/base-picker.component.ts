@@ -6,10 +6,12 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  Optional,
+  Inject
 } from '@angular/core';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, map, distinctUntilChanged } from 'rxjs/operators';
 import {
   PickerConfig,
   PickerState,
@@ -19,6 +21,7 @@ import {
 } from '../../models/picker-config.interface';
 import { PickerConfigRegistry } from '../../services/picker-config-registry.service';
 import { UrlStateService } from '../../services/url-state.service';
+import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
 
 /**
  * Base Picker Component
@@ -79,7 +82,8 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
   constructor(
     private registry: PickerConfigRegistry,
     private urlState: UrlStateService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    @Optional() @Inject(RESOURCE_MANAGEMENT_SERVICE) private resourceService?: ResourceManagementService<any, any, any>
   ) {}
 
   ngOnInit(): void {
@@ -127,25 +131,66 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
   }
 
   /**
-   * Subscribe to URL parameter changes for selection hydration
+   * Subscribe to filter changes for selection hydration
+   *
+   * Architecture: Works in both main window and pop-out
+   * - Main window: URL → ResourceManagementService.filters$ → picker hydration
+   * - Pop-out: BroadcastChannel → ResourceManagementService.filters$ → picker hydration
+   * - Single subscription works for both cases!
    */
   private subscribeToUrlChanges(): void {
     const urlParam = this.activeConfig!.selection.urlParam;
 
-    this.urlState
-      .watchParam(urlParam)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(urlValue => {
-        if (urlValue) {
-          this.hydrateFromUrl(urlValue);
-        } else {
-          // Clear selections if URL param is removed
-          this.state.selectedKeys.clear();
-          this.state.selectedItems = [];
-          this.state.pendingHydration = [];
-          this.cdr.markForCheck();
-        }
-      });
+    // If ResourceManagementService is available, watch filters$ (works in both windows)
+    if (this.resourceService) {
+      this.resourceService.filters$
+        .pipe(
+          map(filters => {
+            // Extract the relevant filter value for this picker
+            // The urlParam might map to a filter field (e.g., 'modelCombos' → filters.modelCombos)
+            return (filters as any)[urlParam] || null;
+          }),
+          distinctUntilChanged(),
+          takeUntil(this.destroy$)
+        )
+        .subscribe(filterValue => {
+          if (filterValue) {
+            // Convert filter value to URL string format if needed
+            const urlValue = Array.isArray(filterValue)
+              ? filterValue.map(item =>
+                  typeof item === 'object'
+                    ? `${item.manufacturer}:${item.model}`
+                    : String(item)
+                ).join(',')
+              : String(filterValue);
+
+            this.hydrateFromUrl(urlValue);
+          } else {
+            // Clear selections if filter value is removed
+            this.state.selectedKeys = new Set<string>();
+            this.state.selectedItems = [];
+            this.state.pendingHydration = [];
+            this.state.data = [...this.state.data];
+            this.cdr.markForCheck();
+          }
+        });
+    } else {
+      // Fallback: watch URL params directly (legacy mode)
+      this.urlState
+        .watchParam(urlParam)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(urlValue => {
+          if (urlValue) {
+            this.hydrateFromUrl(urlValue);
+          } else {
+            this.state.selectedKeys = new Set<string>();
+            this.state.selectedItems = [];
+            this.state.pendingHydration = [];
+            this.state.data = [...this.state.data];
+            this.cdr.markForCheck();
+          }
+        });
+    }
   }
 
   /**
@@ -179,7 +224,8 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
   private hydrateSelections(keys: string[]): void {
     const config = this.activeConfig!;
 
-    this.state.selectedKeys.clear();
+    // Create new Set to trigger object identity change detection
+    this.state.selectedKeys = new Set<string>();
     this.state.selectedItems = [];
 
     // Find matching items in loaded data
@@ -377,8 +423,9 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
    * Clear all selections
    */
   clearSelections(): void {
-    this.state.selectedKeys.clear();
+    this.state.selectedKeys = new Set<string>();
     this.state.selectedItems = [];
+    this.state.data = [...this.state.data];
     this.cdr.markForCheck();
     this.emitSelectionChange();
   }

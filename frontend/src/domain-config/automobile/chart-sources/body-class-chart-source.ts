@@ -146,18 +146,19 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
    * Handle chart click event
    *
    * Supports both single-click and box selection.
-   * For box selection, returns comma-separated list of unique body classes.
+   * Returns comma-separated body classes for OR filtering.
+   * Backend API v1.0.1+ supports comma-separated values.
    */
   handleClick(event: any): string | null {
     if (event.points && event.points.length > 0) {
       // Extract all body class names from selected points
-      const bodyClasses = event.points.map((point: any) => point.x as string);
+      const bodyClasses: string[] = event.points.map((point: any) => point.x as string);
 
       // Remove duplicates (box selection may select both stacked bars)
-      const uniqueBodyClasses = [...new Set(bodyClasses)];
+      const uniqueBodyClasses: string[] = [...new Set(bodyClasses)];
 
-      // Return comma-separated list (or single value)
-      return uniqueBodyClasses.join(',');
+      // Return comma-separated list (backend supports OR logic as of v1.0.1)
+      return uniqueBodyClasses.join(',') || null;
     }
     return null;
   }

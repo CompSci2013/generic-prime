@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import {
@@ -85,7 +85,10 @@ export class PopOutContextService implements OnDestroy {
    */
   private initialized = false;
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private ngZone: NgZone
+  ) {
     // Parse context on service creation
     this.context = parsePopOutRoute(this.router.url);
   }
@@ -214,12 +217,16 @@ export class PopOutContextService implements OnDestroy {
     this.channel = new BroadcastChannel(channelName);
 
     // Set up message handler
+    // BroadcastChannel callbacks run outside Angular's zone
     this.channel.onmessage = (event: MessageEvent) => {
-      const message = event.data as PopOutMessage;
+      // Run in Angular zone to trigger change detection
+      this.ngZone.run(() => {
+        const message = event.data as PopOutMessage;
 
-      console.log(`[PopOut] Received message:`, message.type, message.payload);
+        console.log(`[PopOut] Received message:`, message.type, message.payload);
 
-      this.messagesSubject.next(message);
+        this.messagesSubject.next(message);
+      });
     };
 
     // Set up error handler

@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://auto-discovery.minilab/api/specs/v1'
+  // Backend deployed to generic-prime namespace with v1.0.1 (bodyClass fix)
+  apiBaseUrl: 'http://generic-prime.minilab/api/specs/v1'
 };
 
 /*

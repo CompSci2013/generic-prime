@@ -1,6 +1,6 @@
 # TLDR.md - Implementation Status
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-11-23 (Backend deployment infrastructure added)
 **Purpose:** Quick reference for Claude Code sessions to understand current implementation state
 
 ---
@@ -213,6 +213,55 @@
    - Top 20 items for manufacturer and models charts
    - URL-First architecture compliance
    - Complete specification: [docs/components/charts/](docs/components/charts/)
+
+---
+
+## ✅ Backend Deployment Infrastructure Ready (2025-11-23)
+
+**Self-Contained Project Structure:**
+All backend source code, K8s configs, and documentation now in `~/projects/generic-prime/`
+
+**Backend Source:**
+- `backend-specs/` - Complete API source code (copied from auto-discovery)
+- Ready to build image: `localhost/generic-prime-backend:v1.0.1`
+- **Issue Found**: `bodyClass` parameter doesn't support comma-separated values (needs fix)
+
+**Kubernetes Configurations** (`k8s/` directory):
+- `namespace.yaml` - generic-prime namespace
+- `backend-deployment.yaml` - Backend deployment (2 replicas, Thor node)
+- `backend-service.yaml` - ClusterIP service on port 3000
+- `frontend-deployment.yaml` - Frontend deployment (2 replicas)
+- `frontend-service.yaml` - ClusterIP service on port 80
+- `ingress.yaml` - Traefik ingress routing for `generic-prime.minilab`
+
+**Frontend Build Configs:**
+- `frontend/Dockerfile.dev` - Development container (copied from autos-prime-ng)
+- `frontend/Dockerfile.prod` - Production build (multi-stage: node → nginx)
+
+**Documentation:**
+- `docs/DEVELOPER-ENVIRONMENT.md` (v2.0) - Complete build/deploy guide (880 lines)
+  - Phase 1: Create namespace
+  - Phase 2: Build & deploy backend (steps 2-14)
+  - Phase 3: Build & deploy frontend (steps 15-21)
+  - Phase 4: Dev container setup (steps 22-25)
+  - Phase 5: Daily development workflows
+- `docs/BACKEND-API-UPDATES.md` - Quick reference for backend updates
+
+**Deployment Architecture:**
+- **Namespace**: `generic-prime` (independent from auto-discovery)
+- **Services**: `generic-prime-backend`, `generic-prime-frontend`
+- **Images**: `localhost/generic-prime-backend:v1.0.X`, `localhost/generic-prime-frontend:prod`
+- **Ingress Host**: `generic-prime.minilab`
+- **Backend API**: `http://generic-prime.minilab/api/...`
+- **Frontend**: `http://generic-prime.minilab`
+
+**Backend API Comma-Separated Filter Analysis:**
+- ✅ `manufacturer` - Supports comma-separated (lines 226-248)
+- ✅ `model` - Supports comma-separated (lines 250-272)
+- ❌ `bodyClass` - Does NOT support comma-separated (lines 290-296) **NEEDS FIX**
+- ✅ All highlight parameters (`h_*`) - Support comma-separated correctly
+
+**Next Step:** Fix bodyClass parameter and deploy (see TLDR-NEXT-STEP.md PRIORITY 0)
 
 ---
 

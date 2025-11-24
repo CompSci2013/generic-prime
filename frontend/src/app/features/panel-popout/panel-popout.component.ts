@@ -4,9 +4,10 @@ import {
   OnDestroy,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Inject
+  Inject,
+  Injector
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PopOutContextService } from '../../../framework/services/popout-context.service';
@@ -14,8 +15,9 @@ import { PopOutMessage, PopOutMessageType } from '../../../framework/models/popo
 import { DOMAIN_CONFIG } from '../../../framework/services/domain-config-registry.service';
 import { DomainConfig } from '../../../framework/models';
 import { PickerSelectionEvent } from '../../../framework/models/picker-config.interface';
-import { Params } from '@angular/router';
 import { UrlStateService } from '../../../framework/services/url-state.service';
+import { PickerConfigRegistry } from '../../../framework/services/picker-config-registry.service';
+import { createAutomobilePickerConfigs } from '../../../domain-config/automobile/configs/automobile.picker-configs';
 import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../../framework/services/resource-management.service';
 
 /**
@@ -24,18 +26,26 @@ import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../..
  * Container component for pop-out windows.
  * Renders different panel types based on route parameters.
  *
- * Route: `/panel/:gridId/:panelId/:type`
+ * Route: `/panel/:gridId/:panelId/:type` (NO query params)
  *
  * Architecture:
  * - Initializes as pop-out via PopOutContextService
- * - Subscribes to cross-window messages via BroadcastChannel
- * - Renders appropriate component based on `type` parameter
- * - URL-first state management (watches own URL)
+ * - Receives STATE_UPDATE messages from main window via BroadcastChannel
+ * - Syncs state to ResourceManagementService (no API calls)
+ * - Components subscribe to ResourceManagementService observables naturally
+ * - URL-First: Main window URL is source of truth, pop-out receives derived state
+ *
+ * State Flow:
+ * 1. Main window URL changes → ResourceManagementService updates state
+ * 2. Main window broadcasts STATE_UPDATE to pop-outs
+ * 3. Pop-out receives STATE_UPDATE → syncs to ResourceManagementService
+ * 4. Components subscribe to observables and render
  *
  * @example
  * ```
- * // URL: /panel/discover/model-picker/picker
+ * // URL: /panel/discover/manufacturer-model-picker/picker
  * // Renders: <app-base-picker>
+ * // State comes from BroadcastChannel (synced from main window)
  * ```
  */
 @Component({
@@ -88,15 +98,24 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     private popOutContext: PopOutContextService,
     private cdr: ChangeDetectorRef,
-    @Inject(DOMAIN_CONFIG) domainConfig: DomainConfig<any, any, any>
+    private pickerRegistry: PickerConfigRegistry,
+    private injector: Injector,
+    private urlState: UrlStateService,
+    @Inject(DOMAIN_CONFIG) domainConfig: DomainConfig<any, any, any>,
+    @Inject(RESOURCE_MANAGEMENT_SERVICE) private resourceService: ResourceManagementService<any, any, any>
   ) {
     this.domainConfig = domainConfig;
   }
 
   ngOnInit(): void {
+    // Register picker configurations (needed for BasePickerComponent in pop-out)
+    // TODO: Make this domain-agnostic by using domain config
+    const pickerConfigs = createAutomobilePickerConfigs(this.injector);
+    this.pickerRegistry.registerMultiple(pickerConfigs);
+    console.log('[PanelPopout] Registered picker configs');
+
     // Extract route parameters
     this.route.params
       .pipe(takeUntil(this.destroy$))
@@ -136,32 +155,16 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
         window.close();
         break;
 
-      case PopOutMessageType.URL_PARAMS_SYNC:
-        // Sync URL params from main window
-        this.syncUrlParams(message.payload.params);
+      case PopOutMessageType.STATE_UPDATE:
+        // Sync full state from main window
+        // Main window URL → state$ → BroadcastChannel → pop-out
+        if (message.payload && message.payload.state) {
+          console.log('[PanelPopout] Syncing state from main window');
+          this.resourceService.syncStateFromExternal(message.payload.state);
+          this.cdr.markForCheck();
+        }
         break;
-
-      // Other message types handled by child components
-      // (they subscribe to PopOutContextService directly)
     }
-  }
-
-  /**
-   * Sync URL parameters from main window
-   * Updates the pop-out's URL to match the main window
-   *
-   * @param params - URL parameters from main window
-   */
-  private syncUrlParams(params: Params): void {
-    console.log('[PanelPopout] Syncing URL params from main window:', params);
-
-    // Update URL without triggering navigation
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: params,
-      replaceUrl: true,
-      queryParamsHandling: ''
-    });
   }
 
   /**
@@ -191,40 +194,31 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
 
   /**
    * Handle URL parameter changes from child components
-   * Sends message to main window instead of updating URL directly
+   * Sends message to main window - main window updates its URL and broadcasts STATE_UPDATE
    *
-   * @param params - URL parameters to update
+   * @param params - URL parameters from child component
    */
-  onUrlParamsChange(params: Params): void {
-    console.log('[PanelPopout] URL params change request:', params);
+  onUrlParamsChange(params: any): void {
+    console.log('[PanelPopout] URL params change request from Query Control:', params);
 
-    // Send message to main window to update URL
-    this.popOutContext.sendMessage({
-      type: PopOutMessageType.URL_PARAMS_CHANGED,
-      payload: { params },
-      timestamp: Date.now()
-    });
+    // TODO: Query Control should be refactored to send specific action messages
+    // (FILTER_ADD, FILTER_REMOVE, etc.) instead of generic URL params
+    // For now, log and ignore (main window handles picker selections correctly)
+    console.warn('[PanelPopout] URL_PARAMS_CHANGED not implemented - Query Control needs refactoring');
   }
 
   /**
    * Handle picker selection changes
-   * Sends message to main window to update URL
+   * Sends message to main window which updates URL and broadcasts STATE_UPDATE
    *
    * @param event - Picker selection event
    */
   onPickerSelectionChange(event: PickerSelectionEvent<any>): void {
     console.log('[PanelPopout] Picker selection change:', event);
 
-    // Extract URL param from selection event
-    const params: Params = {};
-
-    // The selection event contains the URL param name and value
-    // We need to extract it from the event
-    // For now, send as generic URL params change
-    if (event.urlValue) {
-      // We need to know the param name - it should be in the picker config
-      // For manufacturer-model-picker, it's typically 'modelCombos'
-      // We'll send the whole event and let main window handle it
+    // Send picker selection event to main window
+    // Main window will update its URL, which triggers state update, which broadcasts to pop-outs
+    if (event.urlValue !== undefined) {
       this.popOutContext.sendMessage({
         type: PopOutMessageType.PICKER_SELECTION_CHANGE,
         payload: event,

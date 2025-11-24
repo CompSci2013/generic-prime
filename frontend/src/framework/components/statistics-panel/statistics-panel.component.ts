@@ -23,6 +23,8 @@ import { ChartConfig, DomainConfig } from '../../models/domain-config.interface'
 import { ChartDataSource } from '../base-chart/base-chart.component';
 import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
 import { UrlStateService } from '../../services/url-state.service';
+import { PopOutContextService } from '../../services/popout-context.service';
+import { PopOutMessageType } from '../../models/popout.interface';
 
 /**
  * Statistics Panel Component
@@ -86,7 +88,8 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
     private resourceService: ResourceManagementService<any, any, any>,
     private route: ActivatedRoute,
     private urlState: UrlStateService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private popOutContext: PopOutContextService
   ) {}
 
   ngOnInit(): void {
@@ -191,12 +194,46 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
       // This ensures URL-First architecture compliance
       console.log('[StatisticsPanel] Setting highlight params:', newParams);
       this.urlState.setParams(newParams);
+
+      // If we're in a pop-out window, broadcast the URL change to main window
+      if (this.popOutContext.isInPopOut()) {
+        console.log('[StatisticsPanel] Broadcasting URL params change to main window:', newParams);
+        this.popOutContext.sendMessage({
+          type: PopOutMessageType.URL_PARAMS_CHANGED,
+          payload: { params: newParams },
+          timestamp: Date.now()
+        });
+      }
     } else {
-      // Normal mode: Update filters
-      // This would trigger a data refetch
-      console.log('Normal click - would update filters with:', event.value);
-      // In a complete implementation, this would call:
-      // this.resourceService.updateFilters({ /* appropriate filter */ });
+      // Normal mode: Add filter URL parameter (non-highlight)
+      const newParams: Record<string, any> = {};
+
+      // Handle range selections (value contains min|max)
+      if (chartId === 'year-distribution' && event.value.includes('|')) {
+        const [min, max] = event.value.split('|');
+        newParams['yearMin'] = min;
+        newParams['yearMax'] = max;
+      } else {
+        // Single value or other chart types
+        const paramName = this.getFilterParamName(chartId);
+        if (paramName) {
+          newParams[paramName] = event.value;
+        }
+      }
+
+      // Use UrlStateService to update filter parameters
+      console.log('[StatisticsPanel] Setting filter params:', newParams);
+      this.urlState.setParams(newParams);
+
+      // If we're in a pop-out window, broadcast the URL change to main window
+      if (this.popOutContext.isInPopOut()) {
+        console.log('[StatisticsPanel] Broadcasting filter params change to main window:', newParams);
+        this.popOutContext.sendMessage({
+          type: PopOutMessageType.URL_PARAMS_CHANGED,
+          payload: { params: newParams },
+          timestamp: Date.now()
+        });
+      }
     }
   }
 
@@ -209,6 +246,20 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
       'top-models': 'h_modelCombos',
       'body-class-distribution': 'h_bodyClass'
       // year-distribution handled separately (uses h_yearMin and h_yearMax)
+    };
+
+    return mapping[chartId] || null;
+  }
+
+  /**
+   * Map chart ID to filter URL parameter name (non-highlight)
+   */
+  private getFilterParamName(chartId: string): string | null {
+    const mapping: Record<string, string> = {
+      'manufacturer-distribution': 'manufacturer',
+      'top-models': 'modelCombos',
+      'body-class-distribution': 'bodyClass'
+      // year-distribution handled separately (uses yearMin and yearMax)
     };
 
     return mapping[chartId] || null;

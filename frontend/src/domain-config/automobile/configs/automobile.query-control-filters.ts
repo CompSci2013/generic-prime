@@ -102,5 +102,37 @@ export const AUTOMOBILE_QUERY_CONTROL_FILTERS: FilterDefinition<AutoSearchFilter
     optionsEndpoint: `${environment.apiBaseUrl}/filters/year-range`,
     urlParams: { min: 'yearMin', max: 'yearMax' },
     dialogSubtitle: 'Select a year range to filter results. You can select just a start year, end year, or both.'
+  },
+
+  /**
+   * Manufacturer-Model Combinations filter (Multiselect)
+   *
+   * Used to display chips when selections are made via Manufacturer-Model Picker
+   * Format: "Manufacturer:Model" (e.g., "Ford:F-150")
+   */
+  {
+    field: 'modelCombos',
+    label: 'Manufacturer & Model',
+    type: 'multiselect',
+    optionsEndpoint: `${environment.apiBaseUrl}/manufacturer-model-combinations?page=1&size=1000`,
+    optionsTransformer: (response: any): FilterOption[] => {
+      // Response structure: { total, data: [ { manufacturer, count, models: [ { model, count } ] } ] }
+      if (response && response.data) {
+        const options: FilterOption[] = [];
+        for (const mfr of response.data) {
+          for (const modelObj of mfr.models || []) {
+            options.push({
+              value: `${mfr.manufacturer}:${modelObj.model}`,
+              label: `${mfr.manufacturer}: ${modelObj.model}`
+            });
+          }
+        }
+        return options;
+      }
+      return [];
+    },
+    urlParams: 'modelCombos',
+    searchPlaceholder: 'Type to search manufacturer-model combinations...',
+    dialogSubtitle: 'Select one or more manufacturer-model combinations. Tip: Use the Manufacturer-Model Picker panel for easier selection.'
   }
 ];

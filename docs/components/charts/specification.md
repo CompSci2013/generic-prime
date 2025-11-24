@@ -76,7 +76,9 @@ IMPORTANT: ALL charts stack bars with:
 
 ```
 Normal Mode (default):
-  Click bar → No action (reserved for future drill-down)
+  Single Click → No action (reserved for future drill-down)
+  Box Select → Add regular filter URL parameters (yearMin/yearMax, manufacturer, etc.)
+              → Same as if selection was made via Query Control
 
 Highlight Mode (hold 'h' key):
   Single Click → Add h_* URL parameter for clicked value
@@ -99,8 +101,12 @@ Visual Feedback:
 **Statistics Field**: `statistics.byManufacturer`
 
 **URL Parameters**:
-- Normal click: `h_manufacturer={value}` (e.g., `h_manufacturer=Ford`)
-- Box select: `h_manufacturer={value1},{value2},...` (e.g., `h_manufacturer=Ford,Buick,Chrysler`)
+- **Normal Mode**:
+  - Single click: No action
+  - Box select: `manufacturer={value1},{value2},...` (e.g., `manufacturer=Ford,Buick,Chrysler`)
+- **Highlight Mode (hold 'h' key)**:
+  - Single click: `h_manufacturer={value}` (e.g., `h_manufacturer=Ford`)
+  - Box select: `h_manufacturer={value1},{value2},...` (e.g., `h_manufacturer=Ford,Buick,Chrysler`)
 
 **Limits**: Top 20 manufacturers by count
 
@@ -114,8 +120,12 @@ Visual Feedback:
 **Statistics Field**: `statistics.modelsByManufacturer` (segmented) or `statistics.topModels` (fallback)
 
 **URL Parameters**:
-- Normal click: `h_modelCombos={Mfr}:{Model}` (e.g., `h_modelCombos=Ford:F-150`)
-- Box select: `h_modelCombos={Mfr}:{Model},{Mfr}:{Model},...` (e.g., `h_modelCombos=Ford:F-150,Buick:Century`)
+- **Normal Mode**:
+  - Single click: No action
+  - Box select: `modelCombos={Mfr}:{Model},{Mfr}:{Model},...` (e.g., `modelCombos=Ford:F-150,Buick:Century`)
+- **Highlight Mode (hold 'h' key)**:
+  - Single click: `h_modelCombos={Mfr}:{Model}` (e.g., `h_modelCombos=Ford:F-150`)
+  - Box select: `h_modelCombos={Mfr}:{Model},{Mfr}:{Model},...` (e.g., `h_modelCombos=Ford:F-150,Buick:Century`)
 
 **Label Format Conversion**:
 - Chart labels: `"Manufacturer Model"` (space-separated, e.g., `"Ford F-150"`)
@@ -134,13 +144,18 @@ Visual Feedback:
 **Statistics Field**: `statistics.byYearRange`
 
 **URL Parameters**:
-- Single year: `h_yearMin={year}&h_yearMax={year}` (e.g., `h_yearMin=2020&h_yearMax=2020`)
-- Year range: `h_yearMin={min}&h_yearMax={max}` (e.g., `h_yearMin=1960&h_yearMax=1970`)
+- **Normal Mode**:
+  - Single click: No action
+  - Box select (range): `yearMin={min}&yearMax={max}` (e.g., `yearMin=1960&yearMax=1970`)
+  - Box select (single): `yearMin={year}&yearMax={year}` (e.g., `yearMin=2020&yearMax=2020`)
+- **Highlight Mode (hold 'h' key)**:
+  - Single click: `h_yearMin={year}&h_yearMax={year}` (e.g., `h_yearMin=2020&h_yearMax=2020`)
+  - Box select: `h_yearMin={min}&h_yearMax={max}` (e.g., `h_yearMin=1960&h_yearMax=1970`)
 
 **Special Handling**:
 - Single click → Returns year as string (e.g., `"2020"`)
 - Box select → Returns pipe-delimited range (e.g., `"1960|1970"`)
-- StatisticsPanelComponent splits pipe and creates two parameters
+- StatisticsPanelComponent splits pipe and creates two parameters (yearMin/yearMax OR h_yearMin/h_yearMax)
 
 **Limits**: All years (no limit)
 
@@ -154,8 +169,12 @@ Visual Feedback:
 **Statistics Field**: `statistics.byBodyClass`
 
 **URL Parameters**:
-- Normal click: `h_bodyClass={value}` (e.g., `h_bodyClass=Sedan`)
-- Box select: `h_bodyClass={value1},{value2},...` (e.g., `h_bodyClass=Sedan,SUV,Truck`)
+- **Normal Mode**:
+  - Single click: No action
+  - Box select: `bodyClass={value1},{value2},...` (e.g., `bodyClass=Sedan,SUV,Truck`)
+- **Highlight Mode (hold 'h' key)**:
+  - Single click: `h_bodyClass={value}` (e.g., `h_bodyClass=Sedan`)
+  - Box select: `h_bodyClass={value1},{value2},...` (e.g., `h_bodyClass=Sedan,SUV,Truck`)
 
 **Limits**: All body classes (no limit)
 
@@ -311,7 +330,43 @@ URL: ?h_manufacturer=Ford
 
 ---
 
-### Action 2: Box Selection (Highlight Mode)
+### Action 2: Box Selection (Normal Mode - WITHOUT 'h' key)
+
+**Trigger**: User drags box across multiple bars WITHOUT holding 'h' key
+**Chart Detection**: `plotly_selected` event
+**Processing**: Delegate to `dataSource.handleClick(event)` (SAME as click)
+**Result**:
+- Chart returns formatted multi-value (format depends on chart type)
+- StatisticsPanelComponent maps to REGULAR parameter name (e.g., `'manufacturer'`, NOT `'h_manufacturer'`)
+- URL updates with regular filter parameter (same as Query Control would create)
+- Page refreshes with filtered data (NOT highlighted)
+
+**Example Flow** (Year Chart):
+```
+User: Drag box across years 1960-1970 (NO 'h' key held)
+↓
+YearChartDataSource.handleClick() processes event.points
+↓
+Returns "1960|1970" (pipe-delimited range)
+↓
+BaseChartComponent emits { value: "1960|1970", isHighlightMode: false }
+↓
+StatisticsPanelComponent: yearMin = 1960, yearMax = 1970
+↓
+UrlStateService.setParams({ yearMin: 1960, yearMax: 1970 })
+↓
+URL: ?yearMin=1960&yearMax=1970
+```
+
+**Key Difference from Highlight Mode**:
+- Uses regular parameter names (`manufacturer`, `modelCombos`, `bodyClass`, `yearMin`/`yearMax`)
+- Behaves identically to adding filters via Query Control
+- Data is FILTERED (not highlighted with segmented statistics)
+- No blue/gray stacked bars - results table shows only filtered data
+
+---
+
+### Action 3: Box Selection (Highlight Mode - WITH 'h' key)
 
 **Trigger**: User holds 'h' key + drags box across multiple bars
 **Chart Detection**: `plotly_selected` event
@@ -353,7 +408,7 @@ URL: ?h_manufacturer=Ford,Buick,Chrysler
 
 ---
 
-### Action 3: Clear Highlights
+### Action 4: Clear Highlights
 
 **Trigger**: User clicks "Clear All Highlights" button (if exists) OR manually removes h_* from URL
 **Result**:
@@ -363,19 +418,34 @@ URL: ?h_manufacturer=Ford,Buick,Chrysler
 
 ---
 
+### Action 5: Clear Regular Filters
+
+**Trigger**: User clicks "Clear All" button OR manually removes filter params from URL
+**Result**:
+- All non-highlight parameters removed from URL
+- Charts and results table show full unfiltered dataset
+- Highlight parameters (h_*) remain if present
+
+---
+
 ## 7. CHART-SPECIFIC OUTPUT FORMATS
 
 ### Chart Output Format Matrix
 
-| Chart | Single Click | Box Select | URL Parameter | Example |
-|-------|-------------|------------|---------------|---------|
-| **Manufacturer** | `"Ford"` | `"Ford,Buick"` | `h_manufacturer` | `?h_manufacturer=Ford,Buick` |
-| **Top Models** | `"Ford:F-150"` | `"Ford:F-150,Buick:Century"` | `h_modelCombos` | `?h_modelCombos=Ford:F-150,Buick:Century` |
-| **Year** | `"2020"` | `"1960\|1970"` (pipe!) | `h_yearMin` + `h_yearMax` | `?h_yearMin=1960&h_yearMax=1970` |
-| **Body Class** | `"Sedan"` | `"Sedan,SUV,Truck"` | `h_bodyClass` | `?h_bodyClass=Sedan,SUV,Truck` |
+| Chart | Mode | Single Click | Box Select | URL Parameter | Example |
+|-------|------|-------------|------------|---------------|---------|
+| **Manufacturer** | Normal | No action | `"Ford,Buick"` | `manufacturer` | `?manufacturer=Ford,Buick` |
+| | Highlight | `"Ford"` | `"Ford,Buick"` | `h_manufacturer` | `?h_manufacturer=Ford,Buick` |
+| **Top Models** | Normal | No action | `"Ford:F-150,Buick:Century"` | `modelCombos` | `?modelCombos=Ford:F-150,Buick:Century` |
+| | Highlight | `"Ford:F-150"` | `"Ford:F-150,Buick:Century"` | `h_modelCombos` | `?h_modelCombos=Ford:F-150,Buick:Century` |
+| **Year** | Normal | No action | `"1960\|1970"` (pipe!) | `yearMin` + `yearMax` | `?yearMin=1960&yearMax=1970` |
+| | Highlight | `"2020"` | `"1960\|1970"` (pipe!) | `h_yearMin` + `h_yearMax` | `?h_yearMin=1960&h_yearMax=1970` |
+| **Body Class** | Normal | No action | `"Sedan,SUV,Truck"` | `bodyClass` | `?bodyClass=Sedan,SUV,Truck` |
+| | Highlight | `"Sedan"` | `"Sedan,SUV,Truck"` | `h_bodyClass` | `?h_bodyClass=Sedan,SUV,Truck` |
 
 ### Parameter Name Mapping (StatisticsPanelComponent)
 
+**Highlight Mode (hold 'h' key)**:
 ```typescript
 private getHighlightParamName(chartId: string): string | null {
   const mapping: Record<string, string> = {
@@ -383,6 +453,19 @@ private getHighlightParamName(chartId: string): string | null {
     'top-models': 'h_modelCombos',           // NOT 'h_model'!
     'body-class-distribution': 'h_bodyClass'
     // 'year-distribution' handled separately (splits into h_yearMin + h_yearMax)
+  };
+  return mapping[chartId] || null;
+}
+```
+
+**Normal Mode (no 'h' key)**:
+```typescript
+private getFilterParamName(chartId: string): string | null {
+  const mapping: Record<string, string> = {
+    'manufacturer-distribution': 'manufacturer',
+    'top-models': 'modelCombos',             // NOT 'model'!
+    'body-class-distribution': 'bodyClass'
+    // 'year-distribution' handled separately (splits into yearMin + yearMax)
   };
   return mapping[chartId] || null;
 }
@@ -552,19 +635,33 @@ Scenario: Single click adds manufacturer highlight
   And other bars should show only gray (other) sections
   And the results table should refresh with only Ford vehicles
 
-Scenario: Box selection adds multiple manufacturer highlights
+Scenario: Box selection adds multiple manufacturer highlights (Highlight Mode)
   When the user holds the 'h' key
   And the user drags a box across "Ford", "Buick", "Chrysler" bars
   Then the URL should update to "?h_manufacturer=Ford,Buick,Chrysler"
   And all three bars should show blue highlighted sections
   And the results table should show only Ford, Buick, or Chrysler vehicles
 
-Scenario: Year range box selection
+Scenario: Box selection filters data like Query Control (Normal Mode)
+  When the user drags a box across "Ford", "Buick", "Chrysler" bars WITHOUT holding 'h' key
+  Then the URL should update to "?manufacturer=Ford,Buick,Chrysler"
+  And the charts should show simple blue bars (no stacking, no highlighting)
+  And the results table should show only Ford, Buick, or Chrysler vehicles
+  And the behavior should be identical to adding filters via Query Control
+
+Scenario: Year range box selection (Highlight Mode)
   When the user holds the 'h' key
   And the user drags a box across years 1960-1970 in the Year chart
   Then the URL should update to "?h_yearMin=1960&h_yearMax=1970"
   And the Year chart should show highlighted sections for years 1960-1970
   And the results table should show only vehicles from 1960-1970
+
+Scenario: Year range box selection filters data (Normal Mode)
+  When the user drags a box across years 1960-1970 WITHOUT holding 'h' key
+  Then the URL should update to "?yearMin=1960&yearMax=1970"
+  And the Year chart should show simple blue bars (no stacking, no highlighting)
+  And the results table should show only vehicles from 1960-1970
+  And the behavior should be identical to setting year range via Query Control
 
 Scenario: Models chart click converts format correctly
   When the user holds the 'h' key
@@ -688,6 +785,7 @@ Scenario: Legacy pipe separators are normalized
 | Date | Version | Author | Changes |
 |------|---------|--------|---------|
 | 2025-11-23 | 1.0 | Claude Code | Initial specification (retroactive documentation of 10 fixes) |
+| 2025-11-23 | 1.1 | Claude Code | Added box selection in Normal Mode (without 'h' key) - sends regular filter params like Query Control |
 
 ---
 

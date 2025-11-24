@@ -343,6 +343,33 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
   }
 
   /**
+   * Sync state from external source (e.g., pop-out receiving state from main window)
+   *
+   * This method allows pop-out windows to receive full state from the main window
+   * via BroadcastChannel and update their local state without making API calls.
+   *
+   * Architecture:
+   * - Main window: URL → ResourceManagementService → state$ → BroadcastChannel
+   * - Pop-out window: BroadcastChannel → syncStateFromExternal() → state$ → components
+   *
+   * @param externalState - Complete state object from main window
+   *
+   * @example
+   * ```typescript
+   * // In PanelPopoutComponent
+   * case PopOutMessageType.STATE_UPDATE:
+   *   this.resourceService.syncStateFromExternal(message.payload.state);
+   *   break;
+   * ```
+   */
+  public syncStateFromExternal(
+    externalState: ResourceState<TFilters, TData, TStatistics>
+  ): void {
+    console.log('[ResourceManagement] Syncing state from external source');
+    this.stateSubject.next(externalState);
+  }
+
+  /**
    * Clean up subscriptions and resources
    * Call this in your component's ngOnDestroy()
    */

@@ -5,31 +5,246 @@
 
 ---
 
-## 🔥 Latest Session Summary (2025-11-23)
+## 🔥 Latest Session Summary (2025-11-23 - Backend Deployment Setup)
 
 **What Just Happened:**
-- Fixed 3 critical pop-out bugs (Clear button, modelCombos chips, focus/change detection)
-- Discovered 2 new pop-out bugs (pagination zero rows, checkbox visual state)
-- **CRITICAL ARCHITECTURAL DISCOVERY**: OnPush change detection in unfocused browser windows
-  - `markForCheck()` doesn't work in unfocused windows (only schedules, never runs)
-  - Must use `detectChanges()` for pop-out window state synchronization
-  - Changed in 3 locations: URL sync, URL hydration, selection hydration
+- ✅ **Created self-contained generic-prime project structure**
+- ✅ **Copied backend-specs from auto-discovery** → `~/projects/generic-prime/backend-specs/`
+- ✅ **Created complete K8s deployment configs** (namespace, backend, frontend, ingress)
+- ✅ **Documented build/deployment process** in `docs/DEVELOPER-ENVIRONMENT.md` (880 lines)
+- ✅ **Created quick reference guide** in `docs/BACKEND-API-UPDATES.md`
+- 🔍 **Discovered backend API issue**: `bodyClass` parameter doesn't support comma-separated values
 
-**Files Modified:**
-1. [panel-popout.component.ts:214](frontend/src/app/features/panel-popout/panel-popout.component.ts#L214) - Added `urlState.setParams()` for pop-out URL sync
-2. [automobile.query-control-filters.ts:113-137](frontend/src/domain-config/automobile/configs/automobile.query-control-filters.ts#L113-L137) - Added modelCombos filter definition
-3. [base-picker.component.ts:147,175,204](frontend/src/framework/components/base-picker/base-picker.component.ts#L147) - Changed `markForCheck()` to `detectChanges()` in 3 places
+**Key Architecture Changes:**
+- **Namespace**: `generic-prime` (not `auto-discovery`)
+- **Services**: `generic-prime-backend`, `generic-prime-frontend`
+- **Images**: `localhost/generic-prime-backend:v1.0.X`, `localhost/generic-prime-frontend:prod`
+- **Ingress**: `generic-prime.minilab`
 
-**Key Pattern Learned:**
-```typescript
-// ❌ WRONG for pop-out windows
-this.cdr.markForCheck();  // Only schedules, doesn't run in unfocused windows
+**Files Created:**
+1. `docs/DEVELOPER-ENVIRONMENT.md` - Complete build/deploy guide (v2.0)
+2. `docs/BACKEND-API-UPDATES.md` - Quick reference for backend updates
+3. `k8s/namespace.yaml` - Generic-prime namespace
+4. `k8s/backend-deployment.yaml` - Backend deployment manifest
+5. `k8s/backend-service.yaml` - Backend service
+6. `k8s/frontend-deployment.yaml` - Frontend deployment manifest
+7. `k8s/frontend-service.yaml` - Frontend service
+8. `k8s/ingress.yaml` - Traefik ingress routing
 
-// ✅ CORRECT for pop-out windows
-this.cdr.detectChanges();  // Forces immediate update, works in unfocused windows
+**Files Copied:**
+1. `backend-specs/` - Complete backend API source code
+2. `frontend/Dockerfile.dev` - Development container config
+3. `frontend/Dockerfile.prod` - Production build config
+
+**Backend API Analysis:**
+- ✅ `manufacturer` filter: Supports comma-separated values (lines 226-248)
+- ✅ `model` filter: Supports comma-separated values (lines 250-272)
+- ❌ `bodyClass` filter: Does NOT support comma-separated values (lines 290-296)
+- ✅ Highlight parameters (`h_*`): All support comma-separated values correctly
+
+**Test Results:**
+```bash
+# Single value works
+curl "http://auto-discovery.minilab/api/specs/v1/vehicles/details?bodyClass=Sedan" → 2615 results ✅
+
+# Comma-separated fails
+curl "http://auto-discovery.minilab/api/specs/v1/vehicles/details?bodyClass=Sedan,SUV" → 0 results ❌
 ```
 
-**Next Recommended Task**: Fix Bug #6 and #7 (see PRIORITY 0 below)
+**Next Recommended Task**: Fix bodyClass parameter and deploy to generic-prime namespace (see PRIORITY 0 below)
+
+---
+
+## 🎯 PRIORITY 0 - Backend API Fix & Deployment (RECOMMENDED)
+
+**Estimated Time:** 1-2 hours
+**Impact:** HIGH - Enables multi-select body class filters in Query Control
+
+### Task Breakdown
+
+**1. Fix bodyClass Parameter** (15 minutes)
+```bash
+cd ~/projects/generic-prime/backend-specs/src/services
+nano elasticsearchService.js
+```
+
+Replace lines 290-296 with comma-separated logic (pattern from manufacturer/model filters):
+
+```javascript
+if (filters.bodyClass) {
+  // Handle comma-separated body classes (OR logic)
+  const bodyClasses = filters.bodyClass.split(',').map(b => b.trim()).filter(b => b);
+
+  if (bodyClasses.length === 1) {
+    // Single body class: exact match using term query
+    query.bool.filter.push({
+      term: {
+        'body_class': bodyClasses[0]
+      }
+    });
+  } else if (bodyClasses.length > 1) {
+    // Multiple body classes: OR logic with exact matching
+    query.bool.filter.push({
+      bool: {
+        should: bodyClasses.map(bc => ({
+          term: { 'body_class': bc }
+        })),
+        minimum_should_match: 1,
+      },
+    });
+  }
+}
+```
+
+**2. Build and Deploy Backend** (30-45 minutes)
+
+Follow `docs/DEVELOPER-ENVIRONMENT.md` Phase 1 & 2:
+
+```bash
+# Create namespace
+cd ~/projects/generic-prime/k8s
+kubectl apply -f namespace.yaml
+
+# Build backend
+cd ~/projects/generic-prime/backend-specs
+podman build -t localhost/generic-prime-backend:v1.0.1 .
+
+# Export and import to K3s
+podman save localhost/generic-prime-backend:v1.0.1 -o generic-prime-backend-v1.0.1.tar
+sudo k3s ctr images import generic-prime-backend-v1.0.1.tar
+
+# Deploy backend
+cd ~/projects/generic-prime/k8s
+kubectl apply -f backend-deployment.yaml
+kubectl apply -f backend-service.yaml
+kubectl apply -f ingress.yaml
+
+# Watch rollout
+kubectl rollout status deployment/generic-prime-backend -n generic-prime
+
+# Clean up
+cd ~/projects/generic-prime/backend-specs
+rm generic-prime-backend-v1.0.1.tar
+```
+
+**3. Test Backend API** (10 minutes)
+
+```bash
+# Test health
+curl http://generic-prime.minilab/api/health
+
+# Test single bodyClass
+curl "http://generic-prime.minilab/api/vehicles/details?bodyClass=Sedan&size=1" | jq '.total'
+
+# Test comma-separated bodyClass (should now work!)
+curl "http://generic-prime.minilab/api/vehicles/details?bodyClass=Sedan,SUV&size=1" | jq '.total'
+
+# Test manufacturer (already working)
+curl "http://generic-prime.minilab/api/vehicles/details?manufacturer=Ford,Chevrolet&size=1" | jq '.total'
+```
+
+**Expected Results:**
+- Health check: `{"status":"ok",...}`
+- Single bodyClass: 2615 (Sedan count)
+- Multiple bodyClass: 3613 (Sedan + SUV combined)
+- Multiple manufacturer: 1514 (Ford + Chevrolet combined)
+
+**4. Deploy Frontend** (20-30 minutes)
+
+Follow `docs/DEVELOPER-ENVIRONMENT.md` Phase 3:
+
+```bash
+cd ~/projects/generic-prime/frontend
+
+# Build production image
+podman build -f Dockerfile.prod -t localhost/generic-prime-frontend:prod .
+
+# Export and import
+podman save localhost/generic-prime-frontend:prod -o generic-prime-frontend-prod.tar
+sudo k3s ctr images import generic-prime-frontend-prod.tar
+
+# Deploy frontend
+cd ~/projects/generic-prime/k8s
+kubectl apply -f frontend-deployment.yaml
+kubectl apply -f frontend-service.yaml
+
+# Watch rollout
+kubectl rollout status deployment/generic-prime-frontend -n generic-prime
+
+# Clean up
+cd ~/projects/generic-prime/frontend
+rm generic-prime-frontend-prod.tar
+```
+
+**5. Test Complete Application** (10 minutes)
+
+```bash
+# Check all pods
+kubectl get pods -n generic-prime
+
+# Test in browser
+firefox http://generic-prime.minilab
+```
+
+**Expected:**
+- 2 backend pods running
+- 2 frontend pods running
+- Browser: Generic Discovery Framework loads
+- Query Control: Body Class multiselect works with comma-separated values
+
+**Deliverables:**
+- ✅ Backend API supports comma-separated filters for all fields
+- ✅ generic-prime namespace deployed to K3s
+- ✅ Frontend and backend running in production
+- ✅ Full application accessible at http://generic-prime.minilab
+
+---
+
+## Alternative Tasks (If Not Doing PRIORITY 0)
+
+### Option 1: Fix Active Pop-Out Bugs (1-2 hours)
+
+**Bug #6**: Popped-out picker shows zero rows after pagination change
+- Location: `frontend/src/framework/components/base-picker/base-picker.component.ts`
+- Fix: Add `this.cdr.detectChanges()` in pagination handler (line ~220)
+- Pattern: Same as Bug #5 fix (use detectChanges() not markForCheck())
+
+**Bug #7**: Checkboxes remain visually checked after clearing selections
+- Location: `frontend/src/framework/components/base-picker/base-picker.component.ts`
+- Issue: PrimeNG Table selection state not syncing with empty array
+- Fix: Force table re-render or reset selection object
+
+### Option 2: VIN Browser Panel (3-4 days, HIGH value)
+
+**Purpose:** Drill-down from vehicle specifications to individual VIN instances
+
+**Key Features:**
+- Click on row in results table → Opens VIN browser for that vehicle
+- Shows all individual VINs for selected vehicle specification
+- Displays VIN-specific data: condition, mileage, value, location, etc.
+- Uses `/api/vins/v1/vehicles/:vehicleId/instances` endpoint
+- Supports pagination, sorting, filtering of VIN instances
+- Pop-out capable (like other panels)
+
+**Implementation:**
+1. Create `VinBrowserComponent` (3-4 hours)
+2. Add VIN models and interfaces (1 hour)
+3. Create VIN API adapter (2 hours)
+4. Add row click handler in ResultsTableComponent (1 hour)
+5. Integrate with pop-out system (2 hours)
+6. Testing and refinement (4-6 hours)
+
+### Option 3: Row Expansion Details (1-2 days)
+
+Implement detailed view when clicking expand button on results table row.
+
+### Option 4: Column Management (1 day)
+
+Add column visibility toggle using PrimeNG MultiSelect.
+
+### Option 5: Export Functionality (1-2 days)
+
+Add CSV/JSON export for filtered results.
 
 ---
 
@@ -42,6 +257,7 @@ this.cdr.detectChanges();  // Forces immediate update, works in unfocused window
    - Search and sorting
    - URL synchronization
    - Template: 157 lines of PrimeNG markup
+   - **Known Issues**: Bug #6 (pagination) and Bug #7 (checkbox visual state) in pop-out mode
 
 2. **ResultsTableComponent** - Domain-agnostic data table
    - Dynamic filter panel (renders from FilterDefinition[])
@@ -55,6 +271,7 @@ this.cdr.detectChanges();  // Forces immediate update, works in unfocused window
    - Multiselect dialog for list-based filters
    - Range dialog for numeric filters
    - Active filter chips with edit/remove functionality
+   - Separate highlights section (v0.3.0)
    - URL-first architecture
    - Fully domain-agnostic
    - Template: 179 lines, TypeScript: 467 lines
@@ -98,457 +315,110 @@ All F1-F10 milestones complete:
 - Chart Data Sources: ManufacturerChartDataSource, TopModelsChartDataSource, BodyClassChartDataSource, YearChartDataSource
 - Domain factory: createAutomobileDomainConfig() with chartDataSources map
 
----
+### ✅ Pop-Out Window System Complete (with learnings)
 
-## Next Implementation Options
+**Architecture:**
+- BroadcastChannel for cross-window messaging
+- URL-First in pop-outs (each window has independent URL)
+- MOVE semantics (panel disappears from main, appears in pop-out)
+- Close detection via polling + visibility API
 
-### ⚠️ PRIORITY 0: Fix Active Pop-Out Bugs (RECOMMENDED NEXT)
-
-**Estimated Effort**: 1-2 hours
-**Priority**: HIGH (blocking smooth pop-out experience)
-
-**Bug #6: Popped-out picker shows zero rows after pagination**
-- Investigation: Check if pagination handler uses `markForCheck()` instead of `detectChanges()`
-- Likely location: [base-picker.component.ts](frontend/src/framework/components/base-picker/base-picker.component.ts) onLazyLoad() handler
-- Expected fix: Replace `markForCheck()` with `detectChanges()` in pagination logic
-- Test: Pop out picker → change page → verify rows display without needing to focus window
-
-**Bug #7: Checkboxes remain visually checked after clearing selections**
-- Investigation: Check PrimeNG Table selection state management
-- Likely issue: `selectedKeys` Set not syncing with PrimeNG's internal selection array
-- Possible fix: Explicitly set `selection` to empty array after clearing `selectedKeys`
-- Test: Select items → clear via Query Control → verify checkboxes uncheck in pop-out
-
-**Reference**: See [KNOWN-BUGS.md](KNOWN-BUGS.md) for detailed reproduction steps
-
----
-
-### ✅ Option 1: Charts & Highlighting System (COMPLETED v0.2.0 - 2025-11-23)
-
-**Status**: ✅ COMPLETE
-**Component**: Statistics Panel with interactive chart highlighting
-**Completed Features**:
-- ✅ URL-First architecture compliance (UrlStateService, not router.navigate)
-- ✅ Server-side segmented statistics support ({total, highlighted} format)
-- ✅ Consistent stacking order across all charts (Highlighted bottom, Other top)
-- ✅ Pipe-to-comma separator normalization for backend compatibility
-- ✅ Box selection deduplication (using Set to remove duplicates from stacked bars)
-- ✅ Box selection delegation pattern (chart-specific formatting)
-- ✅ Models chart parameter mapping (h_modelCombos not h_model)
-- ✅ Models chart format conversion (space to colon for "Manufacturer:Model")
-- ✅ Statistics transform limits (20 items not 10)
-- ✅ Comprehensive component specification created (430 lines + README)
-
-**Documentation**: [docs/components/charts/specification.md](docs/components/charts/specification.md)
-
-**Git Tag**: v0.2.0 (2025-11-23) - 11 commits, 760 lines of documentation
-
----
-
-### ✅ Option 2: Pop-Out Window System (COMPLETED 2025-11-22, REFINEMENTS 2025-11-23)
-
-**Status**: ✅ CORE COMPLETE, ⚠️ 2 ACTIVE BUGS
-**Component**: Pop-out buttons + routing + messaging
-**Completed Features**:
-- ✅ Pop-out buttons on all panels (Statistics, Results, Query Control, Pickers)
-- ✅ Pop-out routing (`/panel/:gridId/:panelId/:type`)
-- ✅ `PanelPopoutComponent` container component
-- ✅ BroadcastChannel cross-window messaging
-- ✅ URL parameter synchronization
-- ✅ MOVE semantics (panel disappears when popped out)
-- ✅ Automatic restoration when pop-out closed
-
-**Bug Fixes (2025-11-22)**:
-- ✅ Fixed duplicate API calls (proper DI with InjectionToken)
-- ✅ Fixed paginator display (removed stateStorage conflict)
-- ✅ Fixed pagination indexing (1-indexed API compliance)
-
-**Bug Fixes (2025-11-23 Session)**:
-- ✅ **Bug #1**: Clear button in pop-out Query Control not updating URL
-  - Fixed: [panel-popout.component.ts:214](frontend/src/app/features/panel-popout/panel-popout.component.ts#L214)
-  - Added `urlState.setParams()` call before broadcasting to main window
-- ✅ **Bug #4**: Query Control not showing modelCombos selection chips
-  - Fixed: [automobile.query-control-filters.ts:113-137](frontend/src/domain-config/automobile/configs/automobile.query-control-filters.ts#L113-L137)
-  - Added modelCombos filter definition to AUTOMOBILE_QUERY_CONTROL_FILTERS
-- ✅ **Bug #5**: Pop-out picker not updating when filters cleared until window focused
-  - Fixed: [base-picker.component.ts:147,175,204](frontend/src/framework/components/base-picker/base-picker.component.ts#L147)
-  - **CRITICAL LEARNING**: Use `detectChanges()` instead of `markForCheck()` for unfocused pop-out windows
-  - OnPush + markForCheck() only schedules change detection, doesn't run in unfocused windows
-  - Changed 3 locations: URL sync handler, hydrateFromUrl(), hydrateSelections()
-
-**Active Bugs (Needs Investigation)**:
-- ❌ **Bug #6**: Popped-out picker shows zero rows after pagination change
-  - Likely same change detection issue as Bug #5
-  - May need `detectChanges()` in pagination handler
-- ❌ **Bug #7**: Checkboxes remain visually checked after clearing selections
-  - Count shows correct value (0) but checkboxes still appear checked
-  - PrimeNG Table selection state sync issue
-
-**Key Architectural Learning**:
-- **OnPush Change Detection in Pop-Outs**: Unfocused browser windows don't run scheduled change detection cycles
-- **Pattern**: Use `detectChanges()` instead of `markForCheck()` for:
-  1. URL parameter change handlers (syncing from main window)
-  2. BroadcastChannel message handlers (cross-window communication)
-  3. Selection hydration (restoring state from URL)
-- **Reference**: See [TLDR.md](TLDR.md) section "6. OnPush Change Detection in Pop-Out Windows" for detailed analysis
-
----
-
-### ✅ Option 4: Query Control Highlights (COMPLETED v0.3.0 - 2025-11-23)
-
-**Status**: ✅ COMPLETE
-**Component**: Query Control with Active Highlights section
-**Completed Features**:
-- ✅ Created highlight filter definitions (h_manufacturer, h_modelCombos, h_bodyClass, h_yearMin/Max)
-- ✅ Added "Active Highlights" section (separate from Active Filters)
-- ✅ Yellow/amber chip styling for highlight filters
-- ✅ "Clear All Highlights" link to remove only highlights
-- ✅ "Clear All" button to remove both filters and highlights
-- ✅ Domain-agnostic implementation (works with any domain config)
-- ✅ URL-First architecture (h_* URL parameters)
-
-**Documentation**: [QUERY-CONTROL-HIGHLIGHTS-SUMMARY.md](QUERY-CONTROL-HIGHLIGHTS-SUMMARY.md)
-
-**Git Tag**: v0.3.0 (2025-11-23) - 1 file created, 7 files modified, ~318 lines added
-
----
-
-### Option 3: VIN Browser Panel (RECOMMENDED - High Value)
-
-**Priority**: HIGH (Adds drill-down capability to complete data exploration)
-**Component**: VIN instance browser
-**Estimated Effort**: 3-4 days
-
-**What to Build**:
-- Browse individual VINs for selected vehicle specs
-- Drill-down from specs to instances
-- Integration with VINs API (`/api/vins/v1/*`)
-- Display VIN details (mileage, condition, value, estimated_value, registered_state, exterior_color, etc.)
-- Row expansion integration in ResultsTable
-- URL-First architecture for VIN filtering
-
-**API Endpoints Available**:
+**Critical Pattern Discovered (2025-11-23):**
 ```typescript
-// Get all VIN instances
-GET /api/vins/v1/vins?manufacturer=Ford&yearMin=2020&page=1&size=20
+// ❌ WRONG for pop-out windows (unfocused browser windows)
+this.cdr.markForCheck();  // Only schedules change detection, doesn't run if window unfocused
 
-// Get VINs for specific vehicle specification
-GET /api/vins/v1/vehicles/:vehicleId/instances?page=1&pageSize=20
+// ✅ CORRECT for pop-out windows
+this.cdr.detectChanges();  // Forces immediate update, works even in unfocused windows
 ```
 
-**Expected Outcome**:
-- Users can click on vehicle spec row to see individual VIN instances
-- VIN details displayed in row expansion panel
-- VIN filtering capabilities (by condition, mileage range, value range, state, etc.)
-- Complete data lineage: Specs → VINs → Details
+**Bugs Fixed:**
+- ✅ Bug #1: Pop-out Query Control Clear button URL update
+- ✅ Bug #4: Query Control modelCombos chips display
+- ✅ Bug #5: Pop-out picker unfocused window updates (CRITICAL detectChanges() discovery)
+
+**Active Bugs:**
+- ❌ Bug #6: Popped-out picker shows zero rows after pagination change
+- ❌ Bug #7: Checkboxes remain visually checked after clearing selections
+
+### ✅ Backend Deployment Infrastructure Ready
+
+**Documentation:**
+- `docs/DEVELOPER-ENVIRONMENT.md` (v2.0) - Complete build/deploy guide (880 lines)
+- `docs/BACKEND-API-UPDATES.md` - Quick reference for backend updates
+
+**Kubernetes Configs:**
+- `k8s/namespace.yaml` - generic-prime namespace
+- `k8s/backend-deployment.yaml` - Backend deployment (2 replicas)
+- `k8s/backend-service.yaml` - Backend ClusterIP service
+- `k8s/frontend-deployment.yaml` - Frontend deployment (2 replicas)
+- `k8s/frontend-service.yaml` - Frontend ClusterIP service
+- `k8s/ingress.yaml` - Traefik ingress (generic-prime.minilab)
+
+**Backend Source:**
+- `backend-specs/` - Complete API source code (copied from auto-discovery)
+- Ready to build: `localhost/generic-prime-backend:v1.0.1`
+
+**Frontend Dockerfiles:**
+- `frontend/Dockerfile.dev` - Development container
+- `frontend/Dockerfile.prod` - Production build
+
+**Status:** All infrastructure ready, needs deployment (see PRIORITY 0)
 
 ---
 
-## Alternative Next Steps
+## Known Issues & Learnings
 
-If VIN Browser Panel seems too complex, consider these alternatives:
+### OnPush Change Detection in Pop-Out Windows
 
-1. **Row Expansion Details** - Custom expansion templates for ResultsTable
-   - Show vehicle specification details inline
-   - Preview VIN instances for a spec
-   - Link to full VIN browser
+**Critical Discovery (2025-11-23):**
 
-2. **Column Management** - UI for show/hide and reorder columns
-   - PrimeNG supports this natively
-   - Just needs UI controls (MultiSelect for column toggle)
-   - State persistence via localStorage
-
-3. **Export Functionality** - CSV/Excel export for filtered data
-   - Export current results to CSV
-   - Export charts as images
-   - PrimeNG provides exportCSV() method on Table
-
----
-
-## Critical Architecture Constraints
-
-### 🔴 DO NOT VIOLATE THESE
-
-1. **Domain-Agnostic Component**
-   - Component MUST work with ANY domain configuration
-   - NO hardcoded field names (manufacturer, model, etc.)
-   - ALL filter definitions from `domainConfig.filters`
-   ```typescript
-   // ✅ CORRECT
-   *ngFor="let filterDef of domainConfig.filters"
-
-   // ❌ WRONG
-   <option value="manufacturer">Manufacturer</option>
-   ```
-
-2. **PrimeNG-First**
-   - Use PrimeNG Dialog, Dropdown, Checkbox directly
-   - DO NOT create custom modal component
-   - DO NOT create custom dropdown component
-   - DO NOT create custom chip component
-
-3. **URL-First State**
-   - ALL state changes via UrlStateService
-   - NO direct router.navigate() with queryParams
-   - URL is single source of truth
-   ```typescript
-   // ✅ CORRECT
-   this.urlState.setQueryParams({ bodyClass: 'Sedan,SUV' }).subscribe();
-
-   // ❌ WRONG
-   this.router.navigate([], { queryParams: { bodyClass: 'Sedan,SUV' } });
-   ```
-
-4. **OnPush Change Detection**
-   ```typescript
-   @Component({
-     changeDetection: ChangeDetectionStrategy.OnPush  // REQUIRED
-   })
-
-   // MUST call after async updates
-   this.apiService.get(...).subscribe(data => {
-     this.data = data;
-     this.cdr.markForCheck();  // REQUIRED
-   });
-   ```
-
-5. **Test-Driven Development**
-   - Write tests FIRST
-   - DO NOT modify tests to make them pass
-   - Fix implementation, not tests
-
----
-
-## API Endpoints Needed
-
-All endpoints exist in backend (Specs API):
+Unfocused browser windows with OnPush change detection don't run scheduled change detection:
 
 ```typescript
-// Filter options endpoints
-GET /api/specs/v1/filters/manufacturers?limit=1000
-// Response: { success: true, manufacturers: ["Ford", "Toyota", ...] }
+// This doesn't work in unfocused pop-out windows
+this.cdr.markForCheck();  // Only schedules, never runs
 
-GET /api/specs/v1/filters/models?limit=1000
-// Response: { success: true, models: ["F-150", "Camry", ...] }
-
-GET /api/specs/v1/filters/body-classes?limit=1000
-// Response: { success: true, body_classes: ["Sedan", "SUV", ...] }
-
-GET /api/specs/v1/filters/data-sources?limit=1000
-// Response: { success: true, data_sources: ["nhtsa_vpic", ...] }
-
-GET /api/specs/v1/filters/year-range
-// Response: { success: true, min: 1908, max: 2024 }
+// This works correctly
+this.cdr.detectChanges();  // Forces immediate update
 ```
 
-All endpoints are already implemented and working.
+**Why This Matters:**
+- Pop-out windows are often unfocused (user looking at main window)
+- OnPush components in unfocused windows won't update with markForCheck()
+- Must use detectChanges() for any state changes triggered by BroadcastChannel
+
+**Where Applied:**
+1. `base-picker.component.ts:147` - URL state hydration
+2. `base-picker.component.ts:175` - URL parameter changes
+3. `base-picker.component.ts:204` - Selection hydration
+
+### Backend API Comma-Separated Filter Support
+
+**Status:**
+- ✅ `manufacturer` - Supports comma-separated (lines 226-248)
+- ✅ `model` - Supports comma-separated (lines 250-272)
+- ❌ `bodyClass` - Does NOT support comma-separated (lines 290-296)
+- ✅ All highlight parameters (`h_*`) - Support comma-separated
+
+**Impact:**
+- Query Control Body Class multiselect won't work correctly until backend updated
+- Workaround: Users can only select one body class at a time
 
 ---
 
-## PrimeNG Modules to Add
+## Version History
 
-Add to `primeng.module.ts`:
-```typescript
-import { DropdownModule } from 'primeng/dropdown';
-import { DialogModule } from 'primeng/dialog';
-import { CheckboxModule } from 'primeng/checkbox';
-import { ChipModule } from 'primeng/chip';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TooltipModule } from 'primeng/tooltip';
-```
+| Version | Date | Components | Backend | Changes |
+|---------|------|------------|---------|---------|
+| v0.1.0 | 2025-11-20 | BasePickerComponent, ResultsTableComponent | N/A | Initial framework components |
+| v0.2.0 | 2025-11-23 | + BaseChartComponent, StatisticsPanelComponent | N/A | Charts & highlighting complete |
+| v0.3.0 | 2025-11-23 | + QueryControlComponent highlights | N/A | Separate highlights section |
+| v1.0.0 | 2025-11-23 | Same | v1.0.0 | Backend infrastructure ready, deployment pending |
+| v1.0.1 | TBD | Same | v1.0.1 | Backend bodyClass fix + deployment to generic-prime namespace |
 
 ---
 
-## Success Criteria
-
-### MVP (Minimum Viable Product)
-- ✅ Query Control panel renders with dropdown
-- ✅ Can add Manufacturer filter (multiselect)
-- ✅ Can add Body Class filter (multiselect)
-- ✅ Can add Year filter (range - simple inputs OK)
-- ✅ Active filters display as chips
-- ✅ Can remove filters via chip X button
-- ✅ Can edit filters by clicking chip
-- ✅ URL updates correctly
-- ✅ Results table filters correctly
-- ✅ Filters persist across refresh
-
-### Full Implementation
-- ✅ All MVP features
-- ✅ Year range picker with grid UI
-- ✅ Search in multiselect dialogs
-- ✅ Loading states
-- ✅ Error handling with retry
-- ✅ Accessibility (keyboard nav, screen reader)
-- ✅ Unit tests (80%+ coverage)
-- ✅ E2E tests (all workflows)
-
----
-
-## Reference Documents
-
-**MUST READ BEFORE CODING**:
-1. [docs/components/query-control/specification.md](docs/components/query-control/specification.md) - PRIMARY SPEC
-   - Complete wireframes
-   - 12 Gherkin acceptance criteria
-   - 10 detailed manual test cases
-   - Edge cases and error handling
-
-2. [docs/components/query-control/NEXT_SESSION.md](docs/components/query-control/NEXT_SESSION.md) - IMPLEMENTATION GUIDE
-   - Complete code examples
-   - Step-by-step implementation
-   - Troubleshooting
-
-3. [VERIFICATION-RUBRIC.md](VERIFICATION-RUBRIC.md) - ARCHITECTURE COMPLIANCE
-   - 7-step verification process
-   - Critical red flags
-   - Valid vs invalid patterns
-
-**Architecture References**:
-- [plan/02-PRIMENG-NATIVE-FEATURES.md](plan/02-PRIMENG-NATIVE-FEATURES.md) - What PrimeNG provides
-- [plan/03-REVISED-ARCHITECTURE.md](plan/03-REVISED-ARCHITECTURE.md) - Clean architecture
-- [plan/05-IMPLEMENTATION-GUIDE.md](plan/05-IMPLEMENTATION-GUIDE.md) - Code patterns
-
-**Example Components**:
-- [frontend/src/framework/components/base-picker/](frontend/src/framework/components/base-picker/) - Configuration-driven approach
-- [frontend/src/framework/components/results-table/](frontend/src/framework/components/results-table/) - PrimeNG integration
-
----
-
-## After Query Control: Next Components
-
-### Priority 2 (After Query Control Works)
-1. **Interactive Charts Panel** (Panel #4)
-   - Manufacturer distribution chart
-   - Year distribution chart
-   - Click-to-highlight interaction
-   - Requires: BaseChartComponent, chart configs
-
-2. **VIN Browser Panel** (Panel #5)
-   - Browse individual VINs for selected vehicles
-   - Drill-down from specs to instances
-   - Integration with VINs API
-
-### Priority 3 (Future)
-3. **Dual Picker Variants** (Panel #2, #3)
-   - Alternative picker UIs
-   - Same data, different visualizations
-
-4. **Panel Container System**
-   - Drag-drop reordering
-   - Collapse/expand
-   - Pop-out to separate windows
-
----
-
-## Quick Start Commands
-
-### Start Development Container
-```bash
-# On host machine
-cd ~/projects/generic-prime
-podman run -d --name generic-prime-dev \
-  --network host \
-  -v $(pwd)/frontend:/app:z \
-  -w /app \
-  localhost/generic-prime-frontend:dev
-
-# Enter container
-podman exec -it generic-prime-dev sh
-
-# Inside container - start dev server
-npm start
-```
-
-Access at: http://localhost:4205
-
-### Generate Component (Inside Container)
-```bash
-ng generate component framework/components/query-control --skip-tests
-```
-
-### Run Tests (Inside Container)
-```bash
-# Unit tests
-npm test
-
-# Specific test file
-npm test -- --include='**/query-control.component.spec.ts'
-
-# E2E tests
-npm run e2e
-
-# Coverage
-npm run test:coverage
-```
-
----
-
-## Troubleshooting
-
-### Backend Services Not Responding
-See [docs/components/query-control/SERVICE-TROUBLESHOOTING.md](docs/components/query-control/SERVICE-TROUBLESHOOTING.md)
-
-Quick fix:
-```bash
-# 1. Start Elasticsearch first
-kubectl scale deployment elasticsearch -n data --replicas=1
-sleep 30
-
-# 2. Start Backend
-kubectl scale deployment autos-backend -n autos --replicas=2
-sleep 30
-
-# 3. Verify
-curl http://auto-discovery.minilab/api/specs/v1/filters/manufacturers
-```
-
-### Container Not Running
-```bash
-podman ps | grep generic-prime-dev
-# If not running, start it (see Quick Start Commands above)
-```
-
----
-
-## Implementation Timeline
-
-| Day | Phase | Hours | Tasks |
-|-----|-------|-------|-------|
-| 1 | Setup & Structure | 6-8h | Component files, interfaces, domain config, basic UI |
-| 2 | Dialogs & Integration | 6-8h | Multiselect dialogs, chip management, discover integration |
-| 3 | Polish & Unit Tests | 6-8h | Year picker, error handling, loading states, unit tests |
-| 4 | E2E & Documentation | 4-6h | E2E tests, bug fixes, TLDR.md updates |
-
-**Total**: 3-4 days (22-30 hours)
-
----
-
-## Key Differences: Query Control vs BasePickerComponent
-
-### Why Not Reuse BasePickerComponent?
-
-| Feature | BasePickerComponent | QueryControlComponent |
-|---------|---------------------|------------------------|
-| **Purpose** | Reusable multi-select table | Panel orchestrating multiple filter types |
-| **UI** | Table with checkboxes | Chips + Dialogs |
-| **Filter Types** | Single type (multiselect) | Multiple types (multiselect, range, text) |
-| **Configuration** | PickerConfig<T> | FilterDefinition<T>[] |
-| **Reusability** | Highly reusable | Panel-specific |
-| **Data Source** | Single API endpoint | Multiple endpoints (one per field) |
-
----
-
-## Post-Implementation: Update These Files
-
-After implementing Query Control, update:
-- [ ] [TLDR.md](TLDR.md) - Add Query Control to "✅ COMPLETED" section
-- [ ] [TLDR-NEXT-STEP.md](TLDR-NEXT-STEP.md) - Move to next component (Charts or VIN Browser)
-- [ ] [framework/framework.module.ts](frontend/src/framework/framework.module.ts) - Export QueryControlComponent
-- [ ] [README.md](README.md) - Update progress (if exists)
-
----
-
-**End of TLDR-NEXT-STEP.md**
+**Last Session:** 2025-11-23 - Backend deployment infrastructure setup
+**Next Session:** Fix bodyClass parameter and deploy to Kubernetes
+**Documentation:** See `docs/DEVELOPER-ENVIRONMENT.md` for complete deployment guide
