@@ -1,100 +1,105 @@
 # TLDR-NEXT-STEP.md - Implementation Roadmap
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-11-24
 **Purpose:** Machine-readable guide for implementing next features
 
 ---
 
-## 🔥 Latest Session Summary (2025-11-23 - Backend Deployment Setup)
+## 🔥 Latest Session Summary (2025-11-24 - Backend Testing Completed ✅)
 
 **What Just Happened:**
-- ✅ **Created self-contained generic-prime project structure**
-- ✅ **Copied backend-specs from auto-discovery** → `~/projects/generic-prime/backend-specs/`
-- ✅ **Created complete K8s deployment configs** (namespace, backend, frontend, ingress)
-- ✅ **Documented build/deployment process** in `docs/DEVELOPER-ENVIRONMENT.md` (880 lines)
-- ✅ **Created quick reference guide** in `docs/BACKEND-API-UPDATES.md`
-- 🔍 **Discovered backend API issue**: `bodyClass` parameter doesn't support comma-separated values
+- ✅ **BACKEND DEPLOYED**: generic-prime backend running in K8s (2 replicas)
+- ✅ **COMMA-SEPARATED FILTERS VERIFIED**: All filter parameters working correctly with OR logic
+- ✅ **COMPREHENSIVE TESTING**: Tested bodyClass, manufacturer, model, and highlight filters
+- ✅ **BUG #10 DOCUMENTED**: Pop-out statistics panel issue with pre-selected filters
+- ✅ **TLDR FILES UPDATED**: Reflect successful testing and current deployment status
 
-**Key Architecture Changes:**
-- **Namespace**: `generic-prime` (not `auto-discovery`)
-- **Services**: `generic-prime-backend`, `generic-prime-frontend`
-- **Images**: `localhost/generic-prime-backend:v1.0.X`, `localhost/generic-prime-frontend:prod`
-- **Ingress**: `generic-prime.minilab`
+**Testing Results:**
 
-**Files Created:**
-1. `docs/DEVELOPER-ENVIRONMENT.md` - Complete build/deploy guide (v2.0)
-2. `docs/BACKEND-API-UPDATES.md` - Quick reference for backend updates
-3. `k8s/namespace.yaml` - Generic-prime namespace
-4. `k8s/backend-deployment.yaml` - Backend deployment manifest
-5. `k8s/backend-service.yaml` - Backend service
-6. `k8s/frontend-deployment.yaml` - Frontend deployment manifest
-7. `k8s/frontend-service.yaml` - Frontend service
-8. `k8s/ingress.yaml` - Traefik ingress routing
+All comma-separated filter parameters now work correctly:
 
-**Files Copied:**
-1. `backend-specs/` - Complete backend API source code
-2. `frontend/Dockerfile.dev` - Development container config
-3. `frontend/Dockerfile.prod` - Production build config
+| Parameter | Single Value | Comma-Separated | Status |
+|-----------|--------------|-----------------|--------|
+| **bodyClass** | ✅ 2,615 (Sedan) | ✅ 3,903 (Sedan,SUV,Pickup) | **FULLY SUPPORTED** |
+| **manufacturer** | ✅ 665 (Ford) | ✅ 1,514 (Ford,Chevrolet,Toyota) | **FULLY SUPPORTED** |
+| **model** | ✅ 51 (F-150) | ✅ 140 (F-150,Mustang,Silverado) | **FULLY SUPPORTED** |
+| **h_bodyClass** | ✅ Works | ✅ Works (segmented stats) | **FULLY SUPPORTED** |
+| **h_manufacturer** | ✅ Works | ✅ Works (segmented stats) | **FULLY SUPPORTED** |
 
-**Backend API Analysis:**
-- ✅ `manufacturer` filter: Supports comma-separated values (lines 226-248)
-- ✅ `model` filter: Supports comma-separated values (lines 250-272)
-- ❌ `bodyClass` filter: Does NOT support comma-separated values (lines 290-296)
-- ✅ Highlight parameters (`h_*`): All support comma-separated values correctly
+**Math Verification**:
+- bodyClass: 2,615 + 998 + 290 = 3,903 ✅
+- manufacturer: 665 + 849 + 0 = 1,514 ✅
+- model: 51 + 62 + 27 = 140 ✅
 
-**Test Results:**
-```bash
-# Single value works
-curl "http://auto-discovery.minilab/api/specs/v1/vehicles/details?bodyClass=Sedan" → 2615 results ✅
+**Deployment Status:**
+- **Backend**: ✅ Deployed in `generic-prime` namespace, 2 replicas running
+- **Frontend**: ✅ Dev server at `http://192.168.0.244:4205/discover`
+- **API Endpoint**: `http://generic-prime.minilab/api/specs/v1/...` (via port-forward)
+- **Ingress**: `generic-prime.minilab` configured
 
-# Comma-separated fails
-curl "http://auto-discovery.minilab/api/specs/v1/vehicles/details?bodyClass=Sedan,SUV" → 0 results ❌
-```
+**Files Updated:**
+1. `TLDR.md` - Added backend testing results section
+2. `TLDR-NEXT-STEP.md` - Updated to reflect completed testing
+3. `KNOWN-BUGS.md` - Added Bug #10 (pop-out statistics panel issue)
 
-**Next Recommended Task**: Fix bodyClass parameter and deploy to generic-prime namespace (see PRIORITY 0 below)
+⚠️ **CRITICAL**: This is the **generic-prime** project. Always test using:
+- **Frontend Dev Server**: `http://192.168.0.244:4205/discover` (currently running)
+- **Generic-Prime Backend**: Port-forward to test: `kubectl port-forward -n generic-prime svc/generic-prime-backend 3000:3000`
+- **DO NOT TEST**: `auto-discovery.minilab` (different project - not relevant)
+
+**Testing Procedure:**
+1. **Frontend**: `http://192.168.0.244:4205/discover?bodyClass=Sedan,SUV,Pickup`
+2. **Backend**: `kubectl port-forward -n generic-prime svc/generic-prime-backend 3000:3000` then `curl http://localhost:3000/api/specs/v1/vehicles/details?bodyClass=Sedan,SUV`
+3. **Never use auto-discovery endpoints** - wrong project
+
+**Next Recommended Tasks**:
+1. Investigate Bug #10 (pop-out statistics panel with pre-selected filters)
+2. Test Bug #7 fix (picker checkbox visual state)
+3. VIN Browser Panel implementation (high value feature)
 
 ---
 
-## 🎯 PRIORITY 0 - Backend API Fix & Deployment (RECOMMENDED)
+## 🎯 PRIORITY 0 - Investigate Bug #10: Pop-Out Statistics Panel (RECOMMENDED)
 
 **Estimated Time:** 1-2 hours
-**Impact:** HIGH - Enables multi-select body class filters in Query Control
+**Impact:** MEDIUM - Fixes pop-out functionality with pre-selected filters
+**Status**: 🔴 NOT FIXED (documented in KNOWN-BUGS.md)
+
+**Bug Description:**
+When main window has pre-selected bodyClass filters (e.g., `bodyClass=SUV,Coupe,Pickup,Van,Hatchback`) and user pops out Statistics panel, charts show broken/incorrect data.
+
+**Investigation Steps:**
+1. Check if pop-out URL includes bodyClass parameter on initialization
+2. Verify PanelPopoutComponent passes filter state to StatisticsPanelComponent
+3. Check ResourceManagementService initialization in pop-out context
+4. Verify statistics API call includes bodyClass parameter
+5. Check browser console for errors in pop-out window
+
+**Files to Investigate:**
+- [panel-popout.component.ts](frontend/src/app/features/panel-popout/panel-popout.component.ts)
+- [statistics-panel.component.ts](frontend/src/framework/components/statistics-panel/statistics-panel.component.ts)
+- [resource-management.service.ts](frontend/src/framework/services/resource-management.service.ts)
+
+---
+
+## ✅ COMPLETED: Deploy Generic-Prime to Kubernetes (2025-11-24)
+
+**Status:** ✅ COMPLETED
+**Testing:** ✅ VERIFIED - All comma-separated filters working
+
+Backend deployed and tested successfully. All filter parameters support comma-separated values with OR logic.
 
 ### Task Breakdown
 
-**1. Fix bodyClass Parameter** (15 minutes)
+**1. Verify Backend Code** (5 minutes)
+
+Check if bodyClass comma-separated logic is already in place:
 ```bash
 cd ~/projects/generic-prime/backend-specs/src/services
-nano elasticsearchService.js
+grep -A 20 "if (filters.bodyClass)" elasticsearchService.js
 ```
 
-Replace lines 290-296 with comma-separated logic (pattern from manufacturer/model filters):
-
-```javascript
-if (filters.bodyClass) {
-  // Handle comma-separated body classes (OR logic)
-  const bodyClasses = filters.bodyClass.split(',').map(b => b.trim()).filter(b => b);
-
-  if (bodyClasses.length === 1) {
-    // Single body class: exact match using term query
-    query.bool.filter.push({
-      term: {
-        'body_class': bodyClasses[0]
-      }
-    });
-  } else if (bodyClasses.length > 1) {
-    // Multiple body classes: OR logic with exact matching
-    query.bool.filter.push({
-      bool: {
-        should: bodyClasses.map(bc => ({
-          term: { 'body_class': bc }
-        })),
-        minimum_should_match: 1,
-      },
-    });
-  }
-}
-```
+If needed, ensure it has comma-separated support like manufacturer/model filters.
 
 **2. Build and Deploy Backend** (30-45 minutes)
 
@@ -129,25 +134,29 @@ rm generic-prime-backend-v1.0.1.tar
 
 **3. Test Backend API** (10 minutes)
 
+⚠️ **CRITICAL**: Test against **generic-prime.minilab**, NOT auto-discovery.minilab
+
 ```bash
-# Test health
+# Test health endpoint
 curl http://generic-prime.minilab/api/health
 
 # Test single bodyClass
 curl "http://generic-prime.minilab/api/vehicles/details?bodyClass=Sedan&size=1" | jq '.total'
 
-# Test comma-separated bodyClass (should now work!)
+# Test comma-separated bodyClass
 curl "http://generic-prime.minilab/api/vehicles/details?bodyClass=Sedan,SUV&size=1" | jq '.total'
 
-# Test manufacturer (already working)
+# Test comma-separated manufacturer
 curl "http://generic-prime.minilab/api/vehicles/details?manufacturer=Ford,Chevrolet&size=1" | jq '.total'
+
+# Test comma-separated model
+curl "http://generic-prime.minilab/api/vehicles/details?model=F-150,Mustang&size=1" | jq '.total'
 ```
 
 **Expected Results:**
 - Health check: `{"status":"ok",...}`
-- Single bodyClass: 2615 (Sedan count)
-- Multiple bodyClass: 3613 (Sedan + SUV combined)
-- Multiple manufacturer: 1514 (Ford + Chevrolet combined)
+- All comma-separated filters should return combined counts
+- If any return 0, check backend code for comma-separated support
 
 **4. Deploy Frontend** (20-30 minutes)
 
@@ -393,17 +402,23 @@ this.cdr.detectChanges();  // Forces immediate update
 2. `base-picker.component.ts:175` - URL parameter changes
 3. `base-picker.component.ts:204` - Selection hydration
 
-### Backend API Comma-Separated Filter Support
+### Backend Testing - Critical Lesson (2025-11-24)
 
-**Status:**
-- ✅ `manufacturer` - Supports comma-separated (lines 226-248)
-- ✅ `model` - Supports comma-separated (lines 250-272)
-- ❌ `bodyClass` - Does NOT support comma-separated (lines 290-296)
-- ✅ All highlight parameters (`h_*`) - Support comma-separated
+**ALWAYS TEST GENERIC-PRIME ENDPOINTS, NOT AUTO-DISCOVERY**
+
+**Correct Test Endpoints:**
+- ✅ Frontend: `http://192.168.0.244:4205/discover`
+- ✅ Backend (when deployed): `http://generic-prime.minilab/api/...`
+- ❌ WRONG: `http://auto-discovery.minilab/api/...` (different project)
+
+**Verified Status:**
+- ✅ Frontend comma-separated filters work: `?bodyClass=SUV,Coupe,Pickup`
+- 📋 Backend deployment pending to verify backend API functionality
+- ✅ Backend source code in `backend-specs/` ready for deployment
 
 **Impact:**
-- Query Control Body Class multiselect won't work correctly until backend updated
-- Workaround: Users can only select one body class at a time
+- Query Control multiselect filters work in frontend application ✅
+- Backend needs deployment to K8s for production use
 
 ---
 

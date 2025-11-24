@@ -4,6 +4,62 @@ This document tracks known issues that need to be fixed.
 
 ## Active Bugs
 
+### 10. Popped-Out Statistics Panel Breaks With Pre-Selected bodyClass Filters (2025-11-24)
+
+**Component**: StatisticsPanelComponent / Pop-Out Window Synchronization
+**Severity**: Medium
+**Status**: 🔴 NOT FIXED
+**Port**: 4205
+
+**Description**:
+When the main window has pre-selected bodyClass filters in the URL (e.g., `bodyClass=SUV,Coupe,Pickup,Van,Hatchback`) and the user pops out the Statistics panel, the charts break or display incorrect data.
+
+**Observed Behavior**:
+- Main window URL: `http://192.168.0.244:4205/discover?page=1&bodyClass=SUV,Coupe,Pickup,Van,Hatchback`
+- Main window shows: "2058 total" results with working charts
+- User clicks pop-out button on Statistics panel
+- **BUG**: Popped-out statistics panel displays broken or incorrect chart data
+- Charts may show empty data, incorrect counts, or fail to reflect the bodyClass filter
+
+**Expected Behavior**:
+- Main window has pre-selected bodyClass filters
+- User pops out Statistics panel
+- Popped-out panel should display identical charts as main window
+- Charts should reflect the same bodyClass filter from URL
+- All 4 charts (Manufacturer, Top Models, Body Class, Year) should work correctly
+
+**Reproduction**:
+1. Navigate to `http://192.168.0.244:4205/discover?page=1&bodyClass=SUV,Coupe,Pickup,Van,Hatchback`
+2. Verify main window shows "2058 total" results
+3. Verify all 4 charts display data correctly in main window
+4. Click pop-out button on Statistics panel
+5. **BUG**: Popped-out charts show broken/incorrect data
+
+**Possible Causes**:
+1. URL parameters not properly synchronized to pop-out window on initial load
+2. ResourceManagementService state not shared correctly between main and pop-out
+3. Statistics API call in pop-out not including bodyClass filter parameters
+4. Chart data sources not receiving filter context in pop-out window
+5. Pop-out initialization race condition (charts render before filters applied)
+
+**Investigation Needed**:
+1. [ ] Check if pop-out URL includes bodyClass parameter: `/panel/discover/statistics-panel/statistics?bodyClass=SUV,Coupe,Pickup,Van,Hatchback`
+2. [ ] Verify PanelPopoutComponent passes filter state to StatisticsPanelComponent
+3. [ ] Check ResourceManagementService initialization in pop-out context
+4. [ ] Verify statistics API call includes bodyClass parameter
+5. [ ] Check browser console for errors in pop-out window
+6. [ ] Test if issue occurs with other filter types (manufacturer, model, yearMin/Max)
+
+**Files Involved**:
+- [frontend/src/app/features/panel-popout/panel-popout.component.ts](frontend/src/app/features/panel-popout/panel-popout.component.ts)
+- [frontend/src/framework/components/statistics-panel/statistics-panel.component.ts](frontend/src/framework/components/statistics-panel/statistics-panel.component.ts)
+- [frontend/src/framework/services/resource-management.service.ts](frontend/src/framework/services/resource-management.service.ts)
+- [frontend/src/domain-config/automobile/chart-sources/*.ts](frontend/src/domain-config/automobile/chart-sources/)
+
+**Related Issues**: Similar to Bug #2 and Bug #3 (pop-out state synchronization issues)
+
+---
+
 ### 7. Popped-Out Picker Checkboxes Remain Checked After Clear (2025-11-23, FIX PENDING TEST)
 
 **Component**: BasePickerComponent / PrimeNG Table selection

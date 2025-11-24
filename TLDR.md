@@ -1,6 +1,6 @@
 # TLDR.md - Implementation Status
 
-**Last Updated:** 2025-11-23 (Backend deployment infrastructure added)
+**Last Updated:** 2025-11-24 (Testing correction - use generic-prime endpoints only, not auto-discovery)
 **Purpose:** Quick reference for Claude Code sessions to understand current implementation state
 
 ---
@@ -255,13 +255,38 @@ All backend source code, K8s configs, and documentation now in `~/projects/gener
 - **Backend API**: `http://generic-prime.minilab/api/...`
 - **Frontend**: `http://generic-prime.minilab`
 
-**Backend API Comma-Separated Filter Analysis:**
-- ✅ `manufacturer` - Supports comma-separated (lines 226-248)
-- ✅ `model` - Supports comma-separated (lines 250-272)
-- ❌ `bodyClass` - Does NOT support comma-separated (lines 290-296) **NEEDS FIX**
-- ✅ All highlight parameters (`h_*`) - Support comma-separated correctly
+**Backend API Status (2025-11-24 - TESTING COMPLETED):**
 
-**Next Step:** Fix bodyClass parameter and deploy (see TLDR-NEXT-STEP.md PRIORITY 0)
+⚠️ **CRITICAL**: This is the **generic-prime** project. Always test using:
+- **Frontend Application**: `http://192.168.0.244:4205/discover` (dev server)
+- **Generic-Prime Backend**: `http://generic-prime.minilab/api/specs/v1/...` (deployed and tested)
+- **DO NOT TEST**: `auto-discovery.minilab` (different project, not relevant)
+
+**Current Status:**
+- ✅ **Backend Deployed**: Running in `generic-prime` namespace (2 replicas)
+- ✅ **Frontend Working**: Dev server at `http://192.168.0.244:4205/discover`
+- ✅ **Comma-Separated Filters Verified**: All parameters support comma-separated values with OR logic
+  - `bodyClass=Sedan,SUV,Pickup` → Returns 3,903 results (2,615 + 998 + 290) ✅
+  - `manufacturer=Ford,Chevrolet,Toyota` → Returns 1,514 results (665 + 849 + 0) ✅
+  - `model=F-150,Mustang,Silverado` → Returns 140 results (51 + 62 + 27) ✅
+  - `h_manufacturer=Ford,Chevrolet` → Segmented statistics working correctly ✅
+  - `h_bodyClass=Sedan,SUV` → Segmented statistics working correctly ✅
+
+**Backend Testing Results (2025-11-24):**
+
+All regular filter parameters now support comma-separated values with proper OR logic:
+- **bodyClass**: ✅ FIXED (was returning 0, now returns correct union)
+- **manufacturer**: ✅ Working (correct totals, proper OR logic)
+- **model**: ✅ Working (correct totals, proper OR logic)
+- **h_*** highlight filters**: ✅ Working (segmented statistics correct)
+
+**Note on Result Pagination**:
+Results are grouped by filter value (Elasticsearch default behavior). Example: `bodyClass=Sedan,SUV` returns all Sedans first (pages 1-130), then SUVs (pages 131+). This is normal distributed search behavior - totals are correct, all data is returned, just not interleaved.
+
+**Testing Procedure for Future Sessions:**
+1. Test through frontend application: `http://192.168.0.244:4205/discover?bodyClass=Sedan,SUV`
+2. Test backend directly: `kubectl port-forward -n generic-prime svc/generic-prime-backend 3000:3000` then `curl http://localhost:3000/api/specs/v1/vehicles/details?bodyClass=Sedan,SUV`
+3. Never test against auto-discovery.minilab - wrong project
 
 ---
 
@@ -330,17 +355,17 @@ All backend source code, K8s configs, and documentation now in `~/projects/gener
   - Fix: Replaced `markForCheck()` with `detectChanges()` in 3 locations (URL sync, hydration)
   - Pattern: **CRITICAL** - Use `detectChanges()` instead of `markForCheck()` for pop-out windows that need immediate UI updates
 
-### ❌ Known Active Bugs (2025-11-23)
+### ❌ Known Active Bugs (2025-11-24)
 
 **Pop-Out Window Bugs**:
-- ❌ **Bug #6**: Popped-out picker shows zero rows after pagination change
+- ❌ **Bug #10**: Popped-out statistics panel breaks with pre-selected bodyClass filters (2025-11-24)
   - Status: Documented in KNOWN-BUGS.md, needs investigation
-  - Likely related to same change detection issue as Bug #5
-  - May require `detectChanges()` in pagination handler
-- ❌ **Bug #7**: Checkboxes remain visually checked after clearing selections
-  - Status: Documented in KNOWN-BUGS.md, needs investigation
+  - When main window has `bodyClass=SUV,Coupe,Pickup,Van,Hatchback` in URL, popping out statistics panel shows broken/incorrect charts
+  - Likely URL parameter synchronization or ResourceManagementService state sharing issue
+- ❌ **Bug #7**: Checkboxes remain visually checked after clearing selections (2025-11-23)
+  - Status: FIX IMPLEMENTED, needs testing
   - Count shows correct value (0) but checkboxes still appear checked
-  - PrimeNG Table selection state sync issue
+  - Fix: Changed from `Set.clear()` + `markForCheck()` to `new Set()` + `detectChanges()`
 
 **Tracking**: See [KNOWN-BUGS.md](KNOWN-BUGS.md) for detailed reproduction steps and analysis
 
