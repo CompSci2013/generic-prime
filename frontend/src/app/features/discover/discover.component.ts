@@ -13,6 +13,7 @@ import { MessageService } from 'primeng/api';
 import { UrlStateService } from '../../../framework/services/url-state.service';
 import { Params } from '@angular/router';
 import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../../framework/services/resource-management.service';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 /**
  * Discover Component
@@ -63,6 +64,21 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
    * Set of panel IDs that are currently popped out
    */
   private poppedOutPanels = new Set<string>();
+
+  /**
+   * Map of collapsed panel states (panel ID → collapsed boolean)
+   */
+  collapsedPanels = new Map<string, boolean>();
+
+  /**
+   * Ordered list of panel IDs (defines display order)
+   */
+  panelOrder: string[] = [
+    'query-control',
+    'manufacturer-model-picker',
+    'statistics-panel',
+    'results-table'
+  ];
 
   /**
    * Map of pop-out windows and their associated channels
@@ -142,6 +158,54 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
    */
   isPanelPoppedOut(panelId: string): boolean {
     return this.poppedOutPanels.has(panelId);
+  }
+
+  /**
+   * Check if a panel is currently collapsed
+   *
+   * @param panelId - Panel identifier
+   * @returns True if panel is collapsed
+   */
+  isPanelCollapsed(panelId: string): boolean {
+    return this.collapsedPanels.get(panelId) ?? false;
+  }
+
+  /**
+   * Toggle panel collapsed state
+   *
+   * @param panelId - Panel identifier
+   */
+  togglePanelCollapse(panelId: string): void {
+    const currentState = this.collapsedPanels.get(panelId) ?? false;
+    this.collapsedPanels.set(panelId, !currentState);
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Handle panel drag-drop to reorder panels
+   *
+   * @param event - CDK drag-drop event
+   */
+  onPanelDrop(event: CdkDragDrop<string[]>): void {
+    moveItemInArray(this.panelOrder, event.previousIndex, event.currentIndex);
+    this.cdr.markForCheck();
+    console.log('[Discover] Panel order updated:', this.panelOrder);
+  }
+
+  /**
+   * Get panel title by panel ID
+   *
+   * @param panelId - Panel identifier
+   * @returns Panel display title
+   */
+  getPanelTitle(panelId: string): string {
+    const titleMap: { [key: string]: string } = {
+      'query-control': 'Query Control',
+      'manufacturer-model-picker': 'Manufacturer-Model Picker',
+      'statistics-panel': 'Statistics',
+      'results-table': 'Results'
+    };
+    return titleMap[panelId] || panelId;
   }
 
   /**

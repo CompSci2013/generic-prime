@@ -4,6 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -26,6 +27,7 @@ import { PanelPopoutComponent } from './features/panel-popout/panel-popout.compo
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
+    DragDropModule,
     AppRoutingModule,
     PrimengModule,
     FrameworkModule

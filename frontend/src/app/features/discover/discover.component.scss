@@ -21,9 +21,25 @@
     }
   }
 
+  // Draggable panels container
+  .panels-container {
+    min-height: 200px;
+  }
+
   // Panel wrapper styles
   .panel-wrapper {
     margin-bottom: 1rem;
+    transition: transform 0.2s;
+
+    // CDK Drag states
+    &.cdk-drag-preview {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      opacity: 0.9;
+    }
+
+    &.cdk-drag-animating {
+      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
 
     .panel-header {
       display: flex;
@@ -32,11 +48,42 @@
       margin-bottom: 0.5rem;
       padding: 0.5rem 0;
 
-      .panel-title {
-        margin: 0;
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--text-color);
+      .panel-title-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+
+        .drag-handle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: move;
+          padding: 0.25rem 0.5rem;
+          color: var(--text-color-secondary);
+          transition: color 0.2s;
+
+          &:hover {
+            color: var(--primary-color);
+          }
+
+          i {
+            font-size: 1.25rem;
+          }
+        }
+
+        .panel-title {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: var(--text-color);
+        }
+      }
+
+      .panel-actions {
+        display: flex;
+        gap: 0.25rem;
+        align-items: center;
       }
 
       button {
@@ -244,6 +291,15 @@
   }
 }
 
+// CDK Drag-Drop placeholder
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
 // PrimeNG overrides for better integration
 ::ng-deep {
   .p-datatable {
@@ -279,6 +335,15 @@
 
     .p-panel-content {
       border-color: var(--surface-200);
+    }
+  }
+
+  // CDK Drag preview styling
+  .cdk-drag-preview {
+    .panel-wrapper {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+      background: white;
     }
   }
 }
