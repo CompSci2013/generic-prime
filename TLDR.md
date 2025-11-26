@@ -29,6 +29,73 @@
 
 ---
 
+## 🐳 Development Container Commands (CRITICAL)
+
+**⚠️ ALL npm/ng commands run INSIDE the container, NOT on the host machine.**
+
+**Container Name:** `generic-prime-frontend-dev`
+
+### Start Development Session
+
+```bash
+# 1. Start container (if not running)
+cd ~/projects/generic-prime/frontend
+podman start generic-prime-frontend-dev 2>/dev/null || \
+  podman run -d --name generic-prime-frontend-dev --network host \
+    -v $(pwd):/app:z -w /app localhost/generic-prime-frontend:dev
+
+# 2. Start Angular dev server
+podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205
+
+# 3. Access at http://localhost:4205 or http://192.168.0.244:4205
+```
+
+### Run Commands Inside Container
+
+```bash
+# Pattern: podman exec -it generic-prime-frontend-dev <command>
+
+# Install dependencies
+podman exec -it generic-prime-frontend-dev npm install
+
+# Run Angular CLI
+podman exec -it generic-prime-frontend-dev ng generate component features/my-component
+podman exec -it generic-prime-frontend-dev ng build
+
+# Interactive shell
+podman exec -it generic-prime-frontend-dev sh
+```
+
+### Container Management
+
+```bash
+# Check if running
+podman ps | grep generic-prime-frontend-dev
+
+# View logs
+podman logs generic-prime-frontend-dev
+
+# Stop container
+podman stop generic-prime-frontend-dev
+
+# Remove and recreate (if issues)
+podman rm -f generic-prime-frontend-dev
+cd ~/projects/generic-prime/frontend
+podman run -d --name generic-prime-frontend-dev --network host \
+  -v $(pwd):/app:z -w /app localhost/generic-prime-frontend:dev
+```
+
+### Build Dev Image (first time only)
+
+```bash
+cd ~/projects/generic-prime/frontend
+podman build -f Dockerfile.dev -t localhost/generic-prime-frontend:dev .
+```
+
+**Full Details:** [docs/DEVELOPER-ENVIRONMENT.md](docs/DEVELOPER-ENVIRONMENT.md)
+
+---
+
 ## Project Architecture
 
 **Generic Discovery Framework** - Domain-agnostic Angular 14 framework for browsing/analyzing data across domains (automobile, agriculture, real estate, etc.)

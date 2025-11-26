@@ -24,6 +24,29 @@
 
 ---
 
+## 🐳 Development Container Quick Reference
+
+**⚠️ ALL npm/ng commands run INSIDE the container, NOT on host.**
+
+```bash
+# Start container + dev server
+cd ~/projects/generic-prime/frontend
+podman start generic-prime-frontend-dev 2>/dev/null || \
+  podman run -d --name generic-prime-frontend-dev --network host \
+    -v $(pwd):/app:z -w /app localhost/generic-prime-frontend:dev
+podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205
+
+# Run any command inside container
+podman exec -it generic-prime-frontend-dev <command>
+podman exec -it generic-prime-frontend-dev npm install
+podman exec -it generic-prime-frontend-dev ng generate component features/foo
+podman exec -it generic-prime-frontend-dev sh  # Interactive shell
+```
+
+**Full commands:** See [TLDR.md](TLDR.md) "Development Container Commands" section
+
+---
+
 ## 🔥 Latest Session Summary (2025-11-24 - Backend Testing Completed ✅)
 
 **What Just Happened:**
