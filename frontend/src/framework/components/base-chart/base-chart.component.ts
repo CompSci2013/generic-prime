@@ -161,6 +161,16 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
   chartTitle = '';
 
   /**
+   * Error state for error boundary
+   */
+  hasError = false;
+
+  /**
+   * Error message for display
+   */
+  errorMessage = '';
+
+  /**
    * Destroy subject for cleanup
    */
   private destroy$ = new Subject<void>();
@@ -239,74 +249,132 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Render Plotly chart
+   * Render Plotly chart with error boundary
    */
   private renderChart(): void {
     if (!this.chartContainer || !this.dataSource) {
       return;
     }
 
-    const element = this.chartContainer.nativeElement;
-    const containerWidth = element.clientWidth;
+    try {
+      // Clear any previous error state
+      this.hasError = false;
+      this.errorMessage = '';
 
-    // Transform data using data source
-    const chartData = this.dataSource.transform(
-      this.statistics,
-      this.highlights,
-      this.selectedValue,
-      containerWidth
-    );
+      const element = this.chartContainer.nativeElement;
+      const containerWidth = element.clientWidth;
 
-    if (!chartData) {
-      // No data - clear chart
-      if (this.plotlyElement) {
-        Plotly.purge(this.plotlyElement);
-        this.plotlyElement = null;
+      // Transform data using data source (can throw on malformed data)
+      const chartData = this.dataSource.transform(
+        this.statistics,
+        this.highlights,
+        this.selectedValue,
+        containerWidth
+      );
+
+      if (!chartData) {
+        // No data - clear chart
+        if (this.plotlyElement) {
+          Plotly.purge(this.plotlyElement);
+          this.plotlyElement = null;
+        }
+        return;
       }
-      return;
+
+      // Plotly configuration
+      const config: Partial<any> = {
+        responsive: true,
+        displayModeBar: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ['sendDataToCloud', 'lasso2d']
+      };
+
+      // Render or update chart
+      if (this.plotlyElement) {
+        // Update existing chart
+        Plotly.react(this.plotlyElement, chartData.traces, chartData.layout, config);
+      } else {
+        // Create new chart
+        Plotly.newPlot(element, chartData.traces, chartData.layout, config)
+          .then((gd: PlotlyHTMLElement) => {
+            this.plotlyElement = gd;
+            this.attachEventHandlers(gd);
+          })
+          .catch((err: Error) => {
+            this.handleRenderError(err, 'Failed to create chart');
+          });
+      }
+    } catch (err) {
+      this.handleRenderError(err as Error, 'Chart rendering failed');
     }
+  }
 
-    // Plotly configuration
-    const config: Partial<any> = {
-      responsive: true,
-      displayModeBar: true,
-      displaylogo: false,
-      modeBarButtonsToRemove: ['sendDataToCloud', 'lasso2d']
-    };
+  /**
+   * Attach Plotly event handlers
+   */
+  private attachEventHandlers(gd: PlotlyHTMLElement): void {
+    // Attach click handler
+    gd.on('plotly_click', (data: any) => {
+      try {
+        const clickedValue = this.dataSource.handleClick(data);
+        if (clickedValue) {
+          this.chartClick.emit({
+            value: clickedValue,
+            isHighlightMode: this.isHighlightModeActive
+          });
+        }
+      } catch (err) {
+        console.error('[BaseChart] Click handler error:', err);
+      }
+    });
 
-    // Render or update chart
+    // Attach selection handler (box select, lasso)
+    gd.on('plotly_selected', (data: any) => {
+      try {
+        // Delegate to chart-specific handleClick() method
+        // This ensures consistent formatting (comma-separated for most charts, pipe for year ranges)
+        const selectedValue = this.dataSource.handleClick(data);
+        if (selectedValue) {
+          this.chartClick.emit({
+            value: selectedValue,
+            isHighlightMode: this.isHighlightModeActive
+          });
+        }
+      } catch (err) {
+        console.error('[BaseChart] Selection handler error:', err);
+      }
+    });
+  }
+
+  /**
+   * Handle render errors with user-friendly fallback
+   */
+  private handleRenderError(err: Error, context: string): void {
+    console.error(`[BaseChart] ${context}:`, err);
+    this.hasError = true;
+    this.errorMessage = `${context}: ${err.message || 'Unknown error'}`;
+    this.cdr.markForCheck();
+
+    // Clean up any partial chart state
     if (this.plotlyElement) {
-      // Update existing chart
-      Plotly.react(this.plotlyElement, chartData.traces, chartData.layout, config);
-    } else {
-      // Create new chart
-      Plotly.newPlot(element, chartData.traces, chartData.layout, config).then((gd: PlotlyHTMLElement) => {
-        this.plotlyElement = gd;
-
-        // Attach click handler
-        gd.on('plotly_click', (data: any) => {
-          const clickedValue = this.dataSource.handleClick(data);
-          if (clickedValue) {
-            this.chartClick.emit({
-              value: clickedValue,
-              isHighlightMode: this.isHighlightModeActive
-            });
-          }
-        });
-
-        // Attach selection handler (box select, lasso)
-        gd.on('plotly_selected', (data: any) => {
-          // Delegate to chart-specific handleClick() method
-          // This ensures consistent formatting (comma-separated for most charts, pipe for year ranges)
-          const selectedValue = this.dataSource.handleClick(data);
-          if (selectedValue) {
-            this.chartClick.emit({
-              value: selectedValue,
-              isHighlightMode: this.isHighlightModeActive
-            });
-          }
-        });
-      });
+      try {
+        Plotly.purge(this.plotlyElement);
+      } catch {
+        // Ignore purge errors
+      }
+      this.plotlyElement = null;
     }
+  }
+
+  /**
+   * Retry rendering the chart (called from template)
+   */
+  retryRender(): void {
+    this.hasError = false;
+    this.errorMessage = '';
+    this.cdr.markForCheck();
+
+    // Attempt to re-render
+    setTimeout(() => this.renderChart(), 0);
   }
 }

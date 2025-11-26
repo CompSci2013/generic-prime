@@ -47,3 +47,44 @@
   color: var(--text-color-secondary);
   font-style: italic;
 }
+
+// Error boundary styles
+.chart-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  background-color: var(--surface-ground, #f8f9fa);
+  border: 1px dashed var(--red-400, #f87171);
+  border-radius: 6px;
+  padding: 2rem;
+
+  .error-content {
+    text-align: center;
+    max-width: 400px;
+
+    .pi-exclamation-triangle {
+      font-size: 2.5rem;
+      color: var(--red-500, #ef4444);
+      margin-bottom: 1rem;
+    }
+
+    .error-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-color);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .error-message {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+      margin: 0 0 1rem 0;
+      word-break: break-word;
+    }
+
+    button {
+      margin-top: 0.5rem;
+    }
+  }
+}

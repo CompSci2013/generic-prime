@@ -8,11 +8,28 @@
     </span>
   </div>
 
-  <!-- Plotly chart container -->
-  <div #chartContainer class="chart-container"></div>
+  <!-- Error boundary fallback -->
+  <div class="chart-error" *ngIf="hasError">
+    <div class="error-content">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p class="error-title">Chart failed to render</p>
+      <p class="error-message">{{ errorMessage }}</p>
+      <button
+        pButton
+        type="button"
+        label="Retry"
+        icon="pi pi-refresh"
+        class="p-button-outlined p-button-sm"
+        (click)="retryRender()">
+      </button>
+    </div>
+  </div>
+
+  <!-- Plotly chart container (hidden when error) -->
+  <div #chartContainer class="chart-container" [hidden]="hasError"></div>
 
   <!-- No data message -->
-  <div class="no-data-message" *ngIf="!statistics">
+  <div class="no-data-message" *ngIf="!statistics && !hasError">
     <p>No data available</p>
   </div>
 </div>

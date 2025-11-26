@@ -4,6 +4,73 @@ This document tracks known issues that need to be fixed.
 
 ## Active Bugs
 
+### 11. 🔴 PRIORITY: Manufacturer-Model Picker Shows Incorrect Total Count and Missing Data (2025-11-26)
+
+**Component**: BasePickerComponent / automobile.picker-configs.ts / Backend API
+**Severity**: CRITICAL
+**Status**: 🔴 NOT FIXED - UNDER INVESTIGATION
+**Port**: 4205
+
+**Description**:
+The Manufacturer-Model Picker displays incorrect total counts and appears to be missing most of the data. When the picker should show ~4,800+ manufacturer-model combinations (matching the results table), it only shows a fraction of the data (e.g., 72 entries, all from a single manufacturer like Chevrolet).
+
+**Observed Behavior**:
+- Results Table shows: "4701 to 4800 of 4887 results" ✅ Correct
+- Picker shows: "Showing 1 to 72 of 72 entries" ❌ WRONG
+- Picker only displays Chevrolet models, missing all other manufacturers (A-B manufacturers like Affordable Aluminum, Brammo, Buick are missing)
+- Changing rows per page previously caused total count to change inconsistently (858, 798, 466, 295)
+
+**Expected Behavior**:
+- Picker should show ~4,800+ manufacturer-model combinations
+- Total count should remain stable regardless of page size
+- All manufacturers from A-Z should be available (Affordable Aluminum through Waterford Tank and Fabrication)
+
+**Possible Root Causes**:
+1. **Backend API Issue**: The `/manufacturer-model-combinations` endpoint may be returning limited/filtered data
+2. **Frontend responseTransformer**: Flattening logic or total count calculation may be incorrect
+3. **Pagination Mismatch**: API paginates by manufacturer groups but UI displays flattened manufacturer-model rows
+4. **Query Parameters**: Unexpected filter parameters being sent to API
+
+**Investigation Plan (NEXT SESSION)**:
+
+**Phase 1: Determine True Counts from Elasticsearch**
+1. [ ] Query Elasticsearch directly to get true counts:
+   - Total unique manufacturers
+   - Total unique manufacturer-model combinations
+   - Count of models per manufacturer (sample)
+2. [ ] Document actual data structure in `autos-unified` index
+
+**Phase 2: Create Expected Values Table**
+| Rows/Page | Expected Manufacturers | Expected Models (flattened) | Expected Total |
+|-----------|----------------------|----------------------------|----------------|
+| 10        | ?                    | ?                          | ?              |
+| 20        | ?                    | ?                          | ?              |
+| 50        | ?                    | ?                          | ?              |
+| 100       | ?                    | ?                          | ?              |
+
+3. [ ] Fill in table with theoretical values based on actual Elasticsearch data
+
+**Phase 3: Debug Frontend and Backend**
+4. [ ] Check browser Network tab - what request is sent? What response is received?
+5. [ ] Test API directly with curl: `curl "http://generic-prime.minilab/api/specs/v1/manufacturer-model-combinations?page=1&size=20"`
+6. [ ] Compare API response with expected values
+7. [ ] If API is wrong → Fix backend
+8. [ ] If API is correct but UI is wrong → Fix frontend responseTransformer
+
+**Files Involved**:
+- [frontend/src/domain-config/automobile/configs/automobile.picker-configs.ts](frontend/src/domain-config/automobile/configs/automobile.picker-configs.ts) (responseTransformer, fetchData)
+- [frontend/src/framework/components/base-picker/base-picker.component.ts](frontend/src/framework/components/base-picker/base-picker.component.ts) (loadData, pagination)
+- Backend: `/api/specs/v1/manufacturer-model-combinations` endpoint
+
+**Recent Changes That May Be Related**:
+- Modified `responseTransformer` to use `response.total ?? flatResults.length`
+- Modified `sortOrder` parameter handling
+- Picker pagination mode is 'server'
+
+**Note**: Both backend API AND frontend may need corrections. Do not assume the issue is frontend-only.
+
+---
+
 ### 10. Popped-Out Statistics Panel Breaks With Pre-Selected bodyClass Filters (2025-11-24)
 
 **Component**: StatisticsPanelComponent / Pop-Out Window Synchronization

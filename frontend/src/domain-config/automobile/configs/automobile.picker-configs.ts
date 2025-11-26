@@ -74,7 +74,8 @@ export function createManufacturerModelPickerConfig(
             size: params.size,
             search: params.search,
             sortBy: params.sortField,
-            sortOrder: params.sortOrder === 1 ? 'asc' : 'desc'
+            // Only send sortOrder when sortField is defined
+            sortOrder: params.sortField ? (params.sortOrder === 1 ? 'asc' : 'desc') : undefined
           }
         });
       },
@@ -100,9 +101,13 @@ export function createManufacturerModelPickerConfig(
           });
         }
 
+        // Use API-provided total if available, otherwise fall back to flattened count
+        // Note: API total represents manufacturer-model combinations, not manufacturer groups
+        const total = response.total ?? response.totalRecords ?? flatResults.length;
+
         return {
           results: flatResults,
-          total: flatResults.length // Total flattened count
+          total: total
         };
       }
     },
@@ -141,6 +146,9 @@ export function createManufacturerModelPickerConfig(
     },
 
     // Pagination configuration
+    // Note: API paginates by manufacturer groups, but we display flattened manufacturer-model rows.
+    // The total count represents manufacturer groups, not individual models.
+    // This is a known limitation - would need API changes for true model-level pagination.
     pagination: {
       mode: 'server',
       defaultPageSize: 20,

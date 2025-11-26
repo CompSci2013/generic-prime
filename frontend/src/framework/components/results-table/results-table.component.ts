@@ -7,7 +7,8 @@ import {
   ChangeDetectionStrategy,
   Inject
 } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject, combineLatest } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DomainConfig } from '../../models/domain-config.interface';
 import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
 
@@ -58,6 +59,9 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
   loading = false;
   expandedRows: { [key: string]: boolean } = {};
 
+  /** Subject for unsubscribing on destroy */
+  private destroy$ = new Subject<void>();
+
   // Expose Object for template use (for dynamic rendering)
   Object = Object;
 
@@ -92,29 +96,27 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
     this.error$ = this.resourceService.error$;
     this.statistics$ = this.resourceService.statistics$;
 
-    // Subscribe to sync component state (for template)
-    this.filters$.subscribe(filters => {
+    // Combine all state streams into single subscription for proper cleanup
+    combineLatest([
+      this.filters$,
+      this.results$,
+      this.totalResults$,
+      this.loading$
+    ]).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(([filters, results, totalResults, loading]) => {
       this.currentFilters = { ...filters as any };
-      this.cdr.markForCheck();
-    });
-
-    this.results$.subscribe(results => {
       this.results = results;
-      this.cdr.markForCheck();
-    });
-
-    this.totalResults$.subscribe(total => {
-      this.totalResults = total;
-      this.cdr.markForCheck();
-    });
-
-    this.loading$.subscribe(loading => {
+      this.totalResults = totalResults;
       this.loading = loading;
       this.cdr.markForCheck();
     });
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+
     if (this.resourceService) {
       this.resourceService.destroy();
     }

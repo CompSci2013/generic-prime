@@ -371,7 +371,12 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
 
     this.state.currentPage = event.first / event.rows;
     this.state.pageSize = event.rows;
-    this.loadData();
+
+    // Only reload data for server-side pagination
+    // For client-side, PrimeNG handles pagination internally
+    if (this.activeConfig?.pagination.mode === 'server') {
+      this.loadData();
+    }
   }
 
   /**
