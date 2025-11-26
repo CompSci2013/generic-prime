@@ -446,17 +446,26 @@ Results are grouped by filter value (Elasticsearch default behavior). Example: `
   - Fix: Replaced `markForCheck()` with `detectChanges()` in 3 locations (URL sync, hydration)
   - Pattern: **CRITICAL** - Use `detectChanges()` instead of `markForCheck()` for pop-out windows that need immediate UI updates
 
-### ❌ Known Active Bugs (2025-11-24)
+### ❌ Known Active Bugs (2025-11-26)
+
+**🔴 CRITICAL - Bug #11**: Manufacturer-Model Picker Shows Incorrect Total Count and Missing Data
+- Status: 🔴 UNDER INVESTIGATION - Documented in KNOWN-BUGS.md
+- Picker shows ~72 entries (only Chevrolet) when there should be ~4,800+ manufacturer-model combinations
+- Total count changes inconsistently with page size (858, 798, 466, 295)
+- **⚠️ METHODOLOGY: Data-First Investigation** (see TLDR-NEXT-STEP.md):
+  1. **Phase 1**: Elasticsearch data analysis FIRST (understand true data structure)
+  2. **Phase 2**: Define what tables/pickers make sense for actual data
+  3. **Phase 3**: Backend routes analysis (fix backend BEFORE frontend)
+  4. **Phase 4**: Frontend component verification (only after backend is correct)
+  5. **Phase 5**: Frontend fixes LAST
+- **DO NOT** modify frontend code until Phases 1-3 are complete!
 
 **Pop-Out Window Bugs**:
 - ❌ **Bug #10**: Popped-out statistics panel breaks with pre-selected bodyClass filters (2025-11-24)
   - Status: Documented in KNOWN-BUGS.md, needs investigation
   - When main window has `bodyClass=SUV,Coupe,Pickup,Van,Hatchback` in URL, popping out statistics panel shows broken/incorrect charts
-  - Likely URL parameter synchronization or ResourceManagementService state sharing issue
 - ❌ **Bug #7**: Checkboxes remain visually checked after clearing selections (2025-11-23)
   - Status: FIX IMPLEMENTED, needs testing
-  - Count shows correct value (0) but checkboxes still appear checked
-  - Fix: Changed from `Set.clear()` + `markForCheck()` to `new Set()` + `detectChanges()`
 
 **Tracking**: See [KNOWN-BUGS.md](KNOWN-BUGS.md) for detailed reproduction steps and analysis
 

@@ -19,7 +19,7 @@
 **Technical Debt to Address Opportunistically:**
 - Replace `$any()` template casts with typed accessors
 - Add `trackBy` to `*ngFor` loops
-- Use `combineLatest` instead of nested subscribes
+- ~~Use `combineLatest` instead of nested subscribes~~ ✅ Fixed in ResultsTableComponent (2025-11-26)
 - Add debouncing to text filter inputs
 
 ---
@@ -47,80 +47,182 @@ podman exec -it generic-prime-frontend-dev sh  # Interactive shell
 
 ---
 
-## 🔥 Latest Session Summary (2025-11-24 - Backend Testing Completed ✅)
+## 🔥 Latest Session Summary (2025-11-26 - Reliability Improvements & Critical Bug Found)
 
 **What Just Happened:**
-- ✅ **BACKEND DEPLOYED**: generic-prime backend running in K8s (2 replicas)
-- ✅ **COMMA-SEPARATED FILTERS VERIFIED**: All filter parameters working correctly with OR logic
-- ✅ **COMPREHENSIVE TESTING**: Tested bodyClass, manufacturer, model, and highlight filters
-- ✅ **BUG #10 DOCUMENTED**: Pop-out statistics panel issue with pre-selected filters
-- ✅ **TLDR FILES UPDATED**: Reflect successful testing and current deployment status
+- ✅ **RXJS ANTI-PATTERNS FIXED**: ResultsTableComponent now uses `combineLatest` + `takeUntil(destroy$)` instead of 4 separate subscriptions
+- ✅ **CHART ERROR BOUNDARIES ADDED**: BaseChartComponent now catches Plotly.js errors gracefully with retry functionality
+- ⚠️ **CRITICAL BUG #11 DISCOVERED**: Picker pagination shows inconsistent totals and truncated data (e.g., stops at Chevrolet instead of reaching Waterford Tank)
+- ✅ **BUG DOCUMENTED**: Bug #11 added to KNOWN-BUGS.md with 3-phase investigation plan
 
-**Testing Results:**
+**Files Modified:**
+1. `results-table.component.ts` - RxJS fix (combineLatest pattern)
+2. `base-chart.component.ts/html/scss` - Error boundary implementation
+3. `automobile.picker-configs.ts` - sortOrder fix, total calculation improvement
+4. `KNOWN-BUGS.md` - Bug #11 documented as CRITICAL
+5. `TLDR.md` - Updated Known Active Bugs section
 
-All comma-separated filter parameters now work correctly:
-
-| Parameter | Single Value | Comma-Separated | Status |
-|-----------|--------------|-----------------|--------|
-| **bodyClass** | ✅ 2,615 (Sedan) | ✅ 3,903 (Sedan,SUV,Pickup) | **FULLY SUPPORTED** |
-| **manufacturer** | ✅ 665 (Ford) | ✅ 1,514 (Ford,Chevrolet,Toyota) | **FULLY SUPPORTED** |
-| **model** | ✅ 51 (F-150) | ✅ 140 (F-150,Mustang,Silverado) | **FULLY SUPPORTED** |
-| **h_bodyClass** | ✅ Works | ✅ Works (segmented stats) | **FULLY SUPPORTED** |
-| **h_manufacturer** | ✅ Works | ✅ Works (segmented stats) | **FULLY SUPPORTED** |
-
-**Math Verification**:
-- bodyClass: 2,615 + 998 + 290 = 3,903 ✅
-- manufacturer: 665 + 849 + 0 = 1,514 ✅
-- model: 51 + 62 + 27 = 140 ✅
+**Bug #11 Summary:**
+- Picker total count changes incorrectly with page size (858→798→466→295 entries)
+- Data truncates at Chevrolet instead of showing all manufacturers through Waterford Tank
+- Root cause: Mismatch between server-side pagination (paginates manufacturer groups) and client-side flattening (expands to manufacturer-model rows)
+- **Requires Elasticsearch data analysis** to establish expected values before fixing
 
 **Deployment Status:**
 - **Backend**: ✅ Deployed in `generic-prime` namespace, 2 replicas running
 - **Frontend**: ✅ Dev server at `http://192.168.0.244:4205/discover`
-- **API Endpoint**: `http://generic-prime.minilab/api/specs/v1/...` (via port-forward)
-- **Ingress**: `generic-prime.minilab` configured
-
-**Files Updated:**
-1. `TLDR.md` - Added backend testing results section
-2. `TLDR-NEXT-STEP.md` - Updated to reflect completed testing
-3. `KNOWN-BUGS.md` - Added Bug #10 (pop-out statistics panel issue)
+- **API Endpoint**: `http://generic-prime.minilab/api/specs/v1/...`
 
 ⚠️ **CRITICAL**: This is the **generic-prime** project. Always test using:
 - **Frontend Dev Server**: `http://192.168.0.244:4205/discover` (currently running)
 - **Generic-Prime Backend**: Port-forward to test: `kubectl port-forward -n generic-prime svc/generic-prime-backend 3000:3000`
 - **DO NOT TEST**: `auto-discovery.minilab` (different project - not relevant)
 
-**Testing Procedure:**
-1. **Frontend**: `http://192.168.0.244:4205/discover?bodyClass=Sedan,SUV,Pickup`
-2. **Backend**: `kubectl port-forward -n generic-prime svc/generic-prime-backend 3000:3000` then `curl http://localhost:3000/api/specs/v1/vehicles/details?bodyClass=Sedan,SUV`
-3. **Never use auto-discovery endpoints** - wrong project
-
 **Next Recommended Tasks**:
-1. Investigate Bug #10 (pop-out statistics panel with pre-selected filters)
-2. Test Bug #7 fix (picker checkbox visual state)
+1. **PRIORITY 0**: Investigate Bug #11 (picker critical - Elasticsearch analysis first)
+2. Bug #10: Pop-out statistics panel with pre-selected filters
 3. VIN Browser Panel implementation (high value feature)
 
 ---
 
-## 🎯 PRIORITY 0 - Investigate Bug #10: Pop-Out Statistics Panel (RECOMMENDED)
+## 🎯 PRIORITY 0 - Data-First Investigation: Bug #11 & Table/Picker Architecture
 
-**Estimated Time:** 1-2 hours
-**Impact:** MEDIUM - Fixes pop-out functionality with pre-selected filters
-**Status**: 🔴 NOT FIXED (documented in KNOWN-BUGS.md)
+**Estimated Time:** 4-6 hours (systematic data-first approach)
+**Impact:** CRITICAL - Ensures all tables/pickers are correctly designed for actual data
+**Status**: 🔴 NOT STARTED
 
-**Bug Description:**
-When main window has pre-selected bodyClass filters (e.g., `bodyClass=SUV,Coupe,Pickup,Van,Hatchback`) and user pops out Statistics panel, charts show broken/incorrect data.
+**⚠️ CRITICAL METHODOLOGY: Data-First, Backend-Second, Frontend-Last**
 
-**Investigation Steps:**
-1. Check if pop-out URL includes bodyClass parameter on initialization
-2. Verify PanelPopoutComponent passes filter state to StatisticsPanelComponent
-3. Check ResourceManagementService initialization in pop-out context
-4. Verify statistics API call includes bodyClass parameter
-5. Check browser console for errors in pop-out window
+Do NOT modify frontend code until Phases 1-3 are complete!
 
-**Files to Investigate:**
-- [panel-popout.component.ts](frontend/src/app/features/panel-popout/panel-popout.component.ts)
-- [statistics-panel.component.ts](frontend/src/framework/components/statistics-panel/statistics-panel.component.ts)
-- [resource-management.service.ts](frontend/src/framework/services/resource-management.service.ts)
+---
+
+### Phase 1: Elasticsearch Data Analysis (DO FIRST)
+
+**Goal:** Understand the TRUE data structure before touching any code.
+
+**Questions to Answer:**
+1. What is the actual schema of `autos-unified` index?
+2. What is the actual schema of `autos-vins` index?
+3. How many unique manufacturers exist?
+4. How many unique manufacturer-model combinations exist?
+5. How many total vehicle specifications exist?
+6. How many total VIN records exist?
+7. What is the relationship between specs and VINs?
+
+**Elasticsearch Queries to Run:**
+```bash
+# Get index mappings
+curl -X GET "elasticsearch:9200/autos-unified/_mapping?pretty"
+curl -X GET "elasticsearch:9200/autos-vins/_mapping?pretty"
+
+# Count documents
+curl -X GET "elasticsearch:9200/autos-unified/_count?pretty"
+curl -X GET "elasticsearch:9200/autos-vins/_count?pretty"
+
+# Unique manufacturers
+curl -X POST "elasticsearch:9200/autos-unified/_search?pretty" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": { "unique_manufacturers": { "cardinality": { "field": "manufacturer.keyword" } } }
+}'
+
+# Unique manufacturer-model combinations
+curl -X POST "elasticsearch:9200/autos-unified/_search?pretty" -H 'Content-Type: application/json' -d'
+{
+  "size": 0,
+  "aggs": {
+    "manufacturers": {
+      "terms": { "field": "manufacturer.keyword", "size": 1000 },
+      "aggs": { "models": { "terms": { "field": "model.keyword", "size": 1000 } } }
+    }
+  }
+}'
+```
+
+**Deliverable:** Document with actual counts and data structure.
+
+---
+
+### Phase 2: Define What Tables/Pickers Make Sense
+
+**Based on Phase 1 data, answer:**
+
+| Component Type | Data Source | Purpose | Feasible? |
+|----------------|-------------|---------|-----------|
+| **Manufacturer-Model Picker** | autos-unified | Select manufacturer-model combos for filtering | ? |
+| **Results Table** | autos-unified | Display vehicle specifications | ? |
+| **Results Table + VIN Expansion** | autos-unified + autos-vins | Specs with expandable VIN details | ? |
+| **Standalone VIN Table** | autos-vins | Browse individual VINs | ? |
+| **Manufacturer Picker (simple)** | autos-unified | Select manufacturers only | ? |
+| **Body Class Picker** | autos-unified | Select body classes | ? |
+
+**Questions:**
+1. Does the current Manufacturer-Model Picker design match the actual data?
+2. Should we have separate Manufacturer and Model pickers instead of combined?
+3. Is the VIN data suitable for row expansion or standalone table?
+4. Are there other logical groupings we're missing?
+
+---
+
+### Phase 3: Backend Routes Analysis
+
+**Only after Phase 1-2 are complete!**
+
+**Examine these backend files:**
+- `backend-specs/src/routes/specs.js` - All specs routes
+- `backend-specs/src/services/elasticsearchService.js` - ES queries
+
+**Questions to Answer:**
+1. Does `/manufacturer-model-combinations` return correct data structure?
+2. What does `total` field represent (manufacturers? combinations? something else)?
+3. Is pagination working correctly for the intended use case?
+4. Do we need NEW routes for the tables/pickers identified in Phase 2?
+5. Do existing routes need logic fixes?
+
+**Backend Changes Checklist:**
+- [ ] Route logic matches intended picker/table design
+- [ ] Pagination returns correct totals
+- [ ] Response structure is frontend-friendly
+- [ ] New routes added if needed
+
+**DO NOT PROCEED TO PHASE 4 UNTIL BACKEND IS VERIFIED CORRECT**
+
+---
+
+### Phase 4: Frontend Component Verification
+
+**Only after backend is confirmed correct!**
+
+**Questions to Answer:**
+1. Are we displaying the correct components for the data?
+2. Are any components missing that should exist?
+3. Are any components being displayed that don't make sense?
+4. Does `responseTransformer` correctly handle the (now-verified) backend response?
+
+**Component Audit:**
+| Component | Exists? | Correct Design? | Needs Changes? |
+|-----------|---------|-----------------|----------------|
+| Manufacturer-Model Picker | Yes | ? | ? |
+| Results Table | Yes | ? | ? |
+| VIN Browser Panel | No | N/A | Create? |
+| Body Class Picker | No | N/A | Create? |
+
+---
+
+### Phase 5: Frontend Fixes (LAST)
+
+**Only after Phases 1-4 are complete!**
+
+Fix bugs in this order:
+1. Fix `responseTransformer` if backend is correct but frontend mishandles response
+2. Fix component configurations if they don't match data structure
+3. Fix UI/UX bugs (pagination display, checkbox state, etc.)
+
+**Files to Modify:**
+- [automobile.picker-configs.ts](frontend/src/domain-config/automobile/configs/automobile.picker-configs.ts)
+- [base-picker.component.ts](frontend/src/framework/components/base-picker/base-picker.component.ts)
+- Any new components identified in Phase 4
 
 ---
 
@@ -253,7 +355,15 @@ firefox http://generic-prime.minilab
 
 ## Alternative Tasks (If Not Doing PRIORITY 0)
 
-### Option 1: Fix Active Pop-Out Bugs (1-2 hours)
+### Option 1: Investigate Bug #10 - Pop-Out Statistics Panel (1-2 hours)
+
+**Bug #10**: Pop-out statistics panel shows broken/incorrect data with pre-selected filters
+- When main window has pre-selected bodyClass filters (e.g., `bodyClass=SUV,Coupe,Pickup,Van,Hatchback`)
+- Pop-out Statistics panel charts show broken/incorrect data
+- Location: `panel-popout.component.ts`, `statistics-panel.component.ts`
+- Investigation: Check if pop-out URL includes bodyClass parameter on initialization
+
+### Option 2: Fix Active Pop-Out Bugs (1-2 hours)
 
 **Bug #6**: Popped-out picker shows zero rows after pagination change
 - Location: `frontend/src/framework/components/base-picker/base-picker.component.ts`
@@ -265,7 +375,7 @@ firefox http://generic-prime.minilab
 - Issue: PrimeNG Table selection state not syncing with empty array
 - Fix: Force table re-render or reset selection object
 
-### Option 2: VIN Browser Panel (3-4 days, HIGH value)
+### Option 3: VIN Browser Panel (3-4 days, HIGH value)
 
 **Purpose:** Drill-down from vehicle specifications to individual VIN instances
 
@@ -285,15 +395,15 @@ firefox http://generic-prime.minilab
 5. Integrate with pop-out system (2 hours)
 6. Testing and refinement (4-6 hours)
 
-### Option 3: Row Expansion Details (1-2 days)
+### Option 4: Row Expansion Details (1-2 days)
 
 Implement detailed view when clicking expand button on results table row.
 
-### Option 4: Column Management (1 day)
+### Option 5: Column Management (1 day)
 
 Add column visibility toggle using PrimeNG MultiSelect.
 
-### Option 5: Export Functionality (1-2 days)
+### Option 6: Export Functionality (1-2 days)
 
 Add CSV/JSON export for filtered results.
 
@@ -474,7 +584,7 @@ this.cdr.detectChanges();  // Forces immediate update
 - Add 300ms debounce to text filter inputs
 
 **Files with Known Debt:**
-- `results-table.component.ts:96-114` - nested subscribes
+- ~~`results-table.component.ts:96-114` - nested subscribes~~ ✅ Fixed (2025-11-26) - now uses `combineLatest`
 - `results-table.component.html` - `Object` exposure, missing trackBy
 - `statistics-panel.component.html` - `$any()` casts
 
@@ -490,17 +600,24 @@ this.cdr.detectChanges();  // Forces immediate update
 | v1.0.0 | 2025-11-23 | Same | v1.0.0 | Backend infrastructure ready |
 | v1.0.1 | 2025-11-24 | Same | v1.0.1 | Backend deployed, all filters verified working |
 | v1.0.2 | 2025-11-26 | Same | v1.0.1 | Quality assessment completed (B+, 84/100) |
+| v1.0.3 | 2025-11-26 | + Error boundaries, RxJS fixes | v1.0.1 | Chart error handling, combineLatest pattern, Bug #11 documented |
 
 ---
 
-**Last Session:** 2025-11-26 - Quality assessment completed
+**Last Session:** 2025-11-26 - Reliability improvements & Bug #11 discovery
 **Assessment Grade:** B+ (84/100) - Production-ready
 **Next Priorities:**
-1. Investigate Bug #10 (pop-out statistics panel)
-2. Address technical debt opportunistically
+1. **CRITICAL**: Investigate Bug #11 (picker pagination - Elasticsearch analysis first)
+2. Bug #10: Pop-out statistics panel with pre-selected filters
 3. VIN Browser Panel (high value feature)
+
+**Session Achievements (2025-11-26):**
+- ✅ RxJS anti-patterns fixed (combineLatest in ResultsTableComponent)
+- ✅ Chart error boundaries added (try/catch + retry in BaseChartComponent)
+- ⚠️ Critical Bug #11 discovered and documented
 
 **Documentation:**
 - [GENERIC-PRIME-ASSESSMENT.md](GENERIC-PRIME-ASSESSMENT.md) - Full assessment
 - [ASSESSMENT-RUBRIC.md](ASSESSMENT-RUBRIC.md) - Scoring criteria
+- [KNOWN-BUGS.md](KNOWN-BUGS.md) - Bug #11 investigation plan
 - `docs/DEVELOPER-ENVIRONMENT.md` - Deployment guide

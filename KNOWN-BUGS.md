@@ -31,31 +31,72 @@ The Manufacturer-Model Picker displays incorrect total counts and appears to be 
 3. **Pagination Mismatch**: API paginates by manufacturer groups but UI displays flattened manufacturer-model rows
 4. **Query Parameters**: Unexpected filter parameters being sent to API
 
+**⚠️ CRITICAL METHODOLOGY: Data-First, Backend-Second, Frontend-Last**
+
+Do NOT modify frontend code until Phases 1-3 are complete!
+
 **Investigation Plan (NEXT SESSION)**:
 
-**Phase 1: Determine True Counts from Elasticsearch**
-1. [ ] Query Elasticsearch directly to get true counts:
-   - Total unique manufacturers
-   - Total unique manufacturer-model combinations
-   - Count of models per manufacturer (sample)
-2. [ ] Document actual data structure in `autos-unified` index
+**Phase 1: Elasticsearch Data Analysis (DO FIRST)**
+1. [ ] Query Elasticsearch directly to understand TRUE data structure:
+   ```bash
+   # Get index mappings
+   curl -X GET "elasticsearch:9200/autos-unified/_mapping?pretty"
+   curl -X GET "elasticsearch:9200/autos-vins/_mapping?pretty"
 
-**Phase 2: Create Expected Values Table**
-| Rows/Page | Expected Manufacturers | Expected Models (flattened) | Expected Total |
-|-----------|----------------------|----------------------------|----------------|
-| 10        | ?                    | ?                          | ?              |
-| 20        | ?                    | ?                          | ?              |
-| 50        | ?                    | ?                          | ?              |
-| 100       | ?                    | ?                          | ?              |
+   # Count documents
+   curl -X GET "elasticsearch:9200/autos-unified/_count?pretty"
+   curl -X GET "elasticsearch:9200/autos-vins/_count?pretty"
 
-3. [ ] Fill in table with theoretical values based on actual Elasticsearch data
+   # Unique manufacturers
+   curl -X POST "elasticsearch:9200/autos-unified/_search?pretty" -H 'Content-Type: application/json' -d'
+   { "size": 0, "aggs": { "unique_manufacturers": { "cardinality": { "field": "manufacturer.keyword" } } } }'
 
-**Phase 3: Debug Frontend and Backend**
-4. [ ] Check browser Network tab - what request is sent? What response is received?
-5. [ ] Test API directly with curl: `curl "http://generic-prime.minilab/api/specs/v1/manufacturer-model-combinations?page=1&size=20"`
-6. [ ] Compare API response with expected values
-7. [ ] If API is wrong → Fix backend
-8. [ ] If API is correct but UI is wrong → Fix frontend responseTransformer
+   # Unique manufacturer-model combinations
+   curl -X POST "elasticsearch:9200/autos-unified/_search?pretty" -H 'Content-Type: application/json' -d'
+   { "size": 0, "aggs": { "manufacturers": { "terms": { "field": "manufacturer.keyword", "size": 1000 }, "aggs": { "models": { "terms": { "field": "model.keyword", "size": 1000 } } } } } }'
+   ```
+2. [ ] Document actual counts:
+   - Total unique manufacturers: ?
+   - Total unique manufacturer-model combinations: ?
+   - Total vehicle specifications: ?
+   - Total VIN records: ?
+
+**Phase 2: Define What Tables/Pickers Make Sense**
+3. [ ] Based on Phase 1 data, answer:
+   - Does current Manufacturer-Model Picker design match actual data?
+   - Should we have separate Manufacturer and Model pickers instead?
+   - Is VIN data suitable for row expansion or standalone table?
+   - Are there other logical groupings we're missing?
+
+| Component Type | Data Source | Purpose | Feasible? |
+|----------------|-------------|---------|-----------|
+| Manufacturer-Model Picker | autos-unified | Select combos for filtering | ? |
+| Results Table | autos-unified | Display vehicle specs | ? |
+| Results + VIN Expansion | unified + vins | Specs with expandable VINs | ? |
+| Standalone VIN Table | autos-vins | Browse individual VINs | ? |
+
+**Phase 3: Backend Routes Analysis**
+4. [ ] Examine backend files:
+   - `backend-specs/src/routes/specs.js`
+   - `backend-specs/src/services/elasticsearchService.js`
+5. [ ] Answer:
+   - Does `/manufacturer-model-combinations` return correct structure?
+   - What does `total` field represent?
+   - Is pagination working correctly?
+   - Do we need NEW routes?
+   - Do existing routes need logic fixes?
+6. [ ] Make any required backend changes BEFORE touching frontend
+
+**Phase 4: Frontend Component Verification (ONLY AFTER BACKEND IS CORRECT)**
+7. [ ] Are we displaying the correct components for the data?
+8. [ ] Are any components missing that should exist?
+9. [ ] Does `responseTransformer` correctly handle backend response?
+
+**Phase 5: Frontend Fixes (LAST)**
+10. [ ] Fix `responseTransformer` if needed
+11. [ ] Fix component configurations
+12. [ ] Fix UI/UX bugs (pagination, checkboxes, etc.)
 
 **Files Involved**:
 - [frontend/src/domain-config/automobile/configs/automobile.picker-configs.ts](frontend/src/domain-config/automobile/configs/automobile.picker-configs.ts) (responseTransformer, fetchData)
