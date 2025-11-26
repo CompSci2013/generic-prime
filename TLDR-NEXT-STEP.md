@@ -9,6 +9,8 @@
 
 **Current Grade: B+ (84/100)** - See [GENERIC-PRIME-ASSESSMENT.md](GENERIC-PRIME-ASSESSMENT.md)
 
+**⚠️ UNIT TESTING POLICY:** Do NOT write unit tests. Testing deferred to dedicated project. AI-generated tests proven brittle. Testing weight in rubric: 1%.
+
 **When implementing new features, maintain these standards:**
 - Architecture & Design: 22/25 - Keep config-driven, URL-first patterns
 - Angular Best Practices: 22/25 - Use OnPush, proper RxJS, lifecycle cleanup

@@ -14,7 +14,7 @@ This rubric provides a comprehensive framework for evaluating professionally dev
 
 ---
 
-## Category 1: Architecture & Design (Weight: 20%)
+## Category 1: Architecture & Design (Weight: 22%)
 
 ### 1.1 Module Organization (0-5)
 - **5**: Clear feature modules with proper separation of concerns; shared/core modules properly utilized; lazy loading implemented appropriately
@@ -53,7 +53,7 @@ This rubric provides a comprehensive framework for evaluating professionally dev
 
 ---
 
-## Category 2: Code Quality (Weight: 20%)
+## Category 2: Code Quality (Weight: 22%)
 
 ### 2.1 TypeScript Usage (0-5)
 - **5**: Strict mode enabled; no `any` types; proper interfaces/types; generics used appropriately; discriminated unions where applicable
@@ -92,7 +92,7 @@ This rubric provides a comprehensive framework for evaluating professionally dev
 
 ---
 
-## Category 3: Angular Best Practices (Weight: 20%)
+## Category 3: Angular Best Practices (Weight: 22%)
 
 ### 3.1 Change Detection Strategy (0-5)
 - **5**: OnPush used throughout; proper use of async pipe; immutable data patterns; ChangeDetectorRef used correctly when needed
@@ -131,7 +131,7 @@ This rubric provides a comprehensive framework for evaluating professionally dev
 
 ---
 
-## Category 4: Performance (Weight: 15%)
+## Category 4: Performance (Weight: 17%)
 
 ### 4.1 Bundle Size Optimization (0-5)
 - **5**: Tree-shaking effective; lazy loading implemented; no unnecessary dependencies; bundle budgets configured
@@ -188,7 +188,9 @@ This rubric provides a comprehensive framework for evaluating professionally dev
 
 ---
 
-## Category 6: Testing (Weight: 10%)
+## Category 6: Testing (Weight: 1%)
+
+**⚠️ REDUCED WEIGHT:** Testing weight intentionally set to 1%. AI-generated unit tests have proven brittle and are often modified to pass rather than driving code improvements. Testing methodology will be addressed as a dedicated project. **Do not write unit tests until testing project is complete.**
 
 ### 6.1 Unit Test Coverage (0-5)
 - **5**: >80% coverage; services/pipes/guards tested; proper mocking; edge cases covered
@@ -213,7 +215,7 @@ This rubric provides a comprehensive framework for evaluating professionally dev
 
 ---
 
-## Category 7: Maintainability (Weight: 5%)
+## Category 7: Maintainability (Weight: 6%)
 
 ### 7.1 Code Readability (0-5)
 - **5**: Self-documenting code; clear naming; proper abstractions; easy to understand
@@ -242,13 +244,15 @@ This rubric provides a comprehensive framework for evaluating professionally dev
 
 | Category | Weight | Max Points |
 |----------|--------|------------|
-| Architecture & Design | 20% | 25 |
-| Code Quality | 20% | 25 |
-| Angular Best Practices | 20% | 25 |
-| Performance | 15% | 20 |
+| Architecture & Design | 22% | 25 |
+| Code Quality | 22% | 25 |
+| Angular Best Practices | 22% | 25 |
+| Performance | 17% | 20 |
 | Security | 10% | 15 |
-| Testing | 10% | 15 |
-| Maintainability | 5% | 15 |
+| Testing | 1% | 15 |
+| Maintainability | 6% | 15 |
+
+**Note:** Testing weight reduced from 10% to 1%. The 9% redistributed to Architecture (+2%), Code Quality (+2%), Angular Best Practices (+2%), Performance (+2%), and Maintainability (+1%). This reflects the decision to defer unit testing to a dedicated project.
 
 ### Final Grade Calculation
 

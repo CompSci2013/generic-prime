@@ -25,6 +25,8 @@
 **Full Assessment:** [GENERIC-PRIME-ASSESSMENT.md](GENERIC-PRIME-ASSESSMENT.md)
 **Rubric Used:** [ASSESSMENT-RUBRIC.md](ASSESSMENT-RUBRIC.md)
 
+**⚠️ UNIT TESTING POLICY:** Do NOT write unit tests. AI-generated tests have proven brittle and are often modified to pass rather than improving code quality. Testing will be addressed as a dedicated project with proper methodology. Testing weight in rubric reduced to 1%.
+
 ---
 
 ## Project Architecture
@@ -668,10 +670,10 @@ frontend/src/
 - Unsubscribe: ✅ `takeUntil(destroy$)` pattern used consistently
 
 **Testing:**
-- Unit tests: ⚠️ Only 5 spec files (services only)
-- Component tests: ❌ MISSING
-- E2E tests: ❌ MISSING (Playwright configured but no tests)
-- Coverage: ⚠️ UNKNOWN (estimated <20%)
+- **⚠️ DO NOT WRITE UNIT TESTS** - Deferred to dedicated testing project
+- Existing tests: 5 spec files (legacy, do not extend)
+- E2E tests: Not implemented (Playwright configured)
+- Reason: AI-generated tests proven brittle, often modified to pass rather than driving improvements
 
 **Documentation:**
 - JSDoc: ✅ Extensive in framework services/interfaces (5/5 in assessment)
@@ -727,9 +729,7 @@ frontend/src/
 4. Render highlight overlays in charts
 
 ### To Add Tests:
-1. Component tests: `ng generate component --spec`
-2. E2E tests: Install Playwright, write test scenarios
-3. Run: `npm test` (Karma), `npm run e2e` (Playwright)
+**⚠️ DO NOT WRITE TESTS** - Deferred to dedicated testing project. AI-generated tests have proven brittle and counterproductive.
 
 ### To Add Another Domain:
 1. Create `domain-config/agriculture/` directory
@@ -746,7 +746,7 @@ frontend/src/
 
 1. **PrimeNG-First**: DO NOT create `BaseDataTableComponent` or custom table wrappers. Use PrimeNG Table directly.
 
-2. **Tests are Sacred**: DO NOT modify tests to make them pass. Fix implementation instead.
+2. **No Unit Tests**: DO NOT write unit tests. Testing deferred to dedicated project. AI-generated tests proven brittle.
 
 3. **URL is Truth**: All state changes MUST sync to URL. URL changes MUST trigger state updates.
 
