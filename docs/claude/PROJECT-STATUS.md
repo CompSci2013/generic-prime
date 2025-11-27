@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 1.6
-**Timestamp**: 2025-11-27T19:30:00Z
-**Updated By**: Bug #10 investigation session
+**Version**: 1.7
+**Timestamp**: 2025-11-27T21:00:00Z
+**Updated By**: Bug #10 isolation testing session
 
 ---
 
@@ -10,7 +10,8 @@
 
 ### Port 4205 (generic-prime) - IN DEVELOPMENT
 - **Bug #11 FULLY RESOLVED** - Picker working with 881 combinations
-- **Bug #10 IN PROGRESS** - Partial fix applied, not resolved
+- **Bug #10 SIGNIFICANT PROGRESS** - Pop-out communication working
+- Discover page in **ISOLATION MODE** - testing QueryControl only
 - Backend upgraded to `generic-prime-backend-api:v1.3.0`
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
@@ -19,54 +20,54 @@
 
 ---
 
-## Bug #10 Investigation (2025-11-27)
+## Session Summary (2025-11-27)
 
-### Problem Statement
-Pop-out statistics panel breaks with pre-selected filters:
-1. Initial state showed unfiltered data instead of filtered data
-2. Changing filters (e.g., Ford → Buick) doesn't update pop-out or main window chips
+### Isolation Testing Strategy
 
-### Root Cause Identified
+Simplified Discover page to test QueryControl in isolation. Removed picker, statistics, and results panels.
 
-**`UrlStateService` is a root singleton** (`providedIn: 'root'`) that was using `ActivatedRoute` for URL state. The root-level `ActivatedRoute` doesn't receive query param updates from child routes like `/discover`.
+### Fixes Applied (Working)
 
-### Fixes Applied (Partial - Not Working)
+| Fix | File | Description |
+|-----|------|-------------|
+| Pop-out → Main URL sync | `panel-popout.component.ts` | Send `URL_PARAMS_CHANGED` via BroadcastChannel |
+| Main handles pop-out messages | `discover.component.ts` | Handle `URL_PARAMS_CHANGED`, update URL |
+| Close pop-outs on refresh | `discover.component.ts` | `beforeunload` broadcasts `CLOSE_POPOUT` |
 
-**File: `frontend/src/framework/services/url-state.service.ts`**
+### Test Results
 
-1. **`watchRouteChanges()`** - Changed from `ActivatedRoute.queryParams` to `Router.events` with `NavigationEnd` filter
-2. **`initializeFromRoute()`** - Changed from `route.snapshot.queryParams` to `router.parseUrl(router.url).queryParams`
+| Test | Status |
+|------|--------|
+| Main window filter add | ✅ Working |
+| URL paste in main window | ✅ Working |
+| Pop-out receives state via BroadcastChannel | ✅ Working |
+| Pop-out filter change → main URL update | ✅ Working |
+| Pop-outs close on page refresh | ✅ Working |
 
-**File: `frontend/src/app/features/panel-popout/panel-popout.component.ts`**
+### Remaining QueryControl Issues
 
-3. **`autoFetch: false`** - Prevents pop-out from making its own API calls (fixed initial state issue)
-
-### What's Still Broken
-
-URL params change correctly (URL bar updates), but:
-- Active Filter chips in QueryControl don't update
-- Pop-out window doesn't receive new state
-- State propagation broken somewhere in: `UrlStateService` → `ResourceManagementService` → components
+- Minor bugs to address in next session (not documented yet)
 
 ### Files Modified This Session
 
 | File | Change |
 |------|--------|
-| `url-state.service.ts` | Use `Router.events` instead of `ActivatedRoute.queryParams` |
-| `url-state.service.ts` | Use `router.url` instead of `route.snapshot` for initialization |
-| `panel-popout.component.ts` | Added `autoFetch: false` |
+| `discover.component.html` | Isolation mode - QueryControl only + debug panel |
+| `discover.component.ts` | Debug URL display, `beforeunload` handler, `closeAllPopOuts()` |
+| `discover.component.scss` | Styles for isolation notice and debug panel |
+| `panel-popout.component.ts` | Implement `URL_PARAMS_CHANGED` message sending |
 
 ---
 
 ## Governing Tactic
 
-**Bug #10 requires deeper investigation into state propagation.**
+**Continue isolation testing approach.**
 
-The `UrlStateService` changes appear correct but state isn't flowing to downstream consumers. Debug logging needed to trace:
-1. `UrlStateService.paramsSubject.next()` emissions
-2. `ResourceManagementService.watchUrlChanges()` subscription
-3. `filters$` observable emissions
-4. Component subscriptions receiving updates
+1. Finish testing QueryControl bugs
+2. Remove QueryControl, add Picker
+3. Test Picker in isolation
+4. Repeat for Statistics and Results
+5. Re-enable all panels when individually verified
 
 ---
 
@@ -89,15 +90,16 @@ The `UrlStateService` changes appear correct but state isn't flowing to downstre
 | Bug | Severity | Status | Summary |
 |-----|----------|--------|---------|
 | #11 | CRITICAL | **RESOLVED** | Picker shows 881 combos with server-side pagination |
-| #10 | Medium | **IN PROGRESS** | URL-First architecture broken, partial fix applied |
+| #10 | Medium | **MOSTLY RESOLVED** | Pop-out communication working, close on refresh |
 | #7 | Low | Not started | Checkboxes stay checked after clearing |
 
 ---
 
 ## Next Session
 
-1. **Continue Bug #10** - Add debug logging to trace state propagation
-2. **Fix Bug #7** - Checkbox visual state (if #10 resolved)
+1. **Fix QueryControl bugs** - Address remaining issues found during isolation testing
+2. **Test Picker in isolation** - Swap QueryControl for Picker
+3. **Fix Bug #7** - Checkbox visual state
 
 See [NEXT-STEPS.md](NEXT-STEPS.md) for details.
 

@@ -200,12 +200,15 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
    * @param params - URL parameters from child component
    */
   onUrlParamsChange(params: any): void {
-    console.log('[PanelPopout] URL params change request from Query Control:', params);
+    console.log('[PanelPopout] URL params change request:', params);
 
-    // TODO: Query Control should be refactored to send specific action messages
-    // (FILTER_ADD, FILTER_REMOVE, etc.) instead of generic URL params
-    // For now, log and ignore (main window handles picker selections correctly)
-    console.warn('[PanelPopout] URL_PARAMS_CHANGED not implemented - Query Control needs refactoring');
+    // Send URL_PARAMS_CHANGED to main window
+    // Main window will update its URL, which triggers state update, which broadcasts to pop-outs
+    this.popOutContext.sendMessage({
+      type: PopOutMessageType.URL_PARAMS_CHANGED,
+      payload: { params },
+      timestamp: Date.now()
+    });
   }
 
   /**

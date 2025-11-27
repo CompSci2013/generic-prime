@@ -62,6 +62,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
 
   /**
    * Set of panel IDs that are currently popped out
+   * Pop-outs are closed on page refresh (beforeunload)
    */
   private poppedOutPanels = new Set<string>();
 
@@ -91,6 +92,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
   private destroy$ = new Subject<void>();
 
   /**
+   * Bound beforeunload handler (needs reference for removeEventListener)
+   */
+  private beforeUnloadHandler = () => this.closeAllPopOuts();
+
+  /**
    * RxJS Subject for pop-out messages (Observable Pattern)
    * Pushes browser API events into Angular zone for change detection
    */
@@ -103,6 +109,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
    * Grid identifier for routing
    */
   private readonly gridId = 'discover';
+
+  /**
+   * Debug: Current URL state for display
+   */
+  debugUrlState = '(loading...)';
 
   constructor(
     @Inject(DOMAIN_CONFIG) domainConfig: DomainConfig<any, any, any>,
@@ -126,6 +137,9 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
     // Initialize as parent window
     this.popOutContext.initializeAsParent();
 
+    // Close all pop-outs when main window refreshes/closes
+    window.addEventListener('beforeunload', this.beforeUnloadHandler);
+
     // Subscribe to messages from pop-out windows
     this.popOutContext.getMessages$()
       .pipe(takeUntil(this.destroy$))
@@ -147,6 +161,14 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
         this.broadcastStateToPopOuts(state);
+      });
+
+    // DEBUG: Subscribe to URL params for debug display
+    this.urlStateService.watchParams()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        this.debugUrlState = JSON.stringify(params, null, 2);
+        this.cdr.markForCheck();
       });
   }
 
@@ -305,8 +327,14 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
         this.broadcastStateToPopOuts(currentState);
         break;
 
-      // Removed: URL_PARAMS_CHANGED - pop-outs no longer sync URL params
-      // Pop-outs send action messages (PICKER_SELECTION_CHANGE, etc.) instead
+      case PopOutMessageType.URL_PARAMS_CHANGED:
+        // Pop-out sent URL params change - update main window URL
+        // This will trigger: URL change → ResourceManagementService → state$ → BroadcastChannel → pop-outs
+        console.log('[Discover] URL params change from pop-out:', message.payload?.params);
+        if (message.payload?.params) {
+          this.urlStateService.setParams(message.payload.params);
+        }
+        break;
     }
   }
 
@@ -361,6 +389,22 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
   }
 
   /**
+   * Close all pop-out windows
+   * Called on beforeunload to clean up pop-outs when main window refreshes
+   */
+  private closeAllPopOuts(): void {
+    console.log('[Discover] Closing all pop-outs (main window unloading)');
+
+    // Send CLOSE_POPOUT to all pop-outs
+    this.popoutWindows.forEach(({ channel }) => {
+      channel.postMessage({
+        type: PopOutMessageType.CLOSE_POPOUT,
+        timestamp: Date.now()
+      });
+    });
+  }
+
+  /**
    * Broadcast full state to all pop-out windows
    * This is called whenever main window state changes
    *
@@ -392,6 +436,9 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
   }
 
   ngOnDestroy(): void {
+    // Remove beforeunload handler
+    window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+
     // Clean up all pop-out windows
     this.popoutWindows.forEach(({ window, channel, checkInterval }) => {
       clearInterval(checkInterval);

@@ -14,80 +14,68 @@
 
 ---
 
-## Current Priority: Bug #10 (In Progress)
+## Current Priority: Isolation Testing
 
-**Status**: Partial fix applied, state propagation still broken
+**Status**: QueryControl isolation testing complete, minor bugs remain
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Bug #10 requires deeper investigation into state propagation.**
+> **Continue isolation testing approach.**
+> Test each component in isolation before re-enabling all panels.
 
 ---
 
-## Bug #10: Pop-out Statistics Panel
+## Immediate Actions
 
-### What Was Done (2025-11-27)
+### 1. Fix QueryControl Bugs
 
-1. **Identified root cause**: `UrlStateService` is `providedIn: 'root'` singleton using `ActivatedRoute` which doesn't receive child route updates
+User mentioned "a few other bugs" - need to identify and fix these in next session.
 
-2. **Applied fixes** (not working):
-   - `url-state.service.ts`: Changed to use `Router.events` + `NavigationEnd`
-   - `url-state.service.ts`: Changed to use `router.url` for initialization
-   - `panel-popout.component.ts`: Added `autoFetch: false`
+**To discover bugs**:
+1. Start dev server: `podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205`
+2. Open `http://192.168.0.244:4205/discover`
+3. Test filter add/remove, clear all, pop-out scenarios
+4. Document any issues found
 
-3. **Observed behavior**:
-   - URL bar updates correctly (Ford → Buick)
-   - `[UrlState] Route queryParams changed` log fires
-   - But Active Filter chips don't update
-   - Pop-out window doesn't receive new state
+### 2. Test Picker in Isolation
 
-### Next Steps for Bug #10
+After QueryControl is verified:
+1. Edit `discover.component.html` - swap QueryControl for Picker
+2. Test Picker scenarios (selection, URL sync, pop-out)
+3. Fix any issues found
 
-1. **Add debug logging** to trace state flow:
-   ```typescript
-   // In UrlStateService.watchRouteChanges()
-   console.log('[UrlState] Emitting params:', params);
+### 3. Continue Component-by-Component
 
-   // In ResourceManagementService.watchUrlChanges()
-   console.log('[ResourceMgmt] Received URL params:', urlParams);
-   console.log('[ResourceMgmt] Converted to filters:', filters);
+Order: QueryControl → Picker → Statistics → Results → All together
 
-   // In ResourceManagementService filters$ pipe
-   console.log('[ResourceMgmt] filters$ emitting:', filters);
+---
 
-   // In QueryControl subscription
-   console.log('[QueryControl] Received filters:', filters);
-   ```
+## Current Discover Page State
 
-2. **Check if `watchParams()` distinctUntilChanged is filtering out emissions** - the JSON.stringify comparison might be matching when it shouldn't
+**ISOLATION MODE**: Only QueryControl is rendered
 
-3. **Verify BroadcastChannel message flow** - check if `STATE_UPDATE` messages are being sent/received by pop-out
+```
+discover.component.html:
+├── Header (with isolation notice)
+├── QueryControl panel (with pop-out button)
+├── Debug panel (shows URL state JSON)
+└── [REMOVED: picker, statistics, results]
+```
 
-### Key Files
+To restore full page later:
+- Revert `discover.component.html` to include all panels
+- Remove debug panel and isolation notice
+
+---
+
+## Key Files for Isolation Testing
 
 | File | Purpose |
 |------|---------|
-| `url-state.service.ts` | URL → params observable |
-| `resource-management.service.ts` | params → filters → state |
-| `query-control.component.ts` | Subscribes to `filters$` for chips |
-| `discover.component.ts` | Broadcasts state to pop-outs |
-| `panel-popout.component.ts` | Receives state via BroadcastChannel |
-
----
-
-## Bug #7: Checkbox Visual State (Low Priority)
-
-**Problem**: Checkboxes remain visually checked after clearing selection.
-
-**Severity**: Low
-
-**Location**: Likely CSS/PrimeNG styling issue in picker component.
-
-**Investigation** (when Bug #10 is resolved):
-1. Select items in picker
-2. Clear selection (click "Clear" button)
-3. Check if `[(selection)]` binding updates
-4. Check if PrimeNG checkbox component re-renders
+| `discover.component.html` | Toggle which panels are visible |
+| `discover.component.ts` | Pop-out handling, URL state debug |
+| `panel-popout.component.ts` | BroadcastChannel communication |
+| `query-control.component.ts` | Filter management, chips |
 
 ---
 
@@ -126,4 +114,4 @@ Before ending session:
 ---
 
 **Last Updated**: 2025-11-27
-**Updated By**: Bug #10 investigation session - partial fix, state propagation broken
+**Updated By**: Bug #10 isolation testing session - pop-out communication fixed
