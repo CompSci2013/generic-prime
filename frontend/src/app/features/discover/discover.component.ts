@@ -335,6 +335,12 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
           this.urlStateService.setParams(message.payload.params);
         }
         break;
+
+      case PopOutMessageType.CLEAR_ALL_FILTERS:
+        // Pop-out requested to clear all filters - clear all URL params
+        console.log('[Discover] Clear all filters from pop-out');
+        this.urlStateService.clearParams();
+        break;
     }
   }
 
@@ -367,6 +373,15 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
   onUrlParamsChange(params: Params): void {
     console.log('[Discover] Updating URL params:', params);
     this.urlStateService.setParams(params);
+  }
+
+  /**
+   * Handle clear all filters request
+   * Clears all URL query parameters
+   */
+  onClearAllFilters(): void {
+    console.log('[Discover] Clearing all URL params');
+    this.urlStateService.clearParams();
   }
 
   /**

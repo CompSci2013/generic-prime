@@ -112,6 +112,13 @@ export enum PopOutMessageType {
   CLEAR_HIGHLIGHTS = 'CLEAR_HIGHLIGHTS',
 
   /**
+   * Clear all filters and highlights from pop-out
+   * Main window should call urlState.clearParams()
+   * Payload: none
+   */
+  CLEAR_ALL_FILTERS = 'CLEAR_ALL_FILTERS',
+
+  /**
    * URL parameters changed in pop-out
    * Pop-out sends to main window to update URL
    * Payload: { params: Params }

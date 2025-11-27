@@ -14,9 +14,9 @@
 
 ---
 
-## Current Priority: Isolation Testing
+## Current Priority: Picker Isolation Testing
 
-**Status**: QueryControl isolation testing complete, minor bugs remain
+**Status**: QueryControl testing complete, moving to Picker
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
@@ -27,44 +27,47 @@
 
 ## Immediate Actions
 
-### 1. Fix QueryControl Bugs
+### 1. Test Picker in Isolation
 
-User mentioned "a few other bugs" - need to identify and fix these in next session.
+Swap QueryControl for Picker in discover.component.html:
 
-**To discover bugs**:
-1. Start dev server: `podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205`
-2. Open `http://192.168.0.244:4205/discover`
-3. Test filter add/remove, clear all, pop-out scenarios
-4. Document any issues found
+```html
+<!-- Comment out QueryControl, add Picker -->
+<!-- <app-query-control ... /> -->
+<app-base-picker [configId]="'manufacturer-model'" ...></app-base-picker>
+```
 
-### 2. Test Picker in Isolation
+Test scenarios:
+- Picker loads 881 combinations
+- Selection updates URL
+- URL paste updates picker selection
+- Pop-out picker syncs with main window
 
-After QueryControl is verified:
-1. Edit `discover.component.html` - swap QueryControl for Picker
-2. Test Picker scenarios (selection, URL sync, pop-out)
-3. Fix any issues found
+### 2. Fix Bug #7 (Checkboxes)
 
-### 3. Continue Component-by-Component
+Low priority checkbox visual state bug - checkboxes stay checked after clearing.
 
-Order: QueryControl → Picker → Statistics → Results → All together
+### 3. Test Statistics in Isolation
+
+After Picker is verified, swap for Statistics panel and test chart interactions.
+
+### 4. Re-enable All Panels
+
+Once each component is verified individually, restore full discover page.
 
 ---
 
 ## Current Discover Page State
 
-**ISOLATION MODE**: Only QueryControl is rendered
+**ISOLATION MODE**: Only QueryControl is rendered (ready to swap for Picker)
 
 ```
 discover.component.html:
 ├── Header (with isolation notice)
-├── QueryControl panel (with pop-out button)
+├── QueryControl panel (with pop-out button)  ← SWAP THIS FOR PICKER
 ├── Debug panel (shows URL state JSON)
 └── [REMOVED: picker, statistics, results]
 ```
-
-To restore full page later:
-- Revert `discover.component.html` to include all panels
-- Remove debug panel and isolation notice
 
 ---
 
@@ -75,7 +78,7 @@ To restore full page later:
 | `discover.component.html` | Toggle which panels are visible |
 | `discover.component.ts` | Pop-out handling, URL state debug |
 | `panel-popout.component.ts` | BroadcastChannel communication |
-| `query-control.component.ts` | Filter management, chips |
+| `base-picker.component.ts` | Picker functionality |
 
 ---
 
@@ -114,4 +117,4 @@ Before ending session:
 ---
 
 **Last Updated**: 2025-11-27
-**Updated By**: Bug #10 isolation testing session - pop-out communication fixed
+**Updated By**: QueryControl bug fixes session - dropdown and Clear All fixed

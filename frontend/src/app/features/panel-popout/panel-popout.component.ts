@@ -212,6 +212,19 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Handle clear all filters request
+   * Sends message to main window to clear all URL params
+   */
+  onClearAllFilters(): void {
+    console.log('[PanelPopout] Clear all filters request');
+
+    this.popOutContext.sendMessage({
+      type: PopOutMessageType.CLEAR_ALL_FILTERS,
+      timestamp: Date.now()
+    });
+  }
+
+  /**
    * Handle picker selection changes
    * Sends message to main window which updates URL and broadcasts STATE_UPDATE
    *

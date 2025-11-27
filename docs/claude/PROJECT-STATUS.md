@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 1.7
-**Timestamp**: 2025-11-27T21:00:00Z
-**Updated By**: Bug #10 isolation testing session
+**Version**: 1.8
+**Timestamp**: 2025-11-27T22:30:00Z
+**Updated By**: QueryControl bug fixes session
 
 ---
 
@@ -10,9 +10,9 @@
 
 ### Port 4205 (generic-prime) - IN DEVELOPMENT
 - **Bug #11 FULLY RESOLVED** - Picker working with 881 combinations
-- **Bug #10 SIGNIFICANT PROGRESS** - Pop-out communication working
+- **Bug #10 RESOLVED** - Pop-out communication working
 - Discover page in **ISOLATION MODE** - testing QueryControl only
-- Backend upgraded to `generic-prime-backend-api:v1.3.0`
+- Backend at `generic-prime-backend-api:v1.3.0`
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
 - Unaffected by changes
@@ -20,42 +20,38 @@
 
 ---
 
-## Session Summary (2025-11-27)
+## Session Summary (2025-11-27 - Evening)
 
-### Isolation Testing Strategy
+### QueryControl Bug Fixes
 
-Simplified Discover page to test QueryControl in isolation. Removed picker, statistics, and results panels.
+Fixed two issues identified during isolation testing:
 
-### Fixes Applied (Working)
+| Bug | Fix | Files Changed |
+|-----|-----|---------------|
+| Dropdown showing highlight filters | Removed highlight filters from `filterFieldOptions` | `query-control.component.ts` |
+| Clear All not clearing all URL params | New `clearAllFilters` event → `urlState.clearParams()` | Multiple (see below) |
 
-| Fix | File | Description |
-|-----|------|-------------|
-| Pop-out → Main URL sync | `panel-popout.component.ts` | Send `URL_PARAMS_CHANGED` via BroadcastChannel |
-| Main handles pop-out messages | `discover.component.ts` | Handle `URL_PARAMS_CHANGED`, update URL |
-| Close pop-outs on refresh | `discover.component.ts` | `beforeunload` broadcasts `CLOSE_POPOUT` |
+### Clear All Implementation
 
-### Test Results
+Simplified from iterating over filter configs to simply clearing the URL:
 
-| Test | Status |
-|------|--------|
-| Main window filter add | ✅ Working |
-| URL paste in main window | ✅ Working |
-| Pop-out receives state via BroadcastChannel | ✅ Working |
-| Pop-out filter change → main URL update | ✅ Working |
-| Pop-outs close on page refresh | ✅ Working |
-
-### Remaining QueryControl Issues
-
-- Minor bugs to address in next session (not documented yet)
+```
+QueryControl.clearAll()
+  → emits clearAllFilters event
+  → Parent calls urlStateService.clearParams()
+  → URL becomes clean
+```
 
 ### Files Modified This Session
 
 | File | Change |
 |------|--------|
-| `discover.component.html` | Isolation mode - QueryControl only + debug panel |
-| `discover.component.ts` | Debug URL display, `beforeunload` handler, `closeAllPopOuts()` |
-| `discover.component.scss` | Styles for isolation notice and debug panel |
-| `panel-popout.component.ts` | Implement `URL_PARAMS_CHANGED` message sending |
+| `query-control.component.ts` | Remove highlight filters from dropdown; add `clearAllFilters` output; simplify `clearAll()` |
+| `popout.interface.ts` | Add `CLEAR_ALL_FILTERS` message type |
+| `discover.component.html` | Bind `(clearAllFilters)` event |
+| `discover.component.ts` | Add `onClearAllFilters()` handler + message handler |
+| `panel-popout.component.html` | Bind `(clearAllFilters)` event |
+| `panel-popout.component.ts` | Add `onClearAllFilters()` handler |
 
 ---
 
@@ -63,7 +59,7 @@ Simplified Discover page to test QueryControl in isolation. Removed picker, stat
 
 **Continue isolation testing approach.**
 
-1. Finish testing QueryControl bugs
+1. ~~Finish testing QueryControl bugs~~ ✅ Done
 2. Remove QueryControl, add Picker
 3. Test Picker in isolation
 4. Repeat for Statistics and Results
@@ -90,16 +86,17 @@ Simplified Discover page to test QueryControl in isolation. Removed picker, stat
 | Bug | Severity | Status | Summary |
 |-----|----------|--------|---------|
 | #11 | CRITICAL | **RESOLVED** | Picker shows 881 combos with server-side pagination |
-| #10 | Medium | **MOSTLY RESOLVED** | Pop-out communication working, close on refresh |
+| #10 | Medium | **RESOLVED** | Pop-out communication working |
 | #7 | Low | Not started | Checkboxes stay checked after clearing |
 
 ---
 
 ## Next Session
 
-1. **Fix QueryControl bugs** - Address remaining issues found during isolation testing
-2. **Test Picker in isolation** - Swap QueryControl for Picker
-3. **Fix Bug #7** - Checkbox visual state
+1. **Test Picker in isolation** - Swap QueryControl for Picker in discover.component.html
+2. **Fix Bug #7** - Checkbox visual state
+3. **Test Statistics in isolation**
+4. **Re-enable all panels** when individually verified
 
 See [NEXT-STEPS.md](NEXT-STEPS.md) for details.
 

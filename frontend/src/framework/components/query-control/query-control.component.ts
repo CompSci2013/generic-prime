@@ -64,6 +64,9 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   /** Emits when URL parameters should be updated */
   @Output() urlParamsChange = new EventEmitter<{ [key: string]: any }>();
 
+  /** Emits when all filters should be cleared (parent should call urlState.clearParams()) */
+  @Output() clearAllFilters = new EventEmitter<void>();
+
   // ==================== Dropdown State ====================
 
   /** Filter field options for dropdown */
@@ -143,19 +146,12 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   ) {}
 
   ngOnInit(): void {
-    // Build filter field dropdown options from domain config (regular filters + highlight filters)
-    this.filterFieldOptions = [
-      // Regular filters
-      ...this.domainConfig.queryControlFilters.map(f => ({
-        label: f.label,
-        value: f
-      })),
-      // Highlight filters (if defined)
-      ...(this.domainConfig.highlightFilters || []).map(f => ({
-        label: f.label,
-        value: f
-      }))
-    ];
+    // Build filter field dropdown options from domain config (regular filters only)
+    // Highlight filters are NOT included in dropdown - they're added via chart interactions
+    this.filterFieldOptions = this.domainConfig.queryControlFilters.map(f => ({
+      label: f.label,
+      value: f
+    }));
 
     console.log('QueryControl: Filter field options:', this.filterFieldOptions);
 
@@ -510,39 +506,11 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
 
   /**
    * Clear all filters (both regular filters AND highlights)
+   *
+   * Emits clearAllFilters event - parent component handles by calling urlState.clearParams()
    */
   clearAll(): void {
-    if (this.activeFilters.length === 0 && this.activeHighlights.length === 0) {
-      return; // Nothing to clear
-    }
-
-    const params: any = { page: 1 }; // Reset to first page
-
-    // Collect all regular filter URL params to clear
-    for (const filter of this.activeFilters) {
-      if (filter.definition.type === 'range') {
-        const urlParamsConfig = filter.definition.urlParams as { min: string; max: string };
-        params[urlParamsConfig.min] = null;
-        params[urlParamsConfig.max] = null;
-      } else {
-        const paramName = filter.definition.urlParams as string;
-        params[paramName] = null;
-      }
-    }
-
-    // Collect all highlight filter URL params to clear
-    for (const highlight of this.activeHighlights) {
-      if (highlight.definition.type === 'range') {
-        const urlParamsConfig = highlight.definition.urlParams as { min: string; max: string };
-        params[urlParamsConfig.min] = null;
-        params[urlParamsConfig.max] = null;
-      } else {
-        const paramName = highlight.definition.urlParams as string;
-        params[paramName] = null;
-      }
-    }
-
-    this.urlParamsChange.emit(params);
+    this.clearAllFilters.emit();
   }
 
   /**
