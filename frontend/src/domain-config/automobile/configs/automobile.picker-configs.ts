@@ -65,49 +65,25 @@ export function createManufacturerModelPickerConfig(
     ],
 
     // API configuration
+    // Note: API uses cursor-based pagination. For simplicity, we fetch all records
+    // and paginate client-side (881 combinations is manageable).
+    // TODO: Add cursor-based pagination support to picker framework for larger datasets.
     api: {
       fetchData: (params) => {
         const endpoint = `${environment.apiBaseUrl}/manufacturer-model-combinations`;
         return apiService.get<ManufacturerModelRow>(endpoint, {
           params: {
-            page: params.page + 1, // API uses 1-indexed pages
-            size: params.size,
-            search: params.search,
-            sortBy: params.sortField,
-            // Only send sortOrder when sortField is defined
-            sortOrder: params.sortField ? (params.sortOrder === 1 ? 'asc' : 'desc') : undefined
+            size: 1000, // Fetch all combinations (881 total)
+            search: params.search || undefined
           }
         });
       },
 
       responseTransformer: (response) => {
-        // API returns nested structure: { data: [{ manufacturer, count, models: [...] }] }
-        // Need to flatten to: { results: [{ manufacturer, model, count }] }
-        const flatResults: ManufacturerModelRow[] = [];
-
-        if (response.data && Array.isArray(response.data)) {
-          response.data.forEach((manufacturerGroup: any) => {
-            const manufacturer = manufacturerGroup.manufacturer;
-
-            if (manufacturerGroup.models && Array.isArray(manufacturerGroup.models)) {
-              manufacturerGroup.models.forEach((modelItem: any) => {
-                flatResults.push({
-                  manufacturer: manufacturer,
-                  model: modelItem.model,
-                  count: modelItem.count
-                });
-              });
-            }
-          });
-        }
-
-        // Use API-provided total if available, otherwise fall back to flattened count
-        // Note: API total represents manufacturer-model combinations, not manufacturer groups
-        const total = response.total ?? response.totalRecords ?? flatResults.length;
-
+        // API returns flat structure: { data: [{ manufacturer, model, count }], total }
         return {
-          results: flatResults,
-          total: total
+          results: response.data || [],
+          total: response.total || 0
         };
       }
     },
@@ -146,11 +122,11 @@ export function createManufacturerModelPickerConfig(
     },
 
     // Pagination configuration
-    // Note: API paginates by manufacturer groups, but we display flattened manufacturer-model rows.
-    // The total count represents manufacturer groups, not individual models.
-    // This is a known limitation - would need API changes for true model-level pagination.
+    // Client-side pagination: all 881 combinations loaded, paginated locally.
+    // This is efficient for this dataset size. For larger datasets (10k+),
+    // implement cursor-based pagination in the picker framework.
     pagination: {
-      mode: 'server',
+      mode: 'client',
       defaultPageSize: 20,
       pageSizeOptions: [10, 20, 50, 100]
     },

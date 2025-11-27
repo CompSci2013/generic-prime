@@ -14,192 +14,119 @@
 
 ---
 
-## Current Priority: Fix Bug #11
+## Current Priority: Test Frontend + Bug #10/#7
 
-**Status**: READY TO IMPLEMENT
+**Status**: Bug #11 FIXED, ready for frontend testing
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Backend deployed. Now fix Bug #11.**
+> **Bug #11 fixed. Test frontend, then proceed to Bug #10 or #7.**
 >
-> The `/manufacturer-model-combinations` endpoint must be rewritten to use ES composite aggregation for true server-side pagination.
->
-> **Bug #11 is now UNBLOCKED and is the immediate priority.**
+> Frontend picker has been updated to use flat format with client-side pagination.
+> Need to verify the UI works correctly with the new API response.
 
 ---
 
-## Bug #11: The Problem
+## Bug #11: COMPLETED
 
-| Issue | Current | Required |
-|-------|---------|----------|
-| ES Query | Nested `terms` with `size: 100` | Composite aggregation with cursor |
-| Pagination | JavaScript `.slice()` | ES `after` cursor |
-| Response | 72 manufacturers (nested) | 881 combinations (flat) |
-| Data Loss | Chevrolet missing 12, Ford missing 11 | All combinations returned |
-
-**Root Cause**: In-memory pagination disguised as server-side pagination.
-
-Full analysis: [../investigation/BACKEND-PAGINATION-ANALYSIS.md](../investigation/BACKEND-PAGINATION-ANALYSIS.md)
+| Metric | Before | After |
+|--------|--------|-------|
+| API Response | 72 manufacturers (nested) | **881 combinations (flat)** |
+| Pagination | In-memory `.slice()` | **ES composite cursor** |
+| Backend Version | v1.1.0 | **v1.2.0** |
 
 ---
 
-## Implementation Steps
+## Immediate Actions
 
-### Step 1: Read Current Implementation
-
-```bash
-# Backend source location
-cat ~/projects/data-broker/generic-prime/src/services/elasticsearchService.js
-```
-
-Key function: `getManufacturerModelCombinations()` (around line 50-150)
-
-### Step 2: Replace ES Query with Composite Aggregation
-
-**Current (broken)**:
-```javascript
-aggs: {
-  manufacturers: {
-    terms: { field: 'manufacturer.keyword', size: 100 },
-    aggs: {
-      models: { terms: { field: 'model.keyword', size: 100 } }
-    }
-  }
-}
-```
-
-**New (correct)**:
-```javascript
-aggs: {
-  manufacturer_model_combos: {
-    composite: {
-      size: pageSize,
-      after: afterCursor,  // null for first page
-      sources: [
-        { manufacturer: { terms: { field: 'manufacturer.keyword' } } },
-        { model: { terms: { field: 'model.keyword' } } }
-      ]
-    }
-  }
-}
-```
-
-### Step 3: Add Total Count Query
-
-```javascript
-// Separate query for total count (cardinality)
-aggs: {
-  total_combos: {
-    cardinality: {
-      script: {
-        source: "doc['manufacturer.keyword'].value + '|' + doc['model.keyword'].value"
-      }
-    }
-  }
-}
-```
-
-### Step 4: Update Response Format
-
-**Current (nested)**:
-```json
-{
-  "data": [
-    {
-      "manufacturer": "Ford",
-      "count": 665,
-      "models": [{ "model": "F-150", "count": 23 }]
-    }
-  ]
-}
-```
-
-**New (flat)**:
-```json
-{
-  "data": [
-    { "manufacturer": "Ford", "model": "F-150", "count": 23 }
-  ],
-  "afterKey": { "manufacturer": "Ford", "model": "F-150" },
-  "total": 881
-}
-```
-
-### Step 5: Update Controller
-
-File: `~/projects/data-broker/generic-prime/src/controllers/specsController.js`
-
-- Accept `after` parameter (JSON cursor) instead of `page`
-- Return `afterKey` cursor in response
-- Keep backward compatibility if possible
-
-### Step 6: Build and Deploy
+### Step 1: Test Frontend with New API
 
 ```bash
-cd ~/projects/data-broker/generic-prime
-
-# Build new image
-podman build -f infra/Dockerfile -t localhost/generic-prime-backend-api:v1.2.0 .
-
-# Export for containerd
-podman save -o /tmp/generic-prime-backend-api-v1.2.0.tar localhost/generic-prime-backend-api:v1.2.0
-
-# Import to containerd (requires sudo)
-sudo ctr -n k8s.io images import /tmp/generic-prime-backend-api-v1.2.0.tar
-
-# Update deployment
-# First update infra/k8s/deployment.yaml to use v1.2.0
-kubectl apply -f infra/k8s/deployment.yaml
+# Start dev container and server
+cd ~/projects/generic-prime/frontend
+podman start generic-prime-frontend-dev 2>/dev/null || \
+  podman run -d --name generic-prime-frontend-dev --network host \
+    -v $(pwd):/app:z -w /app localhost/generic-prime-frontend:dev
+podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205
 ```
 
-### Step 7: Verify Fix
+**Test in browser**: `http://192.168.0.244:4205/discover`
 
-```bash
-# Test endpoint returns 881 combinations
-curl -s -H "Host: generic-prime.minilab" \
-  "http://192.168.0.110/api/specs/v1/manufacturer-model-combinations?size=20" | jq '.total'
+**Verify**:
+- [ ] Manufacturer-Model picker opens
+- [ ] Shows 881 total combinations (not 72)
+- [ ] Pagination works (client-side)
+- [ ] Search filters correctly
+- [ ] Selection persists to URL
 
-# Expected: 881
+### Step 2: Fix Bug #10 (Pop-out Statistics)
 
-# Test cursor-based pagination
-curl -s -H "Host: generic-prime.minilab" \
-  "http://192.168.0.110/api/specs/v1/manufacturer-model-combinations?size=20" | jq '.afterKey'
+**Problem**: Pop-out statistics panel breaks with pre-selected filters.
 
-# Should return cursor for next page
+**Location**: Likely in `PopOutContextService` or chart components.
+
+**Investigation**:
+1. Open app with filters in URL
+2. Pop out statistics panel
+3. Check console for errors
+4. Trace data flow from URL → state → charts
+
+### Step 3: Fix Bug #7 (Checkbox Visual State)
+
+**Problem**: Checkboxes remain visually checked after clearing selection.
+
+**Location**: Likely CSS/PrimeNG styling issue in picker component.
+
+**Investigation**:
+1. Select items in picker
+2. Clear selection
+3. Check if `[(selection)]` binding updates
+4. Check if PrimeNG checkbox component re-renders
+
+---
+
+## Future Enhancement: Cursor-Based Pagination in Picker
+
+The picker framework currently uses page-based pagination. For datasets > 10K records, implement cursor-based pagination:
+
+```typescript
+// Add to PickerApiParams
+export interface PickerApiParams {
+  page: number;
+  size: number;
+  afterKey?: { [key: string]: any };  // Cursor for next page
+  // ...
+}
+
+// Add to PickerApiResponse
+export interface PickerApiResponse<T> {
+  results: T[];
+  total: number;
+  afterKey?: { [key: string]: any };  // Cursor from response
+  hasMore?: boolean;
+  // ...
+}
 ```
+
+**Not urgent** - current client-side pagination works for 881 records.
 
 ---
 
 ## Quick Commands
 
 ```bash
-# Backend source
-cat ~/projects/data-broker/generic-prime/src/services/elasticsearchService.js
+# Frontend dev server
+podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205
 
-# Test composite aggregation directly on ES (via port-forward)
-kubectl port-forward -n data svc/elasticsearch 9200:9200 &
-curl -X POST "localhost:9200/autos-unified/_search" -H 'Content-Type: application/json' -d'
-{
-  "size": 0,
-  "aggs": {
-    "combos": {
-      "composite": {
-        "size": 20,
-        "sources": [
-          { "manufacturer": { "terms": { "field": "manufacturer.keyword" } } },
-          { "model": { "terms": { "field": "model.keyword" } } }
-        ]
-      }
-    }
-  }
-}'
+# Test API directly
+curl -s -H "Host: generic-prime.minilab" \
+  "http://192.168.0.110/api/specs/v1/manufacturer-model-combinations?size=5" | jq
 
-# K8s
+# Check backend pods
 kubectl get pods -n generic-prime
-kubectl logs -n generic-prime -l app=generic-prime-backend-api --tail=50
 
-# Test via ingress
-curl -s -H "Host: generic-prime.minilab" "http://192.168.0.110/api/specs/v1/manufacturer-model-combinations?size=5" | jq
+# Backend logs
+kubectl logs -n generic-prime -l app=generic-prime-backend-api --tail=50
 ```
 
 ---
@@ -220,4 +147,4 @@ Before ending session:
 ---
 
 **Last Updated**: 2025-11-27
-**Updated By**: Backend deployment session - Bug #11 now unblocked
+**Updated By**: Bug #11 fix session - Backend v1.2.0 deployed, frontend updated
