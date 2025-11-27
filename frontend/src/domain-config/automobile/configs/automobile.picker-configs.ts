@@ -65,25 +65,26 @@ export function createManufacturerModelPickerConfig(
     ],
 
     // API configuration
-    // Note: API uses cursor-based pagination. For simplicity, we fetch all records
-    // and paginate client-side (881 combinations is manageable).
-    // TODO: Add cursor-based pagination support to picker framework for larger datasets.
+    // Server-side pagination: API returns { data, total, page, size, totalPages }
     api: {
       fetchData: (params) => {
         const endpoint = `${environment.apiBaseUrl}/manufacturer-model-combinations`;
-        return apiService.get<ManufacturerModelRow>(endpoint, {
+        return apiService.get<any>(endpoint, {
           params: {
-            size: 1000, // Fetch all combinations (881 total)
+            page: params.page + 1, // API is 1-indexed, picker is 0-indexed
+            size: params.size,
             search: params.search || undefined
           }
         });
       },
 
       responseTransformer: (response) => {
-        // API returns flat structure: { data: [{ manufacturer, model, count }], total }
         return {
           results: response.data || [],
-          total: response.total || 0
+          total: response.total || 0,
+          page: response.page,
+          size: response.size,
+          totalPages: response.totalPages
         };
       }
     },
@@ -122,11 +123,9 @@ export function createManufacturerModelPickerConfig(
     },
 
     // Pagination configuration
-    // Client-side pagination: all 881 combinations loaded, paginated locally.
-    // This is efficient for this dataset size. For larger datasets (10k+),
-    // implement cursor-based pagination in the picker framework.
+    // Server-side pagination: fetches only current page from API
     pagination: {
-      mode: 'client',
+      mode: 'server',
       defaultPageSize: 20,
       pageSizeOptions: [10, 20, 50, 100]
     },
