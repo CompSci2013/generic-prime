@@ -1,16 +1,16 @@
 # Project Status
 
-**Version**: 1.1
-**Timestamp**: 2025-11-27T14:30:00Z
-**Updated By**: Backend investigation session
+**Version**: 1.2
+**Timestamp**: 2025-11-27T15:45:00Z
+**Updated By**: Backend migration session
 
 ---
 
 ## Current State
 
 ### Port 4205 (generic-prime) - IN DEVELOPMENT
-- Backend investigation **COMPLETE** - root cause identified
-- **Backend rewrite required** before frontend work can continue
+- Backend **MIGRATED** to `~/projects/data-broker/generic-prime/`
+- Backend needs deployment and validation before Bug #11 fix
 - Configuration-driven architecture (good design, incomplete execution)
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
@@ -19,68 +19,61 @@
 
 ---
 
-## Investigation Findings (2025-11-27)
+## Migration Completed (2025-11-27)
 
-### Bug #11 Root Cause: CONFIRMED
+### Backend Moved to data-broker
 
-**Problem**: `/manufacturer-model-combinations` endpoint uses **in-memory pagination** disguised as server-side pagination.
+The backend API has been moved from `~/projects/generic-prime/backend-specs/` to `~/projects/data-broker/generic-prime/`.
 
-| Issue | Current | Required |
-|-------|---------|----------|
-| ES Query | Nested `terms` with `size: 100` | Composite aggregation with cursor |
-| Pagination | JavaScript `.slice()` | ES `after` cursor |
-| Scalability | ~10K max rows | Millions of rows |
-| Response | 72 manufacturers (nested) | 881 combinations (flat) |
+**New Location**: `~/projects/data-broker/generic-prime/`
 
-### Verified Data (Direct ES Queries)
+```
+data-broker/generic-prime/
+├── docs/
+│   └── README.md
+├── infra/
+│   ├── Dockerfile
+│   └── k8s/
+│       ├── deployment.yaml
+│       └── service.yaml
+├── package.json
+└── src/
+    ├── index.js
+    ├── config/elasticsearch.js
+    ├── controllers/specsController.js
+    ├── routes/specsRoutes.js
+    ├── services/elasticsearchService.js   ← Bug #11 fix goes here
+    └── utils/
+```
 
-| Metric | Count | Verified |
-|--------|-------|----------|
-| Unique manufacturers | 72 | ✓ |
-| Unique manufacturer-model combinations | 881 | ✓ |
-| Vehicle specifications (`autos-unified`) | 4,887 | ✓ |
-| VIN records (`autos-vins`) | 55,463 | ✓ |
+### Naming Changes
 
-### Data Truncation Identified
+| Item | Old | New |
+|------|-----|-----|
+| K8s Deployment | `generic-prime-backend` | `generic-prime-backend-api` |
+| K8s Service | `generic-prime-backend` | `generic-prime-backend-api` |
+| Docker Image | `generic-prime-backend` | `generic-prime-backend-api` |
+| package.json name | `auto-discovery-specs-api` | `generic-prime-backend-api` |
 
-| Manufacturer | Actual Models | API Returns | Missing |
-|--------------|---------------|-------------|---------|
-| Chevrolet | 112 | 100 | 12 |
-| Ford | 111 | 100 | 11 |
-| **Total** | | | **23** |
+### Files Remaining in generic-prime/k8s/
 
----
-
-## Architectural Requirements Documented
-
-Two non-negotiable requirements identified and documented:
-
-1. **Frontend must accept ANY data structure** (flat or nested)
-   - Future domains will have APIs we cannot control
-   - See: [docs/plan/07-DATA-MAPPER-SERVICE.md](../plan/07-DATA-MAPPER-SERVICE.md)
-
-2. **Server-side pagination is mandatory**
-   - Expect millions of rows
-   - No hardcoded size limits
-   - No in-memory pagination disguised as server-side
-
----
-
-## Decision Made
-
-**Backend fix deferred to next session.**
-
-Reason: Backend rewrite is significant (~2-4 hours). Session documented findings completely for continuity.
+- `namespace.yaml` - shared namespace
+- `ingress.yaml` - updated to reference `generic-prime-backend-api`
+- `frontend-deployment.yaml`
+- `frontend-service.yaml`
 
 ---
 
 ## Governing Tactic (Updated)
 
-**Fix backend API before any frontend work.**
+**Deploy and validate backend API, THEN fix Bug #11.**
 
-The `/manufacturer-model-combinations` endpoint must be rewritten to use ES composite aggregation for true server-side pagination.
+1. Build new container image with renamed service
+2. Deploy to Kubernetes
+3. Validate endpoints respond correctly
+4. THEN proceed with Bug #11 composite aggregation fix
 
-**DO NOT modify frontend code until backend is fixed.**
+**DO NOT modify frontend code until backend is deployed and validated.**
 
 ---
 
@@ -93,8 +86,8 @@ The `/manufacturer-model-combinations` endpoint must be rewritten to use ES comp
 | Index: VIN Records | `autos-vins` | 55,463 documents |
 | Unique Manufacturers | 72 | Verified via ES |
 | Unique Mfr-Model Combos | 881 | Verified via ES |
-| Backend Source | `backend-specs/src/` | JavaScript/Express |
-| Backend Image | `localhost/generic-prime-backend:v1.0.1` | K8s deployment |
+| **Backend Source** | `~/projects/data-broker/generic-prime/src/` | **MOVED** |
+| **Backend Image** | `localhost/generic-prime-backend-api:v1.1.0` | **RENAMED** |
 
 ---
 
@@ -102,31 +95,17 @@ The `/manufacturer-model-combinations` endpoint must be rewritten to use ES comp
 
 | Bug | Severity | Status | Summary |
 |-----|----------|--------|---------|
-| #11 | CRITICAL | ROOT CAUSE FOUND | Backend pagination is in-memory, needs composite agg |
-| #10 | Medium | Not started | Pop-out statistics panel breaks with pre-selected filters |
-| #7 | Low | Not started | Checkboxes remain visually checked after clearing |
+| #11 | CRITICAL | BLOCKED (deploy first) | Backend needs composite aggregation |
+| #10 | Medium | Not started | Pop-out statistics breaks with filters |
+| #7 | Low | Not started | Checkboxes stay checked after clearing |
 
 ---
 
-## Documentation Created This Session
-
-1. [docs/plan/07-DATA-MAPPER-SERVICE.md](../plan/07-DATA-MAPPER-SERVICE.md)
-   - Frontend flexibility requirements
-   - DataMapperService design (future work)
-
-2. [docs/investigation/BACKEND-PAGINATION-ANALYSIS.md](../investigation/BACKEND-PAGINATION-ANALYSIS.md)
-   - Complete backend analysis
-   - ES composite aggregation solution
-   - Tested queries
-   - Implementation plan
-
----
-
-## Next Session: Fix Backend
+## Next Session: Deploy Backend
 
 See [NEXT-STEPS.md](NEXT-STEPS.md) for detailed actions.
 
-**Summary**: Rewrite `getManufacturerModelCombinations()` to use ES composite aggregation with cursor-based pagination.
+**Summary**: Build and deploy `generic-prime-backend-api:v1.1.0`, validate it works, then proceed with Bug #11 fix.
 
 ---
 

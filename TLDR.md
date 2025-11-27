@@ -5,6 +5,21 @@
 
 ---
 
+## ⚠️ Two Application Versions Running
+
+| Port | Application | Status | Description |
+|------|-------------|--------|-------------|
+| **4201** | autos-prime-ng | **Mature** | Reference implementation. Nearly all features working without bugs. Legacy picker/table (not config-driven). |
+| **4205** | generic-prime | **Partial** | New implementation. Configuration-driven picker/table system. Partially implemented, has known bugs (#11, #10, #7). |
+
+**URLs**:
+- **Reference (mature)**: `http://192.168.0.244:4201/discover`
+- **New (in development)**: `http://192.168.0.244:4205/discover`
+
+**Key Difference**: Port 4201 is the working reference to compare against. Port 4205 is the new config-driven architecture being developed.
+
+---
+
 ## Quality Assessment (2025-11-26)
 
 **Overall Grade: B+ (84/100)** - Production-ready, professional quality

@@ -9,22 +9,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Key Principles**:
 1. **PrimeNG-First**: Use PrimeNG Table directly, no custom table wrappers
 2. **Configuration-Driven**: Domain specifics in config files, not code
-3. **Plan-Driven**: Follow revised architecture in `plan/` directory
+3. **Plan-Driven**: Follow revised architecture in `docs/plan/` directory
 4. **URL-First State**: URL is single source of truth
 
 ---
 
-## 🎯 START HERE: Read the Plan First!
+## 🎯 START HERE: Session Bootstrap
 
-**⚠️ CRITICAL**: Before coding, read the comprehensive plan in the `plan/` directory:
+**For fresh Claude sessions**, read the `docs/claude/` directory:
 
-1. **[plan/00-OVERVIEW.md](plan/00-OVERVIEW.md)** - Start here! Lessons learned from over-engineering
-2. **[plan/01-OVER-ENGINEERED-FEATURES.md](plan/01-OVER-ENGINEERED-FEATURES.md)** - What NOT to build
-3. **[plan/02-PRIMENG-NATIVE-FEATURES.md](plan/02-PRIMENG-NATIVE-FEATURES.md)** - What PrimeNG provides
-4. **[plan/03-REVISED-ARCHITECTURE.md](plan/03-REVISED-ARCHITECTURE.md)** - Clean architecture
-5. **[plan/04-REVISED-FRAMEWORK-MILESTONES.md](plan/04-REVISED-FRAMEWORK-MILESTONES.md)** - Build order
-6. **[plan/05-IMPLEMENTATION-GUIDE.md](plan/05-IMPLEMENTATION-GUIDE.md)** - Code patterns
-7. **[plan/06-MIGRATION-SUMMARY.md](plan/06-MIGRATION-SUMMARY.md)** - Quick reference
+1. **[docs/claude/ORIENTATION.md](docs/claude/ORIENTATION.md)** - Project overview, infrastructure, architecture
+2. **[docs/claude/NEXT-STEPS.md](docs/claude/NEXT-STEPS.md)** - Current priorities and actionable items
+3. **[docs/claude/DOCUMENT-MAP.md](docs/claude/DOCUMENT-MAP.md)** - Index of all documentation
+
+**For architecture deep-dive**, read the `docs/plan/` directory:
+
+1. **[docs/plan/00-OVERVIEW.md](docs/plan/00-OVERVIEW.md)** - Lessons learned from over-engineering
+2. **[docs/plan/02-PRIMENG-NATIVE-FEATURES.md](docs/plan/02-PRIMENG-NATIVE-FEATURES.md)** - What PrimeNG provides
+3. **[docs/plan/05-IMPLEMENTATION-GUIDE.md](docs/plan/05-IMPLEMENTATION-GUIDE.md)** - Code patterns
 
 **Key Insight**: The first attempt built 1,150 lines of unnecessary table code. This plan shows how to use PrimeNG properly and reduce that to ~170 lines (85% reduction).
 
@@ -121,13 +123,13 @@ podman run -d -p 8080:80 --name generic-prime-prod \
 
 ## Architecture
 
-### PrimeNG-First Development (NEW - See plan/ directory)
+### PrimeNG-First Development (See docs/plan/ directory)
 
-**⚠️ CRITICAL**: This project follows a **PrimeNG-first architecture**. Read `plan/00-OVERVIEW.md` first!
+**⚠️ CRITICAL**: This project follows a **PrimeNG-first architecture**. Read `docs/plan/00-OVERVIEW.md` first!
 
 **Rule #1**: Use PrimeNG Table directly - NO custom table components
 **Rule #2**: Configuration over code - domain specifics in config files
-**Rule #3**: Follow the plan in `plan/` directory - avoid over-engineering
+**Rule #3**: Follow the plan in `docs/plan/` directory - avoid over-engineering
 
 ### Core Structure (PrimeNG-First Architecture)
 
@@ -169,7 +171,7 @@ src/app/
 
 **1. URL-First State Management**
 
-Specification: [04 - State Management](./specs/04-state-management-specification.md)
+Specification: [04 - State Management](./docs/specs/04-state-management-specification.md)
 
 ```typescript
 // URL is single source of truth
@@ -213,7 +215,7 @@ public getCurrentState(): ResourceState<TFilters, TData>
 
 **3. Configuration-Driven Pickers**
 
-Specification: [06 - Filter & Picker](./specs/06-filter-picker-components.md)
+Specification: [06 - Filter & Picker](./docs/specs/06-filter-picker-components.md)
 
 ```typescript
 // Define picker once, reuse everywhere
@@ -247,7 +249,7 @@ const MANUFACTURER_MODEL_PICKER: PickerConfig<ManufacturerModelRow> = {
 
 **4. Pop-Out Window System**
 
-Specification: [07 - Pop-Out Window System](./specs/07-popout-window-system.md)
+Specification: [07 - Pop-Out Window System](./docs/specs/07-popout-window-system.md)
 
 ```typescript
 // MOVE semantics (panel disappears from main window)
@@ -275,7 +277,7 @@ popOutPanel(panelId: string): void {
 
 **⚠️ CRITICAL**: Use PrimeNG Table DIRECTLY. Do NOT build BaseDataTableComponent!
 
-See: [plan/02-PRIMENG-NATIVE-FEATURES.md](./plan/02-PRIMENG-NATIVE-FEATURES.md)
+See: [docs/plan/02-PRIMENG-NATIVE-FEATURES.md](./docs/plan/02-PRIMENG-NATIVE-FEATURES.md)
 
 ```html
 <!-- Use PrimeNG Table directly -->
@@ -327,7 +329,7 @@ Features (ALL built into PrimeNG):
 
 **6. Chart Composition Pattern**
 
-Specification: [05 - Data Visualization](./specs/05-data-visualization-components.md)
+Specification: [05 - Data Visualization](./docs/specs/05-data-visualization-components.md)
 
 ```typescript
 // BaseChartComponent + ChartDataSource pattern
@@ -375,7 +377,7 @@ export const environment = {
 
 ### Specs API Endpoints (`/api/specs/v1/*`)
 
-Specification: [02 - API Contracts](./specs/02-api-contracts-data-models.md) | [Infrastructure Analysis](./docs/INFRASTRUCTURE-ANALYSIS.md)
+Specification: [02 - API Contracts](./docs/specs/02-api-contracts-data-models.md)
 
 **Data Source**: Queries `autos-unified` Elasticsearch index (4,887 vehicle specifications)
 
@@ -553,7 +555,7 @@ GET /api/vins/v1/vehicles/:vehicleId/instances?page=1&pageSize=20
 ### Auth Service Endpoints (`/api/auth/v1/*`)
 
 **Purpose**: User authentication and authorization (JWT-based)
-**Specification**: [Authentication Service](./specs/auth/authentication-service.md)
+**Specification**: [Authentication Service](./docs/specs/auth/authentication-service.md)
 
 #### 1. Login
 ```typescript
@@ -676,7 +678,7 @@ Authorization: Bearer <token>
 
 ## Testing
 
-Specification: [09 - Testing Strategy](./specs/09-testing-strategy.md)
+Specification: [09 - Testing Strategy](./docs/specs/09-testing-strategy.md)
 
 ### Unit Tests (Karma + Jasmine)
 
@@ -776,7 +778,7 @@ ngOnDestroy(): void {
 
 ### Request Coordination
 
-Specification: [04 - State Management](./specs/04-state-management-specification.md), section 6
+Specification: [04 - State Management](./docs/specs/04-state-management-specification.md), section 6
 
 - 3-layer processing: Cache → Deduplication → HTTP with retry
 - 30-second cache TTL (configurable, default: 30000ms)
@@ -809,7 +811,7 @@ if (typeof BroadcastChannel !== 'undefined') {
 
 ## Deployment
 
-Specification: [08 - Non-Functional Requirements](./specs/08-non-functional-requirements.md)
+Specification: [08 - Non-Functional Requirements](./docs/specs/08-non-functional-requirements.md)
 
 ### Production Build
 
@@ -863,7 +865,7 @@ server {
 
 ## Quality Standards
 
-Specification: [08 - Non-Functional Requirements](./specs/08-non-functional-requirements.md)
+Specification: [08 - Non-Functional Requirements](./docs/specs/08-non-functional-requirements.md)
 
 ### Code Quality
 - TypeScript strict mode: ✅ Required
@@ -901,7 +903,7 @@ Specification: [08 - Non-Functional Requirements](./specs/08-non-functional-requ
 - File compilation and hot module reloading
 
 ### 1. Read Specification
-Always start by reading relevant spec in `specs/` directory.
+Always start by reading relevant spec in `docs/specs/` directory.
 
 ### 2. Start Development Container
 
@@ -972,7 +974,7 @@ Implements URL parameter management:
 - getQueryParam() for reading params
 - watchQueryParams() for observing changes
 
-Ref: specs/04-state-management-specification.md section 2"
+Ref: docs/specs/04-state-management-specification.md section 2"
 ```
 
 ---
@@ -980,11 +982,11 @@ Ref: specs/04-state-management-specification.md section 2"
 ## Quick Reference
 
 ### Specifications
-- **Index**: [specs/README.md](./specs/README.md)
-- **Architecture**: [specs/01-architectural-analysis.md](./specs/01-architectural-analysis.md)
-- **State**: [specs/04-state-management-specification.md](./specs/04-state-management-specification.md)
-- **Components**: [specs/05-data-visualization-components.md](./specs/05-data-visualization-components.md)
-- **Testing**: [specs/09-testing-strategy.md](./specs/09-testing-strategy.md)
+- **Index**: [docs/specs/README.md](./docs/specs/README.md)
+- **Architecture**: [docs/specs/01-architectural-analysis.md](./docs/specs/01-architectural-analysis.md)
+- **State**: [docs/specs/04-state-management-specification.md](./docs/specs/04-state-management-specification.md)
+- **Components**: [docs/specs/05-data-visualization-components.md](./docs/specs/05-data-visualization-components.md)
+- **Testing**: [docs/specs/09-testing-strategy.md](./docs/specs/09-testing-strategy.md)
 
 ### Key Services
 - `UrlStateService` - URL parameter management (434 lines)
@@ -1005,7 +1007,7 @@ Ref: specs/04-state-management-specification.md section 2"
 - ❌ `ColumnManagerComponent` - Use `<p-multiSelect>` instead
 - ❌ `TableStatePersistenceService` - Use `stateStorage="local"`
 
-**See plan/ directory for details**
+**See docs/plan/ directory for details**
 
 ---
 

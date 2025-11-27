@@ -14,21 +14,106 @@
 
 ---
 
-## Current Priority: Fix Backend API
+## Current Priority: Deploy and Validate Backend
 
-**Status**: READY TO IMPLEMENT
+**Status**: READY TO DEPLOY
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Fix backend API before any frontend work.**
+> **Deploy and validate backend API, THEN fix Bug #11.**
 >
-> The `/manufacturer-model-combinations` endpoint must be rewritten to use ES composite aggregation for true server-side pagination.
+> 1. Build new container image with renamed service
+> 2. Deploy to Kubernetes
+> 3. Validate endpoints respond correctly
+> 4. THEN proceed with Bug #11 composite aggregation fix
 >
-> **DO NOT modify frontend code until backend is fixed.**
+> **DO NOT modify frontend code until backend is deployed and validated.**
 
-### Background (Investigation Complete)
+---
 
-The backend investigation is **COMPLETE**. Root cause identified:
+## Phase 1: Deploy Backend (DO THIS FIRST)
+
+### 1.1 Build Container Image
+
+```bash
+cd ~/projects/data-broker/generic-prime
+
+# Build new image with renamed service
+podman build -f infra/Dockerfile -t localhost/generic-prime-backend-api:v1.1.0 .
+```
+
+### 1.2 Delete Old Deployment
+
+```bash
+# Delete old deployment (uses old name)
+kubectl delete deployment generic-prime-backend -n generic-prime
+kubectl delete service generic-prime-backend -n generic-prime
+```
+
+### 1.3 Deploy New Service
+
+```bash
+cd ~/projects/data-broker/generic-prime
+
+# Apply new K8s manifests
+kubectl apply -f infra/k8s/deployment.yaml
+kubectl apply -f infra/k8s/service.yaml
+
+# Update ingress (already updated, but apply to be safe)
+kubectl apply -f ~/projects/generic-prime/k8s/ingress.yaml
+```
+
+### 1.4 Verify Deployment
+
+```bash
+# Check pods are running
+kubectl get pods -n generic-prime -l app=generic-prime-backend-api
+
+# Check service exists
+kubectl get svc -n generic-prime
+
+# Check logs
+kubectl logs -n generic-prime -l app=generic-prime-backend-api --tail=50
+```
+
+---
+
+## Phase 2: Validate Endpoints
+
+### 2.1 Test via Ingress
+
+```bash
+# Health check
+curl -s "http://generic-prime.minilab/api/specs/v1/../health" | jq
+
+# Test manufacturer-model combinations
+curl -s "http://generic-prime.minilab/api/specs/v1/manufacturer-model-combinations?size=10" | jq
+
+# Test vehicle details
+curl -s "http://generic-prime.minilab/api/specs/v1/vehicles/details?size=5" | jq
+
+# Test filters
+curl -s "http://generic-prime.minilab/api/specs/v1/filters/manufacturers" | jq
+```
+
+### 2.2 Validation Checklist
+
+- [ ] Pods are Running (2 replicas)
+- [ ] Health endpoint returns `status: ok`
+- [ ] Ready endpoint returns `status: ready`
+- [ ] `/manufacturer-model-combinations` returns data (will still show 72, that's expected)
+- [ ] `/vehicles/details` returns paginated results
+- [ ] `/filters/manufacturers` returns manufacturer list
+
+**Once all checks pass, proceed to Phase 3.**
+
+---
+
+## Phase 3: Fix Bug #11 (After Validation)
+
+### Background
+
+Bug #11 root cause: `/manufacturer-model-combinations` uses in-memory pagination.
 
 | Issue | Current | Required |
 |-------|---------|----------|
@@ -38,11 +123,9 @@ The backend investigation is **COMPLETE**. Root cause identified:
 
 Full analysis: [../investigation/BACKEND-PAGINATION-ANALYSIS.md](../investigation/BACKEND-PAGINATION-ANALYSIS.md)
 
-### Immediate Actions
+### Implementation Steps
 
-**Rewrite `/manufacturer-model-combinations` endpoint:**
-
-1. **Replace ES query** in `backend-specs/src/services/elasticsearchService.js`
+1. **Replace ES query** in `~/projects/data-broker/generic-prime/src/services/elasticsearchService.js`
    - Remove nested `terms` aggregation
    - Implement `composite` aggregation with cursor
    ```javascript
@@ -78,65 +161,22 @@ Full analysis: [../investigation/BACKEND-PAGINATION-ANALYSIS.md](../investigatio
    - Return flat list of manufacturer-model combinations
    - Include `afterKey` cursor for next page
 
-4. **Update controller** in `backend-specs/src/controllers/specsController.js`
+4. **Update controller** in `~/projects/data-broker/generic-prime/src/controllers/specsController.js`
    - Accept `after` parameter instead of (or in addition to) `page`
    - Return cursor in response
 
-5. **Test the changes**
+5. **Build and deploy updated image**
    ```bash
-   # Build and deploy
-   cd backend-specs
-   podman build -t localhost/generic-prime-backend:v1.1.0 .
-   kubectl set image deployment/generic-prime-backend \
-     backend-api=localhost/generic-prime-backend:v1.1.0 -n generic-prime
-
-   # Test endpoint
-   curl "http://localhost:3000/api/specs/v1/manufacturer-model-combinations?size=20" | jq
+   cd ~/projects/data-broker/generic-prime
+   podman build -f infra/Dockerfile -t localhost/generic-prime-backend-api:v1.2.0 .
+   kubectl set image deployment/generic-prime-backend-api \
+     backend-api=localhost/generic-prime-backend-api:v1.2.0 -n generic-prime
    ```
 
-6. **Verify with frontend**
-   - Update `responseTransformer` if needed
-   - Test picker displays 881 combinations
-
----
-
-## Architectural Requirements (Reference)
-
-Two non-negotiable requirements documented:
-
-1. **Frontend must accept ANY data structure** (flat or nested)
-   - See: [../plan/07-DATA-MAPPER-SERVICE.md](../plan/07-DATA-MAPPER-SERVICE.md)
-
-2. **Server-side pagination is mandatory**
-   - No hardcoded size limits
-   - Expect millions of rows
-
----
-
-## Known Bugs (for reference)
-
-| Bug | Severity | Status | Summary |
-|-----|----------|--------|---------|
-| #11 | CRITICAL | ROOT CAUSE FOUND | Backend needs composite aggregation |
-| #10 | Medium | Not started | Pop-out statistics breaks with filters |
-| #7 | Low | Not started | Checkboxes stay checked after clearing |
-
-Full details: [../status/KNOWN-BUGS.md](../status/KNOWN-BUGS.md)
-
----
-
-## Session End Checklist
-
-Before ending session:
-
-1. [ ] Archive current PROJECT-STATUS.md to STATUS-HISTORY.md
-2. [ ] Update PROJECT-STATUS.md with:
-   - New version number (increment)
-   - New timestamp
-   - Findings and decisions
-3. [ ] Update this NEXT-STEPS.md with next actions
-4. [ ] Commit changes: `git add -A && git commit -m "docs: session summary"`
-5. [ ] Push if appropriate
+6. **Verify fix**
+   - Test endpoint returns 881 combinations (paginated)
+   - Test cursor-based pagination works
+   - Verify frontend displays all combinations
 
 ---
 
@@ -147,9 +187,8 @@ Before ending session:
 kubectl port-forward -n data svc/elasticsearch 9200:9200 &
 curl -s "http://localhost:9200/_cluster/health" | jq '.status'
 
-# Backend (port-forward to test directly)
-kubectl port-forward -n generic-prime svc/generic-prime-backend 3000:3000 &
-curl -s "http://localhost:3000/api/specs/v1/manufacturer-model-combinations?size=20" | jq
+# Backend (via ingress)
+curl -s "http://generic-prime.minilab/api/specs/v1/manufacturer-model-combinations?size=20" | jq
 
 # Test composite aggregation directly
 curl -X POST "localhost:9200/autos-unified/_search" -H 'Content-Type: application/json' -d'
@@ -168,8 +207,9 @@ curl -X POST "localhost:9200/autos-unified/_search" -H 'Content-Type: applicatio
   }
 }'
 
-# Frontend dev server (if needed)
-podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205
+# K8s
+kubectl get pods -n generic-prime
+kubectl logs -n generic-prime -l app=generic-prime-backend-api --tail=50
 
 # Git
 git status
@@ -178,5 +218,20 @@ git add -A && git commit -m "docs: description"
 
 ---
 
+## Session End Checklist
+
+Before ending session:
+
+1. [ ] Archive current PROJECT-STATUS.md to STATUS-HISTORY.md
+2. [ ] Update PROJECT-STATUS.md with:
+   - New version number (increment)
+   - New timestamp
+   - Findings and decisions
+3. [ ] Update this NEXT-STEPS.md with next actions
+4. [ ] Commit changes: `git add -A && git commit -m "docs: session summary"`
+5. [ ] Push if appropriate
+
+---
+
 **Last Updated**: 2025-11-27
-**Updated By**: Backend investigation session - ready for implementation
+**Updated By**: Backend migration session - ready for deployment
