@@ -14,183 +14,170 @@
 
 ---
 
-## Current Priority: Deploy and Validate Backend
+## Current Priority: Fix Bug #11
 
-**Status**: READY TO DEPLOY
+**Status**: READY TO IMPLEMENT
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Deploy and validate backend API, THEN fix Bug #11.**
+> **Backend deployed. Now fix Bug #11.**
 >
-> 1. Build new container image with renamed service
-> 2. Deploy to Kubernetes
-> 3. Validate endpoints respond correctly
-> 4. THEN proceed with Bug #11 composite aggregation fix
+> The `/manufacturer-model-combinations` endpoint must be rewritten to use ES composite aggregation for true server-side pagination.
 >
-> **DO NOT modify frontend code until backend is deployed and validated.**
+> **Bug #11 is now UNBLOCKED and is the immediate priority.**
 
 ---
 
-## Phase 1: Deploy Backend (DO THIS FIRST)
-
-### 1.1 Build Container Image
-
-```bash
-cd ~/projects/data-broker/generic-prime
-
-# Build new image with renamed service
-podman build -f infra/Dockerfile -t localhost/generic-prime-backend-api:v1.1.0 .
-```
-
-### 1.2 Delete Old Deployment
-
-```bash
-# Delete old deployment (uses old name)
-kubectl delete deployment generic-prime-backend -n generic-prime
-kubectl delete service generic-prime-backend -n generic-prime
-```
-
-### 1.3 Deploy New Service
-
-```bash
-cd ~/projects/data-broker/generic-prime
-
-# Apply new K8s manifests
-kubectl apply -f infra/k8s/deployment.yaml
-kubectl apply -f infra/k8s/service.yaml
-
-# Update ingress (already updated, but apply to be safe)
-kubectl apply -f ~/projects/generic-prime/k8s/ingress.yaml
-```
-
-### 1.4 Verify Deployment
-
-```bash
-# Check pods are running
-kubectl get pods -n generic-prime -l app=generic-prime-backend-api
-
-# Check service exists
-kubectl get svc -n generic-prime
-
-# Check logs
-kubectl logs -n generic-prime -l app=generic-prime-backend-api --tail=50
-```
-
----
-
-## Phase 2: Validate Endpoints
-
-### 2.1 Test via Ingress
-
-```bash
-# Health check
-curl -s "http://generic-prime.minilab/api/specs/v1/../health" | jq
-
-# Test manufacturer-model combinations
-curl -s "http://generic-prime.minilab/api/specs/v1/manufacturer-model-combinations?size=10" | jq
-
-# Test vehicle details
-curl -s "http://generic-prime.minilab/api/specs/v1/vehicles/details?size=5" | jq
-
-# Test filters
-curl -s "http://generic-prime.minilab/api/specs/v1/filters/manufacturers" | jq
-```
-
-### 2.2 Validation Checklist
-
-- [ ] Pods are Running (2 replicas)
-- [ ] Health endpoint returns `status: ok`
-- [ ] Ready endpoint returns `status: ready`
-- [ ] `/manufacturer-model-combinations` returns data (will still show 72, that's expected)
-- [ ] `/vehicles/details` returns paginated results
-- [ ] `/filters/manufacturers` returns manufacturer list
-
-**Once all checks pass, proceed to Phase 3.**
-
----
-
-## Phase 3: Fix Bug #11 (After Validation)
-
-### Background
-
-Bug #11 root cause: `/manufacturer-model-combinations` uses in-memory pagination.
+## Bug #11: The Problem
 
 | Issue | Current | Required |
 |-------|---------|----------|
 | ES Query | Nested `terms` with `size: 100` | Composite aggregation with cursor |
 | Pagination | JavaScript `.slice()` | ES `after` cursor |
 | Response | 72 manufacturers (nested) | 881 combinations (flat) |
+| Data Loss | Chevrolet missing 12, Ford missing 11 | All combinations returned |
+
+**Root Cause**: In-memory pagination disguised as server-side pagination.
 
 Full analysis: [../investigation/BACKEND-PAGINATION-ANALYSIS.md](../investigation/BACKEND-PAGINATION-ANALYSIS.md)
 
-### Implementation Steps
+---
 
-1. **Replace ES query** in `~/projects/data-broker/generic-prime/src/services/elasticsearchService.js`
-   - Remove nested `terms` aggregation
-   - Implement `composite` aggregation with cursor
-   ```javascript
-   aggs: {
-     manufacturer_model_combos: {
-       composite: {
-         size: pageSize,
-         after: afterCursor,  // null for first page
-         sources: [
-           { manufacturer: { terms: { field: 'manufacturer.keyword' } } },
-           { model: { terms: { field: 'model.keyword' } } }
-         ]
-       }
-     }
-   }
-   ```
+## Implementation Steps
 
-2. **Add total count query** (cardinality aggregation)
-   ```javascript
-   aggs: {
-     total_combos: {
-       cardinality: {
-         script: {
-           source: "doc['manufacturer.keyword'].value + '|' + doc['model.keyword'].value"
-         }
-       }
-     }
-   }
-   ```
+### Step 1: Read Current Implementation
 
-3. **Update API contract**
-   - Change pagination from page-based to cursor-based
-   - Return flat list of manufacturer-model combinations
-   - Include `afterKey` cursor for next page
+```bash
+# Backend source location
+cat ~/projects/data-broker/generic-prime/src/services/elasticsearchService.js
+```
 
-4. **Update controller** in `~/projects/data-broker/generic-prime/src/controllers/specsController.js`
-   - Accept `after` parameter instead of (or in addition to) `page`
-   - Return cursor in response
+Key function: `getManufacturerModelCombinations()` (around line 50-150)
 
-5. **Build and deploy updated image**
-   ```bash
-   cd ~/projects/data-broker/generic-prime
-   podman build -f infra/Dockerfile -t localhost/generic-prime-backend-api:v1.2.0 .
-   kubectl set image deployment/generic-prime-backend-api \
-     backend-api=localhost/generic-prime-backend-api:v1.2.0 -n generic-prime
-   ```
+### Step 2: Replace ES Query with Composite Aggregation
 
-6. **Verify fix**
-   - Test endpoint returns 881 combinations (paginated)
-   - Test cursor-based pagination works
-   - Verify frontend displays all combinations
+**Current (broken)**:
+```javascript
+aggs: {
+  manufacturers: {
+    terms: { field: 'manufacturer.keyword', size: 100 },
+    aggs: {
+      models: { terms: { field: 'model.keyword', size: 100 } }
+    }
+  }
+}
+```
+
+**New (correct)**:
+```javascript
+aggs: {
+  manufacturer_model_combos: {
+    composite: {
+      size: pageSize,
+      after: afterCursor,  // null for first page
+      sources: [
+        { manufacturer: { terms: { field: 'manufacturer.keyword' } } },
+        { model: { terms: { field: 'model.keyword' } } }
+      ]
+    }
+  }
+}
+```
+
+### Step 3: Add Total Count Query
+
+```javascript
+// Separate query for total count (cardinality)
+aggs: {
+  total_combos: {
+    cardinality: {
+      script: {
+        source: "doc['manufacturer.keyword'].value + '|' + doc['model.keyword'].value"
+      }
+    }
+  }
+}
+```
+
+### Step 4: Update Response Format
+
+**Current (nested)**:
+```json
+{
+  "data": [
+    {
+      "manufacturer": "Ford",
+      "count": 665,
+      "models": [{ "model": "F-150", "count": 23 }]
+    }
+  ]
+}
+```
+
+**New (flat)**:
+```json
+{
+  "data": [
+    { "manufacturer": "Ford", "model": "F-150", "count": 23 }
+  ],
+  "afterKey": { "manufacturer": "Ford", "model": "F-150" },
+  "total": 881
+}
+```
+
+### Step 5: Update Controller
+
+File: `~/projects/data-broker/generic-prime/src/controllers/specsController.js`
+
+- Accept `after` parameter (JSON cursor) instead of `page`
+- Return `afterKey` cursor in response
+- Keep backward compatibility if possible
+
+### Step 6: Build and Deploy
+
+```bash
+cd ~/projects/data-broker/generic-prime
+
+# Build new image
+podman build -f infra/Dockerfile -t localhost/generic-prime-backend-api:v1.2.0 .
+
+# Export for containerd
+podman save -o /tmp/generic-prime-backend-api-v1.2.0.tar localhost/generic-prime-backend-api:v1.2.0
+
+# Import to containerd (requires sudo)
+sudo ctr -n k8s.io images import /tmp/generic-prime-backend-api-v1.2.0.tar
+
+# Update deployment
+# First update infra/k8s/deployment.yaml to use v1.2.0
+kubectl apply -f infra/k8s/deployment.yaml
+```
+
+### Step 7: Verify Fix
+
+```bash
+# Test endpoint returns 881 combinations
+curl -s -H "Host: generic-prime.minilab" \
+  "http://192.168.0.110/api/specs/v1/manufacturer-model-combinations?size=20" | jq '.total'
+
+# Expected: 881
+
+# Test cursor-based pagination
+curl -s -H "Host: generic-prime.minilab" \
+  "http://192.168.0.110/api/specs/v1/manufacturer-model-combinations?size=20" | jq '.afterKey'
+
+# Should return cursor for next page
+```
 
 ---
 
 ## Quick Commands
 
 ```bash
-# Elasticsearch
+# Backend source
+cat ~/projects/data-broker/generic-prime/src/services/elasticsearchService.js
+
+# Test composite aggregation directly on ES (via port-forward)
 kubectl port-forward -n data svc/elasticsearch 9200:9200 &
-curl -s "http://localhost:9200/_cluster/health" | jq '.status'
-
-# Backend (via ingress)
-curl -s "http://generic-prime.minilab/api/specs/v1/manufacturer-model-combinations?size=20" | jq
-
-# Test composite aggregation directly
 curl -X POST "localhost:9200/autos-unified/_search" -H 'Content-Type: application/json' -d'
 {
   "size": 0,
@@ -211,9 +198,8 @@ curl -X POST "localhost:9200/autos-unified/_search" -H 'Content-Type: applicatio
 kubectl get pods -n generic-prime
 kubectl logs -n generic-prime -l app=generic-prime-backend-api --tail=50
 
-# Git
-git status
-git add -A && git commit -m "docs: description"
+# Test via ingress
+curl -s -H "Host: generic-prime.minilab" "http://192.168.0.110/api/specs/v1/manufacturer-model-combinations?size=5" | jq
 ```
 
 ---
@@ -234,4 +220,4 @@ Before ending session:
 ---
 
 **Last Updated**: 2025-11-27
-**Updated By**: Backend migration session - ready for deployment
+**Updated By**: Backend deployment session - Bug #11 now unblocked

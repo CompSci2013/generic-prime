@@ -1,83 +1,65 @@
 # Project Status
 
-**Version**: 1.2
-**Timestamp**: 2025-11-27T15:45:00Z
-**Updated By**: Backend migration session
+**Version**: 1.3
+**Timestamp**: 2025-11-27T13:25:00Z
+**Updated By**: Backend deployment session
 
 ---
 
 ## Current State
 
 ### Port 4205 (generic-prime) - IN DEVELOPMENT
-- Backend **MIGRATED** to `~/projects/data-broker/generic-prime/`
-- Backend needs deployment and validation before Bug #11 fix
-- Configuration-driven architecture (good design, incomplete execution)
+- Backend **DEPLOYED** to Kubernetes (`generic-prime-backend-api:v1.1.0`)
+- All endpoints validated and working
+- Ready for Bug #11 fix (composite aggregation)
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
-- Largely bug-free and functional
-- Serves as the working reference for expected behavior
+- Verified unaffected by new deployment
+- Continues to serve as working reference
 
 ---
 
-## Migration Completed (2025-11-27)
+## Deployment Completed (2025-11-27)
 
-### Backend Moved to data-broker
+### What Was Deployed
 
-The backend API has been moved from `~/projects/generic-prime/backend-specs/` to `~/projects/data-broker/generic-prime/`.
+| Resource | Name | Version |
+|----------|------|---------|
+| Deployment | `generic-prime-backend-api` | v1.1.0 |
+| Service | `generic-prime-backend-api` | ClusterIP:3000 |
+| Ingress | `generic-prime-ingress` | Routes `/api` to backend |
+| Pods | 2 replicas | Running on Thor |
 
-**New Location**: `~/projects/data-broker/generic-prime/`
+### Validation Results
 
-```
-data-broker/generic-prime/
-├── docs/
-│   └── README.md
-├── infra/
-│   ├── Dockerfile
-│   └── k8s/
-│       ├── deployment.yaml
-│       └── service.yaml
-├── package.json
-└── src/
-    ├── index.js
-    ├── config/elasticsearch.js
-    ├── controllers/specsController.js
-    ├── routes/specsRoutes.js
-    ├── services/elasticsearchService.js   ← Bug #11 fix goes here
-    └── utils/
-```
+| Endpoint | Status | Result |
+|----------|--------|--------|
+| `/api/specs/v1/manufacturer-model-combinations` | OK | Returns 72 manufacturers |
+| `/api/specs/v1/vehicles/details` | OK | Returns 4,887 vehicles |
+| `/api/specs/v1/filters/manufacturers` | OK | Returns 72 manufacturers |
+| Old service (`auto-discovery.minilab`) | OK | Unaffected |
 
-### Naming Changes
+### No Conflicts with Port 4201
 
-| Item | Old | New |
-|------|-----|-----|
-| K8s Deployment | `generic-prime-backend` | `generic-prime-backend-api` |
-| K8s Service | `generic-prime-backend` | `generic-prime-backend-api` |
-| Docker Image | `generic-prime-backend` | `generic-prime-backend-api` |
-| package.json name | `auto-discovery-specs-api` | `generic-prime-backend-api` |
-
-### Files Remaining in generic-prime/k8s/
-
-- `namespace.yaml` - shared namespace
-- `ingress.yaml` - updated to reference `generic-prime-backend-api`
-- `frontend-deployment.yaml`
-- `frontend-service.yaml`
+| Aspect | Port 4201 (old) | Port 4205 (new) |
+|--------|-----------------|-----------------|
+| Namespace | `auto-discovery` | `generic-prime` |
+| Ingress Host | `auto-discovery.minilab` | `generic-prime.minilab` |
+| Service | `auto-discovery-specs-api` | `generic-prime-backend-api` |
 
 ---
 
 ## Governing Tactic (Updated)
 
-**Deploy and validate backend API, THEN fix Bug #11.**
+**Backend deployed. Now fix Bug #11.**
 
-1. Build new container image with renamed service
-2. Deploy to Kubernetes
-3. Validate endpoints respond correctly
-4. THEN proceed with Bug #11 composite aggregation fix
+The `/manufacturer-model-combinations` endpoint must be rewritten to use ES composite aggregation for true server-side pagination.
 
-**DO NOT modify frontend code until backend is deployed and validated.**
+**Bug #11 is now UNBLOCKED and is the immediate priority.**
 
 ---
 
-## Known Facts (Updated)
+## Known Facts
 
 | Resource | Value | Notes |
 |----------|-------|-------|
@@ -86,8 +68,9 @@ data-broker/generic-prime/
 | Index: VIN Records | `autos-vins` | 55,463 documents |
 | Unique Manufacturers | 72 | Verified via ES |
 | Unique Mfr-Model Combos | 881 | Verified via ES |
-| **Backend Source** | `~/projects/data-broker/generic-prime/src/` | **MOVED** |
-| **Backend Image** | `localhost/generic-prime-backend-api:v1.1.0` | **RENAMED** |
+| **Backend Source** | `~/projects/data-broker/generic-prime/src/` | JavaScript/Express |
+| **Backend Image** | `localhost/generic-prime-backend-api:v1.1.0` | Deployed |
+| **Bug #11 Fix Location** | `elasticsearchService.js` | Line ~50-150 |
 
 ---
 
@@ -95,17 +78,17 @@ data-broker/generic-prime/
 
 | Bug | Severity | Status | Summary |
 |-----|----------|--------|---------|
-| #11 | CRITICAL | BLOCKED (deploy first) | Backend needs composite aggregation |
+| #11 | CRITICAL | **READY TO FIX** | Backend returns 72 mfrs, needs 881 combos |
 | #10 | Medium | Not started | Pop-out statistics breaks with filters |
 | #7 | Low | Not started | Checkboxes stay checked after clearing |
 
 ---
 
-## Next Session: Deploy Backend
+## Next Session: Fix Bug #11
 
-See [NEXT-STEPS.md](NEXT-STEPS.md) for detailed actions.
+See [NEXT-STEPS.md](NEXT-STEPS.md) for implementation details.
 
-**Summary**: Build and deploy `generic-prime-backend-api:v1.1.0`, validate it works, then proceed with Bug #11 fix.
+**Summary**: Implement composite aggregation in `elasticsearchService.js` to return 881 manufacturer-model combinations with cursor-based pagination.
 
 ---
 
