@@ -63,7 +63,8 @@ import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../..
           cacheKeyBuilder: domainConfig.cacheKeyBuilder,
           defaultFilters: {} as any,
           supportsHighlights: domainConfig.features?.highlights ?? false,
-          highlightPrefix: 'h_'
+          highlightPrefix: 'h_',
+          autoFetch: false  // Pop-outs receive state from main window, no API calls needed
         });
       },
       deps: [UrlStateService, DOMAIN_CONFIG]

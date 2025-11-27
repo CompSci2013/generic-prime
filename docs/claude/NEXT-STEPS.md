@@ -14,44 +14,68 @@
 
 ---
 
-## Current Priority: Bug #10 or Bug #7
+## Current Priority: Bug #10 (In Progress)
 
-**Status**: Bug #11 RESOLVED, picker working with server-side pagination
+**Status**: Partial fix applied, state propagation still broken
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Bug #11 fully resolved. Proceed to Bug #10 or #7.**
+> **Bug #10 requires deeper investigation into state propagation.**
 
 ---
 
-## Bug #11: RESOLVED ✓
+## Bug #10: Pop-out Statistics Panel
 
-| Metric | Before | After |
-|--------|--------|-------|
-| API Response | Cursor-based (`afterKey`) | **Offset-based (`page`, `size`)** |
-| Pagination | Frontend was broken | **Server-side, industry standard** |
-| Backend Version | v1.2.0 | **v1.3.0** |
-| Picker | 400 error | **Working, 881 combinations** |
+### What Was Done (2025-11-27)
+
+1. **Identified root cause**: `UrlStateService` is `providedIn: 'root'` singleton using `ActivatedRoute` which doesn't receive child route updates
+
+2. **Applied fixes** (not working):
+   - `url-state.service.ts`: Changed to use `Router.events` + `NavigationEnd`
+   - `url-state.service.ts`: Changed to use `router.url` for initialization
+   - `panel-popout.component.ts`: Added `autoFetch: false`
+
+3. **Observed behavior**:
+   - URL bar updates correctly (Ford → Buick)
+   - `[UrlState] Route queryParams changed` log fires
+   - But Active Filter chips don't update
+   - Pop-out window doesn't receive new state
+
+### Next Steps for Bug #10
+
+1. **Add debug logging** to trace state flow:
+   ```typescript
+   // In UrlStateService.watchRouteChanges()
+   console.log('[UrlState] Emitting params:', params);
+
+   // In ResourceManagementService.watchUrlChanges()
+   console.log('[ResourceMgmt] Received URL params:', urlParams);
+   console.log('[ResourceMgmt] Converted to filters:', filters);
+
+   // In ResourceManagementService filters$ pipe
+   console.log('[ResourceMgmt] filters$ emitting:', filters);
+
+   // In QueryControl subscription
+   console.log('[QueryControl] Received filters:', filters);
+   ```
+
+2. **Check if `watchParams()` distinctUntilChanged is filtering out emissions** - the JSON.stringify comparison might be matching when it shouldn't
+
+3. **Verify BroadcastChannel message flow** - check if `STATE_UPDATE` messages are being sent/received by pop-out
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `url-state.service.ts` | URL → params observable |
+| `resource-management.service.ts` | params → filters → state |
+| `query-control.component.ts` | Subscribes to `filters$` for chips |
+| `discover.component.ts` | Broadcasts state to pop-outs |
+| `panel-popout.component.ts` | Receives state via BroadcastChannel |
 
 ---
 
-## Immediate Actions
-
-### Option A: Fix Bug #10 (Pop-out Statistics)
-
-**Problem**: Pop-out statistics panel breaks with pre-selected filters.
-
-**Severity**: Medium
-
-**Location**: Likely in `PopOutContextService` or chart components.
-
-**Investigation**:
-1. Open app with filters in URL (e.g., `?manufacturer=Ford`)
-2. Pop out statistics panel
-3. Check console for errors
-4. Trace data flow from URL → state → charts
-
-### Option B: Fix Bug #7 (Checkbox Visual State)
+## Bug #7: Checkbox Visual State (Low Priority)
 
 **Problem**: Checkboxes remain visually checked after clearing selection.
 
@@ -59,7 +83,7 @@
 
 **Location**: Likely CSS/PrimeNG styling issue in picker component.
 
-**Investigation**:
+**Investigation** (when Bug #10 is resolved):
 1. Select items in picker
 2. Clear selection (click "Clear" button)
 3. Check if `[(selection)]` binding updates
@@ -102,4 +126,4 @@ Before ending session:
 ---
 
 **Last Updated**: 2025-11-27
-**Updated By**: Pagination fix session - Backend v1.3.0 deployed, picker working
+**Updated By**: Bug #10 investigation session - partial fix, state propagation broken

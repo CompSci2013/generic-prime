@@ -365,7 +365,6 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
   public syncStateFromExternal(
     externalState: ResourceState<TFilters, TData, TStatistics>
   ): void {
-    console.log('[ResourceManagement] Syncing state from external source');
     this.stateSubject.next(externalState);
   }
 

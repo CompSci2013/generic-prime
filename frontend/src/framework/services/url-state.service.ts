@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Router, ActivatedRoute, Params, NavigationEnd } from '@angular/router';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map, distinctUntilChanged, skip } from 'rxjs/operators';
+import { map, distinctUntilChanged, filter } from 'rxjs/operators';
 
 /**
  * Domain-agnostic URL state management service
@@ -267,23 +267,41 @@ export class UrlStateService {
 
   /**
    * Initialize from current route
+   *
+   * IMPORTANT: Uses router.url instead of route.snapshot because UrlStateService
+   * is a root singleton. Root-level ActivatedRoute.snapshot may not have query
+   * params from child routes (like /discover). router.url contains the full URL.
    */
   private initializeFromRoute(): void {
-    const snapshot = this.route.snapshot;
-    this.paramsSubject.next(snapshot.queryParams);
+    const params = this.extractQueryParams();
+    this.paramsSubject.next(params);
   }
 
   /**
    * Watch for route changes and update internal state
+   *
+   * IMPORTANT: Uses Router.events instead of ActivatedRoute.queryParams because
+   * UrlStateService is a root singleton. Root-level ActivatedRoute doesn't receive
+   * query param updates from child routes (like /discover). Router.events is global
+   * and captures all navigation events including query parameter changes.
    */
   private watchRouteChanges(): void {
-    this.route.queryParams
+    this.router.events
       .pipe(
-        skip(1), // Skip first emission since we already initialized from snapshot
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        map(() => this.extractQueryParams()),
         distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
       )
       .subscribe(params => {
         this.paramsSubject.next(params);
       });
+  }
+
+  /**
+   * Extract query parameters from current router state
+   */
+  private extractQueryParams(): Params {
+    const urlTree = this.router.parseUrl(this.router.url);
+    return urlTree.queryParams;
   }
 }
