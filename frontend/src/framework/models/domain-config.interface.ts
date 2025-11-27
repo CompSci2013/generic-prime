@@ -495,8 +495,20 @@ export interface FilterDefinition {
 
   /**
    * Options for select/multiselect controls
+   * Use this for static options that don't change
    */
   options?: FilterOption[];
+
+  /**
+   * API endpoint for loading options dynamically
+   * The endpoint should return: { field: string, values: Array<{value: string, count: number}> }
+   *
+   * @example
+   * optionsEndpoint: 'body_class'
+   * // Fetches from: {apiBaseUrl}/agg/body_class
+   * // Response: { field: "body_class", values: [{value: "Sedan", count: 100}, ...] }
+   */
+  optionsEndpoint?: string;
 
   /**
    * Minimum value (for numeric/date filters)

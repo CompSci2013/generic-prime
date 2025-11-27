@@ -164,25 +164,64 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
   /**
    * Update filters (triggers URL update → data fetch)
    *
-   * @param partial - Partial filter updates
+   * Pass undefined for a filter value to remove it from the filters.
+   *
+   * @param partial - Partial filter updates (undefined values = remove key)
    */
   updateFilters(partial: Partial<TFilters>): void {
     const currentFilters = this.stateSubject.value.filters;
-    const newFilters = { ...currentFilters, ...partial };
+    const merged = { ...currentFilters, ...partial };
+
+    // Remove keys with undefined/null values (these should be cleared from URL)
+    const newFilters: Record<string, any> = {};
+    for (const key of Object.keys(merged)) {
+      const value = (merged as Record<string, any>)[key];
+      if (value !== undefined && value !== null && value !== '') {
+        newFilters[key] = value;
+      }
+    }
+
+    // Get the new URL params
+    const newUrlParams = this.config.filterMapper.toUrlParams(newFilters as TFilters);
+
+    // Get current URL params to find which ones need to be removed
+    const currentUrlParams = this.config.filterMapper.toUrlParams(currentFilters);
+
+    // Build final params: new params + null for removed params
+    const finalParams: Record<string, any> = { ...newUrlParams };
+    for (const key of Object.keys(currentUrlParams)) {
+      if (!(key in newUrlParams)) {
+        // This param was in current but not in new - explicitly set to null to remove
+        finalParams[key] = null;
+      }
+    }
 
     // Update URL (this will trigger watchUrlChanges which fetches data)
-    const urlParams = this.config.filterMapper.toUrlParams(newFilters);
-    this.urlState.setParams(urlParams);
+    this.urlState.setParams(finalParams);
   }
 
   /**
    * Clear all filters (reset to defaults)
    */
   clearFilters(): void {
-    const urlParams = this.config.filterMapper.toUrlParams(
+    // Get current URL params to find which ones need to be removed
+    const currentFilters = this.stateSubject.value.filters;
+    const currentUrlParams = this.config.filterMapper.toUrlParams(currentFilters);
+
+    // Get default URL params
+    const defaultUrlParams = this.config.filterMapper.toUrlParams(
       this.config.defaultFilters
     );
-    this.urlState.setParams(urlParams, true); // Replace history entry
+
+    // Build final params: default params + null for removed params
+    const finalParams: Record<string, any> = { ...defaultUrlParams };
+    for (const key of Object.keys(currentUrlParams)) {
+      if (!(key in defaultUrlParams)) {
+        finalParams[key] = null;
+      }
+    }
+
+    this.urlState.setParams(finalParams, true); // Replace history entry
   }
 
   /**

@@ -14,9 +14,9 @@
 
 ---
 
-## Current Priority: Statistics Isolation Testing
+## Current Priority: Bug #13 - Dropdown Keyboard Navigation
 
-**Status**: QueryControl and Picker testing complete, moving to Statistics
+**Status**: Results Table isolation testing in progress, keyboard navigation bug identified
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
@@ -27,15 +27,34 @@
 
 ## Completed This Session
 
-- Picker isolation testing - ALL TESTS PASSED
-- Column sorting implemented (backend v1.4.0 + frontend)
-- Backend deployment pattern documented in ORIENTATION.md
+- Results Table isolation testing (with Picker for easier testing)
+- Dropdown improvements - dynamic options from backend `/agg/:field`
+- Filter clearing now removes params from URL
+- Dropdown search input added (`[filter]="true"`)
+- All body classes now available (12 total, including Sports Car)
+- Backend v1.5.0 deployed with generic aggregation endpoint
 
 ---
 
 ## Immediate Actions
 
-### 1. Test Statistics in Isolation
+### 1. Fix Bug #13 - Dropdown Keyboard Navigation (PRIORITY)
+
+**Problem**: PrimeNG p-dropdown with `[filter]="true"` keyboard navigation broken:
+- Down arrow should highlight next option
+- Up arrow should highlight previous option
+- Enter/Space should select highlighted option
+- Currently: Arrow keys do nothing, can only click
+
+**Investigation needed**:
+- Check PrimeNG version compatibility
+- Check if `[filter]="true"` disables keyboard nav
+- Try PrimeNG accessibility settings
+- May need to add `[autoDisplayFirst]="false"` or other attributes
+
+**File to modify**: `results-table.component.html` (p-dropdown element)
+
+### 2. Test Statistics in Isolation
 
 Swap Picker for Statistics panel in discover.component.html:
 
@@ -51,26 +70,11 @@ Test scenarios:
 - Highlight filters update URL
 - Pop-out statistics syncs with main window
 
-### 2. Test Results in Isolation
-
-After Statistics verified, add Results panel:
-- Table loads with vehicle data
-- Pagination works
-- Sorting works
-- Selection works
-
 ### 3. Fix Bug #7 (Checkboxes)
 
 Low priority checkbox visual state bug - checkboxes stay checked after clearing.
 
-### 4. Fix New Bugs (Low Priority)
-
-| Bug | Description |
-|-----|-------------|
-| Search filter partial match | Searching "15" returns no results (should match years) |
-| URL params case sensitive | `Ford` vs `ford` treated differently |
-
-### 5. Re-enable All Panels
+### 4. Re-enable All Panels
 
 Once each component is verified individually, restore full discover page.
 
@@ -78,27 +82,28 @@ Once each component is verified individually, restore full discover page.
 
 ## Current Discover Page State
 
-**ISOLATION MODE**: Picker is rendered (ready to swap for Statistics)
+**ISOLATION MODE**: Picker + Results Table are rendered
 
 ```
 discover.component.html:
 ├── Header (with isolation notice)
-├── Picker panel (with pop-out button)  ← SWAP THIS FOR STATISTICS
+├── Picker panel (with pop-out button)
+├── Results Table panel (TESTING IN PROGRESS)
 ├── Debug panel (shows URL state JSON)
-└── [REMOVED: query-control, statistics, results]
+└── [REMOVED: query-control, statistics]
 ```
 
 ---
 
-## Key Files for Isolation Testing
+## Key Files for Current Work
 
 | File | Purpose |
 |------|---------|
-| `discover.component.html` | Toggle which panels are visible |
-| `discover.component.ts` | Pop-out handling, URL state debug |
-| `panel-popout.component.ts` | BroadcastChannel communication |
-| `statistics-panel.component.ts` | Statistics/charts functionality |
-| `results-table.component.ts` | Results table functionality |
+| `results-table.component.html` | p-dropdown keyboard fix |
+| `results-table.component.ts` | Dynamic option loading |
+| `automobile.filter-definitions.ts` | Filter configs with optionsEndpoint |
+| `domain-config.interface.ts` | FilterDefinition with optionsEndpoint |
+| `elasticsearchService.js` | Backend /agg/:field endpoint |
 
 ---
 
@@ -108,9 +113,8 @@ discover.component.html:
 # Frontend dev server
 podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205
 
-# Test API directly
-curl -s -H "Host: generic-prime.minilab" \
-  "http://192.168.0.110/api/specs/v1/vehicles/details?page=1&size=20" | jq
+# Test new agg endpoint
+curl -s "http://generic-prime.minilab/api/specs/v1/agg/body_class" | jq
 
 # Check backend pods
 kubectl get pods -n generic-prime
@@ -146,4 +150,4 @@ Before ending session:
 ---
 
 **Last Updated**: 2025-11-27
-**Updated By**: Picker isolation testing session - sorting implemented, all tests passed
+**Updated By**: Results Table isolation testing session - dropdown improvements, Bug #13 identified

@@ -7,9 +7,10 @@ import {
   ChangeDetectionStrategy,
   Inject
 } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { DomainConfig } from '../../models/domain-config.interface';
+import { DomainConfig, FilterOption } from '../../models/domain-config.interface';
 import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
 
 /**
@@ -59,6 +60,9 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
   loading = false;
   expandedRows: { [key: string]: boolean } = {};
 
+  /** Dynamically loaded options for select filters (keyed by filter id) */
+  dynamicOptions: Record<string, FilterOption[]> = {};
+
   /** Subject for unsubscribing on destroy */
   private destroy$ = new Subject<void>();
 
@@ -80,13 +84,17 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
   constructor(
     @Inject(RESOURCE_MANAGEMENT_SERVICE)
     private resourceService: ResourceManagementService<TFilters, TData, TStatistics>,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
     if (!this.domainConfig) {
       throw new Error('ResultsTableComponent requires domainConfig input');
     }
+
+    // Load dynamic options for filters with optionsEndpoint
+    this.loadDynamicFilterOptions();
 
     // Subscribe to state streams (service injected via constructor)
     this.filters$ = this.resourceService.filters$;
@@ -148,14 +156,24 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
 
   /**
    * Handle filter input changes
+   * When value is null/undefined/empty, pass undefined to signal removal
    */
   onFilterChange(field: string, value: any): void {
-    const newFilters = {
+    const newFilters: Record<string, any> = {
       ...this.currentFilters,
-      [field]: value,
       page: 1 // Reset to first page on filter change
-    } as unknown as TFilters;
-    this.resourceService.updateFilters(newFilters);
+    };
+
+    // If value is null, undefined, or empty string, set to undefined
+    // (updateFilters will remove keys with undefined values from URL)
+    // Otherwise, set the new value
+    if (value === null || value === undefined || value === '') {
+      newFilters[field] = undefined;
+    } else {
+      newFilters[field] = value;
+    }
+
+    this.resourceService.updateFilters(newFilters as unknown as TFilters);
   }
 
   /**
@@ -173,5 +191,47 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
    */
   refresh(): void {
     this.resourceService.refresh();
+  }
+
+  /**
+   * Get options for a filter - returns dynamic options if loaded, otherwise static options
+   */
+  getFilterOptions(filterId: string): FilterOption[] {
+    // Check for dynamically loaded options first
+    if (this.dynamicOptions[filterId]) {
+      return this.dynamicOptions[filterId];
+    }
+
+    // Fall back to static options from filter definition
+    const filterDef = this.domainConfig.filters.find(f => f.id === filterId);
+    return filterDef?.options || [];
+  }
+
+  /**
+   * Load dynamic options for filters that specify an optionsEndpoint
+   */
+  private loadDynamicFilterOptions(): void {
+    const filtersWithEndpoint = this.domainConfig.filters.filter(f => f.optionsEndpoint);
+
+    filtersWithEndpoint.forEach(filterDef => {
+      const endpoint = `${this.domainConfig.apiBaseUrl}/agg/${filterDef.optionsEndpoint}`;
+
+      this.http.get<{ field: string; values: Array<{ value: string; count: number }> }>(endpoint)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            // Transform API response to FilterOption format
+            this.dynamicOptions[filterDef.id] = response.values.map(item => ({
+              value: item.value,
+              label: item.value // Use value as label, could add count: `${item.value} (${item.count})`
+            }));
+            this.cdr.markForCheck();
+          },
+          error: (err) => {
+            console.error(`Failed to load options for ${filterDef.id}:`, err);
+            // Keep using static options if dynamic load fails
+          }
+        });
+    });
   }
 }

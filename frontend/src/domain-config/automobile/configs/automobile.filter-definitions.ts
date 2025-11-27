@@ -84,8 +84,8 @@ export const AUTOMOBILE_FILTER_DEFINITIONS: FilterDefinition[] = [
   /**
    * Body class filter
    *
-   * Uses caseSensitive: false and transform: 'titlecase' to handle
-   * user input like "coupe", "COUPE", or "Coupe" consistently
+   * Uses optionsEndpoint to load options dynamically from the backend.
+   * This ensures all body classes in the data are available as options.
    */
   {
     id: 'bodyClass',
@@ -96,17 +96,7 @@ export const AUTOMOBILE_FILTER_DEFINITIONS: FilterDefinition[] = [
       caseSensitive: false, // Match "Coupe", "coupe", "COUPE" equally
       transform: 'titlecase' // Normalize to "Coupe" format
     },
-    options: [
-      { value: 'Sedan', label: 'Sedan' },
-      { value: 'SUV', label: 'SUV' },
-      { value: 'Truck', label: 'Truck' },
-      { value: 'Coupe', label: 'Coupe' },
-      { value: 'Wagon', label: 'Wagon' },
-      { value: 'Van', label: 'Van' },
-      { value: 'Minivan', label: 'Minivan' },
-      { value: 'Convertible', label: 'Convertible' },
-      { value: 'Hatchback', label: 'Hatchback' }
-    ]
+    optionsEndpoint: 'body_class' // Loads from /api/specs/v1/agg/body_class
   },
 
   /**

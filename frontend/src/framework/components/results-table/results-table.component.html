@@ -7,35 +7,25 @@
         <div class="filter-field" [ngClass]="{'filter-field-wide': filterDef.id === 'search'}">
           <label [for]="filterDef.id">{{ filterDef.label }}</label>
 
-          <!-- Text Input -->
-          <input *ngIf="filterDef.type === 'text'"
-                 pInputText
-                 [id]="filterDef.id"
-                 [(ngModel)]="currentFilters[filterDef.id]"
-                 (ngModelChange)="onFilterChange(filterDef.id, $event)"
-                 [placeholder]="filterDef.placeholder || ''">
+          <!-- Text Input with Clear -->
+          <span *ngIf="filterDef.type === 'text'" class="p-input-icon-right" style="display: block;">
+            <i class="pi pi-times"
+               *ngIf="currentFilters[filterDef.id]"
+               (click)="onFilterChange(filterDef.id, null)"
+               style="cursor: pointer;"></i>
+            <input pInputText
+                   [id]="filterDef.id"
+                   [(ngModel)]="currentFilters[filterDef.id]"
+                   (ngModelChange)="onFilterChange(filterDef.id, $event)"
+                   [placeholder]="filterDef.placeholder || ''"
+                   style="width: 100%;">
+          </span>
 
-          <!-- Number Input -->
-          <p-inputNumber *ngIf="filterDef.type === 'number'"
-                         [id]="filterDef.id"
-                         [(ngModel)]="currentFilters[filterDef.id]"
-                         (ngModelChange)="onFilterChange(filterDef.id, $event)"
-                         [showButtons]="true"
-                         [min]="+(filterDef.min ?? 0)"
-                         [max]="+(filterDef.max ?? 999999)"
-                         [step]="filterDef.step ?? 1"
-                         [useGrouping]="filterDef.format?.number?.useGrouping ?? true"
-                         [minFractionDigits]="filterDef.format?.number?.minimumFractionDigits ?? 0"
-                         [maxFractionDigits]="filterDef.format?.number?.maximumFractionDigits ?? 0"
-                         [placeholder]="filterDef.placeholder || ''">
-          </p-inputNumber>
-
-          <!-- Range Input (dual number inputs for min/max) -->
-          <ng-container *ngIf="filterDef.type === 'range'">
-            <!-- Range Min -->
-            <p-inputNumber [id]="filterDef.id + 'Min'"
-                           [(ngModel)]="currentFilters[filterDef.id + 'Min']"
-                           (ngModelChange)="onFilterChange(filterDef.id + 'Min', $event)"
+          <!-- Number Input with Clear -->
+          <div *ngIf="filterDef.type === 'number'" class="p-inputgroup">
+            <p-inputNumber [id]="filterDef.id"
+                           [(ngModel)]="currentFilters[filterDef.id]"
+                           (ngModelChange)="onFilterChange(filterDef.id, $event)"
                            [showButtons]="true"
                            [min]="+(filterDef.min ?? 0)"
                            [max]="+(filterDef.max ?? 999999)"
@@ -43,8 +33,35 @@
                            [useGrouping]="filterDef.format?.number?.useGrouping ?? true"
                            [minFractionDigits]="filterDef.format?.number?.minimumFractionDigits ?? 0"
                            [maxFractionDigits]="filterDef.format?.number?.maximumFractionDigits ?? 0"
-                           placeholder="Min">
+                           [placeholder]="filterDef.placeholder || ''">
             </p-inputNumber>
+            <button *ngIf="currentFilters[filterDef.id] != null"
+                    pButton type="button" icon="pi pi-times"
+                    class="p-button-outlined p-button-secondary"
+                    (click)="onFilterChange(filterDef.id, null)"></button>
+          </div>
+
+          <!-- Range Input (dual number inputs for min/max) -->
+          <ng-container *ngIf="filterDef.type === 'range'">
+            <!-- Range Min with Clear -->
+            <div class="p-inputgroup">
+              <p-inputNumber [id]="filterDef.id + 'Min'"
+                             [(ngModel)]="currentFilters[filterDef.id + 'Min']"
+                             (ngModelChange)="onFilterChange(filterDef.id + 'Min', $event)"
+                             [showButtons]="true"
+                             [min]="+(filterDef.min ?? 0)"
+                             [max]="+(filterDef.max ?? 999999)"
+                             [step]="filterDef.step ?? 1"
+                             [useGrouping]="filterDef.format?.number?.useGrouping ?? true"
+                             [minFractionDigits]="filterDef.format?.number?.minimumFractionDigits ?? 0"
+                             [maxFractionDigits]="filterDef.format?.number?.maximumFractionDigits ?? 0"
+                             placeholder="Min">
+              </p-inputNumber>
+              <button *ngIf="currentFilters[filterDef.id + 'Min'] != null"
+                      pButton type="button" icon="pi pi-times"
+                      class="p-button-outlined p-button-secondary"
+                      (click)="onFilterChange(filterDef.id + 'Min', null)"></button>
+            </div>
           </ng-container>
 
           <!-- Select Dropdown -->
@@ -52,19 +69,27 @@
                       [id]="filterDef.id"
                       [(ngModel)]="currentFilters[filterDef.id]"
                       (ngModelChange)="onFilterChange(filterDef.id, $event)"
-                      [options]="filterDef.options || []"
+                      [options]="getFilterOptions(filterDef.id)"
                       optionLabel="label"
                       optionValue="value"
+                      [showClear]="true"
+                      [filter]="true"
+                      filterBy="label"
                       [placeholder]="filterDef.placeholder || 'Select...'">
           </p-dropdown>
 
-          <!-- Date Picker -->
-          <p-calendar *ngIf="filterDef.type === 'date'"
-                      [id]="filterDef.id"
-                      [(ngModel)]="currentFilters[filterDef.id]"
-                      (ngModelChange)="onFilterChange(filterDef.id, $event)"
-                      dateFormat="yy-mm-dd">
-          </p-calendar>
+          <!-- Date Picker with Clear -->
+          <div *ngIf="filterDef.type === 'date'" class="p-inputgroup">
+            <p-calendar [id]="filterDef.id"
+                        [(ngModel)]="currentFilters[filterDef.id]"
+                        (ngModelChange)="onFilterChange(filterDef.id, $event)"
+                        dateFormat="yy-mm-dd">
+            </p-calendar>
+            <button *ngIf="currentFilters[filterDef.id]"
+                    pButton type="button" icon="pi pi-times"
+                    class="p-button-outlined p-button-secondary"
+                    (click)="onFilterChange(filterDef.id, null)"></button>
+          </div>
 
           <!-- Boolean Checkbox -->
           <p-checkbox *ngIf="filterDef.type === 'boolean'"
@@ -75,21 +100,27 @@
           </p-checkbox>
         </div>
 
-        <!-- Range Max (second input for range type) -->
+        <!-- Range Max (second input for range type) with Clear -->
         <div *ngIf="filterDef.type === 'range'" class="filter-field">
           <label [for]="filterDef.id + 'Max'">{{ filterDef.label }} Max</label>
-          <p-inputNumber [id]="filterDef.id + 'Max'"
-                         [(ngModel)]="currentFilters[filterDef.id + 'Max']"
-                         (ngModelChange)="onFilterChange(filterDef.id + 'Max', $event)"
-                         [showButtons]="true"
-                         [min]="+(filterDef.min ?? 0)"
-                         [max]="+(filterDef.max ?? 999999)"
-                         [step]="filterDef.step ?? 1"
-                         [useGrouping]="filterDef.format?.number?.useGrouping ?? true"
-                         [minFractionDigits]="filterDef.format?.number?.minimumFractionDigits ?? 0"
-                         [maxFractionDigits]="filterDef.format?.number?.maximumFractionDigits ?? 0"
-                         placeholder="Max">
-          </p-inputNumber>
+          <div class="p-inputgroup">
+            <p-inputNumber [id]="filterDef.id + 'Max'"
+                           [(ngModel)]="currentFilters[filterDef.id + 'Max']"
+                           (ngModelChange)="onFilterChange(filterDef.id + 'Max', $event)"
+                           [showButtons]="true"
+                           [min]="+(filterDef.min ?? 0)"
+                           [max]="+(filterDef.max ?? 999999)"
+                           [step]="filterDef.step ?? 1"
+                           [useGrouping]="filterDef.format?.number?.useGrouping ?? true"
+                           [minFractionDigits]="filterDef.format?.number?.minimumFractionDigits ?? 0"
+                           [maxFractionDigits]="filterDef.format?.number?.maximumFractionDigits ?? 0"
+                           placeholder="Max">
+            </p-inputNumber>
+            <button *ngIf="currentFilters[filterDef.id + 'Max'] != null"
+                    pButton type="button" icon="pi pi-times"
+                    class="p-button-outlined p-button-secondary"
+                    (click)="onFilterChange(filterDef.id + 'Max', null)"></button>
+          </div>
         </div>
       </ng-container>
 
