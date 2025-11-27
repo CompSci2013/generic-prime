@@ -1,18 +1,18 @@
 # Project Status
 
-**Version**: 1.8
-**Timestamp**: 2025-11-27T22:30:00Z
-**Updated By**: QueryControl bug fixes session
+**Version**: 1.9
+**Timestamp**: 2025-11-27T23:45:00Z
+**Updated By**: Picker isolation testing session
 
 ---
 
 ## Current State
 
 ### Port 4205 (generic-prime) - IN DEVELOPMENT
-- **Bug #11 FULLY RESOLVED** - Picker working with 881 combinations
-- **Bug #10 RESOLVED** - Pop-out communication working
-- Discover page in **ISOLATION MODE** - testing QueryControl only
-- Backend at `generic-prime-backend-api:v1.3.0`
+- **Picker isolation testing COMPLETE** - All 4 tests passed
+- **Column sorting implemented** - Backend v1.4.0 deployed
+- Discover page in **ISOLATION MODE** - testing Picker only
+- Backend at `generic-prime-backend-api:v1.4.0`
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
 - Unaffected by changes
@@ -20,38 +20,46 @@
 
 ---
 
-## Session Summary (2025-11-27 - Evening)
+## Session Summary (2025-11-27 - Late Evening)
 
-### QueryControl Bug Fixes
+### Picker Isolation Testing Results
 
-Fixed two issues identified during isolation testing:
-
-| Bug | Fix | Files Changed |
-|-----|-----|---------------|
-| Dropdown showing highlight filters | Removed highlight filters from `filterFieldOptions` | `query-control.component.ts` |
-| Clear All not clearing all URL params | New `clearAllFilters` event → `urlState.clearParams()` | Multiple (see below) |
-
-### Clear All Implementation
-
-Simplified from iterating over filter configs to simply clearing the URL:
-
-```
-QueryControl.clearAll()
-  → emits clearAllFilters event
-  → Parent calls urlStateService.clearParams()
-  → URL becomes clean
-```
-
-### Files Modified This Session
-
-| File | Change |
+| Test | Status |
 |------|--------|
-| `query-control.component.ts` | Remove highlight filters from dropdown; add `clearAllFilters` output; simplify `clearAll()` |
-| `popout.interface.ts` | Add `CLEAR_ALL_FILTERS` message type |
-| `discover.component.html` | Bind `(clearAllFilters)` event |
-| `discover.component.ts` | Add `onClearAllFilters()` handler + message handler |
-| `panel-popout.component.html` | Bind `(clearAllFilters)` event |
-| `panel-popout.component.ts` | Add `onClearAllFilters()` handler |
+| Picker loads 881 combinations | PASS |
+| Selection updates URL | PASS |
+| URL paste updates picker selection | PASS |
+| Pop-out picker syncs with main window | PASS |
+
+### Column Sorting Implementation
+
+Backend and frontend changes to enable column sorting:
+
+| Component | Change |
+|-----------|--------|
+| Backend `specsController.js` | Added `sortBy` and `sortOrder` query params |
+| Backend `elasticsearchService.js` | Sort cached combinations before pagination |
+| Frontend `automobile.picker-configs.ts` | Pass sort params to API |
+| Frontend `base-picker.component.html` | Replace `(onPage)`+`(onSort)` with `(onLazyLoad)` |
+| Frontend `base-picker.component.ts` | Add `onLazyLoad()` handler |
+
+**Key Learning**: PrimeNG with `[lazy]="true"` fires `(onLazyLoad)` event instead of separate `(onSort)` and `(onPage)` events.
+
+### Backend Deployment Pattern Documented
+
+Added to ORIENTATION.md:
+```bash
+podman save localhost/generic-prime-backend-api:vX.Y.Z -o /tmp/backend-vX.Y.Z.tar && \
+  sudo k3s ctr images import /tmp/backend-vX.Y.Z.tar && \
+  sudo rm /tmp/backend-vX.Y.Z.tar
+```
+
+### Bugs Found (Not Fixed)
+
+| Bug | Description | Priority |
+|-----|-------------|----------|
+| Search filter partial match | Searching "15" returns no results (should match years like 2015) | Low |
+| URL params case sensitive | `Ford` vs `ford` treated differently | Low |
 
 ---
 
@@ -59,10 +67,10 @@ QueryControl.clearAll()
 
 **Continue isolation testing approach.**
 
-1. ~~Finish testing QueryControl bugs~~ ✅ Done
-2. Remove QueryControl, add Picker
-3. Test Picker in isolation
-4. Repeat for Statistics and Results
+1. ~~Test QueryControl in isolation~~ DONE
+2. ~~Test Picker in isolation~~ DONE
+3. Test Statistics in isolation
+4. Test Results in isolation
 5. Re-enable all panels when individually verified
 
 ---
@@ -77,7 +85,7 @@ QueryControl.clearAll()
 | Unique Manufacturers | 72 | Verified via ES |
 | Unique Mfr-Model Combos | 881 | Working in picker |
 | **Backend Source** | `~/projects/data-broker/generic-prime/src/` | JavaScript/Express |
-| **Backend Image** | `localhost/generic-prime-backend-api:v1.3.0` | **Current** |
+| **Backend Image** | `localhost/generic-prime-backend-api:v1.4.0` | **Current** |
 
 ---
 
@@ -88,14 +96,16 @@ QueryControl.clearAll()
 | #11 | CRITICAL | **RESOLVED** | Picker shows 881 combos with server-side pagination |
 | #10 | Medium | **RESOLVED** | Pop-out communication working |
 | #7 | Low | Not started | Checkboxes stay checked after clearing |
+| NEW | Low | Not started | Search filter doesn't match partial text |
+| NEW | Low | Not started | URL params are case sensitive |
 
 ---
 
 ## Next Session
 
-1. **Test Picker in isolation** - Swap QueryControl for Picker in discover.component.html
-2. **Fix Bug #7** - Checkbox visual state
-3. **Test Statistics in isolation**
+1. **Test Statistics in isolation** - Swap Picker for Statistics panel
+2. **Test Results in isolation** - Add Results panel
+3. **Fix Bug #7** - Checkbox visual state
 4. **Re-enable all panels** when individually verified
 
 See [NEXT-STEPS.md](NEXT-STEPS.md) for details.

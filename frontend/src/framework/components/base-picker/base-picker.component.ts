@@ -359,7 +359,35 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle pagination change
+   * Handle lazy load event (pagination + sorting combined)
+   * PrimeNG fires this instead of separate onPage/onSort when [lazy]="true"
+   */
+  onLazyLoad(event: any): void {
+    // Ignore lazy load events while already loading to prevent race conditions
+    if (this.state.loading) {
+      console.warn('[BasePickerComponent] Ignoring lazy load while loading', event);
+      return;
+    }
+
+    // Update pagination state
+    this.state.currentPage = event.first / event.rows;
+    this.state.pageSize = event.rows;
+
+    // Update sort state
+    this.state.sortField = event.sortField || undefined;
+    this.state.sortOrder = event.sortOrder || 1;
+
+    console.log('[BasePickerComponent] onLazyLoad:', {
+      page: this.state.currentPage,
+      sortField: this.state.sortField,
+      sortOrder: this.state.sortOrder
+    });
+
+    this.loadData();
+  }
+
+  /**
+   * Handle pagination change (for non-lazy mode)
    */
   onPageChange(event: any): void {
     // Ignore page changes while loading to prevent race conditions
@@ -389,7 +417,7 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle sort change
+   * Handle sort change (for non-lazy mode)
    */
   onSort(event: any): void {
     this.state.sortField = event.sortField;

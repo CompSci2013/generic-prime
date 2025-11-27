@@ -14,9 +14,9 @@
 
 ---
 
-## Current Priority: Picker Isolation Testing
+## Current Priority: Statistics Isolation Testing
 
-**Status**: QueryControl testing complete, moving to Picker
+**Status**: QueryControl and Picker testing complete, moving to Statistics
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
@@ -25,33 +25,52 @@
 
 ---
 
+## Completed This Session
+
+- Picker isolation testing - ALL TESTS PASSED
+- Column sorting implemented (backend v1.4.0 + frontend)
+- Backend deployment pattern documented in ORIENTATION.md
+
+---
+
 ## Immediate Actions
 
-### 1. Test Picker in Isolation
+### 1. Test Statistics in Isolation
 
-Swap QueryControl for Picker in discover.component.html:
+Swap Picker for Statistics panel in discover.component.html:
 
 ```html
-<!-- Comment out QueryControl, add Picker -->
-<!-- <app-query-control ... /> -->
-<app-base-picker [configId]="'manufacturer-model'" ...></app-base-picker>
+<!-- Comment out Picker, add Statistics -->
+<!-- <app-base-picker ... /> -->
+<app-statistics-panel ...></app-statistics-panel>
 ```
 
 Test scenarios:
-- Picker loads 881 combinations
-- Selection updates URL
-- URL paste updates picker selection
-- Pop-out picker syncs with main window
+- Statistics load with vehicle data
+- Chart interactions work
+- Highlight filters update URL
+- Pop-out statistics syncs with main window
 
-### 2. Fix Bug #7 (Checkboxes)
+### 2. Test Results in Isolation
+
+After Statistics verified, add Results panel:
+- Table loads with vehicle data
+- Pagination works
+- Sorting works
+- Selection works
+
+### 3. Fix Bug #7 (Checkboxes)
 
 Low priority checkbox visual state bug - checkboxes stay checked after clearing.
 
-### 3. Test Statistics in Isolation
+### 4. Fix New Bugs (Low Priority)
 
-After Picker is verified, swap for Statistics panel and test chart interactions.
+| Bug | Description |
+|-----|-------------|
+| Search filter partial match | Searching "15" returns no results (should match years) |
+| URL params case sensitive | `Ford` vs `ford` treated differently |
 
-### 4. Re-enable All Panels
+### 5. Re-enable All Panels
 
 Once each component is verified individually, restore full discover page.
 
@@ -59,14 +78,14 @@ Once each component is verified individually, restore full discover page.
 
 ## Current Discover Page State
 
-**ISOLATION MODE**: Only QueryControl is rendered (ready to swap for Picker)
+**ISOLATION MODE**: Picker is rendered (ready to swap for Statistics)
 
 ```
 discover.component.html:
 ├── Header (with isolation notice)
-├── QueryControl panel (with pop-out button)  ← SWAP THIS FOR PICKER
+├── Picker panel (with pop-out button)  ← SWAP THIS FOR STATISTICS
 ├── Debug panel (shows URL state JSON)
-└── [REMOVED: picker, statistics, results]
+└── [REMOVED: query-control, statistics, results]
 ```
 
 ---
@@ -78,7 +97,8 @@ discover.component.html:
 | `discover.component.html` | Toggle which panels are visible |
 | `discover.component.ts` | Pop-out handling, URL state debug |
 | `panel-popout.component.ts` | BroadcastChannel communication |
-| `base-picker.component.ts` | Picker functionality |
+| `statistics-panel.component.ts` | Statistics/charts functionality |
+| `results-table.component.ts` | Results table functionality |
 
 ---
 
@@ -90,13 +110,22 @@ podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 42
 
 # Test API directly
 curl -s -H "Host: generic-prime.minilab" \
-  "http://192.168.0.110/api/specs/v1/manufacturer-model-combinations?page=1&size=20" | jq
+  "http://192.168.0.110/api/specs/v1/vehicles/details?page=1&size=20" | jq
 
 # Check backend pods
 kubectl get pods -n generic-prime
 
 # Backend logs
 kubectl logs -n generic-prime -l app=generic-prime-backend-api --tail=50
+
+# Backend deployment (when code changes)
+cd ~/projects/data-broker/generic-prime
+podman build -f infra/Dockerfile -t localhost/generic-prime-backend-api:vX.Y.Z .
+podman save localhost/generic-prime-backend-api:vX.Y.Z -o /tmp/backend-vX.Y.Z.tar && \
+  sudo k3s ctr images import /tmp/backend-vX.Y.Z.tar && \
+  sudo rm /tmp/backend-vX.Y.Z.tar
+kubectl set image deployment/generic-prime-backend-api -n generic-prime \
+  backend-api=localhost/generic-prime-backend-api:vX.Y.Z
 ```
 
 ---
@@ -117,4 +146,4 @@ Before ending session:
 ---
 
 **Last Updated**: 2025-11-27
-**Updated By**: QueryControl bug fixes session - dropdown and Clear All fixed
+**Updated By**: Picker isolation testing session - sorting implemented, all tests passed

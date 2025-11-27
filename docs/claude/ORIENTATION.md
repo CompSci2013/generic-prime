@@ -72,6 +72,24 @@ podman exec -it generic-prime-frontend-dev ng build
 podman exec -it generic-prime-frontend-dev sh  # Interactive shell
 ```
 
+**Backend Deployment (when backend code changes):**
+
+```bash
+# From Thor - build, import to k3s, and clean up in one command
+cd ~/projects/data-broker/generic-prime
+podman build -f infra/Dockerfile -t localhost/generic-prime-backend-api:vX.Y.Z .
+podman save localhost/generic-prime-backend-api:vX.Y.Z -o /tmp/backend-vX.Y.Z.tar && \
+  sudo k3s ctr images import /tmp/backend-vX.Y.Z.tar && \
+  sudo rm /tmp/backend-vX.Y.Z.tar
+
+# Update deployment to use new image
+kubectl set image deployment/generic-prime-backend-api -n generic-prime \
+  backend-api=localhost/generic-prime-backend-api:vX.Y.Z
+
+# Or restart to pick up new image with same tag
+kubectl rollout restart deployment/generic-prime-backend-api -n generic-prime
+```
+
 ---
 
 ## Key Architectural Patterns
@@ -136,4 +154,4 @@ podman exec -it generic-prime-frontend-dev sh  # Interactive shell
 
 ---
 
-**Last Updated**: 2025-11-27 (backend migrated to data-broker)
+**Last Updated**: 2025-11-27 (added backend deployment commands)

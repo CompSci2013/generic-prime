@@ -73,7 +73,9 @@ export function createManufacturerModelPickerConfig(
           params: {
             page: params.page + 1, // API is 1-indexed, picker is 0-indexed
             size: params.size,
-            search: params.search || undefined
+            search: params.search || undefined,
+            sortBy: params.sortField || 'manufacturer',
+            sortOrder: params.sortOrder === -1 ? 'desc' : 'asc'
           }
         });
       },
