@@ -1,18 +1,17 @@
 # Project Status
 
-**Version**: 2.0
-**Timestamp**: 2025-11-27T19:00:00Z
-**Updated By**: Results Table isolation testing session
+**Version**: 2.1
+**Timestamp**: 2025-11-28T01:30:00Z
+**Updated By**: Body Class multiselect + Query Control session
 
 ---
 
 ## Current State
 
 ### Port 4205 (generic-prime) - IN DEVELOPMENT
-- **Results Table isolation testing IN PROGRESS**
-- **Dropdown improvements implemented** - Dynamic options from backend
-- **Generic /agg/:field endpoint added** - Backend v1.5.0
-- Discover page in **ISOLATION MODE** - testing Picker + Results Table
+- **Body Class multiselect implemented** - Checkbox selection working
+- **Query Control re-enabled** - Now testing 3 panels together
+- Discover page in **ISOLATION MODE** - testing Query Control + Picker + Results Table
 - Backend at `generic-prime-backend-api:v1.5.0`
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
@@ -21,62 +20,30 @@
 
 ---
 
-## Session Summary (2025-11-27 - Afternoon)
+## Session Summary (2025-11-28)
 
-### Results Table Isolation Testing
+### Body Class Multiselect Implementation
 
-Testing Results Table component alongside Picker for easier testing.
-
-| Test | Status |
-|------|--------|
-| Results Table loads data | PASS |
-| Filters update URL | PASS |
-| Filter clearing removes from URL | PASS |
-| Dropdown search works | PASS |
-| Dropdown options sorted alphabetically | PASS |
-| All body classes available | PASS |
-
-### Dropdown Improvements
-
-Implemented data-driven dropdown options instead of hard-coded values:
+Changed Body Class filter from single-select dropdown to multiselect with checkboxes:
 
 | Component | Change |
 |-----------|--------|
-| Backend `elasticsearchService.js` | Added generic `getAggregation()` function |
-| Backend `specsController.js` | Added `getAggregationHandler` controller |
-| Backend `specsRoutes.js` | Added `GET /agg/:field` route |
-| Frontend `domain-config.interface.ts` | Added `optionsEndpoint` to FilterDefinition |
-| Frontend `automobile.filter-definitions.ts` | Changed bodyClass to use `optionsEndpoint: 'body_class'` |
-| Frontend `results-table.component.ts` | Added dynamic option loading from API |
-| Frontend `results-table.component.html` | Added `[filter]="true"` to dropdown for search |
+| `automobile.filter-definitions.ts` | Changed type from `select` to `multiselect` |
+| `automobile.filters.ts` | Changed `bodyClass` type to `string \| string[]` |
+| `automobile-url-mapper.ts` | Array serialization (comma-separated) for URL |
+| `results-table.component.html` | Added `p-multiSelect` template |
+| `results-table.component.ts` | Handle empty arrays as "no filter" |
+| `query-control.component.ts` | Handle array param values (fixed `.split()` crash) |
 
-### API Changes (v1.5.0)
+### Query Control Re-enabled
 
-New generic aggregation endpoint:
-```
-GET /api/specs/v1/agg/:field?order=alpha&limit=1000
-Response: {
-  field: "body_class",
-  values: [
-    { value: "Convertible", count: 21 },
-    { value: "Coupe", count: 494 },
-    ...
-  ]
-}
-```
+Added Query Control panel back to discover page alongside Picker and Results Table.
 
-### Filter Clearing Fix
+### Bug Fixed
 
-Fixed bug where clearing filters didn't remove them from URL:
-- Modified `updateFilters()` to explicitly set `null` for removed params
-- Modified `clearFilters()` to use same pattern
-
-### Bugs Found
-
-| Bug | Description | Priority | Status |
-|-----|-------------|----------|--------|
-| #13 | Dropdown keyboard navigation broken | Medium | **NEW** |
-|     | Down arrow should highlight options, Enter/Space should select | | Not started |
+| Bug | Description | Resolution |
+|-----|-------------|------------|
+| `.split is not a function` | Query Control crashed on array values | Check if value is array before splitting |
 
 ---
 
@@ -87,8 +54,10 @@ Fixed bug where clearing filters didn't remove them from URL:
 1. ~~Test QueryControl in isolation~~ DONE
 2. ~~Test Picker in isolation~~ DONE
 3. Test Statistics in isolation
-4. ~~Test Results in isolation~~ IN PROGRESS
+4. ~~Test Results in isolation~~ DONE
 5. Re-enable all panels when individually verified
+
+**Progress**: 3 of 4 panels now active (Query Control, Picker, Results Table). Statistics panel remaining.
 
 ---
 
@@ -116,16 +85,15 @@ Fixed bug where clearing filters didn't remove them from URL:
 | #12 | Low | **RESOLVED** | Picker search partial match (changed from fuzzy to wildcard) |
 | #13 | Medium | Not started | Dropdown keyboard navigation (arrow keys, Enter/Space) broken |
 | #7 | Low | Not started | Checkboxes stay checked after clearing |
-| NEW | Low | Not started | URL params are case sensitive |
 
 ---
 
 ## Next Session
 
-1. **Fix Bug #13** - Dropdown keyboard navigation (may be PrimeNG issue)
-2. **Test Statistics in isolation** - Swap Picker for Statistics panel
+1. **Test Statistics in isolation** - Add Statistics panel to discover page
+2. **Fix Bug #13** - Dropdown keyboard navigation (may be PrimeNG issue)
 3. **Fix Bug #7** - Checkbox visual state
-4. **Re-enable all panels** when individually verified
+4. **Re-enable all panels** - Remove isolation mode notice
 
 See [NEXT-STEPS.md](NEXT-STEPS.md) for details.
 

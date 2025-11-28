@@ -14,9 +14,9 @@
 
 ---
 
-## Current Priority: Bug #13 - Dropdown Keyboard Navigation
+## Current Priority: Add Statistics Panel
 
-**Status**: Results Table isolation testing in progress, keyboard navigation bug identified
+**Status**: 3 of 4 panels active (Query Control, Picker, Results Table). Statistics panel remaining.
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
@@ -27,18 +27,39 @@
 
 ## Completed This Session
 
-- Results Table isolation testing (with Picker for easier testing)
-- Dropdown improvements - dynamic options from backend `/agg/:field`
-- Filter clearing now removes params from URL
-- Dropdown search input added (`[filter]="true"`)
-- All body classes now available (12 total, including Sports Car)
-- Backend v1.5.0 deployed with generic aggregation endpoint
+- Body Class multiselect with checkboxes (p-multiSelect)
+- Array serialization for URL (comma-separated)
+- Query Control re-enabled on discover page
+- Fixed `.split is not a function` crash in Query Control
 
 ---
 
 ## Immediate Actions
 
-### 1. Fix Bug #13 - Dropdown Keyboard Navigation (PRIORITY)
+### 1. Add Statistics Panel (PRIORITY)
+
+Add Statistics panel to discover page to complete isolation testing:
+
+```html
+<!-- In discover.component.html, add after Results Table -->
+<div class="panel-wrapper">
+  <div class="panel-header">
+    <h3 class="panel-title">Statistics</h3>
+    <!-- Pop-out button here -->
+  </div>
+  <app-statistics-panel
+    [domainConfig]="domainConfig">
+  </app-statistics-panel>
+</div>
+```
+
+Test scenarios:
+- Statistics load with vehicle data
+- Chart interactions work
+- Highlight filters update URL
+- Pop-out statistics syncs with main window
+
+### 2. Fix Bug #13 - Dropdown Keyboard Navigation
 
 **Problem**: PrimeNG p-dropdown with `[filter]="true"` keyboard navigation broken:
 - Down arrow should highlight next option
@@ -50,47 +71,32 @@
 - Check PrimeNG version compatibility
 - Check if `[filter]="true"` disables keyboard nav
 - Try PrimeNG accessibility settings
-- May need to add `[autoDisplayFirst]="false"` or other attributes
-
-**File to modify**: `results-table.component.html` (p-dropdown element)
-
-### 2. Test Statistics in Isolation
-
-Swap Picker for Statistics panel in discover.component.html:
-
-```html
-<!-- Comment out Picker, add Statistics -->
-<!-- <app-base-picker ... /> -->
-<app-statistics-panel ...></app-statistics-panel>
-```
-
-Test scenarios:
-- Statistics load with vehicle data
-- Chart interactions work
-- Highlight filters update URL
-- Pop-out statistics syncs with main window
 
 ### 3. Fix Bug #7 (Checkboxes)
 
 Low priority checkbox visual state bug - checkboxes stay checked after clearing.
 
-### 4. Re-enable All Panels
+### 4. Remove Isolation Mode
 
-Once each component is verified individually, restore full discover page.
+Once Statistics panel verified, update discover.component.html:
+- Remove "ISOLATION MODE" notice
+- Remove debug panel (or make collapsible)
+- Restore normal page layout
 
 ---
 
 ## Current Discover Page State
 
-**ISOLATION MODE**: Picker + Results Table are rendered
+**ISOLATION MODE**: Query Control + Picker + Results Table are rendered
 
 ```
 discover.component.html:
 ├── Header (with isolation notice)
+├── Query Control panel (with pop-out button)
 ├── Picker panel (with pop-out button)
-├── Results Table panel (TESTING IN PROGRESS)
+├── Results Table panel (with pop-out button)
 ├── Debug panel (shows URL state JSON)
-└── [REMOVED: query-control, statistics]
+└── [REMOVED: statistics-panel]
 ```
 
 ---
@@ -99,11 +105,9 @@ discover.component.html:
 
 | File | Purpose |
 |------|---------|
-| `results-table.component.html` | p-dropdown keyboard fix |
-| `results-table.component.ts` | Dynamic option loading |
-| `automobile.filter-definitions.ts` | Filter configs with optionsEndpoint |
-| `domain-config.interface.ts` | FilterDefinition with optionsEndpoint |
-| `elasticsearchService.js` | Backend /agg/:field endpoint |
+| `discover.component.html` | Add Statistics panel |
+| `statistics-panel.component.ts` | Statistics rendering |
+| `automobile.chart-configs.ts` | Chart configuration |
 
 ---
 
@@ -113,23 +117,11 @@ discover.component.html:
 # Frontend dev server
 podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205
 
-# Test new agg endpoint
-curl -s "http://generic-prime.minilab/api/specs/v1/agg/body_class" | jq
-
 # Check backend pods
 kubectl get pods -n generic-prime
 
 # Backend logs
 kubectl logs -n generic-prime -l app=generic-prime-backend-api --tail=50
-
-# Backend deployment (when code changes)
-cd ~/projects/data-broker/generic-prime
-podman build -f infra/Dockerfile -t localhost/generic-prime-backend-api:vX.Y.Z .
-podman save localhost/generic-prime-backend-api:vX.Y.Z -o /tmp/backend-vX.Y.Z.tar && \
-  sudo k3s ctr images import /tmp/backend-vX.Y.Z.tar && \
-  sudo rm /tmp/backend-vX.Y.Z.tar
-kubectl set image deployment/generic-prime-backend-api -n generic-prime \
-  backend-api=localhost/generic-prime-backend-api:vX.Y.Z
 ```
 
 ---
@@ -149,5 +141,5 @@ Before ending session:
 
 ---
 
-**Last Updated**: 2025-11-27
-**Updated By**: Results Table isolation testing session - dropdown improvements, Bug #13 identified
+**Last Updated**: 2025-11-28
+**Updated By**: Body Class multiselect + Query Control session
