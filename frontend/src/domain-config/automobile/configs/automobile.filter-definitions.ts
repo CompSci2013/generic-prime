@@ -82,16 +82,17 @@ export const AUTOMOBILE_FILTER_DEFINITIONS: FilterDefinition[] = [
   },
 
   /**
-   * Body class filter
+   * Body class filter (multi-select)
    *
    * Uses optionsEndpoint to load options dynamically from the backend.
    * This ensures all body classes in the data are available as options.
+   * Allows selecting multiple body classes with checkboxes.
    */
   {
     id: 'bodyClass',
     label: 'Body Class',
-    type: 'select',
-    placeholder: 'Select body class...',
+    type: 'multiselect',
+    placeholder: 'Select body classes...',
     format: {
       caseSensitive: false, // Match "Coupe", "coupe", "COUPE" equally
       transform: 'titlecase' // Normalize to "Coupe" format

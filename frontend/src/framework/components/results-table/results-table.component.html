@@ -64,7 +64,7 @@
             </div>
           </ng-container>
 
-          <!-- Select Dropdown -->
+          <!-- Select Dropdown (single) -->
           <p-dropdown *ngIf="filterDef.type === 'select'"
                       [id]="filterDef.id"
                       [(ngModel)]="currentFilters[filterDef.id]"
@@ -77,6 +77,20 @@
                       filterBy="label"
                       [placeholder]="filterDef.placeholder || 'Select...'">
           </p-dropdown>
+
+          <!-- Multi-Select Dropdown -->
+          <p-multiSelect *ngIf="filterDef.type === 'multiselect'"
+                         [id]="filterDef.id"
+                         [(ngModel)]="currentFilters[filterDef.id]"
+                         (ngModelChange)="onFilterChange(filterDef.id, $event)"
+                         [options]="getFilterOptions(filterDef.id)"
+                         optionLabel="label"
+                         optionValue="value"
+                         [filter]="true"
+                         filterBy="label"
+                         [showClear]="true"
+                         [placeholder]="filterDef.placeholder || 'Select...'">
+          </p-multiSelect>
 
           <!-- Date Picker with Clear -->
           <div *ngIf="filterDef.type === 'date'" class="p-inputgroup">

@@ -114,12 +114,13 @@ export class AutoSearchFilters {
   yearMax?: number;
 
   /**
-   * Vehicle body class/type
+   * Vehicle body class/type (supports multiple selections)
    * Case-insensitive partial match
+   * Can be a single value or array for multi-select
    *
-   * @example 'Sedan', 'SUV', 'Truck', 'Coupe'
+   * @example 'Sedan', ['SUV', 'Truck'], 'Coupe'
    */
-  bodyClass?: string;
+  bodyClass?: string | string[];
 
   /**
    * Minimum VIN instance count
@@ -222,12 +223,17 @@ export class AutoSearchFilters {
    * @returns True if no search filters are active
    */
   isEmpty(): boolean {
+    // Handle bodyClass as potentially array
+    const hasBodyClass = Array.isArray(this.bodyClass)
+      ? this.bodyClass.length > 0
+      : !!this.bodyClass;
+
     return (
       !this.manufacturer &&
       !this.model &&
       !this.yearMin &&
       !this.yearMax &&
-      !this.bodyClass &&
+      !hasBodyClass &&
       !this.instanceCountMin &&
       !this.instanceCountMax &&
       !this.search

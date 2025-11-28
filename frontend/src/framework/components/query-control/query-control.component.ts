@@ -569,11 +569,17 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
       const paramValue = params[paramName];
 
       if (paramValue) {
-        const values = paramValue.split(',');
+        // Handle both string and array values (array can come from multiselect)
+        const values = Array.isArray(paramValue)
+          ? paramValue
+          : paramValue.split(',');
+        const urlValue = Array.isArray(paramValue)
+          ? paramValue.join(',')
+          : paramValue;
         targetArray.push({
           definition: filterDef,
           values: values,
-          urlValue: paramValue
+          urlValue: urlValue
         });
       }
     }

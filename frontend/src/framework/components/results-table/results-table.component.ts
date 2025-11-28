@@ -164,10 +164,15 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
       page: 1 // Reset to first page on filter change
     };
 
-    // If value is null, undefined, or empty string, set to undefined
+    // If value is null, undefined, empty string, or empty array, set to undefined
     // (updateFilters will remove keys with undefined values from URL)
     // Otherwise, set the new value
-    if (value === null || value === undefined || value === '') {
+    const isEmpty = value === null ||
+                    value === undefined ||
+                    value === '' ||
+                    (Array.isArray(value) && value.length === 0);
+
+    if (isEmpty) {
       newFilters[field] = undefined;
     } else {
       newFilters[field] = value;

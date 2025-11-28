@@ -2,46 +2,44 @@
   <!-- Header -->
   <div class="discover-header">
     <h1>{{ domainConfig.domainLabel }}</h1>
-    <p class="isolation-notice">ISOLATION MODE: Testing Results Table + Picker</p>
+    <p class="isolation-notice">ISOLATION MODE: Testing Query Control + Picker + Results Table</p>
   </div>
 
   <hr/>
 
-  <!--
-    REMOVED FOR ISOLATION TESTING (QueryControl verified working):
-    <div class="panel-wrapper">
-      <div class="panel-header">
-        <div class="panel-title-group">
-          <h3 class="panel-title">Query Control</h3>
-        </div>
-        <div class="panel-actions">
-          <button
-            *ngIf="!isPanelPoppedOut('query-control')"
-            pButton
-            type="button"
-            icon="pi pi-external-link"
-            class="p-button-sm p-button-text p-button-rounded"
-            (click)="popOutPanel('query-control', 'query-control')"
-            pTooltip="Pop out to separate window"
-            tooltipPosition="left">
-          </button>
-        </div>
+  <!-- Query Control Panel (verified working) -->
+  <div class="panel-wrapper">
+    <div class="panel-header">
+      <div class="panel-title-group">
+        <h3 class="panel-title">Query Control</h3>
       </div>
-      <div *ngIf="!isPanelPoppedOut('query-control'); else queryControlPlaceholder">
-        <app-query-control
-          [domainConfig]="domainConfig"
-          (urlParamsChange)="onUrlParamsChange($event)"
-          (clearAllFilters)="onClearAllFilters()">
-        </app-query-control>
+      <div class="panel-actions">
+        <button
+          *ngIf="!isPanelPoppedOut('query-control')"
+          pButton
+          type="button"
+          icon="pi pi-external-link"
+          class="p-button-sm p-button-text p-button-rounded"
+          (click)="popOutPanel('query-control', 'query-control')"
+          pTooltip="Pop out to separate window"
+          tooltipPosition="left">
+        </button>
       </div>
-      <ng-template #queryControlPlaceholder>
-        <div class="popout-placeholder">
-          <i class="pi pi-external-link"></i>
-          <span>Query Control is open in a separate window</span>
-        </div>
-      </ng-template>
     </div>
-  -->
+    <div *ngIf="!isPanelPoppedOut('query-control'); else queryControlPlaceholder">
+      <app-query-control
+        [domainConfig]="domainConfig"
+        (urlParamsChange)="onUrlParamsChange($event)"
+        (clearAllFilters)="onClearAllFilters()">
+      </app-query-control>
+    </div>
+    <ng-template #queryControlPlaceholder>
+      <div class="popout-placeholder">
+        <i class="pi pi-external-link"></i>
+        <span>Query Control is open in a separate window</span>
+      </div>
+    </ng-template>
+  </div>
 
   <!-- Manufacturer-Model Picker Panel (verified working) -->
   <div class="panel-wrapper">
@@ -120,10 +118,8 @@
 
   <!--
     REMOVED FOR ISOLATION TESTING:
-    - query-control (verified working)
-    - manufacturer-model-picker (verified working)
     - statistics-panel
 
-    Will re-add one at a time after Results is verified working.
+    Currently active: query-control, picker, results-table
   -->
 </div>

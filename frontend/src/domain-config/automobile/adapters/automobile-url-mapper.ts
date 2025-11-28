@@ -107,7 +107,14 @@ export class AutomobileUrlMapper implements IFilterUrlMapper<AutoSearchFilters> 
     }
 
     if (filters.bodyClass !== undefined && filters.bodyClass !== null) {
-      params[this.PARAM_NAMES.bodyClass] = filters.bodyClass;
+      // Handle array values (multiselect) - join with comma
+      if (Array.isArray(filters.bodyClass)) {
+        if (filters.bodyClass.length > 0) {
+          params[this.PARAM_NAMES.bodyClass] = filters.bodyClass.join(',');
+        }
+      } else {
+        params[this.PARAM_NAMES.bodyClass] = filters.bodyClass;
+      }
     }
 
     if (filters.instanceCountMin !== undefined && filters.instanceCountMin !== null) {
@@ -184,7 +191,14 @@ export class AutomobileUrlMapper implements IFilterUrlMapper<AutoSearchFilters> 
     }
 
     if (params[this.PARAM_NAMES.bodyClass]) {
-      filters.bodyClass = String(params[this.PARAM_NAMES.bodyClass]);
+      const bodyClassParam = String(params[this.PARAM_NAMES.bodyClass]);
+      // Check if it contains comma (multiple values)
+      if (bodyClassParam.includes(',')) {
+        filters.bodyClass = bodyClassParam.split(',').map(v => v.trim());
+      } else {
+        // Single value - still return as array for consistency with multiselect
+        filters.bodyClass = [bodyClassParam];
+      }
     }
 
     if (params[this.PARAM_NAMES.instanceCountMin]) {
