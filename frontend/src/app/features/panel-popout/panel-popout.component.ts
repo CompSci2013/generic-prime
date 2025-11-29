@@ -1,24 +1,27 @@
 import {
-  Component,
-  OnInit,
-  OnDestroy,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  Component,
   Inject,
-  Injector
+  Injector,
+  OnDestroy,
+  OnInit
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { PopOutContextService } from '../../../framework/services/popout-context.service';
-import { PopOutMessage, PopOutMessageType } from '../../../framework/models/popout.interface';
-import { DOMAIN_CONFIG } from '../../../framework/services/domain-config-registry.service';
+import { createAutomobilePickerConfigs } from '../../../domain-config/automobile/configs/automobile.picker-configs';
 import { DomainConfig } from '../../../framework/models';
 import { PickerSelectionEvent } from '../../../framework/models/picker-config.interface';
-import { UrlStateService } from '../../../framework/services/url-state.service';
+import {
+  PopOutMessage,
+  PopOutMessageType
+} from '../../../framework/models/popout.interface';
+import { DOMAIN_CONFIG } from '../../../framework/services/domain-config-registry.service';
 import { PickerConfigRegistry } from '../../../framework/services/picker-config-registry.service';
-import { createAutomobilePickerConfigs } from '../../../domain-config/automobile/configs/automobile.picker-configs';
-import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../../framework/services/resource-management.service';
+import { PopOutContextService } from '../../../framework/services/popout-context.service';
+import { ResourceManagementService } from '../../../framework/services/resource-management.service';
+import { UrlStateService } from '../../../framework/services/url-state.service';
 
 /**
  * Panel Popout Component
@@ -53,23 +56,7 @@ import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../..
   templateUrl: './panel-popout.component.html',
   styleUrls: ['./panel-popout.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: RESOURCE_MANAGEMENT_SERVICE,
-      useFactory: (urlState: UrlStateService, domainConfig: DomainConfig<any, any, any>) => {
-        return new ResourceManagementService(urlState, {
-          filterMapper: domainConfig.urlMapper,
-          apiAdapter: domainConfig.apiAdapter,
-          cacheKeyBuilder: domainConfig.cacheKeyBuilder,
-          defaultFilters: {} as any,
-          supportsHighlights: domainConfig.features?.highlights ?? false,
-          highlightPrefix: 'h_',
-          autoFetch: false  // Pop-outs receive state from main window, no API calls needed
-        });
-      },
-      deps: [UrlStateService, DOMAIN_CONFIG]
-    }
-  ]
+  providers: [ResourceManagementService]
 })
 export class PanelPopoutComponent implements OnInit, OnDestroy {
   /**
@@ -105,7 +92,7 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
     private injector: Injector,
     private urlState: UrlStateService,
     @Inject(DOMAIN_CONFIG) domainConfig: DomainConfig<any, any, any>,
-    @Inject(RESOURCE_MANAGEMENT_SERVICE) private resourceService: ResourceManagementService<any, any, any>
+    public resourceService: ResourceManagementService<any, any, any>
   ) {
     this.domainConfig = domainConfig;
   }
@@ -118,24 +105,25 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
     console.log('[PanelPopout] Registered picker configs');
 
     // Extract route parameters
-    this.route.params
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-        this.gridId = params['gridId'];
-        this.panelId = params['panelId'];
-        this.panelType = params['type'];
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      this.gridId = params['gridId'];
+      this.panelId = params['panelId'];
+      this.panelType = params['type'];
 
-        console.log(`[PanelPopout] Initialized - Grid: ${this.gridId}, Panel: ${this.panelId}, Type: ${this.panelType}`);
+      console.log(
+        `[PanelPopout] Initialized - Grid: ${this.gridId}, Panel: ${this.panelId}, Type: ${this.panelType}`
+      );
 
-        // Initialize as pop-out
-        this.popOutContext.initializeAsPopOut(this.panelId);
+      // Initialize as pop-out
+      this.popOutContext.initializeAsPopOut(this.panelId);
 
-        // Trigger change detection
-        this.cdr.markForCheck();
-      });
+      // Trigger change detection
+      this.cdr.markForCheck();
+    });
 
     // Subscribe to messages from main window
-    this.popOutContext.getMessages$()
+    this.popOutContext
+      .getMessages$()
       .pipe(takeUntil(this.destroy$))
       .subscribe(message => {
         this.handleMessage(message);

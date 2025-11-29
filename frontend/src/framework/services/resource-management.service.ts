@@ -1,19 +1,20 @@
-import { InjectionToken } from '@angular/core';
+import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
 import {
-  map,
-  distinctUntilChanged,
-  takeUntil,
   catchError,
-  tap,
+  distinctUntilChanged,
   finalize,
-  switchMap
+  map,
+  takeUntil
 } from 'rxjs/operators';
-import { UrlStateService } from './url-state.service';
+import { DomainConfig } from '../models/domain-config.interface';
 import {
   ResourceManagementConfig,
   ResourceState
 } from '../models/resource-management.interface';
+import { DOMAIN_CONFIG } from './domain-config-registry.service';
+import { PopOutContextService } from './popout-context.service';
+import { UrlStateService } from './url-state.service';
 
 /**
  * Generic resource management service
@@ -21,42 +22,24 @@ import {
  * Orchestrates state management with URL-first architecture:
  * URL → Filters → API → Data → Components
  *
+ * This service is provided at a component level (e.g., DiscoverComponent)
+ * and configured via the DOMAIN_CONFIG injection token. This allows for
+ * multiple instances of the service to exist, each configured for a different
+ * data domain (e.g., Automobiles, Agriculture).
+ *
+ * It is also context-aware: when used within a pop-out window, it automatically
+ * disables API calls (`autoFetch: false`).
+ *
  * @template TFilters - The shape of filter objects
  * @template TData - The shape of individual data items
  * @template TStatistics - The shape of statistics objects (optional)
- *
- * @example
- * ```typescript
- * interface SearchFilters {
- *   search: string;
- *   page: number;
- *   size: number;
- * }
- *
- * interface Item {
- *   id: string;
- *   name: string;
- * }
- *
- * const service = new ResourceManagementService<SearchFilters, Item>(
- *   urlState,
- *   config
- * );
- *
- * // Subscribe to data
- * service.results$.subscribe(items => console.log(items));
- *
- * // Update filters (triggers URL update → data fetch)
- * service.updateFilters({ search: 'test', page: 1 });
- * ```
- *
- * NOTE: This is a plain TypeScript class, NOT an Angular service.
- * Create instances manually in your components by passing urlState and config.
- * Call destroy() in your component's ngOnDestroy() to clean up subscriptions.
  */
-export class ResourceManagementService<TFilters, TData, TStatistics = any> {
-  private urlState: UrlStateService;
-  private stateSubject: BehaviorSubject<ResourceState<TFilters, TData, TStatistics>>;
+@Injectable()
+export class ResourceManagementService<TFilters, TData, TStatistics = any>
+  implements OnDestroy {
+  private stateSubject: BehaviorSubject<
+    ResourceState<TFilters, TData, TStatistics>
+  >;
   private destroy$ = new Subject<void>();
   private config: ResourceManagementConfig<TFilters, TData, TStatistics>;
 
@@ -101,12 +84,24 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
   public highlights$: Observable<any>;
 
   constructor(
-    urlState: UrlStateService,
-    config: ResourceManagementConfig<TFilters, TData, TStatistics>
+    private urlState: UrlStateService,
+    @Inject(DOMAIN_CONFIG)
+    private domainConfig: DomainConfig<TFilters, TData, TStatistics>,
+    private popOutContext: PopOutContextService
   ) {
-    this.urlState = urlState;
-    this.config = config;
-    // Initialize state
+    // 1. Create the internal configuration from the injected domain config
+    this.config = {
+      filterMapper: this.domainConfig.urlMapper,
+      apiAdapter: this.domainConfig.apiAdapter,
+      cacheKeyBuilder: this.domainConfig.cacheKeyBuilder,
+      defaultFilters: (this.domainConfig.defaultFilters || {}) as TFilters,
+      supportsHighlights: this.domainConfig.features?.highlights ?? false,
+      highlightPrefix: 'h_',
+      // Service is context-aware: disable auto-fetching if in a pop-out
+      autoFetch: !this.popOutContext.isInPopOut()
+    };
+
+    // 2. Initialize state
     this.stateSubject = new BehaviorSubject<
       ResourceState<TFilters, TData, TStatistics>
     >({
@@ -118,7 +113,7 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
       statistics: undefined
     });
 
-    // Create observable streams
+    // 3. Create observable streams from state
     this.state$ = this.stateSubject.asObservable();
 
     this.filters$ = this.state$.pipe(
@@ -156,7 +151,7 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
       distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
     );
 
-    // Initialize from URL and watch for changes
+    // 4. Initialize from URL and watch for changes
     this.initializeFromUrl();
     this.watchUrlChanges();
   }
@@ -182,7 +177,9 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
     }
 
     // Get the new URL params
-    const newUrlParams = this.config.filterMapper.toUrlParams(newFilters as TFilters);
+    const newUrlParams = this.config.filterMapper.toUrlParams(
+      newFilters as TFilters
+    );
 
     // Get current URL params to find which ones need to be removed
     const currentUrlParams = this.config.filterMapper.toUrlParams(currentFilters);
@@ -297,7 +294,7 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
     this.updateState({ filters, highlights });
 
     // Fetch data if auto-fetch is enabled
-    if (this.config.autoFetch !== false) {
+    if (this.config.autoFetch) {
       this.fetchData(filters);
     }
   }
@@ -315,7 +312,7 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
         this.updateState({ filters, highlights });
 
         // Fetch data if auto-fetch is enabled
-        if (this.config.autoFetch !== false) {
+        if (this.config.autoFetch) {
           this.fetchData(filters);
         }
       });
@@ -392,14 +389,6 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
    * - Pop-out window: BroadcastChannel → syncStateFromExternal() → state$ → components
    *
    * @param externalState - Complete state object from main window
-   *
-   * @example
-   * ```typescript
-   * // In PanelPopoutComponent
-   * case PopOutMessageType.STATE_UPDATE:
-   *   this.resourceService.syncStateFromExternal(message.payload.state);
-   *   break;
-   * ```
    */
   public syncStateFromExternal(
     externalState: ResourceState<TFilters, TData, TStatistics>
@@ -408,45 +397,17 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any> {
   }
 
   /**
-   * Clean up subscriptions and resources
-   * Call this in your component's ngOnDestroy()
+   * Clean up subscriptions on component destroy
    */
   destroy(): void {
+    this.ngOnDestroy();
+  }
+
+  /**
+   * Clean up subscriptions on component destroy
+   */
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 }
-
-/**
- * Injection token for ResourceManagementService
- *
- * Use this token to provide and inject a shared instance of ResourceManagementService.
- * Typically provided at the page component level (DiscoverComponent, PanelPopoutComponent)
- * and injected into child components that need access to shared state.
- *
- * @example
- * ```typescript
- * // In parent component (DiscoverComponent)
- * providers: [{
- *   provide: RESOURCE_MANAGEMENT_SERVICE,
- *   useFactory: (urlState: UrlStateService, domainConfig: DomainConfig) => {
- *     return new ResourceManagementService(urlState, {
- *       filterMapper: domainConfig.urlMapper,
- *       apiAdapter: domainConfig.apiAdapter,
- *       cacheKeyBuilder: domainConfig.cacheKeyBuilder,
- *       defaultFilters: {}
- *     });
- *   },
- *   deps: [UrlStateService, DOMAIN_CONFIG]
- * }]
- *
- * // In child component
- * constructor(
- *   @Inject(RESOURCE_MANAGEMENT_SERVICE)
- *   private resourceService: ResourceManagementService<TFilters, TData, TStatistics>
- * ) {}
- * ```
- */
-export const RESOURCE_MANAGEMENT_SERVICE = new InjectionToken<ResourceManagementService<any, any, any>>(
-  'ResourceManagementService'
-);

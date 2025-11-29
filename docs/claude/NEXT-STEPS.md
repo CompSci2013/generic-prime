@@ -14,50 +14,33 @@
 
 ---
 
-## Current Priority: Add Statistics Panel
+## Current Priority: Validate Domain Architecture
 
-**Status**: 3 of 4 panels active (Query Control, Picker, Results Table). Statistics panel remaining.
+**Status**: The domain configuration has been refactored to support multiple domains. The next step is to validate this new architecture.
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Continue isolation testing approach.**
-> Test each component in isolation before re-enabling all panels.
+> **Validate the new domain architecture.**
+> The refactoring is complete. The next logical step is to prove the new architecture by adding a second domain.
 
 ---
 
 ## Completed This Session
 
-- Body Class multiselect with checkboxes (p-multiSelect)
-- Array serialization for URL (comma-separated)
-- Query Control re-enabled on discover page
-- Fixed `.split is not a function` crash in Query Control
+- **Domain Configuration Refactoring** - Decoupled domain configuration from the main application module to allow for dynamic registration of multiple domains.
+- **Bug Fixes** - Fixed compilation errors introduced during the refactoring.
 
 ---
 
 ## Immediate Actions
 
-### 1. Add Statistics Panel (PRIORITY)
+### 1. Add "Agriculture" Domain (PRIORITY)
 
-Add Statistics panel to discover page to complete isolation testing:
-
-```html
-<!-- In discover.component.html, add after Results Table -->
-<div class="panel-wrapper">
-  <div class="panel-header">
-    <h3 class="panel-title">Statistics</h3>
-    <!-- Pop-out button here -->
-  </div>
-  <app-statistics-panel
-    [domainConfig]="domainConfig">
-  </app-statistics-panel>
-</div>
-```
-
-Test scenarios:
-- Statistics load with vehicle data
-- Chart interactions work
-- Highlight filters update URL
-- Pop-out statistics syncs with main window
+Create a new "agriculture" domain to validate the new flexible domain architecture. This will involve:
+- Creating a new folder `frontend/src/domain-config/agriculture/`
+- Defining a new set of models, adapters, and configs for the agriculture domain.
+- Adding the new domain provider to the `DOMAIN_PROVIDERS` array.
+- Creating a simple way to switch between domains in the UI (e.g., a dropdown in the header).
 
 ### 2. Fix Bug #13 - Dropdown Keyboard Navigation
 
@@ -75,13 +58,6 @@ Test scenarios:
 ### 3. Fix Bug #7 (Checkboxes)
 
 Low priority checkbox visual state bug - checkboxes stay checked after clearing.
-
-### 4. Remove Isolation Mode
-
-Once Statistics panel verified, update discover.component.html:
-- Remove "ISOLATION MODE" notice
-- Remove debug panel (or make collapsible)
-- Restore normal page layout
 
 ---
 
@@ -105,9 +81,10 @@ discover.component.html:
 
 | File | Purpose |
 |------|---------|
-| `discover.component.html` | Add Statistics panel |
-| `statistics-panel.component.ts` | Statistics rendering |
-| `automobile.chart-configs.ts` | Chart configuration |
+| `frontend/src/domain-config/` | Directory for all domain configurations. |
+| `frontend/src/domain-config/domain-providers.ts` | Centralized array of all domain providers. |
+| `app.component.ts` | Where domains are registered at startup. |
+
 
 ---
 
@@ -130,16 +107,16 @@ kubectl logs -n generic-prime -l app=generic-prime-backend-api --tail=50
 
 Before ending session:
 
-1. [ ] Archive current PROJECT-STATUS.md to STATUS-HISTORY.md
-2. [ ] Update PROJECT-STATUS.md with:
+1. [x] Archive current PROJECT-STATUS.md to STATUS-HISTORY.md
+2. [x] Update PROJECT-STATUS.md with:
    - New version number (increment)
    - New timestamp
    - Findings and decisions
-3. [ ] Update this NEXT-STEPS.md with next actions
+3. [x] Update this NEXT-STEPS.md with next actions
 4. [ ] Commit changes: `git add -A && git commit -m "docs: session summary"`
 5. [ ] Push if appropriate
 
 ---
 
-**Last Updated**: 2025-11-28
-**Updated By**: Body Class multiselect + Query Control session
+**Last Updated**: 2025-11-29
+**Updated By**: Domain Configuration Refactoring Session

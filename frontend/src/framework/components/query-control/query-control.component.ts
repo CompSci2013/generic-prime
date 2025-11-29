@@ -1,21 +1,24 @@
 import {
-  Component,
-  OnInit,
-  OnDestroy,
   ChangeDetectionStrategy,
-  Input,
-  Output,
-  EventEmitter,
   ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  OnDestroy,
+  OnInit,
   Optional,
-  Inject
+  Output
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { DomainConfig } from '../../models/domain-config.interface';
-import { FilterDefinition, FilterOption } from '../../models/filter-definition.interface';
-import { UrlStateService } from '../../services/url-state.service';
+import {
+  FilterDefinition,
+  FilterOption
+} from '../../models/filter-definition.interface';
 import { ApiService } from '../../services/api.service';
-import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
+import { ResourceManagementService } from '../../services/resource-management.service';
+import { UrlStateService } from '../../services/url-state.service';
 
 /**
  * Active filter representation
@@ -142,7 +145,7 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     private urlState: UrlStateService,
     private apiService: ApiService,
     private cdr: ChangeDetectorRef,
-    @Optional() @Inject(RESOURCE_MANAGEMENT_SERVICE) private resourceService?: ResourceManagementService<any, any, any>
+    @Optional() private resourceService?: ResourceManagementService<any, any, any>
   ) {}
 
   ngOnInit(): void {

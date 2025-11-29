@@ -11,8 +11,6 @@ import { AppComponent } from './app.component';
 import { PrimengModule } from './primeng.module';
 import { FrameworkModule } from '../framework/framework.module';
 import { GlobalErrorHandler } from '../framework/services/global-error.handler';
-import { DOMAIN_CONFIG } from '../framework/services/domain-config-registry.service';
-import { createAutomobileDomainConfig } from '../domain-config/automobile';
 import { DiscoverComponent } from './features/discover/discover.component';
 import { PanelPopoutComponent } from './features/panel-popout/panel-popout.component';
 
@@ -38,11 +36,6 @@ import { PanelPopoutComponent } from './features/panel-popout/panel-popout.compo
       provide: ErrorHandler,
       useClass: GlobalErrorHandler
     },
-    {
-      provide: DOMAIN_CONFIG,
-      useFactory: createAutomobileDomainConfig,
-      deps: [Injector]
-    }
   ],
   bootstrap: [AppComponent]
 })

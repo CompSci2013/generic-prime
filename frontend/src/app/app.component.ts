@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Injector } from '@angular/core';
+import { DomainConfigRegistry } from '../framework/services';
+import { DOMAIN_PROVIDERS } from '../domain-config/domain-providers';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +8,13 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'frontend';
+  title = 'generic-prime';
+
+  constructor(
+    private domainConfigRegistry: DomainConfigRegistry,
+    private injector: Injector
+  ) {
+    this.domainConfigRegistry.registerDomainProviders(DOMAIN_PROVIDERS, this.injector);
+  }
 }
+

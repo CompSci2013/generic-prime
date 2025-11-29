@@ -176,6 +176,12 @@ export interface DomainConfig<TFilters, TData, TStatistics = any> {
    * Additional domain-specific information
    */
   metadata?: DomainMetadata;
+
+  /**
+   * Default filters for the domain (optional)
+   * These filters are applied when the application first loads or when filters are cleared.
+   */
+  defaultFilters?: Partial<TFilters>;
 }
 
 /**

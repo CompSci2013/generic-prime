@@ -1,19 +1,30 @@
-import { Component, Inject, ChangeDetectionStrategy, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { DOMAIN_CONFIG } from '../../../framework/services/domain-config-registry.service';
-import { DomainConfig } from '../../../framework/models';
-import { PickerConfigRegistry } from '../../../framework/services/picker-config-registry.service';
-import { PickerSelectionEvent } from '../../../framework/models/picker-config.interface';
-import { createAutomobilePickerConfigs } from '../../../domain-config/automobile/configs/automobile.picker-configs';
-import { Injector } from '@angular/core';
-import { PopOutContextService } from '../../../framework/services/popout-context.service';
-import { PopOutWindowRef, buildWindowFeatures, PopOutMessageType } from '../../../framework/models/popout.interface';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Inject,
+  Injector,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
+import { Params } from '@angular/router';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { MessageService } from 'primeng/api';
+import { createAutomobilePickerConfigs } from '../../../domain-config/automobile/configs/automobile.picker-configs';
+import { DomainConfig } from '../../../framework/models';
+import { PickerSelectionEvent } from '../../../framework/models/picker-config.interface';
+import {
+  buildWindowFeatures,
+  PopOutMessageType,
+  PopOutWindowRef
+} from '../../../framework/models/popout.interface';
+import { DOMAIN_CONFIG } from '../../../framework/services/domain-config-registry.service';
+import { PickerConfigRegistry } from '../../../framework/services/picker-config-registry.service';
+import { PopOutContextService } from '../../../framework/services/popout-context.service';
+import { ResourceManagementService } from '../../../framework/services/resource-management.service';
 import { UrlStateService } from '../../../framework/services/url-state.service';
-import { Params } from '@angular/router';
-import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../../framework/services/resource-management.service';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 /**
  * Discover Component
@@ -37,24 +48,10 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
   templateUrl: './discover.component.html',
   styleUrls: ['./discover.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: RESOURCE_MANAGEMENT_SERVICE,
-      useFactory: (urlState: UrlStateService, domainConfig: DomainConfig<any, any, any>) => {
-        return new ResourceManagementService(urlState, {
-          filterMapper: domainConfig.urlMapper,
-          apiAdapter: domainConfig.apiAdapter,
-          cacheKeyBuilder: domainConfig.cacheKeyBuilder,
-          defaultFilters: {} as any,
-          supportsHighlights: domainConfig.features?.highlights ?? false,
-          highlightPrefix: 'h_'
-        });
-      },
-      deps: [UrlStateService, DOMAIN_CONFIG]
-    }
-  ]
+  providers: [ResourceManagementService]
 })
-export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> implements OnInit, OnDestroy {
+export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
+  implements OnInit, OnDestroy {
   /**
    * Domain configuration (injected, works with any domain)
    */
@@ -117,7 +114,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
 
   constructor(
     @Inject(DOMAIN_CONFIG) domainConfig: DomainConfig<any, any, any>,
-    @Inject(RESOURCE_MANAGEMENT_SERVICE) private resourceService: ResourceManagementService<TFilters, TData, TStatistics>,
+    public resourceService: ResourceManagementService<
+      TFilters,
+      TData,
+      TStatistics
+    >,
     private pickerRegistry: PickerConfigRegistry,
     private injector: Injector,
     private popOutContext: PopOutContextService,
@@ -126,7 +127,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
     private urlStateService: UrlStateService
   ) {
     // Store injected config (works with any domain)
-    this.domainConfig = domainConfig as DomainConfig<TFilters, TData, TStatistics>;
+    this.domainConfig = domainConfig as DomainConfig<
+      TFilters,
+      TData,
+      TStatistics
+    >;
   }
 
   ngOnInit(): void {
@@ -141,7 +146,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
     window.addEventListener('beforeunload', this.beforeUnloadHandler);
 
     // Subscribe to messages from pop-out windows
-    this.popOutContext.getMessages$()
+    this.popOutContext
+      .getMessages$()
       .pipe(takeUntil(this.destroy$))
       .subscribe(message => {
         this.handlePopOutMessage('', message);
@@ -157,14 +163,13 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
 
     // Subscribe to state changes and broadcast to ALL pop-outs
     // URL-First: Main window URL → state$ → BroadcastChannel → pop-out components
-    this.resourceService.state$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(state => {
-        this.broadcastStateToPopOuts(state);
-      });
+    this.resourceService.state$.pipe(takeUntil(this.destroy$)).subscribe(state => {
+      this.broadcastStateToPopOuts(state);
+    });
 
     // DEBUG: Subscribe to URL params for debug display
-    this.urlStateService.watchParams()
+    this.urlStateService
+      .watchParams()
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
         this.debugUrlState = JSON.stringify(params, null, 2);
@@ -278,7 +283,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
 
     // Listen for messages from pop-out (Observable Pattern)
     // Push browser API events to RxJS Subject for handling in Angular zone
-    channel.onmessage = (event) => {
+    channel.onmessage = event => {
       this.popoutMessages$.next({ panelId, event });
     };
 
@@ -311,7 +316,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
    * @param message - Message from pop-out
    */
   private handlePopOutMessage(panelId: string, message: any): void {
-    console.log(`[Discover] Message from pop-out:`, message.type, message.payload);
+    console.log(
+      `[Discover] Message from pop-out:`,
+      message.type,
+      message.payload
+    );
 
     switch (message.type) {
       case PopOutMessageType.PICKER_SELECTION_CHANGE:
@@ -330,7 +339,10 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
       case PopOutMessageType.URL_PARAMS_CHANGED:
         // Pop-out sent URL params change - update main window URL
         // This will trigger: URL change → ResourceManagementService → state$ → BroadcastChannel → pop-outs
-        console.log('[Discover] URL params change from pop-out:', message.payload?.params);
+        console.log(
+          '[Discover] URL params change from pop-out:',
+          message.payload?.params
+        );
         if (message.payload?.params) {
           this.urlStateService.setParams(message.payload.params);
         }
@@ -351,7 +363,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any> i
    * @param channel - BroadcastChannel to close
    * @param checkInterval - Interval to clear
    */
-  private onPopOutClosed(panelId: string, channel: BroadcastChannel, checkInterval: number): void {
+  private onPopOutClosed(
+    panelId: string,
+    channel: BroadcastChannel,
+    checkInterval: number
+  ): void {
     console.log(`[Discover] Pop-out ${panelId} closed, restoring panel`);
 
     // Clean up

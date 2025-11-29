@@ -108,6 +108,38 @@
     </ng-template>
   </div>
 
+  <!-- Statistics Panel (ISOLATED FOR TESTING) -->
+  <div class="panel-wrapper">
+    <div class="panel-header">
+      <div class="panel-title-group">
+        <h3 class="panel-title">Statistics</h3>
+      </div>
+      <div class="panel-actions">
+        <button
+          *ngIf="!isPanelPoppedOut('statistics-panel')"
+          pButton
+          type="button"
+          icon="pi pi-external-link"
+          class="p-button-sm p-button-text p-button-rounded"
+          (click)="popOutPanel('statistics-panel', 'statistics')"
+          pTooltip="Pop out to separate window"
+          tooltipPosition="left">
+        </button>
+      </div>
+    </div>
+    <div *ngIf="!isPanelPoppedOut('statistics-panel'); else statisticsPlaceholder">
+      <app-statistics-panel
+        [domainConfig]="domainConfig">
+      </app-statistics-panel>
+    </div>
+    <ng-template #statisticsPlaceholder>
+      <div class="popout-placeholder">
+        <i class="pi pi-external-link"></i>
+        <span>Statistics is open in a separate window</span>
+      </div>
+    </ng-template>
+  </div>
+
   <hr/>
 
   <!-- DEBUG: Current URL State -->

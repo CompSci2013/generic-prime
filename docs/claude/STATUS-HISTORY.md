@@ -546,7 +546,657 @@ URL params change correctly (URL bar updates), but:
 The `UrlStateService` changes appear correct but state isn't flowing to downstream consumers. Debug logging needed to trace:
 1. `UrlStateService.paramsSubject.next()` emissions
 2. `ResourceManagementService.watchUrlChanges()` subscription
-3. `filters$` observable emissions
+3. `filters$`# Status History
+
+**Purpose**: Archive of previous PROJECT-STATUS.md versions.
+
+**Usage**: Before updating PROJECT-STATUS.md, copy the current version here with a separator.
+
+---
+
+## Archive
+
+---
+
+## Version 2.1 - 2025-11-28T01:30:00Z
+
+# Project Status
+
+**Version**: 2.1
+**Timestamp**: 2025-11-28T01:30:00Z
+**Updated By**: Body Class multiselect + Query Control session
+
+---
+
+## Current State
+
+### Port 4205 (generic-prime) - IN DEVELOPMENT
+- **Body Class multiselect implemented** - Checkbox selection working
+- **Query Control re-enabled** - Now testing 3 panels together
+- Discover page in **ISOLATION MODE** - testing Query Control + Picker + Results Table
+- Backend at `generic-prime-backend-api:v1.5.0`
+
+### Port 4201 (autos-prime-ng) - REFERENCE
+- Unaffected by changes
+- Continues to serve as working reference
+
+---
+
+## Session Summary (2025-11-28)
+
+### Body Class Multiselect Implementation
+
+Changed Body Class filter from single-select dropdown to multiselect with checkboxes:
+
+| Component | Change |
+|-----------|--------|
+| `automobile.filter-definitions.ts` | Changed type from `select` to `multiselect` |
+| `automobile.filters.ts` | Changed `bodyClass` type to `string \| string[]` |
+| `automobile-url-mapper.ts` | Array serialization (comma-separated) for URL |
+| `results-table.component.html` | Added `p-multiSelect` template |
+| `results-table.component.ts` | Handle empty arrays as "no filter" |
+| `query-control.component.ts` | Handle array param values (fixed `.split()` crash) |
+
+### Query Control Re-enabled
+
+Added Query Control panel back to discover page alongside Picker and Results Table.
+
+### Bug Fixed
+
+| Bug | Description | Resolution |
+|-----|-------------|------------|
+| `.split is not a function` | Query Control crashed on array values | Check if value is array before splitting |
+
+---
+
+## Governing Tactic
+
+**Continue isolation testing approach.**
+
+1. ~~Test QueryControl in isolation~~ DONE
+2. ~~Test Picker in isolation~~ DONE
+3. Test Statistics in isolation
+4. ~~Test Results in isolation~~ DONE
+5. Re-enable all panels when individually verified
+
+**Progress**: 3 of 4 panels now active (Query Control, Picker, Results Table). Statistics panel remaining.
+
+---
+
+## Known Facts
+
+| Resource | Value | Notes |
+|----------|-------|-------|
+| Elasticsearch Cluster | `elasticsearch.data.svc.cluster.local:9200` | K8s internal |
+| Index: Vehicle Specs | `autos-unified` | 4,887 documents |
+| Index: VIN Records | `autos-vins` | 55,463 documents |
+| Unique Manufacturers | 72 | Verified via ES |
+| Unique Mfr-Model Combos | 881 | Working in picker |
+| Unique Body Classes | 12 | Via /agg/body_class |
+| **Backend Source** | `~/projects/data-broker/generic-prime/src/` | JavaScript/Express |
+| **Backend Image** | `localhost/generic-prime-backend-api:v1.5.0` | **Current** |
+
+---
+
+## Critical Bugs
+
+| Bug | Severity | Status | Summary |
+|-----|----------|--------|---------|
+| #11 | CRITICAL | **RESOLVED** | Picker shows 881 combos with server-side pagination |
+| #10 | Medium | **RESOLVED** | Pop-out communication working |
+| #12 | Low | **RESOLVED** | Picker search partial match (changed from fuzzy to wildcard) |
+| #13 | Medium | Not started | Dropdown keyboard navigation (arrow keys, Enter/Space) broken |
+| #7 | Low | Not started | Checkboxes stay checked after clearing |
+
+---
+
+## Next Session
+
+1. **Test Statistics in isolation** - Add Statistics panel to discover page
+2. **Fix Bug #13** - Dropdown keyboard navigation (may be PrimeNG issue)
+3. **Fix Bug #7** - Checkbox visual state
+4. **Re-enable all panels** - Remove isolation mode notice
+
+See [NEXT-STEPS.md](NEXT-STEPS.md) for details.
+
+---
+
+**When this status changes, copy it to STATUS-HISTORY.md before updating.**
+
+---
+
+## Version 2.0 - 2025-11-27T19:00:00Z
+
+# Project Status
+
+**Version**: 2.0
+**Timestamp**: 2025-11-27T19:00:00Z
+**Updated By**: Results Table isolation testing session
+
+---
+
+## Current State
+
+### Port 4205 (generic-prime) - IN DEVELOPMENT
+- **Results Table isolation testing IN PROGRESS**
+- **Dropdown improvements implemented** - Dynamic options from backend
+- **Generic /agg/:field endpoint added** - Backend v1.5.0
+- Discover page in **ISOLATION MODE** - testing Picker + Results Table
+- Backend at `generic-prime-backend-api:v1.5.0`
+
+### Port 4201 (autos-prime-ng) - REFERENCE
+- Unaffected by changes
+- Continues to serve as working reference
+
+---
+
+## Session Summary (2025-11-27 - Afternoon)
+
+### Results Table Isolation Testing
+
+Testing Results Table component alongside Picker for easier testing.
+
+| Test | Status |
+|------|--------|
+| Results Table loads data | PASS |
+| Filters update URL | PASS |
+| Filter clearing removes from URL | PASS |
+| Dropdown search works | PASS |
+| Dropdown options sorted alphabetically | PASS |
+| All body classes available | PASS |
+
+### Dropdown Improvements
+
+Implemented data-driven dropdown options instead of hard-coded values:
+
+| Component | Change |
+|-----------|--------|
+| Backend `elasticsearchService.js` | Added generic `getAggregation()` function |
+| Backend `specsController.js` | Added `getAggregationHandler` controller |
+| Backend `specsRoutes.js` | Added `GET /agg/:field` route |
+| Frontend `domain-config.interface.ts` | Added `optionsEndpoint` to FilterDefinition |
+| Frontend `automobile.filter-definitions.ts` | Changed bodyClass to use `optionsEndpoint: 'body_class'` |
+| Frontend `results-table.component.ts` | Added dynamic option loading from API |
+| Frontend `results-table.component.html` | Added `[filter]="true"` to dropdown for search |
+
+### API Changes (v1.5.0)
+
+New generic aggregation endpoint:
+```
+GET /api/specs/v1/agg/:field?order=alpha&limit=1000
+Response: {
+  field: "body_class",
+  values: [
+    { value: "Convertible", count: 21 },
+    { value: "Coupe", count: 494 },
+    ...
+  ]
+}
+```
+
+### Bugs Found
+
+| Bug | Description | Priority | Status |
+|-----|-------------|----------|--------|
+| #13 | Dropdown keyboard navigation broken | Medium | **NEW** |
+|     | Down arrow should highlight options, Enter/Space should select | | Not started |
+
+---
+
+## Governing Tactic
+
+**Continue isolation testing approach.**
+
+1. ~~Test QueryControl in isolation~~ DONE
+2. ~~Test Picker in isolation~~ DONE
+3. Test Statistics in isolation
+4. ~~Test Results in isolation~~ IN PROGRESS
+5. Re-enable all panels when individually verified
+
+---
+
+## Known Facts
+
+| Resource | Value | Notes |
+|----------|-------|-------|
+| Elasticsearch Cluster | `elasticsearch.data.svc.cluster.local:9200` | K8s internal |
+| Index: Vehicle Specs | `autos-unified` | 4,887 documents |
+| Index: VIN Records | `autos-vins` | 55,463 documents |
+| Unique Manufacturers | 72 | Verified via ES |
+| Unique Mfr-Model Combos | 881 | Working in picker |
+| Unique Body Classes | 12 | Via /agg/body_class |
+| **Backend Source** | `~/projects/data-broker/generic-prime/src/` | JavaScript/Express |
+| **Backend Image** | `localhost/generic-prime-backend-api:v1.5.0` | **Current** |
+
+---
+
+## Critical Bugs
+
+| Bug | Severity | Status | Summary |
+|-----|----------|--------|---------|
+| #11 | CRITICAL | **RESOLVED** | Picker shows 881 combos with server-side pagination |
+| #10 | Medium | **RESOLVED** | Pop-out communication working |
+| #12 | Low | **RESOLVED** | Picker search partial match (changed from fuzzy to wildcard) |
+| #13 | Medium | Not started | Dropdown keyboard navigation (arrow keys, Enter/Space) broken |
+| #7 | Low | Not started | Checkboxes stay checked after clearing |
+| NEW | Low | Not started | URL params are case sensitive |
+
+---
+
+## Next Session
+
+1. **Fix Bug #13** - Dropdown keyboard navigation (may be PrimeNG issue)
+2. **Test Statistics in isolation** - Swap Picker for Statistics panel
+3. **Fix Bug #7** - Checkbox visual state
+4. **Re-enable all panels** when individually verified
+
+See [NEXT-STEPS.md](NEXT-STEPS.md) for details.
+
+---
+
+## Version 1.9 - 2025-11-27T23:45:00Z
+
+# Project Status
+
+**Version**: 1.9
+**Timestamp**: 2025-11-27T23:45:00Z
+**Updated By**: Picker isolation testing session
+
+---
+
+## Current State
+
+### Port 4205 (generic-prime) - IN DEVELOPMENT
+- **Picker isolation testing COMPLETE** - All 4 tests passed
+- **Column sorting implemented** - Backend v1.4.0
+- **Picker search partial matching fixed** - Backend v1.4.1
+- Discover page in **ISOLATION MODE** - testing Picker only
+- Backend at `generic-prime-backend-api:v1.4.1`
+
+### Port 4201 (autos-prime-ng) - REFERENCE
+- Unaffected by changes
+- Continues to serve as working reference
+
+---
+
+## Session Summary (2025-11-27 - Late Evening)
+
+### Picker Isolation Testing Results
+
+| Test | Status |
+|------|--------|
+| Picker loads 881 combinations | PASS |
+| Selection updates URL | PASS |
+| URL paste updates picker selection | PASS |
+| Pop-out picker syncs with main window | PASS |
+
+### Column Sorting Implementation
+
+Backend and frontend changes to enable column sorting:
+
+| Component | Change |
+|-----------|--------|
+| Backend `specsController.js` | Added `sortBy` and `sortOrder` query params |
+| Backend `elasticsearchService.js` | Sort cached combinations before pagination |
+| Frontend `automobile.picker-configs.ts` | Pass sort params to API |
+| Frontend `base-picker.component.html` | Replace `(onPage)`+`(onSort)` with `(onLazyLoad)` |
+| Frontend `base-picker.component.ts` | Add `onLazyLoad()` handler |
+
+**Key Learning**: PrimeNG with `[lazy]="true"` fires `(onLazyLoad)` event instead of separate `(onSort)` and `(onPage)` events.
+
+### Backend Deployment Pattern Documented
+
+Added to ORIENTATION.md:
+```bash
+podman save localhost/generic-prime-backend-api:vX.Y.Z -o /tmp/backend-vX.Y.Z.tar && \
+  sudo k3s ctr images import /tmp/backend-vX.Y.Z.tar && \
+  sudo rm /tmp/backend-vX.Y.Z.tar
+```
+
+### Bugs Found
+
+| Bug | Description | Priority | Status |
+|-----|-------------|----------|--------|
+| Search filter partial match | Searching "bla" should match "Blazer" | Low | **FIXED** (v1.4.1) |
+| URL params case sensitive | `Ford` vs `ford` treated differently | Low | Not started |
+
+---
+
+## Governing Tactic
+
+**Continue isolation testing approach.**
+
+1. ~~Test QueryControl in isolation~~ DONE
+2. ~~Test Picker in isolation~~ DONE
+3. Test Statistics in isolation
+4. Test Results in isolation
+5. Re-enable all panels when individually verified
+
+---
+
+## Known Facts
+
+| Resource | Value | Notes |
+|----------|-------|-------|
+| Elasticsearch Cluster | `elasticsearch.data.svc.cluster.local:9200` | K8s internal |
+| Index: Vehicle Specs | `autos-unified` | 4,887 documents |
+| Index: VIN Records | `autos-vins` | 55,463 documents |
+| Unique Manufacturers | 72 | Verified via ES |
+| Unique Mfr-Model Combos | 881 | Working in picker |
+| **Backend Source** | `~/projects/data-broker/generic-prime/src/` | JavaScript/Express |
+| **Backend Image** | `localhost/generic-prime-backend-api:v1.4.1` | **Current** |
+
+---
+
+## Critical Bugs
+
+| Bug | Severity | Status | Summary |
+|-----|----------|--------|---------|
+| #11 | CRITICAL | **RESOLVED** | Picker shows 881 combos with server-side pagination |
+| #10 | Medium | **RESOLVED** | Pop-out communication working |
+| #12 | Low | **RESOLVED** | Picker search partial match (changed from fuzzy to wildcard) |
+| #7 | Low | Not started | Checkboxes stay checked after clearing |
+| NEW | Low | Not started | URL params are case sensitive |
+
+---
+
+## Next Session
+
+1. **Test Statistics in isolation** - Swap Picker for Statistics panel
+2. **Test Results in isolation** - Add Results panel
+3. **Fix Bug #7** - Checkbox visual state
+4. **Re-enable all panels** when individually verified
+
+See [NEXT-STEPS.md](NEXT-STEPS.md) for details.
+
+---
+
+## Version 1.8 - 2025-11-27T22:30:00Z
+
+# Project Status
+
+**Version**: 1.8
+**Timestamp**: 2025-11-27T22:30:00Z
+**Updated By**: QueryControl bug fixes session
+
+---
+
+## Current State
+
+### Port 4205 (generic-prime) - IN DEVELOPMENT
+- **Bug #11 FULLY RESOLVED** - Picker working with 881 combinations
+- **Bug #10 RESOLVED** - Pop-out communication working
+- Discover page in **ISOLATION MODE** - testing QueryControl only
+- Backend at `generic-prime-backend-api:v1.3.0`
+
+### Port 4201 (autos-prime-ng) - REFERENCE
+- Unaffected by changes
+- Continues to serve as working reference
+
+---
+
+## Session Summary (2025-11-27 - Evening)
+
+### QueryControl Bug Fixes
+
+Fixed two issues identified during isolation testing:
+
+| Bug | Fix | Files Changed |
+|-----|-----|---------------|
+| Dropdown showing highlight filters | Removed highlight filters from `filterFieldOptions` | `query-control.component.ts` |
+| Clear All not clearing all URL params | New `clearAllFilters` event → `urlState.clearParams()` | Multiple (see below) |
+
+### Clear All Implementation
+
+Simplified from iterating over filter configs to simply clearing the URL:
+
+```
+QueryControl.clearAll()
+  → emits clearAllFilters event
+  → Parent calls urlStateService.clearParams()
+  → URL becomes clean
+```
+
+### Files Modified This Session
+
+| File | Change |
+|------|--------|
+| `query-control.component.ts` | Remove highlight filters from dropdown; add `clearAllFilters` output; simplify `clearAll()` |
+| `popout.interface.ts` | Add `CLEAR_ALL_FILTERS` message type |
+| `discover.component.html` | Bind `(clearAllFilters)` event |
+| `discover.component.ts` | Add `onClearAllFilters()` handler + message handler |
+| `panel-popout.component.html` | Bind `(clearAllFilters)` event |
+| `panel-popout.component.ts` | Add `onClearAllFilters()` handler |
+
+---
+
+## Governing Tactic
+
+**Continue isolation testing approach.**
+
+1. ~~Finish testing QueryControl bugs~~ ✅ Done
+2. Remove QueryControl, add Picker
+3. Test Picker in isolation
+4. Repeat for Statistics and Results
+5. Re-enable all panels when individually verified
+
+---
+
+## Known Facts
+
+| Resource | Value | Notes |
+|----------|-------|-------|
+| Elasticsearch Cluster | `elasticsearch.data.svc.cluster.local:9200` | K8s internal |
+| Index: Vehicle Specs | `autos-unified` | 4,887 documents |
+| Index: VIN Records | `autos-vins` | 55,463 documents |
+| Unique Manufacturers | 72 | Verified via ES |
+| Unique Mfr-Model Combos | 881 | Working in picker |
+| **Backend Source** | `~/projects/data-broker/generic-prime/src/` | JavaScript/Express |
+| **Backend Image** | `localhost/generic-prime-backend-api:v1.3.0` | **Current** |
+
+---
+
+## Critical Bugs
+
+| Bug | Severity | Status | Summary |
+|-----|----------|--------|---------|
+| #11 | CRITICAL | **RESOLVED** | Picker shows 881 combos with server-side pagination |
+| #10 | Medium | **RESOLVED** | Pop-out communication working |
+| #7 | Low | Not started | Checkboxes stay checked after clearing |
+
+---
+
+## Next Session
+
+1. **Test Picker in isolation** - Swap QueryControl for Picker in discover.component.html
+2. **Fix Bug #7** - Checkbox visual state
+3. **Test Statistics in isolation**
+4. **Re-enable all panels** when individually verified
+
+See [NEXT-STEPS.md](NEXT-STEPS.md) for details.
+
+---
+
+## Version 1.7 - 2025-11-27T21:00:00Z
+
+# Project Status
+
+**Version**: 1.7
+**Timestamp**: 2025-11-27T21:00:00Z
+**Updated By**: Bug #10 isolation testing session
+
+---
+
+## Current State
+
+### Port 4205 (generic-prime) - IN DEVELOPMENT
+- **Bug #11 FULLY RESOLVED** - Picker working with 881 combinations
+- **Bug #10 SIGNIFICANT PROGRESS** - Pop-out communication working
+- Discover page in **ISOLATION MODE** - testing QueryControl only
+- Backend upgraded to `generic-prime-backend-api:v1.3.0`
+
+### Port 4201 (autos-prime-ng) - REFERENCE
+- Unaffected by changes
+- Continues to serve as working reference
+
+---
+
+## Session Summary (2025-11-27)
+
+### Isolation Testing Strategy
+
+Simplified Discover page to test QueryControl in isolation. Removed picker, statistics, and results panels.
+
+### Fixes Applied (Working)
+
+| Fix | File | Description |
+|-----|------|-------------|
+| Pop-out → Main URL sync | `panel-popout.component.ts` | Send `URL_PARAMS_CHANGED` via BroadcastChannel |
+| Main handles pop-out messages | `discover.component.ts` | Handle `URL_PARAMS_CHANGED`, update URL |
+| Close pop-outs on refresh | `discover.component.ts` | `beforeunload` broadcasts `CLOSE_POPOUT` |
+
+### Test Results
+
+| Test | Status |
+|------|--------|
+| Main window filter add | ✅ Working |
+| URL paste in main window | ✅ Working |
+| Pop-out receives state via BroadcastChannel | ✅ Working |
+| Pop-out filter change → main URL update | ✅ Working |
+| Pop-outs close on page refresh | ✅ Working |
+
+### Remaining QueryControl Issues
+
+- Minor bugs to address in next session (not documented yet)
+
+### Files Modified This Session
+
+| File | Change |
+|------|--------|
+| `discover.component.html` | Isolation mode - QueryControl only + debug panel |
+| `discover.component.ts` | Debug URL display, `beforeunload` handler, `closeAllPopOuts()` |
+| `discover.component.scss` | Styles for isolation notice and debug panel |
+| `panel-popout.component.ts` | Implement `URL_PARAMS_CHANGED` message sending |
+
+---
+
+## Governing Tactic
+
+**Continue isolation testing approach.**
+
+1. Finish testing QueryControl bugs
+2. Remove QueryControl, add Picker
+3. Test Picker in isolation
+4. Repeat for Statistics and Results
+5. Re-enable all panels when individually verified
+
+---
+
+## Known Facts
+
+| Resource | Value | Notes |
+|----------|-------|-------|
+| Elasticsearch Cluster | `elasticsearch.data.svc.cluster.local:9200` | K8s internal |
+| Index: Vehicle Specs | `autos-unified` | 4,887 documents |
+| Index: VIN Records | `autos-vins` | 55,463 documents |
+| Unique Manufacturers | 72 | Verified via ES |
+| Unique Mfr-Model Combos | 881 | Working in picker |
+| **Backend Source** | `~/projects/data-broker/generic-prime/src/` | JavaScript/Express |
+| **Backend Image** | `localhost/generic-prime-backend-api:v1.3.0` | **Current** |
+
+---
+
+## Critical Bugs
+
+| Bug | Severity | Status | Summary |
+|-----|----------|--------|---------|
+| #11 | CRITICAL | **RESOLVED** | Picker shows 881 combos with server-side pagination |
+| #10 | Medium | **MOSTLY RESOLVED** | Pop-out communication working, close on refresh |
+| #7 | Low | Not started | Checkboxes stay checked after clearing |
+
+---
+
+## Next Session
+
+1. **Fix QueryControl bugs** - Address remaining issues found during isolation testing
+2. **Test Picker in isolation** - Swap QueryControl for Picker
+3. **Fix Bug #7** - Checkbox visual state
+
+See [NEXT-STEPS.md](NEXT-STEPS.md) for details.
+
+---
+
+## Version 1.6 - 2025-11-27T19:30:00Z
+
+# Project Status
+
+**Version**: 1.6
+**Timestamp**: 2025-11-27T19:30:00Z
+**Updated By**: Bug #10 investigation session
+
+---
+
+## Current State
+
+### Port 4205 (generic-prime) - IN DEVELOPMENT
+- **Bug #11 FULLY RESOLVED** - Picker working with 881 combinations
+- **Bug #10 IN PROGRESS** - Partial fix applied, not resolved
+- Backend upgraded to `generic-prime-backend-api:v1.3.0`
+
+### Port 4201 (autos-prime-ng) - REFERENCE
+- Unaffected by changes
+- Continues to serve as working reference
+
+---
+
+## Bug #10 Investigation (2025-11-27)
+
+### Problem Statement
+Pop-out statistics panel breaks with pre-selected filters:
+1. Initial state showed unfiltered data instead of filtered data
+2. Changing filters (e.g., Ford → Buick) doesn't update pop-out or main window chips
+
+### Root Cause Identified
+
+**`UrlStateService` is a root singleton** (`providedIn: 'root'`) that was using `ActivatedRoute` for URL state. The root-level `ActivatedRoute` doesn't receive query param updates from child routes like `/discover`.
+
+### Fixes Applied (Partial - Not Working)
+
+**File: `frontend/src/framework/services/url-state.service.ts`**
+
+1. **`watchRouteChanges()`** - Changed from `ActivatedRoute.queryParams` to `Router.events` with `NavigationEnd` filter
+2. **`initializeFromRoute()`** - Changed from `route.snapshot.queryParams` to `router.parseUrl(router.url).queryParams`
+
+**File: `frontend/src/app/features/panel-popout/panel-popout.component.ts`**
+
+3. **`autoFetch: false`** - Prevents pop-out from making its own API calls (fixed initial state issue)
+
+### What's Still Broken
+
+URL params change correctly (URL bar updates), but:
+- Active Filter chips in QueryControl don't update
+- Pop-out window doesn't receive new state
+- State propagation broken somewhere in: `UrlStateService` → `ResourceManagementService` → components
+
+### Files Modified This Session
+
+| File | Change |
+|------|--------|
+| `url-state.service.ts` | Use `Router.events` instead of `ActivatedRoute.queryParams` |
+| `url-state.service.ts` | Use `router.url` instead of `route.snapshot` for initialization |
+| `panel-popout.component.ts` | Added `autoFetch: false` |
+
+---
+
+## Governing Tactic
+
+**Bug #10 requires deeper investigation into state propagation.**
+
+The `UrlStateService` changes appear correct but state isn't flowing to downstream consumers. Debug logging needed to trace:
+1. `UrlStateService.paramsSubject.next()` emissions
+2. `ResourceManagementService.watchUrlChanges()` subscription
+3. `filters
+ observable emissions
 4. Component subscriptions receiving updates
 
 ---
@@ -722,7 +1372,7 @@ See [NEXT-STEPS.md](NEXT-STEPS.md) for details.
 
 | Component | Before | After |
 |-----------|--------|-------|
-| ES Query | Nested `terms` (size: 100) | Composite aggregation |
+| ES Query | Nested `terms` with `size: 100` | Composite aggregation |
 | Pagination | In-memory `.slice()` | ES cursor (`afterKey`) |
 | Response | 72 manufacturers (nested) | 881 combinations (flat) |
 | Total Count | Manufacturer count | Cardinality of combos |

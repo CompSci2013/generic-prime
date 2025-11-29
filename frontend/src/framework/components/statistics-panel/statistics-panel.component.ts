@@ -8,23 +8,23 @@
  */
 
 import {
-  Component,
-  Input,
-  OnInit,
-  OnDestroy,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Inject
+  Component,
+  Inject,
+  Input,
+  OnDestroy,
+  OnInit
 } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ChartConfig, DomainConfig } from '../../models/domain-config.interface';
-import { ChartDataSource } from '../base-chart/base-chart.component';
-import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
-import { UrlStateService } from '../../services/url-state.service';
-import { PopOutContextService } from '../../services/popout-context.service';
 import { PopOutMessageType } from '../../models/popout.interface';
+import { PopOutContextService } from '../../services/popout-context.service';
+import { ResourceManagementService } from '../../services/resource-management.service';
+import { UrlStateService } from '../../services/url-state.service';
+import { ChartDataSource } from '../base-chart/base-chart.component';
 
 /**
  * Statistics Panel Component
@@ -84,7 +84,6 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    @Inject(RESOURCE_MANAGEMENT_SERVICE)
     private resourceService: ResourceManagementService<any, any, any>,
     private route: ActivatedRoute,
     private urlState: UrlStateService,
@@ -128,10 +127,6 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-
-    if (this.resourceService) {
-      this.resourceService.destroy();
-    }
   }
 
   /**

@@ -1,4 +1,4 @@
-import { Injectable, InjectionToken } from '@angular/core';
+import { Injectable, InjectionToken, Injector, Provider } from '@angular/core';
 import { DomainConfig } from '../models/domain-config.interface';
 import { DomainConfigValidator } from './domain-config-validator.service';
 
@@ -113,6 +113,21 @@ export class DomainConfigRegistry {
     validate: boolean = true
   ): void {
     configs.forEach((config) => this.register(config, validate));
+  }
+
+  /**
+   * Register domain providers
+   *
+   * @param providers - Array of domain configuration providers
+   * @param injector - Angular injector for resolving dependencies
+   */
+  registerDomainProviders(providers: Provider[], injector: Injector): void {
+    providers.forEach(provider => {
+      if ('useFactory' in provider && provider.deps) {
+        const config = provider.useFactory(...provider.deps.map(dep => injector.get(dep)));
+        this.register(config);
+      }
+    });
   }
 
   /**

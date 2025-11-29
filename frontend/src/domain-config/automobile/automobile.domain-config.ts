@@ -33,6 +33,8 @@ import {
   BodyClassChartDataSource,
   YearChartDataSource
 } from './chart-sources';
+import { Provider } from '@angular/core';
+import { DOMAIN_CONFIG } from '../../framework/services';
 
 /**
  * Factory function to create Automobile Domain Configuration
@@ -115,3 +117,9 @@ export function createAutomobileDomainConfig(injector: Injector): DomainConfig<
     }
   };
 }
+
+export const DOMAIN_PROVIDER: Provider = {
+  provide: DOMAIN_CONFIG,
+  useFactory: createAutomobileDomainConfig,
+  deps: [Injector],
+};

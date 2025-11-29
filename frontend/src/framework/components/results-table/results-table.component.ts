@@ -1,17 +1,17 @@
 import {
-  Component,
-  Input,
-  OnInit,
-  OnDestroy,
-  ChangeDetectorRef,
   ChangeDetectionStrategy,
-  Inject
+  ChangeDetectorRef,
+  Component,
+  Inject,
+  Input,
+  OnDestroy,
+  OnInit
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DomainConfig, FilterOption } from '../../models/domain-config.interface';
-import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
+import { ResourceManagementService } from '../../services/resource-management.service';
 
 /**
  * Results Table Component
@@ -38,7 +38,6 @@ import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../se
 })
 export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {
-
   /**
    * Domain configuration (required)
    * Contains all configuration for filters, table, API, etc.
@@ -82,8 +81,11 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
   }
 
   constructor(
-    @Inject(RESOURCE_MANAGEMENT_SERVICE)
-    private resourceService: ResourceManagementService<TFilters, TData, TStatistics>,
+    private resourceService: ResourceManagementService<
+      TFilters,
+      TData,
+      TStatistics
+    >,
     private cdr: ChangeDetectorRef,
     private http: HttpClient
   ) {}

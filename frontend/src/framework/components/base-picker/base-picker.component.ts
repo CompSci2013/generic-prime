@@ -1,27 +1,27 @@
 import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnInit,
-  OnDestroy,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  OnDestroy,
+  OnInit,
   Optional,
-  Inject
+  Output
 } from '@angular/core';
 import { Subject } from 'rxjs';
-import { takeUntil, map, distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import {
-  PickerConfig,
-  PickerState,
-  PickerSelectionEvent,
+  getDefaultPickerState,
   PickerApiParams,
-  getDefaultPickerState
+  PickerConfig,
+  PickerSelectionEvent,
+  PickerState
 } from '../../models/picker-config.interface';
 import { PickerConfigRegistry } from '../../services/picker-config-registry.service';
+import { ResourceManagementService } from '../../services/resource-management.service';
 import { UrlStateService } from '../../services/url-state.service';
-import { ResourceManagementService, RESOURCE_MANAGEMENT_SERVICE } from '../../services/resource-management.service';
 
 /**
  * Base Picker Component
@@ -83,7 +83,7 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
     private registry: PickerConfigRegistry,
     private urlState: UrlStateService,
     private cdr: ChangeDetectorRef,
-    @Optional() @Inject(RESOURCE_MANAGEMENT_SERVICE) private resourceService?: ResourceManagementService<any, any, any>
+    @Optional() private resourceService?: ResourceManagementService<any, any, any>
   ) {}
 
   ngOnInit(): void {
