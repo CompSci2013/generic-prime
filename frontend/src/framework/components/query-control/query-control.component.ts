@@ -3,14 +3,14 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
-  Inject,
   Input,
   OnDestroy,
   OnInit,
   Optional,
   Output
 } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DomainConfig } from '../../models/domain-config.interface';
 import {
   FilterDefinition,
@@ -158,20 +158,30 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
 
     console.log('QueryControl: Filter field options:', this.filterFieldOptions);
 
-    // Subscribe to filter changes for chip synchronization
+    // Subscribe to filter AND highlight changes for chip synchronization
     //
     // Architecture: Works in both main window and pop-out
-    // - Main window: URL → ResourceManagementService.filters$ → chip sync
-    // - Pop-out: BroadcastChannel → ResourceManagementService.filters$ → chip sync
-    // - Single subscription works for both cases!
+    // - Main window: URL → ResourceManagementService.filters$/highlights$ → chip sync
+    // - Pop-out: BroadcastChannel → ResourceManagementService.filters$/highlights$ → chip sync
     if (this.resourceService) {
-      // Use ResourceManagementService.filters$ (works in pop-outs)
-      this.resourceService.filters$
+      // Use combineLatest to get both filters and highlights
+      // highlights$ strips the h_ prefix, so we need to add it back
+      combineLatest([
+        this.resourceService.filters$,
+        this.resourceService.highlights$
+      ])
         .pipe(takeUntil(this.destroy$))
-        .subscribe(filters => {
-          // Convert filters object to params format for syncFiltersFromUrl
-          // (syncFiltersFromUrl expects params format, filters$ provides filter object)
-          const params = { ...filters };
+        .subscribe(([filters, highlights]) => {
+          // Build params object with filters + highlights (with h_ prefix restored)
+          const params: Record<string, any> = { ...filters };
+
+          // Add highlights back with h_ prefix
+          if (highlights) {
+            Object.keys(highlights).forEach(key => {
+              params[`h_${key}`] = highlights[key];
+            });
+          }
+
           this.syncFiltersFromUrl(params);
           this.cdr.markForCheck();
         });
