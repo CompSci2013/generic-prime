@@ -1,24 +1,4 @@
 <div class="picker-container" *ngIf="activeConfig">
-  <!-- Header -->
-  <div class="picker-header">
-    <h3 class="picker-title">{{ activeConfig!.displayName }}</h3>
-    <p class="picker-description" *ngIf="activeConfig!.description">
-      {{ activeConfig!.description }}
-    </p>
-  </div>
-
-  <!-- Search -->
-  <div class="picker-search" *ngIf="activeConfig!.showSearch !== false">
-    <input
-      type="text"
-      pInputText
-      [placeholder]="activeConfig!.searchPlaceholder || 'Search...'"
-      [value]="state.searchTerm"
-      (input)="onSearch($any($event.target).value)"
-      class="search-input"
-    />
-  </div>
-
   <!-- Table -->
   <p-table
     [value]="state.data"
@@ -34,13 +14,19 @@
     styleClass="p-datatable-gridlines"
     responsiveLayout="scroll"
   >
-    <!-- Caption with selection info -->
+    <!-- Caption with search and actions -->
     <ng-template pTemplate="caption">
       <div class="table-caption">
-        <div class="selection-info">
-          <span class="selection-count">
-            {{ state.selectedItems.length }} item(s) selected
-          </span>
+        <!-- Search -->
+        <div class="picker-search" *ngIf="activeConfig!.showSearch !== false">
+          <input
+            type="text"
+            pInputText
+            [placeholder]="activeConfig!.searchPlaceholder || 'Search...'"
+            [value]="state.searchTerm"
+            (input)="onSearch($any($event.target).value)"
+            class="search-input"
+          />
         </div>
         <div class="table-actions">
           <button
