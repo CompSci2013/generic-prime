@@ -50,7 +50,7 @@
 
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   padding: 0.5rem;
 }
@@ -60,7 +60,26 @@
   border: 1px solid var(--surface-border);
   border-radius: 6px;
   padding: 1rem;
-  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  aspect-ratio: 1.618 / 1;
+}
+
+.chart-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--surface-border);
+  flex-shrink: 0;
+}
+
+app-base-chart {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Responsive adjustments */

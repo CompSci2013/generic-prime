@@ -99,11 +99,16 @@ export class TopModelsChartDataSource extends ChartDataSource<VehicleStatistics>
       barmode: hasSegmentedStats ? 'stack' : undefined,
       xaxis: {
         tickangle: -45,
-        automargin: true
+        automargin: true,
+        scaleanchor: 'y',
+        scaleratio: 1
       },
       yaxis: {
         title: '',
-        gridcolor: '#E5E7EB'
+        gridcolor: '#E5E7EB',
+        automargin: true,
+        scaleanchor: 'x',
+        scaleratio: 1
       },
       margin: {
         l: 60,
@@ -111,7 +116,6 @@ export class TopModelsChartDataSource extends ChartDataSource<VehicleStatistics>
         t: 40,
         b: 140
       },
-      height: 400,
       plot_bgcolor: '#FFFFFF',
       paper_bgcolor: '#FFFFFF',
       showlegend: hasSegmentedStats

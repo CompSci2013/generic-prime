@@ -23,9 +23,9 @@
     <div class="charts-grid" *ngIf="statistics">
       <div
         *ngFor="let item of visibleCharts; trackBy: trackByChartId"
-        class="chart-container"
-        [style.height.px]="item.config.height || 400">
+        class="chart-container">
 
+        <div class="chart-title">{{ item.config.title }}</div>
         <app-base-chart
           [dataSource]="item.dataSource"
           [statistics]="statistics"

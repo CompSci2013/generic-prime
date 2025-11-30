@@ -258,19 +258,4 @@
       </ng-template>
     </p-table>
   </div>
-
-  <!-- Statistics Panel (if enabled) - Domain Agnostic -->
-  <p-panel
-    *ngIf="domainConfig.features.statistics && (statistics$ | async) as stats"
-    header="Statistics"
-    [toggleable]="true"
-    [collapsed]="true"
-    styleClass="statistics-panel">
-    <div class="statistics-grid">
-      <div class="stat-card" *ngFor="let key of Object.keys($any(stats))">
-        <div class="stat-value">{{ $any(stats)[key] }}</div>
-        <div class="stat-label">{{ key }}</div>
-      </div>
-    </div>
-  </p-panel>
 </div>

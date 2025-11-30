@@ -92,12 +92,17 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
       xaxis: {
         title: { text: '' },
         gridcolor: '#E5E7EB',
-        type: 'category'
+        type: 'category',
+        scaleanchor: 'y',
+        scaleratio: 1
       },
       yaxis: {
         title: { text: '' },
         gridcolor: '#E5E7EB',
-        rangemode: 'tozero'
+        rangemode: 'tozero',
+        automargin: true,
+        scaleanchor: 'x',
+        scaleratio: 1
       },
       margin: {
         l: 60,
@@ -105,7 +110,6 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
         t: 40,
         b: 60
       },
-      height: 400,
       plot_bgcolor: '#FFFFFF',
       paper_bgcolor: '#FFFFFF',
       showlegend: isSegmented

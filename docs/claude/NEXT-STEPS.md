@@ -25,13 +25,13 @@
 
 ---
 
-## Completed This Session (2025-11-30)
+## Completed This Session (2025-11-30 - Chart Refinement)
 
-- **Layout Restoration** - Restored draggable panel layout from pre-isolation mode
-  - Restored `cdkDropList` and `cdkDrag` for panel reordering
-  - Restored drag handles (hamburger icons) and collapse buttons (chevrons)
-  - Removed debug panel and isolation notice
-  - All bug fixes preserved (beforeunload, clearAllFilters, pop-out communication)
+- **Chart Aspect Ratio Fixed** - Changed from 1:1 square to golden ratio (1.618:1)
+  - Applied CSS `aspect-ratio: 1.618 / 1` to `.chart-container`
+  - Removed hardcoded `height: 400` from Plotly layout configs
+  - Charts now display wider and less tall, maintaining golden ratio
+  - All axis labels visible with `automargin: true`
 
 ---
 
@@ -75,6 +75,7 @@ discover.component.html:
 │   ├── Query Control panel (draggable, collapsible, pop-out)
 │   ├── Manufacturer-Model Picker panel (draggable, collapsible, pop-out)
 │   ├── Statistics panel (draggable, collapsible, pop-out)
+│   │   └── 2×2 Chart Grid (golden ratio aspect ratio)
 │   └── Results Table panel (draggable, collapsible, pop-out)
 ```
 
@@ -124,4 +125,4 @@ Before ending session:
 ---
 
 **Last Updated**: 2025-11-30
-**Updated By**: Layout Restoration Session
+**Updated By**: Chart Layout Refinement Session

@@ -111,11 +111,16 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
       barmode: isSegmented ? 'stack' : undefined,
       xaxis: {
         tickangle: -45,
-        automargin: true
+        automargin: true,
+        scaleanchor: 'y',
+        scaleratio: 1
       },
       yaxis: {
         title: { text: '' },
-        gridcolor: '#E5E7EB'
+        gridcolor: '#E5E7EB',
+        automargin: true,
+        scaleanchor: 'x',
+        scaleratio: 1
       },
       margin: {
         l: 60,
@@ -123,7 +128,6 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
         t: 40,
         b: 100
       },
-      height: 400,
       plot_bgcolor: '#FFFFFF',
       paper_bgcolor: '#FFFFFF',
       showlegend: isSegmented
