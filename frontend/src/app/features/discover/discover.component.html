@@ -22,7 +22,7 @@
               pButton
               type="button"
               [icon]="isPanelCollapsed(panelId) ? 'pi pi-chevron-right' : 'pi pi-chevron-down'"
-              class="p-button-sm p-button-text p-button-rounded"
+              class="p-button-sm p-button-text"
               (click)="togglePanelCollapse(panelId)"
               [pTooltip]="isPanelCollapsed(panelId) ? 'Expand' : 'Collapse'"
               tooltipPosition="left">
@@ -32,7 +32,7 @@
               pButton
               type="button"
               icon="pi pi-external-link"
-              class="p-button-sm p-button-text p-button-rounded"
+              class="p-button-sm p-button-text"
               (click)="popOutPanel(panelId, getPanelType(panelId))"
               pTooltip="Pop out to separate window"
               tooltipPosition="left">

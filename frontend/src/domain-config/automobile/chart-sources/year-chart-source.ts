@@ -91,18 +91,20 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
       barmode: isSegmented ? 'stack' : undefined,
       xaxis: {
         title: { text: '' },
-        gridcolor: '#E5E7EB',
+        gridcolor: '#333333',
         type: 'category',
         scaleanchor: 'y',
-        scaleratio: 1
+        scaleratio: 1,
+        color: '#FFFFFF'
       },
       yaxis: {
         title: { text: '' },
-        gridcolor: '#E5E7EB',
+        gridcolor: '#333333',
         rangemode: 'tozero',
         automargin: true,
         scaleanchor: 'x',
-        scaleratio: 1
+        scaleratio: 1,
+        color: '#FFFFFF'
       },
       margin: {
         l: 60,
@@ -110,8 +112,9 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
         t: 40,
         b: 60
       },
-      plot_bgcolor: '#FFFFFF',
-      paper_bgcolor: '#FFFFFF',
+      plot_bgcolor: '#000000',
+      paper_bgcolor: '#1a1a1a',
+      font: { color: '#FFFFFF' },
       showlegend: isSegmented
     };
 

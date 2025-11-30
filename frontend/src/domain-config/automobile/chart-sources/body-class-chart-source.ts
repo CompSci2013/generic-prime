@@ -113,14 +113,17 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
         tickangle: -45,
         automargin: true,
         scaleanchor: 'y',
-        scaleratio: 1
+        scaleratio: 1,
+        color: '#FFFFFF',
+        gridcolor: '#333333'
       },
       yaxis: {
         title: { text: '' },
-        gridcolor: '#E5E7EB',
+        gridcolor: '#333333',
         automargin: true,
         scaleanchor: 'x',
-        scaleratio: 1
+        scaleratio: 1,
+        color: '#FFFFFF'
       },
       margin: {
         l: 60,
@@ -128,8 +131,9 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
         t: 40,
         b: 100
       },
-      plot_bgcolor: '#FFFFFF',
-      paper_bgcolor: '#FFFFFF',
+      plot_bgcolor: '#000000',
+      paper_bgcolor: '#1a1a1a',
+      font: { color: '#FFFFFF' },
       showlegend: isSegmented
     };
 

@@ -14,24 +14,26 @@
 
 ---
 
-## Current Priority: Validate Domain Architecture
+## Current Priority: Add Agriculture Domain
 
-**Status**: The draggable panel layout has been restored. All 4 panels are now active with drag-drop, collapse, and pop-out functionality.
+**Status**: Dark theme implementation complete. UI styling is fully finished.
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Validate the new domain architecture.**
-> The layout has been restored. The next step is to prove the domain architecture by adding a second domain.
+> **Dark theme implementation complete. UI is now fully styled with dark/black theme.**
+> The application now features a cohesive dark theme matching Visual Studio's color scheme.
 
 ---
 
-## Completed This Session (2025-11-30 - Chart Refinement)
+## Completed This Session (2025-11-30 - Dark Theme Implementation)
 
-- **Chart Aspect Ratio Fixed** - Changed from 1:1 square to golden ratio (1.618:1)
-  - Applied CSS `aspect-ratio: 1.618 / 1` to `.chart-container`
-  - Removed hardcoded `height: 400` from Plotly layout configs
-  - Charts now display wider and less tall, maintaining golden ratio
-  - All axis labels visible with `automargin: true`
+- **PrimeNG Theme Switched** - Changed from `lara-light-blue` to `lara-dark-blue`
+- **Dark Theme Applied** - Page background `#3c3c3c`, panels `#252526`, controls black
+- **Plotly Charts Dark Mode** - All 4 chart sources updated with dark backgrounds and white text
+- **Query Control Styled** - Dark panel with black input backgrounds
+- **Table Rows Compacted** - Row height reduced by 50%
+- **Panel Headers Refined** - Padding reduced, icons cleaned up (no circular backgrounds)
+- **White Text Applied** - All text changed to white for readability on dark backgrounds
 
 ---
 
@@ -70,13 +72,13 @@ Low priority checkbox visual state bug - checkboxes stay checked after clearing.
 
 ```
 discover.component.html:
-├── Header (domain label)
+├── Header (domain label) - White text on dark background
 ├── cdkDropList (panels-container)
-│   ├── Query Control panel (draggable, collapsible, pop-out)
-│   ├── Manufacturer-Model Picker panel (draggable, collapsible, pop-out)
-│   ├── Statistics panel (draggable, collapsible, pop-out)
-│   │   └── 2×2 Chart Grid (golden ratio aspect ratio)
-│   └── Results Table panel (draggable, collapsible, pop-out)
+│   ├── Query Control panel (dark themed) - draggable, collapsible, pop-out
+│   ├── Manufacturer-Model Picker panel (dark themed) - draggable, collapsible, pop-out
+│   ├── Statistics panel (dark themed) - draggable, collapsible, pop-out
+│   │   └── 2×2 Chart Grid (dark Plotly charts with white text)
+│   └── Results Table panel (dark themed, compact rows) - draggable, collapsible, pop-out
 ```
 
 ---
@@ -125,4 +127,4 @@ Before ending session:
 ---
 
 **Last Updated**: 2025-11-30
-**Updated By**: Chart Layout Refinement Session
+**Updated By**: Dark Theme Implementation Session

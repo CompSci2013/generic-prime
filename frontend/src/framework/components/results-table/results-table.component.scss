@@ -46,6 +46,13 @@
     border-radius: 6px;
     padding: 1rem;
 
+    ::ng-deep .p-datatable {
+      .p-datatable-thead > tr > th,
+      .p-datatable-tbody > tr > td {
+        padding: 0rem 0.5rem; // Reduced by 50% from default ~0.75rem
+      }
+    }
+
     .table-caption {
       display: flex;
       justify-content: space-between;
