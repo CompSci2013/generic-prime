@@ -107,11 +107,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    */
   private readonly gridId = 'discover';
 
-  /**
-   * Debug: Current URL state for display
-   */
-  debugUrlState = '(loading...)';
-
   constructor(
     @Inject(DOMAIN_CONFIG) domainConfig: DomainConfig<any, any, any>,
     public resourceService: ResourceManagementService<
@@ -166,15 +161,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     this.resourceService.state$.pipe(takeUntil(this.destroy$)).subscribe(state => {
       this.broadcastStateToPopOuts(state);
     });
-
-    // DEBUG: Subscribe to URL params for debug display
-    this.urlStateService
-      .watchParams()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-        this.debugUrlState = JSON.stringify(params, null, 2);
-        this.cdr.markForCheck();
-      });
   }
 
   /**
@@ -233,6 +219,22 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       'results-table': 'Results'
     };
     return titleMap[panelId] || panelId;
+  }
+
+  /**
+   * Get panel type for routing by panel ID
+   *
+   * @param panelId - Panel identifier
+   * @returns Panel type for pop-out routing
+   */
+  getPanelType(panelId: string): string {
+    const typeMap: { [key: string]: string } = {
+      'query-control': 'query-control',
+      'manufacturer-model-picker': 'picker',
+      'statistics-panel': 'statistics',
+      'results-table': 'results'
+    };
+    return typeMap[panelId] || panelId;
   }
 
   /**
