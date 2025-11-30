@@ -320,7 +320,7 @@
     }
 
     .p-paginator {
-      border-top: 1px solid var(--surface-200);
+      border-top: none;
     }
   }
 
@@ -329,12 +329,12 @@
 
     .p-panel-header {
       background-color: var(--surface-100);
-      border-color: var(--surface-200);
+      border-color: transparent;
       font-weight: 600;
     }
 
     .p-panel-content {
-      border-color: var(--surface-200);
+      border-color: transparent;
     }
   }
 

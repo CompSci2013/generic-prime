@@ -4,8 +4,6 @@
     <h1>{{ domainConfig.domainLabel }}</h1>
   </div>
 
-  <hr/>
-
   <!-- Draggable Panels Container -->
   <div cdkDropList (cdkDropListDropped)="onPanelDrop($event)" class="panels-container">
     <ng-container *ngFor="let panelId of panelOrder">
@@ -104,8 +102,6 @@
           </ng-container>
         </div>
       </div>
-
-      <hr/>
     </ng-container>
   </div>
 </div>
