@@ -16,19 +16,22 @@
 
 ## Current Priority: Validate Domain Architecture
 
-**Status**: The domain configuration has been refactored to support multiple domains. The next step is to validate this new architecture.
+**Status**: The draggable panel layout has been restored. All 4 panels are now active with drag-drop, collapse, and pop-out functionality.
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
 > **Validate the new domain architecture.**
-> The refactoring is complete. The next logical step is to prove the new architecture by adding a second domain.
+> The layout has been restored. The next step is to prove the domain architecture by adding a second domain.
 
 ---
 
-## Completed This Session
+## Completed This Session (2025-11-30)
 
-- **Domain Configuration Refactoring** - Decoupled domain configuration from the main application module to allow for dynamic registration of multiple domains.
-- **Bug Fixes** - Fixed compilation errors introduced during the refactoring.
+- **Layout Restoration** - Restored draggable panel layout from pre-isolation mode
+  - Restored `cdkDropList` and `cdkDrag` for panel reordering
+  - Restored drag handles (hamburger icons) and collapse buttons (chevrons)
+  - Removed debug panel and isolation notice
+  - All bug fixes preserved (beforeunload, clearAllFilters, pop-out communication)
 
 ---
 
@@ -63,16 +66,16 @@ Low priority checkbox visual state bug - checkboxes stay checked after clearing.
 
 ## Current Discover Page State
 
-**ISOLATION MODE**: Query Control + Picker + Results Table are rendered
+**FULL LAYOUT**: All 4 panels with drag-drop, collapse, and pop-out
 
 ```
 discover.component.html:
-├── Header (with isolation notice)
-├── Query Control panel (with pop-out button)
-├── Picker panel (with pop-out button)
-├── Results Table panel (with pop-out button)
-├── Debug panel (shows URL state JSON)
-└── [REMOVED: statistics-panel]
+├── Header (domain label)
+├── cdkDropList (panels-container)
+│   ├── Query Control panel (draggable, collapsible, pop-out)
+│   ├── Manufacturer-Model Picker panel (draggable, collapsible, pop-out)
+│   ├── Statistics panel (draggable, collapsible, pop-out)
+│   └── Results Table panel (draggable, collapsible, pop-out)
 ```
 
 ---
@@ -84,6 +87,8 @@ discover.component.html:
 | `frontend/src/domain-config/` | Directory for all domain configurations. |
 | `frontend/src/domain-config/domain-providers.ts` | Centralized array of all domain providers. |
 | `app.component.ts` | Where domains are registered at startup. |
+| `discover.component.html` | Main discover page layout (restored). |
+| `discover.component.ts` | Panel management, pop-out coordination. |
 
 
 ---
@@ -107,16 +112,16 @@ kubectl logs -n generic-prime -l app=generic-prime-backend-api --tail=50
 
 Before ending session:
 
-1. [x] Archive current PROJECT-STATUS.md to STATUS-HISTORY.md
-2. [x] Update PROJECT-STATUS.md with:
+1. [ ] Archive current PROJECT-STATUS.md to STATUS-HISTORY.md
+2. [ ] Update PROJECT-STATUS.md with:
    - New version number (increment)
    - New timestamp
    - Findings and decisions
-3. [x] Update this NEXT-STEPS.md with next actions
+3. [ ] Update this NEXT-STEPS.md with next actions
 4. [ ] Commit changes: `git add -A && git commit -m "docs: session summary"`
 5. [ ] Push if appropriate
 
 ---
 
-**Last Updated**: 2025-11-29
-**Updated By**: Domain Configuration Refactoring Session
+**Last Updated**: 2025-11-30
+**Updated By**: Layout Restoration Session

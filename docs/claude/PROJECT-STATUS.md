@@ -1,17 +1,17 @@
 # Project Status
 
-**Version**: 2.2
-**Timestamp**: 2025-11-29T15:30:00Z
-**Updated By**: Domain Configuration Refactoring Session
+**Version**: 2.3
+**Timestamp**: 2025-11-30T18:45:00Z
+**Updated By**: Layout Restoration Session
 
 ---
 
 ## Current State
 
 ### Port 4205 (generic-prime) - IN DEVELOPMENT
-- **Domain configuration refactored** - Now supports dynamic registration of multiple domains.
-- **Compilation errors fixed** - Application now compiles successfully after refactoring.
-- Discover page in **ISOLATION MODE** - testing Query Control + Picker + Results Table
+- **Draggable panel layout restored** - Panels are now draggable with collapse functionality
+- **Isolation mode removed** - All 4 panels active (Query Control, Picker, Statistics, Results Table)
+- **All bug fixes preserved** - beforeunload, clearAllFilters, pop-out communication intact
 - Backend at `generic-prime-backend-api:v1.5.0`
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
@@ -20,25 +20,32 @@
 
 ---
 
-## Session Summary (2025-11-29)
+## Session Summary (2025-11-30)
 
-### Domain Configuration Refactoring
+### Layout Restoration
 
-Refactored the domain configuration to support multiple domains dynamically. This addresses a key architectural goal of the project.
+Restored the original draggable panel layout from before isolation mode (commit dc952da~1):
 
 | Component | Change |
 |-----------|--------|
-| `automobile.domain-config.ts` | Created a `DOMAIN_PROVIDER` for dynamic registration. |
-| `domain-providers.ts` | Created a centralized array of domain providers. |
-| `domain-config-registry.service.ts` | Added `registerDomainProviders` method to dynamically load domains. |
-| `app.component.ts` | Application now registers all domains at startup. |
-| `app.module.ts` | Removed static, hardcoded domain configuration. |
+| `discover.component.html` | Restored `cdkDropList`, `*ngFor` iteration, drag handles, collapse buttons |
+| `discover.component.ts` | Added `getPanelType()` method, removed debug panel code |
+| `discover.component.scss` | Removed `.isolation-notice` and `.debug-panel` styles |
 
-### Bug Fixes
+### Features Restored
 
-| Bug | Description | Resolution |
-|-----|-------------|------------|
-| Multiple | Compilation errors after refactoring | Fixed 3 separate compilation errors in `resource-management.service.ts` and `domain-config.interface.ts`. |
+- ✅ Draggable panels with `cdkDrag` and `cdkDragHandle`
+- ✅ Collapse/expand buttons (chevron icons)
+- ✅ Panel reordering via drag-drop
+- ✅ All 4 panels visible (no isolation mode)
+
+### Bug Fixes Preserved
+
+| Fix | Status |
+|-----|--------|
+| `beforeUnloadHandler` for closing pop-outs on refresh | ✅ Preserved |
+| `(clearAllFilters)` event binding on query-control | ✅ Preserved |
+| Pop-out communication via BroadcastChannel | ✅ Preserved |
 
 ---
 
@@ -46,7 +53,7 @@ Refactored the domain configuration to support multiple domains dynamically. Thi
 
 **Validate the new domain architecture.**
 
-The refactoring is complete. The next logical step is to prove the new architecture by adding a second domain.
+The layout has been restored. The next step is to prove the domain architecture by adding a second domain.
 
 ---
 
