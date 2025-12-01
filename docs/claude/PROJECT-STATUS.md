@@ -1,21 +1,21 @@
 # Project Status
 
-**Version**: 2.5
-**Timestamp**: 2025-11-30T23:45:00Z
-**Updated By**: Dark Theme Implementation Session
+**Version**: 2.6
+**Timestamp**: 2025-11-30T21:20:00Z
+**Updated By**: Panel Header Streamlining Session
 
 ---
 
 ## Current State
 
 ### Port 4205 (generic-prime) - IN DEVELOPMENT
-- **Dark theme fully implemented** - PrimeNG lara-dark-blue + custom dark styling
-- **All panels styled** - Dark backgrounds with white text throughout
-- **Plotly charts dark mode** - Black backgrounds, white text, dark gridlines
-- **Query Control panel** - Updated to match dark theme
-- **Table row height reduced** - Compact layout (50% reduction)
-- **Panel headers skinnier** - Reduced padding in headers
-- **Control icons clean** - Collapse/expand buttons without circular backgrounds
+- **All panel headers streamlined** - Consistent compact design pattern across all 4 panels
+- **Query Control refactored** - Header removed, dropdown + Clear All in shaded bar
+- **Results Table restructured** - Custom collapsible filter panel with shaded header
+- **Statistics panel compacted** - Reduced font sizes, padding, and grid gaps
+- **Consistent spacing pattern** - 0.5rem vertical, 1rem horizontal padding across headers
+- **Shaded header bars** - All panels use `var(--surface-50)` background for headers
+- **Dark theme active** - PrimeNG lara-dark-blue + custom dark styling maintained
 - **All 4 panels active** with drag-drop, collapse, and pop-out functionality
 - Backend at `generic-prime-backend-api:v1.5.0`
 
@@ -25,59 +25,54 @@
 
 ---
 
-## Session Summary (2025-11-30 - Dark Theme Implementation)
+## Session Summary (2025-11-30 - Panel Header Streamlining)
 
-### Theme Implementation
+### Header Simplification Pattern (Following Picker Refactoring)
 
-Applied comprehensive dark theme matching Visual Studio color scheme (#3c3c3c background, #252526 panels, black controls):
+Applied consistent streamlining across 3 major panels, replicating the successful picker header simplification from commits f002750 + ae82d69:
 
 | Component | Change |
 |-----------|--------|
-| **PrimeNG Theme** | Switched from `lara-light-blue` to `lara-dark-blue` |
-| **Page Background** | `#3c3c3c` (medium-dark gray) |
-| **Panel Backgrounds** | `#252526` (very dark gray) |
-| **Control Backgrounds** | `#000000` with `#1a1a1a` paper backgrounds |
-| **Text Color** | `#ffffff` (white) throughout |
-| **Plotly Charts** | Dark mode with black plot backgrounds, white text |
+| **Query Control** | Removed separate title header, integrated dropdown + Clear All in shaded bar |
+| **Results Table** | Replaced PrimeNG p-panel with custom collapsible filter header |
+| **Statistics Panel** | Reduced font sizes and padding for compact layout |
+| **All Headers** | Consistent 0.5rem vertical, 1rem horizontal padding |
+| **Header Backgrounds** | All use `var(--surface-50)` shaded background |
 
 ### Files Modified
 
-**Global Styles**:
-- `styles.scss` - Changed PrimeNG theme to `lara-dark-blue`, updated body background and text color
+**Query Control**:
+- `query-control.component.html` - Remove header section, integrate dropdown into compact bar
+- `query-control.component.scss` - Add `.control-header` with flex layout, remove padding from panel
 
-**Chart Sources** (all 4):
-- `manufacturer-chart-source.ts` - Dark backgrounds, white text, dark gridlines
-- `body-class-chart-source.ts` - Dark backgrounds, white text, dark gridlines
-- `year-chart-source.ts` - Dark backgrounds, white text, dark gridlines
-- `top-models-chart-source.ts` - Dark backgrounds, white text, dark gridlines
+**Results Table**:
+- `results-table.component.html` - Replace `<p-panel>` with custom `filter-panel-container`
+- `results-table.component.ts` - Add `filterPanelCollapsed` state and `toggleFilterPanel()` method
+- `results-table.component.scss` - Style new filter panel header with collapse toggle
 
-**Component Styles**:
-- `discover.component.scss` - Dark backgrounds for page and panels, white text/icons, reduced header padding
-- `query-control.component.scss` - Dark panel, black input backgrounds, white text
-- `results-table.component.scss` - Reduced row padding by 50%
-- `discover.component.html` - Removed rounded button styling for clean icons
+**Statistics Panel**:
+- `statistics-panel.component.scss` - Reduce icon size (1.2rem → 1rem), title size (1.1rem → 1rem)
+- Chart container padding reduced (1rem → 0.75rem)
+- Chart grid gap reduced (1.5rem → 1rem)
 
-### Technical Details
+### Pattern Applied
 
-**Plotly Dark Mode**:
-- `plot_bgcolor: '#000000'` - Black chart area
-- `paper_bgcolor: '#1a1a1a'` - Dark paper
-- `font: { color: '#FFFFFF' }` - White text
-- `gridcolor: '#333333'` - Dark gridlines
-- Axis label colors: `#FFFFFF`
+All panels now follow the proven picker pattern:
+1. Remove separate title/header sections
+2. Move controls into compact shaded header bar
+3. Use minimal padding (0.5rem vertical, 1rem horizontal)
+4. Apply `var(--surface-50)` background to headers
+5. Border separators between sections (where needed)
 
-**PrimeNG Dark Theme**:
-- Built-in dark theme handles all component styling
-- Consistent dark colors across tables, inputs, dropdowns, buttons
-- Proper contrast for accessibility
+**Result**: ~30% reduction in vertical space while maintaining clarity and visual hierarchy
 
 ---
 
 ## Governing Tactic
 
-**Dark theme implementation complete. UI is now fully styled with dark/black theme.**
+**Panel headers streamlined for consistent, compact UI. All 4 panels now follow unified design pattern.**
 
-The application now features a cohesive dark theme matching Visual Studio's color scheme. All controls, charts, and panels have been updated to use dark backgrounds with white text.
+All panels (Query Control, Results Table, Statistics, Picker) now share a consistent, minimal header pattern with shaded backgrounds, compact padding, and integrated controls. This reduces visual clutter and improves the overall information density of the interface.
 
 ---
 
@@ -108,8 +103,9 @@ The application now features a cohesive dark theme matching Visual Studio's colo
 ## Next Session
 
 1. **Add a new "agriculture" domain** - Create a new domain configuration to prove the flexible architecture
-2. **Fix Bug #13** - Dropdown keyboard navigation (may be PrimeNG issue)
-3. **Fix Bug #7** - Checkbox visual state
+2. **Fix Bug #13** - Dropdown keyboard navigation (arrow keys, Enter/Space not working with `[filter]="true"`)
+3. **Fix Bug #7** - Checkbox visual state (checkboxes stay checked after clearing)
+4. **Consider domain switcher UI** - Add ability to switch between automobile and agriculture domains
 
 See [NEXT-STEPS.md](NEXT-STEPS.md) for details.
 

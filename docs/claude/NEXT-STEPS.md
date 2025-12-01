@@ -16,24 +16,24 @@
 
 ## Current Priority: Add Agriculture Domain
 
-**Status**: Dark theme implementation complete. UI styling is fully finished.
+**Status**: Panel headers streamlined and consolidated. UI is now clean and compact.
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Dark theme implementation complete. UI is now fully styled with dark/black theme.**
-> The application now features a cohesive dark theme matching Visual Studio's color scheme.
+> **Panel headers streamlined for consistent, compact UI. All 4 panels now follow unified design pattern.**
+> All panels (Query Control, Results Table, Statistics, Picker) now share a consistent, minimal header pattern with shaded backgrounds, compact padding, and integrated controls.
 
 ---
 
-## Completed This Session (2025-11-30 - Dark Theme Implementation)
+## Completed This Session (2025-11-30 - Panel Header Streamlining)
 
-- **PrimeNG Theme Switched** - Changed from `lara-light-blue` to `lara-dark-blue`
-- **Dark Theme Applied** - Page background `#3c3c3c`, panels `#252526`, controls black
-- **Plotly Charts Dark Mode** - All 4 chart sources updated with dark backgrounds and white text
-- **Query Control Styled** - Dark panel with black input backgrounds
-- **Table Rows Compacted** - Row height reduced by 50%
-- **Panel Headers Refined** - Padding reduced, icons cleaned up (no circular backgrounds)
-- **White Text Applied** - All text changed to white for readability on dark backgrounds
+- **Query Control Refactored** - Removed header title, integrated dropdown + Clear All into compact bar
+- **Results Table Restructured** - Replaced PrimeNG p-panel with custom collapsible filter header
+- **Statistics Panel Compacted** - Reduced font sizes (1.2rem → 1rem icons, 1.1rem → 1rem titles)
+- **Consistent Padding Applied** - All headers use 0.5rem vertical, 1rem horizontal padding
+- **Shaded Header Bars** - All panels updated to use `var(--surface-50)` background
+- **Filter Panel Collapse** - Added toggleable filter panel with visual chevron indicator
+- **Build Successful** - All changes compiled without errors
 
 ---
 
@@ -127,4 +127,4 @@ Before ending session:
 ---
 
 **Last Updated**: 2025-11-30
-**Updated By**: Dark Theme Implementation Session
+**Updated By**: Panel Header Streamlining Session
