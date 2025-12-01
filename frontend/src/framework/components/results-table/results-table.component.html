@@ -1,7 +1,14 @@
 <div class="results-table-container">
   <!-- Filter Panel - Domain Agnostic -->
-  <p-panel header="Filters" [toggleable]="true" [collapsed]="false" styleClass="filter-panel">
-    <div class="filter-grid">
+  <div class="filter-panel-container" [ngClass]="{'collapsed': filterPanelCollapsed}">
+    <div class="filter-panel-header" (click)="toggleFilterPanel()">
+      <span class="filter-title">
+        <i class="pi pi-filter"></i>
+        Filters
+      </span>
+      <i [ngClass]="filterPanelCollapsed ? 'pi pi-chevron-right' : 'pi pi-chevron-down'"></i>
+    </div>
+    <div class="filter-grid" *ngIf="!filterPanelCollapsed">
       <!-- Dynamic Filter Rendering from domainConfig.filters -->
       <ng-container *ngFor="let filterDef of domainConfig.filters">
         <div class="filter-field" [ngClass]="{'filter-field-wide': filterDef.id === 'search'}">
@@ -149,7 +156,7 @@
                 (click)="clearFilters()"></button>
       </div>
     </div>
-  </p-panel>
+  </div>
 
   <!-- Data Table -->
   <div class="table-container">
@@ -172,15 +179,11 @@
       [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results">
 
-      <!-- Caption -->
+      <!-- Caption with result count -->
       <ng-template pTemplate="caption">
         <div class="table-caption">
-          <span class="caption-text">
-            <i class="pi pi-table"></i>
-            {{ domainConfig.domainLabel }} Results
-          </span>
           <span class="caption-count">
-            {{ totalResults }} total
+            {{ totalResults }} result(s)
           </span>
         </div>
       </ng-template>

@@ -1,17 +1,6 @@
 <div class="query-control-panel">
-  <div class="query-control-header">
-    <h3>Query Control</h3>
-    <p-button
-      label="Clear All"
-      icon="pi pi-times"
-      (onClick)="clearAll()"
-      styleClass="p-button-danger p-button-sm"
-      [disabled]="!hasActiveFiltersOrHighlights()">
-    </p-button>
-  </div>
-
-  <!-- Filter Field Selector -->
-  <div class="filter-field-selector">
+  <!-- Compact Header Bar with Dropdown and Actions -->
+  <div class="control-header">
     <p-dropdown
       [options]="filterFieldOptions"
       [(ngModel)]="selectedField"
@@ -24,6 +13,13 @@
       optionValue="value"
       styleClass="filter-field-dropdown">
     </p-dropdown>
+    <p-button
+      label="Clear All"
+      icon="pi pi-times"
+      (onClick)="clearAll()"
+      styleClass="p-button-danger p-button-sm"
+      [disabled]="!hasActiveFiltersOrHighlights()">
+    </p-button>
   </div>
 
   <!-- Active Filters -->

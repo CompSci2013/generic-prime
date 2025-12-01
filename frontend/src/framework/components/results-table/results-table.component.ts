@@ -59,6 +59,9 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
   loading = false;
   expandedRows: { [key: string]: boolean } = {};
 
+  /** Filter panel collapse state */
+  filterPanelCollapsed = false;
+
   /** Dynamically loaded options for select filters (keyed by filter id) */
   dynamicOptions: Record<string, FilterOption[]> = {};
 
@@ -191,6 +194,14 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
       page: 1,
       size: this.currentFilters['size'] || 20
     } as unknown as TFilters);
+  }
+
+  /**
+   * Toggle filter panel collapse state
+   */
+  toggleFilterPanel(): void {
+    this.filterPanelCollapsed = !this.filterPanelCollapsed;
+    this.cdr.markForCheck();
   }
 
   /**
