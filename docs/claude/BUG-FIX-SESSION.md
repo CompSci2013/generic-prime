@@ -2,7 +2,7 @@
 
 **Purpose**: Special session prompt for implementing bug fixes in generic-prime.
 
-**Context**: This repository has two unresolved bugs. A reference document explains how similar bugs were resolved in another codebase, providing implementation patterns and lessons learned.
+**Context**: This repository has two unresolved bugs. A reference document provides proven implementation patterns and solutions.
 
 ---
 
@@ -20,7 +20,7 @@ You are an expert in Angular 14 application development and Web Applications arc
 1. `docs/claude/ORIENTATION.md`
 2. `docs/claude/PROJECT-STATUS.md`
 3. `docs/claude/NEXT-STEPS.md`
-4. **`docs/claude/BUG-REFERENCE.md`** ← Read this: Cross-repository bug analysis and implementation patterns
+4. **`docs/claude/BUG-REFERENCE.md`** ← Read this: Implementation patterns for proven bug fixes
 
 Do not verify with builds or trying to run the application. I do these things in a separate ssh session.
 
@@ -47,7 +47,7 @@ This session has a special focus on resolving the **two remaining open bugs**:
 - **Reference**: See `BUG-REFERENCE.md` section "Bug #13: Dropdown Keyboard Navigation"
 - **Recommended Solutions**:
   1. PrimeNG version check (may need upgrade)
-  2. Use p-multiSelect alternative (pattern proven in reference)
+  2. Use p-multiSelect alternative (proven solution in reference)
   3. Custom keyboard handler with `@HostListener`
 
 ### Bug #7: Checkbox Visual State (LOW PRIORITY)
@@ -66,13 +66,13 @@ This session has a special focus on resolving the **two remaining open bugs**:
 
 **BUG-REFERENCE.md** provides:
 - Detailed problem descriptions for both unresolved bugs
-- Implementation patterns showing how these bugs were resolved elsewhere
+- Proven implementation patterns showing how these bugs were solved
 - Code examples and architectural patterns
 - Testing recommendations and success criteria
 
 **Location**: `docs/claude/BUG-REFERENCE.md`
 
-Use this document as a guide for implementing fixes, but make implementation decisions appropriate for this codebase.
+Use this document as a guide for implementing fixes, adapting the patterns to fit this codebase's architecture.
 
 ---
 

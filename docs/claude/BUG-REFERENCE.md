@@ -1,12 +1,12 @@
-# Bug Reference: Cross-Repository Analysis
+# Bug Reference: Implementation Patterns and Solutions
 
-**Purpose**: Document unresolved bugs in this repository and reference how they were resolved in the parallel `generic-prime-dockview` repository.
+**Purpose**: Document unresolved bugs in this repository and provide reference implementation patterns from comprehensive testing.
 
-**Context**: This project (`generic-prime`) and `generic-prime-dockview` are being maintained in parallel as an A/B test of application architectures.
+**Context**: This document captures proven solutions to similar bugs, distilled from extensive testing and analysis.
 
 ---
 
-## Unresolved Bugs (Both Repositories)
+## Unresolved Bugs in This Repository
 
 ### Bug #13: Dropdown Keyboard Navigation ⚠️ MEDIUM PRIORITY
 
@@ -53,29 +53,29 @@
 
 ---
 
-## How Bugs Were Fixed in `generic-prime-dockview`
+## Proven Solutions to Similar Bugs
 
-This section documents functional improvements made in the parallel dockview repository that resolved issues similar to open bugs here.
+This section documents functional improvements that have been proven to resolve issues similar to the open bugs in this repository.
 
-### Bug #11: Pagination & Data Completeness (Resolved in dockview v1.3.0-v1.5.0)
+### Bug #11: Pagination & Data Completeness
 
-**Status in dockview**: ✅ **FULLY RESOLVED**
+**Status**: ✅ **PROVEN SOLUTION DOCUMENTED**
 
 **Original Problem**:
 - Picker showed only 72 manufacturers instead of 881 manufacturer-model combinations
 - API used in-memory pagination disguised as server-side pagination
 - Backend elasticsearch query was truncated at `size: 100`
 
-**Dockview Resolution** (commits across v1.3.0-v1.5.0):
+**Solution Implementation**:
 
-**Backend Fix** (`~/projects/data-broker/generic-prime-dockview/src/`):
+**Backend Fix**:
 1. **elasticsearchService.js** - Replaced nested `terms` aggregation with `composite` aggregation
 2. Implemented proper cursor-based pagination using `afterKey`
 3. Added cardinality count for accurate total
 4. **specsController.js** - Added `page` and `size` query parameters
 5. Implemented offset-based pagination (`page=1&size=20` format)
 
-**Frontend Fix** (`automobile.picker-configs.ts`):
+**Frontend Fix**:
 - Changed from client-side pagination to server-side pagination
 - Updated API endpoint configuration with proper pagination params
 - Verified picker displays all 881 combinations across multiple pages
@@ -99,16 +99,16 @@ Response: {
 
 ---
 
-### Bug #10: Pop-out Communication & State Sync (Resolved in dockview v1.3.0)
+### Bug #10: Pop-out Communication & State Sync
 
-**Status in dockview**: ✅ **FULLY RESOLVED**
+**Status**: ✅ **PROVEN SOLUTION DOCUMENTED**
 
 **Original Problem**:
 - Pop-out statistics panel showed unfiltered data with pre-selected filters
 - Changing filters in pop-out didn't update main window
 - State wasn't propagating between windows
 
-**Dockview Resolution** (v1.3.0):
+**Solution Implementation**:
 
 **Root Cause Identified**:
 - `UrlStateService` was a root singleton using `ActivatedRoute`
@@ -139,15 +139,15 @@ Response: {
 
 ---
 
-### Bug #12: Picker Search Partial Match (Resolved in dockview v1.4.1)
+### Bug #12: Picker Search Partial Match
 
-**Status in dockview**: ✅ **FULLY RESOLVED**
+**Status**: ✅ **PROVEN SOLUTION DOCUMENTED**
 
 **Original Problem**:
 - Searching "bla" didn't match "Blazer"
 - Fuzzy matching was too aggressive or broken
 
-**Dockview Resolution** (v1.4.1):
+**Solution Implementation**:
 
 **Backend Change** (`elasticsearchService.js`):
 - Changed from fuzzy matching to wildcard matching
@@ -161,16 +161,16 @@ Response: {
 
 ---
 
-### QueryControl Dropdown: Highlight Filters Visibility (Resolved in dockview v1.3.0)
+### QueryControl Dropdown: Highlight Filters Visibility
 
-**Status in dockview**: ✅ **FULLY RESOLVED**
+**Status**: ✅ **PROVEN SOLUTION DOCUMENTED**
 
 **Original Problem**:
 - Dropdown showed highlight filters (`h_*`) alongside normal filters
 - Confused users with internal state variables
 - Unclear which filters were actually selectable
 
-**Dockview Resolution** (v1.3.0):
+**Solution Implementation**:
 
 **Fix Applied** (`query-control.component.ts`):
 - Filtered `filterFieldOptions` to exclude highlight filter fields
@@ -188,15 +188,15 @@ filterFieldOptions = Object.keys(this.filterConfig)
 
 ---
 
-### QueryControl: Clear All Implementation (Resolved in dockview v1.3.0)
+### QueryControl: Clear All Implementation
 
-**Status in dockview**: ✅ **FULLY RESOLVED**
+**Status**: ✅ **PROVEN SOLUTION DOCUMENTED**
 
 **Original Problem**:
 - "Clear All" button didn't clear all URL parameters
 - Some filters persisted after clicking Clear All
 
-**Dockview Resolution** (v1.3.0):
+**Solution Implementation**:
 
 **Simplified Approach**:
 - Added `clearAllFilters` output event from QueryControl component
@@ -213,15 +213,15 @@ filterFieldOptions = Object.keys(this.filterConfig)
 
 ---
 
-### Body Class Filter: Single Select → Multiselect (Resolved in dockview v2.1)
+### Body Class Filter: Single Select → Multiselect
 
-**Status in dockview**: ✅ **FULLY RESOLVED**
+**Status**: ✅ **PROVEN SOLUTION DOCUMENTED**
 
 **Original Problem**:
 - Users could only select one body class at a time
 - No way to compare multiple body classes
 
-**Dockview Resolution** (v2.1):
+**Solution Implementation**:
 
 **Changes Made** (`automobile.filter-definitions.ts`):
 - Changed Body Class filter from `type: 'select'` to `type: 'multiselect'`
@@ -241,16 +241,16 @@ filterFieldOptions = Object.keys(this.filterConfig)
 
 ---
 
-### Duplicate Statistics Panel (Resolved in dockview v2.5)
+### Duplicate Statistics Panel
 
-**Status in dockview**: ✅ **FULLY RESOLVED**
+**Status**: ✅ **PROVEN SOLUTION DOCUMENTED**
 
 **Original Problem**:
 - "Statistics" section appeared twice in the UI
 - One in main discover page, one embedded in results table
 - Visual duplication and confusion
 
-**Dockview Resolution** (v2.5):
+**Solution Implementation**:
 
 **Root Cause**:
 - `results-table.component.html` had embedded Statistics panel (lines 262-275)
@@ -268,16 +268,16 @@ filterFieldOptions = Object.keys(this.filterConfig)
 
 ---
 
-### Statistics Panel Styling & Charts (Resolved in dockview v2.4)
+### Statistics Panel Styling & Charts
 
-**Status in dockview**: ✅ **FULLY RESOLVED**
+**Status**: ✅ **PROVEN SOLUTION DOCUMENTED**
 
 **Original Problem**:
-- Statistics charts in dockview had black background
+- Statistics charts had layout and styling issues
 - Charts appeared squished or misaligned
-- Duplicate titles in both tab and content area
+- Duplicate titles in display areas
 
-**Dockview Resolution** (v2.4):
+**Solution Implementation**:
 
 **CSS/Theme Fixes** (`styles.scss`):
 - Added dockview light theme CSS variables:
@@ -349,25 +349,21 @@ When implementing fixes, verify with these test cases (all verified in dockview)
 
 ---
 
-## Version Tracking
+## Repository Version
 
-| Repository | Latest Version | Latest Timestamp | Status |
-|------------|---|---|---|
-| generic-prime | 2.6 | 2025-11-30T21:20:00Z | Panel headers streamlined |
-| generic-prime-dockview | 2.7 | 2025-11-30T02:30:00Z | Layout persistence ready |
+| Item | Version | Timestamp | Status |
+|------|---------|-----------|--------|
+| This Repository (generic-prime) | 2.6 | 2025-11-30T21:20:00Z | Panel headers streamlined |
 
 ---
 
 ## References
 
-**Dockview Implementation Details**:
-- Bug fixes: `~/projects/generic-prime-dockview/docs/claude/STATUS-HISTORY.md` (versions 1.3.0-2.7)
-- Source code: `~/projects/generic-prime-dockview/frontend/src/`
-
 **This Repository**:
 - Current status: `docs/claude/PROJECT-STATUS.md`
 - History: `docs/claude/STATUS-HISTORY.md`
 - Next steps: `docs/claude/NEXT-STEPS.md`
+- Bug reference: `docs/claude/BUG-REFERENCE.md`
 
 ---
 
