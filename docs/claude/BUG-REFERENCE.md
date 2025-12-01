@@ -131,7 +131,7 @@ Response: {
 - `discover.component.ts` - Message handlers
 - `popout.interface.ts` - Added CLEAR_ALL_FILTERS message type
 
-**Test Results** (all passing in dockview):
+**Test Results** (all verified):
 - Main window filter add → pop-out receives update ✓
 - URL paste in main window → pop-out updates ✓
 - Pop-out filter change → main URL updates ✓
@@ -280,7 +280,7 @@ filterFieldOptions = Object.keys(this.filterConfig)
 **Solution Implementation**:
 
 **CSS/Theme Fixes** (`styles.scss`):
-- Added dockview light theme CSS variables:
+- Added light theme CSS variables:
   - `--dv-group-view-background-color: #ffffff`
   - `--dv-tabs-and-actions-container-background-color: #f8fafc`
   - Proper scrollbar styling
@@ -298,7 +298,7 @@ filterFieldOptions = Object.keys(this.filterConfig)
 
 ## Recommended Approach for This Repository
 
-Based on dockview's resolution patterns, consider these approaches for Bug #13 and Bug #7:
+Based on the proven solutions documented above, consider these approaches for Bug #13 and Bug #7:
 
 ### For Bug #13 (Keyboard Navigation):
 
@@ -315,7 +315,7 @@ Based on dockview's resolution patterns, consider these approaches for Bug #13 a
 - Manually manage option highlighting
 - Implement in results-table-panel component
 
-**Reference**: See dockview's `results-table-panel.component.ts` for multiselect pattern
+**Reference**: See `results-table-panel.component.ts` for multiselect pattern (documented in reference solution)
 
 ### For Bug #7 (Checkbox Visual State):
 
@@ -328,13 +328,13 @@ Based on dockview's resolution patterns, consider these approaches for Bug #13 a
 - Ensure `[(ngModel)]` or `[value]` is properly synchronized with component state
 - Check for timing issues in filter clearing logic
 
-**Reference**: See dockview's `results-table-panel.component.ts` for proper multiselect state management
+**Reference**: See `results-table-panel.component.ts` for proper multiselect state management (documented in reference solution)
 
 ---
 
 ## Testing Recommendations
 
-When implementing fixes, verify with these test cases (all verified in dockview):
+When implementing fixes, verify with these test cases (all documented in proven solutions):
 
 **For dropdown/multiselect fixes**:
 - [ ] Select item via keyboard (arrow keys, Enter/Space)
