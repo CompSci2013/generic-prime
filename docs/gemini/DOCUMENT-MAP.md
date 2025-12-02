@@ -8,9 +8,9 @@
 
 | Need To... | Read This |
 |------------|-----------|
-| Understand project structure | [../gemini/ORIENTATION.md](../gemini/ORIENTATION.md) |
-| Know current state & approach | [../gemini/PROJECT-STATUS.md](../gemini/PROJECT-STATUS.md) |
-| See what to work on next | [../gemini/NEXT-STEPS.md](../gemini/NEXT-STEPS.md) |
+| Understand project structure | [./ORIENTATION.md](./ORIENTATION.md) |
+| Know current state & approach | [./PROJECT-STATUS.md](./PROJECT-STATUS.md) |
+| See what to work on next | [./NEXT-STEPS.md](./NEXT-STEPS.md) |
 | Debug a bug | [../status/KNOWN-BUGS.md](../status/KNOWN-BUGS.md) |
 | Understand API contracts | [../specs/02-api-contracts-data-models.md](../specs/02-api-contracts-data-models.md) |
 | Add a new domain | [../plan/05-IMPLEMENTATION-GUIDE.md](../plan/05-IMPLEMENTATION-GUIDE.md) |

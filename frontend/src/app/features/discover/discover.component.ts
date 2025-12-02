@@ -317,7 +317,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * @param panelId - Panel identifier
    * @param message - Message from pop-out
    */
-  private handlePopOutMessage(panelId: string, message: any): void {
+  private async handlePopOutMessage(_panelId: string, message: any): Promise<void> {
     console.log(
       `[Discover] Message from pop-out:`,
       message.type,
@@ -327,7 +327,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     switch (message.type) {
       case PopOutMessageType.PICKER_SELECTION_CHANGE:
         // Handle picker selection from pop-out
-        this.onPickerSelectionChangeAndUpdateUrl(message.payload);
+        await this.onPickerSelectionChangeAndUpdateUrl(message.payload);
         break;
 
       case PopOutMessageType.PANEL_READY:
@@ -346,14 +346,14 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
           message.payload?.params
         );
         if (message.payload?.params) {
-          this.urlStateService.setParams(message.payload.params);
+          await this.urlStateService.setParams(message.payload.params);
         }
         break;
 
       case PopOutMessageType.CLEAR_ALL_FILTERS:
         // Pop-out requested to clear all filters - clear all URL params
         console.log('[Discover] Clear all filters from pop-out');
-        this.urlStateService.clearParams();
+        await this.urlStateService.clearParams();
         break;
     }
   }
@@ -388,18 +388,18 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    *
    * @param params - URL parameters to update
    */
-  onUrlParamsChange(params: Params): void {
+  async onUrlParamsChange(params: Params): Promise<void> {
     console.log('[Discover] Updating URL params:', params);
-    this.urlStateService.setParams(params);
+    await this.urlStateService.setParams(params);
   }
 
   /**
    * Handle clear all filters request
    * Clears all URL query parameters
    */
-  onClearAllFilters(): void {
+  async onClearAllFilters(): Promise<void> {
     console.log('[Discover] Clearing all URL params');
-    this.urlStateService.clearParams();
+    await this.urlStateService.clearParams();
   }
 
   /**
@@ -407,7 +407,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    *
    * @param event - Picker selection event containing selected items and URL value
    */
-  onPickerSelectionChangeAndUpdateUrl(event: PickerSelectionEvent<any>): void {
+  async onPickerSelectionChangeAndUpdateUrl(event: PickerSelectionEvent<any>): Promise<void> {
     console.log('[Discover] Picker selection changed:', event);
 
     // Extract the URL param name from the picker config
@@ -415,7 +415,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     const paramName = 'modelCombos'; // TODO: Get from picker config
 
     // Update URL with the serialized selection and reset pagination
-    this.urlStateService.setParams({
+    await this.urlStateService.setParams({
       [paramName]: event.urlValue || null,
       page: 1 // Reset to first page when selection changes (1-indexed)
     });
