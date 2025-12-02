@@ -21,7 +21,7 @@ After reading, provide:
 
 ## SESSION END PROTOCOL
 Before ending, do:
-1. Archive PROJECT-STATUS.md to STATUS-HISTORY.md (append, don't overwrite).
-2. Update PROJECT-STATUS.md (bump version, update timestamp).
+1. Append current PROJECT-STATUS.md snapshot to STATUS-HISTORY.md (preserve historical record, append, don't overwrite).
+2. Update PROJECT-STATUS.md (bump version, update timestamp, document findings).
 3. Update NEXT-STEPS.md with next actions for the following session.
-4. Commit changes to the `docs/gemini/` directory.
+4. Commit all changes with descriptive message to the `docs/gemini/` directory.
