@@ -2,6 +2,7 @@
   <!-- Compact Header Bar with Dropdown and Actions -->
   <div class="control-header">
     <p-dropdown
+      #filterFieldDropdown
       [options]="filterFieldOptions"
       [(ngModel)]="selectedField"
       placeholder="Add filter by field..."

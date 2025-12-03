@@ -6,7 +6,8 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  Output
+  Output,
+  ViewChild
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -135,9 +136,28 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   /** Available year range from API */
   availableYearRange: { min: number; max: number } = { min: 1900, max: 2025 };
 
+  // ==================== Template References ====================
+
+  @ViewChild('filterFieldDropdown') filterFieldDropdown: any;
+
   // ==================== Lifecycle ====================
 
   private destroy$ = new Subject<void>();
+
+  /**
+   * Reset the filter field dropdown to allow next selection
+   * This ensures PrimeNG's internal state is synchronized with the template binding.
+   * Note: The label remains visible as a reminder of the last filter chosen.
+   */
+  private resetFilterDropdown(): void {
+    this.selectedField = null;
+    // Reset PrimeNG dropdown's internal value
+    if (this.filterFieldDropdown) {
+      this.filterFieldDropdown.value = null;
+      this.filterFieldDropdown.selectedOption = null;
+      this.filterFieldDropdown.updateSelectedOption(null);
+    }
+  }
 
   constructor(
     private urlState: UrlStateService,
@@ -304,7 +324,8 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
 
     this.showMultiselectDialog = false;
     this.currentFilterDef = null;
-    this.cdr.markForCheck();
+    this.resetFilterDropdown();
+    this.cdr.detectChanges(); // Force immediate update instead of markForCheck()
   }
 
   // ==================== Year Range Dialog ====================
@@ -372,7 +393,8 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
 
     this.showYearRangeDialog = false;
     this.currentFilterDef = null;
-    this.cdr.markForCheck();
+    this.resetFilterDropdown();
+    this.cdr.detectChanges();
   }
 
   // ==================== Dialog Management ====================
@@ -389,16 +411,18 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     this.yearMin = null;
     this.yearMax = null;
     this.optionsError = null;
-    this.cdr.markForCheck();
+    this.resetFilterDropdown();
+    this.cdr.detectChanges();
   }
 
   /**
    * Handle dialog hide event
    */
   onDialogHide(): void {
-    // Cleanup when dialog closes
     this.currentFilterDef = null;
     this.optionsError = null;
+    this.resetFilterDropdown();
+    this.cdr.detectChanges();
   }
 
   // ==================== Filter Chip Management ====================
