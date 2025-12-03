@@ -1,13 +1,13 @@
 # Project Status
 
-**Version**: 2.7
-**Timestamp**: 2025-12-02T11:15:00Z
+**Version**: 2.8
+**Timestamp**: 2025-12-03T10:45:00Z
 
 ---
 
 ## Current State
 
-### Port 4205 (generic-prime) - IN DEVELOPMENT
+### Port 4205 (generic-prime) - BUG #1.3 FIXED ✓
 - **All panel headers streamlined** - Consistent compact design pattern across all 4 panels
 - **Query Control refactored** - Header removed, dropdown + Clear All in shaded bar
 - **Results Table restructured** - Custom collapsible filter panel with shaded header
@@ -16,6 +16,7 @@
 - **Shaded header bars** - All panels use `var(--surface-50)` background for headers
 - **Dark theme active** - PrimeNG lara-dark-blue + custom dark styling maintained
 - **All 4 panels active** with drag-drop, collapse, and pop-out functionality
+- **✓ CRITICAL FIX: Bug #1.3** - Query Control now updates when URL changes (race condition eliminated)
 - Backend at `generic-prime-backend-api:v1.5.0`
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
@@ -82,9 +83,9 @@ Critical focus: **Fix URL-First state management so controls update when URL cha
 
 ## Critical Bugs (Priority Order)
 
-| Bug | Severity | Status | Summary | Investigation |
+| Bug | Severity | Status | Summary | Root Cause |
 |-----|----------|--------|---------|---|
-| #1.3 | CRITICAL | In Progress | Query Control and Results Table not updating after filter selection (URL updates but controls don't sync) | Check Query Control subscription to `resourceService.filters$` or `urlState.params$`; verify `syncFiltersFromUrl()` is called; verify change detection firing |
+| #1.3 | CRITICAL | ✓ FIXED | Query Control not updating when URL changes | combineLatest race condition - highlights$ doesn't emit when only regular filters change, blocking subscription |
 | #13 | Medium | Not started | Dropdown keyboard navigation (arrow keys, Enter/Space) broken with `[filter]="true"` | PrimeNG version compatibility issue or accessibility feature disabled |
 | #7 | Low | Not started | Checkboxes stay checked after clearing | Visual state not syncing with data model |
 
@@ -92,36 +93,40 @@ Critical focus: **Fix URL-First state management so controls update when URL cha
 
 ## Next Session Actions
 
-### Immediate (CRITICAL)
+### Immediate (AFTER BUG #1.3)
 
-1. **Debug Query Control Subscription**
-   - Add console.logs to verify `filters$` observable fires when URL changes
-   - Verify `syncFiltersFromUrl()` method is called
-   - Check if `ChangeDetectorRef.markForCheck()` is firing
-   - Trace filter mapper conversion from URL params
+1. **Fix Bug #13** - Dropdown keyboard navigation
+   - Investigate PrimeNG `[filter]="true"` compatibility
+   - Test arrow key / Enter / Space functionality
+   - Update to newer PrimeNG version if needed
 
-2. **Verify Observable Chain**
-   - Check UrlStateService emits on `setParams()` completion
-   - Verify ResourceManagementService receives URL params
-   - Verify filter mapper correctly converts params
+2. **Fix Bug #7** - Checkbox visual state
+   - Verify checkbox model state syncs with UI state
+   - Test Clear All button behavior with checkboxes
 
-3. **Test Fix**
-   - Manually re-test Phase 1.3 after investigation
-   - Verify URL changes trigger component updates
+3. **Execute Full MANUAL-TEST-PLAN Phase 2**
+   - Run comprehensive Query Control tests
+   - Test pop-out Query Control windows
+   - Verify drag-drop panel ordering persistence
 
-### Secondary (After Bug #1.3 Fixed)
+### Secondary
 
 4. **Add Agriculture Domain** - Validate flexible domain architecture
-5. **Fix Bug #13** - Dropdown keyboard navigation
-6. **Fix Bug #7** - Checkbox visual state
+5. **Implement Additional Features**
+   - Panel collapse/expand state persistence
+   - Dark/Light theme toggle
+   - Export functionality for results
 
 ---
 
-## Files Modified This Session
+## Files Modified This Session (2025-12-03)
 
-- `frontend/src/app/features/discover/discover.component.ts` - Added async/await to URL state updates
-- `docs/gemini/STATUS-HISTORY.md` - Appended session summary
-- `docs/gemini/PROJECT-STATUS.md` - Updated (this file)
+- `frontend/src/framework/components/query-control/query-control.component.ts` - Fixed race condition in URL subscription
+- `frontend/src/framework/services/url-state.service.ts` - Removed debug logging
+- `frontend/src/framework/services/resource-management.service.ts` - Removed debug logging
+- `frontend/src/app/features/discover/discover.component.ts` - Removed debug logging
+- `docs/gemini/BUG-1.3-FIX-ANALYSIS.md` - Created comprehensive fix analysis
+- `docs/gemini/PROJECT-STATUS.md` - Updated with Bug #1.3 fix details
 
 ---
 
