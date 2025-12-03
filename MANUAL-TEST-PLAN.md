@@ -10,9 +10,9 @@
 ## Prerequisites & Test Methodology
 
 ### Test Data Setup
-- [ ] **Action**: Ensure the backend database is seeded with the standard `v1` test dataset.
-- [ ] **Verification**: The application should show a total of ~4,887 records on initial load.
-- [ ] **Verification**: The manufacturer filter should list 72 unique manufacturers.
+- [x] **Action**: Ensure the backend database is seeded with the standard `v1` test dataset.
+- [x] **Verification**: The application should show a total of ~4,887 records on initial load.
+- [x] **Verification**: The manufacturer filter should list 72 unique manufacturers.
 
 ### URL-First Architecture
 All state changes must be reflected in the URL and vice versa. Controls must update when URL changes, regardless of whether the control is in the main Discover page or popped out.
@@ -33,33 +33,34 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 **Estimated Time**: 5 minutes
 
 ### 1.1 Initial Page Load
-- [ ] Navigate to http://localhost:4205/discover
-- [ ] Verify page loads without errors
-- [ ] Verify all 4 panels visible (Query Control, Picker, Results Table, Statistics)
-- [ ] Verify all panels expanded by default
-- [ ] Verify URL is clean: `http://localhost:4205/discover` (no query params)
-- [ ] Verify Results Table shows all records (~4,887 total)
-- [ ] Verify Statistics Panel shows all data aggregations (Manufacturers: 72, etc.)
+- [x] Navigate to http://localhost:4205/discover
+- [x] Verify page loads without errors
+- [x] Verify all 4 panels visible (Query Control, Picker, Results Table, Statistics)
+- [x] Verify all panels expanded by default
+- [x] Verify URL is clean: `http://localhost:4205/discover` (no query params)
+- [x] Verify Results Table shows all records (~4,887 total)
+- [x] Verify Statistics Panel shows all data aggregations (Manufacturers: 72, etc.)
 
 ### 1.2 Panel Collapse/Expand (Main Page)
-- [ ] Click collapse button on Query Control panel header
-- [ ] Verify panel collapses and content hidden
-- [ ] Verify collapse button changes to expand icon
-- [ ] Click to expand - verify content reappears
-- [ ] Repeat collapse/expand for each panel:
-  - [ ] Manufacturer-Model Picker
-  - [ ] Results Table
-  - [ ] Statistics Panel
-- [ ] Verify collapsed state does NOT affect URL
+- [x] Click collapse button on Query Control panel header
+- [x] Verify panel collapses and content hidden
+- [x] Verify collapse button changes to expand icon
+- [x] Click to expand - verify content reappears
+- [x] Repeat collapse/expand for each panel:
+  - [x] Manufacturer-Model Picker
+  - [x] Results Table
+  - [x] Statistics Panel
+- [x] Verify collapsed state does NOT affect URL
 
 ### 1.3 Panel Drag-Drop Reordering (Main Page)
-- [ ] Drag Query Control panel to bottom position
-- [ ] Verify panel reorders visually
-- [ ] Verify all controls still functional in new position
-- [ ] Drag Picker panel to top
-- [ ] Drag Results Table above Statistics
-- [ ] Verify drag-drop does NOT affect URL state
-- [ ] Refresh page - verify panels return to original order
+- [x] Drag Query Control panel to bottom position
+- [x] Verify panel reorders visually
+- [X] Verify all controls still functional in new position Fail
+- [x] Drag Picker panel to top
+- [x] Drag Results Table above Statistics
+- [x] Verify drag-drop does NOT affect URL state
+- [x] Refresh page - verify panels return to original order
+  - They do, but this is a bug. Panels should remain in the order selected by user
 
 ---
 
@@ -70,11 +71,13 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 ### 2.1 Manufacturer Dropdown Filter
 
 #### Interaction Tests
-- [ ] Click "Add Filter" or dropdown in Query Control header
-- [ ] Select single manufacturer (e.g., "Toyota")
-- [ ] Verify URL updates: `?manufacturer=Toyota`
-- [ ] Verify Results Table updates to show only Toyota results
-- [ ] Verify Statistics Panel updates (charts reflect Toyota data only)
+- [x] Click "Add Filter" or dropdown in Query Control header
+- [x] Select single manufacturer (e.g., "Brammo")
+- [x] Verify URL updates: `?manufacturer=Brammo`
+- [-] Verify Results Table updates to show only Brammo results
+ -  Brammo selected, URL updated but the controls did not ![image](/uploads/16f2bf7638009cf02e8549e62c56c3b3/image.png){width=1310 height=449} ![image](/uploads/24972d80a1b5719688abba1c463ef182/image.png){width=1307 height=547}
+ - After page refresh, controls are updated correctly, but drag order was not persisted. Query Control returned to top of page. ![image](/uploads/0a0ecae8ae4f8cbda32c811c7a2e129f/image.png){width=1281 height=744}
+- [ ] Verify Statistics Panel updates (charts reflect Brammo data only)
 - [ ] Verify result count shows filtered total
 
 #### Clear/Reset Tests
@@ -84,8 +87,8 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Verify Statistics Panel shows all data again
 
 #### Multiple Selection Tests
-- [ ] Select multiple manufacturers (Toyota, Honda, Ford)
-- [ ] Verify URL shows: `?manufacturer=Toyota,Honda,Ford` (or similar)
+- [ ] Select multiple manufacturers (Brammo, Honda, Ford)
+- [ ] Verify URL shows: `?manufacturer=Brammo,Honda,Ford` (or similar)
 - [ ] Verify Results Table shows only records from those 3 manufacturers
 - [ ] Verify row counts match filtered set
 - [ ] Verify Statistics reflect only selected manufacturers
@@ -93,7 +96,7 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 #### Dropdown Search Tests
 - [ ] Click manufacturer dropdown
 - [ ] Type "toy" to search
-- [ ] Verify dropdown filters to show matching options (Toyota, Toyoda, etc.)
+- [ ] Verify dropdown filters to show matching options (Brammo, Toyoda, etc.)
 - [ ] Verify ESC key closes dropdown without selection
 - [ ] Verify arrow keys navigate dropdown options
 - [ ] Select option with Enter key
@@ -174,9 +177,9 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Verify Statistics reflect search results
 
 #### Search with Other Filters
-- [ ] Set Manufacturer=Toyota, then Search=Hybrid
-- [ ] Verify URL shows: `?manufacturer=Toyota&search=Hybrid`
-- [ ] Verify Results Table shows Toyota Hybrids only
+- [ ] Set Manufacturer=Brammo, then Search=Hybrid
+- [ ] Verify URL shows: `?manufacturer=Brammo&search=Hybrid`
+- [ ] Verify Results Table shows Brammo Hybrids only
 
 #### Clear Search
 - [ ] Click X to clear search
@@ -199,7 +202,7 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 
 #### Size with Filters
 - [ ] Apply manufacturer filter, then set size=20
-- [ ] Verify URL shows both: `?manufacturer=Toyota&size=20`
+- [ ] Verify URL shows both: `?manufacturer=Brammo&size=20`
 - [ ] Verify table shows 20 filtered rows per page
 
 ### 2.7 "Clear All" Button
@@ -294,10 +297,10 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 ### 3.5 Table Pagination with Filters
 
 #### Paginate Filtered Results
-- [ ] Apply manufacturer filter (e.g., Toyota: 500 results)
+- [ ] Apply manufacturer filter (e.g., Brammo: 500 results)
 - [ ] Verify page count updates based on filtered total
 - [ ] Navigate to page 2
-- [ ] Verify URL shows: `?manufacturer=Toyota&first=10` (or similar)
+- [ ] Verify URL shows: `?manufacturer=Brammo&first=10` (or similar)
 - [ ] Verify page 2 shows filtered results, not all manufacturers
 
 ---
@@ -314,10 +317,10 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Verify all ~72 manufacturers listed
 
 #### Single Selection
-- [ ] Click on a manufacturer row (e.g., "Toyota")
+- [ ] Click on a manufacturer row (e.g., "Brammo")
 - [ ] Verify row highlights (background color change)
-- [ ] Verify URL updates: `?pickedManufacturer=Toyota` (or equivalent)
-- [ ] Verify Results Table updates to show only Toyota
+- [ ] Verify URL updates: `?pickedManufacturer=Brammo` (or equivalent)
+- [ ] Verify Results Table updates to show only Brammo
 
 #### Deselection
 - [ ] Click same manufacturer row again
@@ -375,10 +378,10 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 ### 5.2 Statistics Responsiveness to Filters
 
 #### Filter → Stats Update
-- [ ] Set Manufacturer=Toyota (Query Control)
-- [ ] Verify Chart 1 (Manufacturer) shows only Toyota
-- [ ] Verify Chart 4 (Top Models) shows only Toyota models
-- [ ] Verify all charts reflect Toyota-only data
+- [ ] Set Manufacturer=Brammo (Query Control)
+- [ ] Verify Chart 1 (Manufacturer) shows only Brammo
+- [ ] Verify Chart 4 (Top Models) shows only Brammo models
+- [ ] Verify all charts reflect Brammo-only data
 
 #### Multiple Filters
 - [ ] Set Manufacturer=Honda, Year=2020-2024
@@ -428,12 +431,12 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Verify pop-out window reflects main URL state
 
 #### Pop-Out Filter Change
-- [ ] In pop-out window, change to Toyota
-- [ ] Verify pop-out shows Toyota selected
+- [ ] In pop-out window, change to Brammo
+- [ ] Verify pop-out shows Brammo selected
 - [ ] Switch back to main window
-- [ ] Verify main Results Table shows Toyota results
-- [ ] Verify main URL shows: `?manufacturer=Toyota`
-- [ ] Verify Statistics show Toyota data
+- [ ] Verify main Results Table shows Brammo results
+- [ ] Verify main URL shows: `?manufacturer=Brammo`
+- [ ] Verify Statistics show Brammo data
 
 #### Complex Sync Test
 - [ ] In main window: Set Manufacturer=Honda, Year=2020-2024
@@ -521,17 +524,17 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Verify charts render properly
 
 #### Stats Reflect Main Filters
-- [ ] In main window, set filter (e.g., Manufacturer=Toyota)
-- [ ] Verify main Statistics show Toyota data
+- [ ] In main window, set filter (e.g., Manufacturer=Brammo)
+- [ ] Verify main Statistics show Brammo data
 - [ ] Switch to pop-out Statistics
-- [ ] Verify pop-out charts ALSO show Toyota data
+- [ ] Verify pop-out charts ALSO show Brammo data
 - [ ] Verify charts match main window (same data)
 
 #### Filter Change Updates Pop-Out Stats
 - [ ] In pop-out, wait and monitor
 - [ ] In main window (different browser window), change filter
 - [ ] Verify pop-out Statistics update automatically
-- [ ] Verify data now matches new filter (not Toyota)
+- [ ] Verify data now matches new filter (not Brammo)
 
 ### 6.7 Multiple Pop-Outs Simultaneously
 
@@ -547,11 +550,11 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Verify pop-out Query Control shows Honda
 - [ ] Verify pop-out Results Table shows Honda results
 - [ ] Switch to main window - verify filters applied
-- [ ] In pop-out Picker: Select Toyota
-- [ ] Verify pop-out Query Control NOW shows Toyota (overrides Honda)
-- [ ] Verify pop-out Results Table shows Toyota
-- [ ] Verify pop-out Statistics show Toyota
-- [ ] Verify main window updated to Toyota
+- [ ] In pop-out Picker: Select Brammo
+- [ ] Verify pop-out Query Control NOW shows Brammo (overrides Honda)
+- [ ] Verify pop-out Results Table shows Brammo
+- [ ] Verify pop-out Statistics show Brammo
+- [ ] Verify main window updated to Brammo
 
 #### Page Navigation Across Windows
 - [ ] In pop-out Results Table: Go to page 3
@@ -604,7 +607,7 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 ### 7.2 Rapid Filter Changes
 
 #### Quick Filter Switching
-- [ ] Rapidly change manufacturer 3 times (Toyota → Honda → Ford)
+- [ ] Rapidly change manufacturer 3 times (Brammo → Honda → Ford)
 - [ ] Verify Results Table updates to final selection (Ford)
 - [ ] Verify URL shows Ford
 - [ ] Verify no orphaned/stale data displays
@@ -658,18 +661,18 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 
 #### Filter History Navigation
 - [ ] Start at clean URL (no filters)
-- [ ] Apply manufacturer=Toyota
+- [ ] Apply manufacturer=Brammo
 - [ ] Apply year=2020
 - [ ] Click browser back button
-- [ ] Verify URL reverts to: `?manufacturer=Toyota`
-- [ ] Verify Results Table shows Toyota all years
+- [ ] Verify URL reverts to: `?manufacturer=Brammo`
+- [ ] Verify Results Table shows Brammo all years
 - [ ] Click back again
 - [ ] Verify URL becomes clean (no params)
 - [ ] Verify Results Table unfiltered
 - [ ] Click forward button
-- [ ] Verify URL: `?manufacturer=Toyota`
+- [ ] Verify URL: `?manufacturer=Brammo`
 - [ ] Click forward again
-- [ ] Verify URL: `?manufacturer=Toyota&yearMin=2020&yearMax=2024`
+- [ ] Verify URL: `?manufacturer=Pontaic&yearMin=2020&yearMax=2024`
 
 ### 7.6 Component Interaction Sequences
 

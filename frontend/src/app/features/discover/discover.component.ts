@@ -389,7 +389,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * @param params - URL parameters to update
    */
   async onUrlParamsChange(params: Params): Promise<void> {
-    console.log('[Discover] Updating URL params:', params);
     await this.urlStateService.setParams(params);
   }
 
@@ -398,7 +397,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * Clears all URL query parameters
    */
   async onClearAllFilters(): Promise<void> {
-    console.log('[Discover] Clearing all URL params');
     await this.urlStateService.clearParams();
   }
 

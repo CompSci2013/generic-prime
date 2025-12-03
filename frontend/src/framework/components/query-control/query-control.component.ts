@@ -6,10 +6,9 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  Optional,
   Output
 } from '@angular/core';
-import { combineLatest, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DomainConfig } from '../../models/domain-config.interface';
 import {
@@ -17,7 +16,6 @@ import {
   FilterOption
 } from '../../models/filter-definition.interface';
 import { ApiService } from '../../services/api.service';
-import { ResourceManagementService } from '../../services/resource-management.service';
 import { UrlStateService } from '../../services/url-state.service';
 
 /**
@@ -144,8 +142,7 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   constructor(
     private urlState: UrlStateService,
     private apiService: ApiService,
-    private cdr: ChangeDetectorRef,
-    @Optional() private resourceService?: ResourceManagementService<any, any, any>
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -156,44 +153,28 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
       value: f
     }));
 
-    console.log('QueryControl: Filter field options:', this.filterFieldOptions);
-
-    // Subscribe to filter AND highlight changes for chip synchronization
+    // Subscribe to URL parameters for chip synchronization
+    //
+    // CRITICAL FIX: We MUST subscribe to URL params directly, not to filters$ and highlights$
+    //
+    // WHY: combineLatest([filters$, highlights$]) has a race condition:
+    // - When URL changes, filters$ emits (value changed)
+    // - But highlights$ uses distinctUntilChanged() - if highlights didn't change, it doesn't emit
+    // - combineLatest waits for BOTH observables to emit, so it blocks waiting for highlights$
+    // - Result: Query Control subscription never fires, chips don't appear
+    //
+    // SOLUTION: Subscribe to URL params directly - they include BOTH regular params and h_ prefixed highlights
+    // This matches syncFiltersFromUrl() which matches against FilterDefinition.urlParams
     //
     // Architecture: Works in both main window and pop-out
-    // - Main window: URL → ResourceManagementService.filters$/highlights$ → chip sync
-    // - Pop-out: BroadcastChannel → ResourceManagementService.filters$/highlights$ → chip sync
-    if (this.resourceService) {
-      // Use combineLatest to get both filters and highlights
-      // highlights$ strips the h_ prefix, so we need to add it back
-      combineLatest([
-        this.resourceService.filters$,
-        this.resourceService.highlights$
-      ])
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(([filters, highlights]) => {
-          // Build params object with filters + highlights (with h_ prefix restored)
-          const params: Record<string, any> = { ...filters };
-
-          // Add highlights back with h_ prefix
-          if (highlights) {
-            Object.keys(highlights).forEach(key => {
-              params[`h_${key}`] = highlights[key];
-            });
-          }
-
-          this.syncFiltersFromUrl(params);
-          this.cdr.markForCheck();
-        });
-    } else {
-      // Fallback: watch URL params directly (legacy mode)
-      this.urlState.params$
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(params => {
-          this.syncFiltersFromUrl(params);
-          this.cdr.markForCheck();
-        });
-    }
+    // - Main window: URL → UrlStateService.params$ → chip sync
+    // - Pop-out: BroadcastChannel (synced by pop-out setup) → URL → UrlStateService.params$ → chip sync
+    this.urlState.params$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        this.syncFiltersFromUrl(params);
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnDestroy(): void {
