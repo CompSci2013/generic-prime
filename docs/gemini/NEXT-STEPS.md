@@ -14,80 +14,42 @@
 
 ---
 
-## Current Priority: Fix URL-First State Management Bug #1.3
+## Current Priority: Fix Bug #13 (Dropdown Keyboard Navigation)
 
-**Status**: Async/await added to Discover component, but issue persists. Controls still not updating when URL changes.
+**Status**: All critical bugs fixed. URL-First state management working. Ready for Phase 2 testing.
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
 > **Panel headers streamlined for consistent, compact UI. All 4 panels now follow unified design pattern.**
-> Critical focus: **Fix URL-First state management so controls update when URL changes.**
+> **All critical bugs fixed - URL-First architecture validated.**
 
 ---
 
-## Completed This Session (2025-12-02 - URL-First Investigation)
+## Completed This Session (2025-12-03 - Critical Bug Fixes)
 
-- **Phase 1 Manual Testing Executed** - Found critical bug in test 1.3
-- **Root Cause Analysis** - Identified race condition in Discover component
-- **Applied Fix** - Added async/await to all URL state update calls
-- **Build Verified** - Application compiles successfully
-- **Testing** - Bug persists despite async/await fix, suggesting subscription or change detection issue
+### Session 2025-12-03 Achievements
 
----
+1. **Bug #1.3 - FIXED ✓**
+   - Fixed Query Control race condition in URL subscription
+   - Changed from `combineLatest([filters$, highlights$])` to direct `urlState.params$` subscription
+   - Chips now appear immediately when filter selected (verified working)
 
-## Immediate Actions (CRITICAL)
+2. **Dropdown Interaction Issue - FIXED ✓**
+   - Added `@ViewChild('filterFieldDropdown')` reference
+   - Created `resetFilterDropdown()` helper to synchronize PrimeNG internal state
+   - Dropdown now allows re-selection after dialog closes
+   - Verified: Filter selection → URL update → Chip display → Re-selection all working
 
-### 1. Debug Query Control Component Subscriptions
-
-**Status**: BLOCKED on investigation
-
-Query Control is not updating when URL changes, even though URL correctly updates. Need to:
-
-1. **Add debug logging to Query Control Component**
-   - Log when `filters$` observable emits
-   - Log when `urlState.params$` observable emits
-   - Log when `syncFiltersFromUrl()` is called
-   - Log when `ChangeDetectorRef.markForCheck()` is called
-
-2. **Verify Observable Chain**
-   - Check if ResourceManagementService `watchUrlChanges()` is firing
-   - Verify filter mapper converts URL params to filter state correctly
-   - Verify BehaviorSubject emits after URL navigation completes
-
-3. **Check Change Detection**
-   - Component uses OnPush - verify `markForCheck()` is being called
-   - Check if `cdr.detectChanges()` needed instead of `markForCheck()`
-   - Verify no subscription is unsubscribing prematurely
-
-**Key Files:**
-- `frontend/src/framework/components/query-control/query-control.component.ts` - Add debug logs
-- `frontend/src/framework/services/resource-management.service.ts` - Verify `watchUrlChanges()` logic
-- `frontend/src/domain-config/automobile/adapters/automobile-url-mapper.ts` - Test filter conversion
-
-### 2. Trace Observable Flow
-
-1. Open browser DevTools (F12)
-2. Navigate to Discover page
-3. Select a manufacturer in Query Control
-4. Check console logs:
-   - Does Discover emit URL change?
-   - Does ResourceManagementService receive new params?
-   - Does Query Control's subscription fire?
-   - Is `syncFiltersFromUrl()` called?
-   - Is `markForCheck()` called?
-
-### 3. Test Hypothesis
-
-Current hypothesis: Either:
-- **A)** Query Control subscription doesn't fire when ResourceManagementService updates
-- **B)** Filter mapper doesn't correctly convert URL params to filter state
-- **C)** Change detection doesn't fire despite `markForCheck()`
+3. **Architecture Validation**
+   - URL-First state management chain verified: URL → UrlStateService → ResourceManagementService → Components
+   - Observable chain working correctly
+   - Change detection strategy optimized
 
 ---
 
-## Secondary Actions (After Bug #1.3 Fixed)
+## Immediate Actions (Next Session)
 
-### 4. Fix Bug #13 - Dropdown Keyboard Navigation
+### 1. Fix Bug #13 - Dropdown Keyboard Navigation
 
 **Problem**: PrimeNG p-dropdown with `[filter]="true"` keyboard navigation broken:
 - Down arrow should highlight next option
@@ -101,13 +63,28 @@ Current hypothesis: Either:
 - Try PrimeNG accessibility settings
 - May require downgrading to different PrimeNG version or using alternative component
 
-### 5. Fix Bug #7 (Checkboxes)
+### 2. Fix Bug #7 - Checkbox Visual State
 
-Low priority checkbox visual state bug - checkboxes stay checked after clearing.
+**Problem**: Checkboxes stay checked after clearing filters
+- Visual state not syncing with data model
+- Low priority (cosmetic only)
 
-### 6. Add "Agriculture" Domain (AFTER #1.3 FIXED)
+**Investigation**:
+- Verify checkbox model state syncs with data
+- Test Clear All button behavior
+- Check if form control state is being reset
 
-Create a new "agriculture" domain to validate the new flexible domain architecture.
+### 3. Execute Full MANUAL-TEST-PLAN Phase 2
+
+Run comprehensive Query Control test suite:
+- Test all filter types (multiselect, range)
+- Test pop-out Query Control windows
+- Verify chip behavior
+- Test drag-drop panel ordering persistence
+
+### 4. Add "Agriculture" Domain (After Phase 2 Complete)
+
+Create a new "agriculture" domain to validate the flexible domain architecture.
 
 ---
 
@@ -173,4 +150,4 @@ Before ending session:
 
 ---
 
-**Last Updated**: 2025-12-02
+**Last Updated**: 2025-12-03

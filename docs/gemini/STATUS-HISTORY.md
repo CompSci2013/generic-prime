@@ -4,6 +4,47 @@
 
 ---
 
+## Session 2025-12-03 (Dropdown Interaction & Critical Bug Fixes)
+
+**Version**: 2.8 → 2.9
+**Timestamp**: 2025-12-03T12:00:00Z
+**Duration**: ~2 hours
+**Status**: ✓ COMPLETED
+
+### Achievements
+
+#### Bug #1.3 - Query Control Race Condition (FIXED ✓)
+**Problem**: After selecting filter, URL updated but Query Control didn't show chips until page refresh
+**Root Cause**: `combineLatest([filters$, highlights$])` race condition - highlights$ blocks when value unchanged
+**Solution**: Subscribe directly to `urlState.params$` instead (includes both regular + highlight params)
+**Result**: Chips now appear immediately when filter selected (verified working)
+**Commit**: 46b64ab
+
+#### Dropdown Interaction Issue (FIXED ✓)
+**Problem**: Couldn't re-select filters after closing dialog - dropdown was in broken state
+**Root Cause**: PrimeNG dropdown internal state not synchronized with component state
+**Solution**:
+- Added `@ViewChild('filterFieldDropdown')` reference to dropdown component
+- Created `resetFilterDropdown()` helper method to synchronize both states
+- Resets `value`, `selectedOption` properties after dialog closes
+- Uses `detectChanges()` for immediate UI updates
+**Result**: Dropdown allows re-selection, label remains as reminder of last filter
+**Commits**: 7ea5185, e82abef
+
+### Files Modified This Session
+- `frontend/src/framework/components/query-control/query-control.component.ts` - Fixed race condition + dropdown reset
+- `frontend/src/framework/components/query-control/query-control.component.html` - Added ViewChild template reference
+- `docs/gemini/PROJECT-STATUS.md` - Updated status and session summary
+
+### Test Verification
+- ✓ Filter selection works
+- ✓ URL updates correctly
+- ✓ Chips appear immediately (no refresh needed)
+- ✓ Dropdown allows re-selection after Apply/Cancel
+- ✓ Dialog appears when clicking dropdown again
+
+---
+
 ## Session 2025-12-02 (URL-First State Management Bug Investigation)
 
 **Version**: 2.6 → 2.7 (in progress)
