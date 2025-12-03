@@ -80,6 +80,9 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   /** Whether we're currently editing a highlight filter (vs regular filter) */
   isHighlightFilter = false;
 
+  /** Track the last keyboard event key to distinguish arrow navigation from selection */
+  private lastKeyPressed: string | null = null;
+
   // ==================== Active Filters ====================
 
   /** List of currently active filters */
@@ -205,12 +208,64 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   // ==================== Field Selection ====================
 
   /**
-   * User selected a field from dropdown
+   * Handle keyboard events in the dropdown filter field
+   *
+   * Track which key was pressed so we can distinguish arrow key navigation
+   * from actual selection (Enter/Space/Click)
+   */
+  onDropdownKeydown(event: KeyboardEvent): void {
+    // Record which key was pressed
+    this.lastKeyPressed = event.key;
+
+    // If user pressed Enter or Space on a highlighted option, allow it to proceed
+    // If they pressed arrow keys, we'll detect that in onChange and skip dialog opening
+    if (event.key === 'Escape') {
+      // Let Escape key close the dropdown naturally (PrimeNG handles this)
+      this.lastKeyPressed = null;
+    }
+  }
+
+  /**
+   * User selected a field from dropdown via mouse click, Enter, or Space
+   *
+   * This is called by PrimeNG's onChange event. However, arrow key navigation
+   * also triggers onChange in PrimeNG. We use lastKeyPressed to distinguish:
+   * - Arrow keys: Do NOT open dialog (just highlighting)
+   * - Enter/Space/Click: DO open dialog (actual selection)
    */
   onFieldSelected(event: any): void {
     console.log('QueryControl: Field selected:', event);
     const filterDef: FilterDefinition = event.value;
     console.log('QueryControl: Filter definition:', filterDef);
+
+    // If no filterDef, skip (can happen during navigation)
+    if (!filterDef) {
+      return;
+    }
+
+    // Check if this was triggered by arrow key navigation
+    // Arrow keys alone should NOT open the dialog
+    const isArrowKeyNavigation = this.lastKeyPressed === 'ArrowDown' ||
+                                 this.lastKeyPressed === 'ArrowUp';
+
+    if (isArrowKeyNavigation) {
+      // This is just highlighting, not selection - do NOT open dialog
+      console.log('QueryControl: Arrow key navigation detected, skipping dialog');
+      return;
+    }
+
+    // This was triggered by Enter, Space, or Mouse click - open the dialog
+    this.openFilterDialog(filterDef);
+
+    // Reset the key tracker
+    this.lastKeyPressed = null;
+  }
+
+  /**
+   * Open the appropriate dialog for a filter definition
+   * Extracted into separate method for reuse from keyboard and mouse handlers
+   */
+  private openFilterDialog(filterDef: FilterDefinition): void {
     this.currentFilterDef = filterDef;
 
     // Determine if this is a highlight filter by checking if urlParams starts with 'h_'

@@ -11,23 +11,38 @@
 ### Bug #13: Dropdown Keyboard Navigation ⚠️ MEDIUM PRIORITY
 
 **Severity**: Medium
-**Status**: Not started in either repository
-**Affected Component**: PrimeNG `p-dropdown` with `[filter]="true"`
+**Status**: In Progress
+**Affected Component**: PrimeNG `p-dropdown` with `[filter]="true"` in Query Control panel
 
-**Problem**:
-- Down arrow key should highlight next option, but doesn't
-- Up arrow key should highlight previous option, but doesn't
-- Enter/Space should select highlighted option, but doesn't
-- Only mouse selection works; keyboard navigation is broken
+**Problem** (Detailed from 2025-12-03 session):
+1. **Arrow Keys Trigger Unwanted Side Effects**:
+   - Down arrow highlights the next filter option ✓ (works)
+   - BUT also triggers opening the multiselect dialog for that filter ✗ (side effect)
+   - Should ONLY highlight, not open dialogs
+
+2. **Spacebar Has Wrong Behavior**:
+   - Pressing spacebar returns focus to the search input field (wrong)
+   - Should open/select the currently highlighted filter option
+
+3. **Expected Behavior**:
+   - Arrow keys: Navigate dropdown options and highlight them
+   - Enter key: Open the selected filter's dialog
+   - Spacebar: Open the selected filter's dialog (same as Enter)
+   - Escape: Close dropdown
+   - Mouse click: Open filter's dialog immediately
+
+**Root Cause**:
+- PrimeNG dropdown's `(onChange)` event fires on arrow key navigation
+- Arrow key navigation unintentionally triggers `onFieldSelected()` which opens the dialog
+- Spacebar event handling likely captured by PrimeNG's internal logic, not propagated to component
 
 **Affects**:
-- Body Class filter (in results-table-panel)
+- Query Control dropdown ("Add filter by field...")
 - Any other filtered dropdowns in the application
 
-**Investigation Notes**:
-- Likely PrimeNG issue with `[filter]="true"` mode
-- May require PrimeNG version check or workaround implementation
-- Consider using `p-multiSelect` as alternative (already works in Body Class filter)
+**Files to Modify**:
+- `query-control.component.ts` - Keyboard event handling
+- `query-control.component.html` - Event bindings
 
 ---
 

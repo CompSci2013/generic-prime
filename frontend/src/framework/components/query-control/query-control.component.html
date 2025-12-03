@@ -9,6 +9,7 @@
       [filter]="true"
       filterPlaceholder="Search fields..."
       (onChange)="onFieldSelected($event)"
+      (keydown)="onDropdownKeydown($event)"
       [showClear]="false"
       optionLabel="label"
       optionValue="value"
