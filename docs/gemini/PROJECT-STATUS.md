@@ -1,13 +1,13 @@
 # Project Status
 
-**Version**: 2.8
-**Timestamp**: 2025-12-03T10:45:00Z
+**Version**: 2.9
+**Timestamp**: 2025-12-03T12:00:00Z
 
 ---
 
 ## Current State
 
-### Port 4205 (generic-prime) - BUG #1.3 FIXED ✓
+### Port 4205 (generic-prime) - ALL CRITICAL FIXES COMPLETE ✓
 - **All panel headers streamlined** - Consistent compact design pattern across all 4 panels
 - **Query Control refactored** - Header removed, dropdown + Clear All in shaded bar
 - **Results Table restructured** - Custom collapsible filter panel with shaded header
@@ -17,6 +17,7 @@
 - **Dark theme active** - PrimeNG lara-dark-blue + custom dark styling maintained
 - **All 4 panels active** with drag-drop, collapse, and pop-out functionality
 - **✓ CRITICAL FIX: Bug #1.3** - Query Control now updates when URL changes (race condition eliminated)
+- **✓ FIXED: Dropdown interaction issue** - Can re-select filters after dialog closes (dropdown internal state synchronized)
 - Backend at `generic-prime-backend-api:v1.5.0`
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
@@ -49,6 +50,14 @@ After filter selection in Query Control, the URL updates correctly BUT the contr
 
 ### Applied Fixes
 
+#### Bug #1.3 - Query Control Race Condition
+
+**File: query-control.component.ts**
+- Changed from `combineLatest([filters$, highlights$])` to direct `urlState.params$` subscription
+- Eliminates race condition where highlights$ blocks emission if value unchanged
+- Now chips appear immediately when filter selected (no refresh needed)
+- Verified working: filter selection → URL update → chip display (all synchronous)
+
 **File: discover.component.ts**
 1. Made `handlePopOutMessage()` async
 2. Made `onUrlParamsChange()` async
@@ -56,7 +65,16 @@ After filter selection in Query Control, the URL updates correctly BUT the contr
 4. Made `onPickerSelectionChangeAndUpdateUrl()` async
 5. Added `await` to all `setParams()` and `clearParams()` calls
 
-**Result:** Build compiles successfully with no TypeScript errors. Application runs on port 4205.
+#### Dropdown Interaction Fix (Session 2)
+
+**File: query-control.component.ts**
+- Added `@ViewChild('filterFieldDropdown')` reference to PrimeNG dropdown
+- Created `resetFilterDropdown()` helper method to synchronize component and PrimeNG internal state
+- Resets `selectedField`, `value`, `selectedOption` properties after dialog closes
+- Uses `detectChanges()` instead of `markForCheck()` for immediate updates
+- Now allows re-selecting filters after dialog closure (dropdown label remains as reminder)
+
+**Result:** All filters working - URL-First architecture validated, dropdown interaction resolved.
 
 ### Governing Tactic
 
