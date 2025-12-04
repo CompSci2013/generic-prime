@@ -4,7 +4,85 @@
 
 ---
 
-## Session 2025-12-04 (Compilation Error Fix - Missing onDropdownKeydown Method)
+## Session 2025-12-04 (UX Documentation & Manual Test Plan Update)
+
+**Version**: 2.10 → 2.11
+**Timestamp**: 2025-12-04T18:30:00Z
+**Duration**: ~2 hours
+**Status**: ✓ COMPLETED
+
+### Achievements
+
+#### 1. Created UX Standards Documentation
+- **File**: `docs/gemini/UX.md`
+- **Scope**: Framework-agnostic UX standard for dropdown filters with search/multiselect
+- **Coverage**:
+  - Part A: Single-select dropdown with search (ARIA Combobox pattern)
+  - Part B: Multi-select dropdown with checkboxes (modal dialog pattern)
+  - Complete keyboard navigation and mouse interaction patterns
+  - Industry references (W3C WAI-ARIA, Nielsen Norman Group)
+
+#### 2. Created PrimeNG Implementation Guide
+- **File**: `docs/gemini/UX-IMPLEMENTATION.md`
+- **Scope**: Angular 14 + PrimeNG specific implementation of UX standards
+- **Coverage**:
+  - PrimeNG `<p-dropdown>` with `[filter]="true"` (Combobox pattern)
+  - PrimeNG `<p-dialog>` + `<p-checkbox>` (Multi-select workflow)
+  - Complete component properties and keyboard support
+  - OnPush change detection requirements
+  - Bug #13 investigation findings and workarounds
+  - Current implementation status (what works, known issues)
+
+#### 3. Updated MANUAL-TEST-PLAN.md for Actual Workflow
+- **Reason**: Original test plan assumed direct filter selection; actual workflow uses field selector dropdown + dialogs
+- **Changes Made**:
+  - **Phase 2.1 (Manufacturer)**: Completely rewritten with actual workflow steps
+    - Field selector dropdown → Multiselect dialog → Apply/Cancel → Chip display
+    - Added "Dialog Cancel Behavior (Side Effect)" section to test the expected behavior where clicking a new filter exercises Cancel on previous dialog
+    - Added search/filter, keyboard navigation, edit, and remove tests
+  - **Phase 2.2 (Model)**: Updated to match workflow
+  - **Phase 2.3 (Body Class)**: Updated to match workflow
+  - **Phase 2.4 (Year Range)**: Updated to use Range dialog workflow
+  - **Phase 2.5 (Search)**: Clarified as live text input (not dialog-based)
+  - **Phase 2.6 (Page Size)**: Clarified as table control (not dialog-based)
+  - **Phase 2.7 (Clear All)**: Updated to test combined filters with multiple dialogs
+
+### Key Findings
+
+#### UX Standard: Dropdown with Search
+- **Single-Select**: Open → Search → Navigate (arrows) → Select (Enter/Space/Click) → Close
+- **Multi-Select with Checkboxes**: Open → Search → Navigate/Toggle (Space) → Confirm (Apply button)
+- **Critical UX Requirement**: Explicit Apply/Cancel buttons for multi-select (not auto-close)
+
+#### PrimeNG Compatibility
+- ✅ Dropdown `[filter]="true"` implements ARIA Combobox correctly
+- ❌ **Bug #13 Confirmed**: Arrow key navigation with `[filter]="true"` is unreliable (likely PrimeNG version issue)
+- ✅ Checkboxes with `[binary]="false"` work correctly for multi-select
+- ✅ Dialog focus trapping and modal behavior correct per ARIA spec
+
+#### Workflow Discovery
+- Current implementation uses **field selector dropdown + modal dialogs** (not single-step filtering)
+- **Side Effect**: When selecting a new filter, the previous dialog's Cancel button is automatically exercised
+  - This is **user-facing UX** that must be tested and verified
+  - Tests added in Phase 2.1 to verify this behavior
+
+### Files Modified This Session
+
+1. `docs/gemini/UX.md` - New file (industry-standard UX patterns)
+2. `docs/gemini/UX-IMPLEMENTATION.md` - New file (Angular 14 + PrimeNG implementation guide)
+3. `MANUAL-TEST-PLAN.md` - Updated Phase 2 sections (2.1-2.7) to reflect actual workflow
+
+### Session Impact
+
+- ✅ **Clarity**: Full understanding of dropdown UX pattern (both industry standard and current implementation)
+- ✅ **Documentation**: Comprehensive guides for future developers
+- ✅ **Testing**: Updated manual test plan reflects actual user workflow, not assumed workflow
+- ✅ **Bug #13 Context**: Deep investigation of keyboard navigation issue with findings documented
+- ⏳ **Next Step**: Execute updated Phase 2 manual tests to verify all workflows work correctly
+
+---
+
+## Session 2025-12-04 (Morning - Compilation Error Fix - Missing onDropdownKeydown Method)
 
 **Version**: 2.9 → 2.10
 **Timestamp**: 2025-12-04T06:45:00Z

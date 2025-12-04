@@ -14,76 +14,94 @@
 
 ---
 
-## Current Priority: Fix Bug #13 (Dropdown Keyboard Navigation)
+## Current Priority: Execute Phase 2 Manual Tests (Updated Test Plan)
 
-**Status**: Build compiles successfully. URL-First state management working. Ready for Bug #13 testing.
+**Status**: Build compiles successfully. UX standards documented. Test plan updated for actual workflow. Ready for manual testing.
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Panel headers streamlined for consistent, compact UI. All 4 panels now follow unified design pattern.**
-> **All critical bugs fixed - URL-First architecture validated. Build now compiles without errors.**
+> **Understand dropdown UX patterns → Execute Phase 2 manual tests → Resolve Bug #13 if needed**
+> **Current focus: Validate that all filter workflows (multiselect dialogs, range inputs, search) work correctly per updated test plan and UX standards.**
 
 ---
 
-## Completed This Session (2025-12-04 - Build Compilation Fix)
+## Completed This Session (2025-12-04 - UX Documentation & Test Plan Updates)
 
 ### Session 2025-12-04 Achievements
 
-1. **Build Compilation Fix - FIXED ✓**
-   - Fixed missing `onDropdownKeydown($event)` method in QueryControlComponent
-   - Method was deleted in earlier merge but template binding remained
-   - Added placeholder method to prevent compilation errors
-   - Build now succeeds in 32.3 seconds with no errors
+1. **UX Standards Documentation - COMPLETED ✓**
+   - Created `docs/gemini/UX.md` (industry-standard dropdown UX patterns)
+   - Created `docs/gemini/UX-IMPLEMENTATION.md` (Angular 14 + PrimeNG implementation)
+   - Comprehensive research on ARIA Combobox and Modal Dialog patterns
+   - Bug #13 investigation complete: Arrow keys **should work** but don't with `[filter]="true"`
 
-2. **IDE Warnings Fixed - FIXED ✓**
-   - Fixed unused parameter warning by prefixing with underscore (`_event`)
-   - Clean build with no TypeScript diagnostics
+2. **Manual Test Plan Updated - COMPLETED ✓**
+   - Phase 2 sections (2.1-2.7) completely rewritten for actual workflow
+   - Added "Dialog Cancel Behavior (Side Effect)" tests
+   - Aligned tests with real user workflows (field selector → dialog → chips)
+   - Test plan now reflects dialog workflow + side effect behavior
 
 3. **Documentation Updated**
    - Appended session snapshot to STATUS-HISTORY.md
-   - Updated PROJECT-STATUS.md to v2.10
-   - Updated NEXT-STEPS.md with immediate actions
+   - Updated PROJECT-STATUS.md to v2.11
+   - Updated NEXT-STEPS.md (this file)
 
 ---
 
 ## Immediate Actions (Next Session)
 
-### 1. Fix Bug #13 - Dropdown Keyboard Navigation
+### 1. Execute MANUAL-TEST-PLAN Phase 2 Tests
 
-**Problem**: PrimeNG p-dropdown with `[filter]="true"` keyboard navigation broken:
-- Down arrow should highlight next option
-- Up arrow should highlight previous option
-- Enter/Space should select highlighted option
-- Currently: Arrow keys do nothing, can only click
+**Priority**: HIGH - This tests the core filter workflow
 
-**Investigation needed**:
-- Check PrimeNG version compatibility
-- Check if `[filter]="true"` disables keyboard nav
-- Try PrimeNG accessibility settings
-- May require downgrading to different PrimeNG version or using alternative component
+**Tests to Execute** (in order from updated test plan):
+- **2.1 Manufacturer Filter** - Multiselect dialog workflow with side effect test
+- **2.2 Model Filter** - Combined with Manufacturer
+- **2.3 Body Class Filter** - Combined with previous filters
+- **2.4 Year Range Filter** - Range dialog workflow
+- **2.5 Search Filter** - Live text filtering
+- **2.6 Page Size** - Results table control
+- **2.7 Clear All** - Combined filter clearing
 
-### 2. Fix Bug #7 - Checkbox Visual State
+**Testing Workflow**:
+- Execute each test item one-by-one
+- Mark checkbox `[X]` on success, or `fail` with description
+- Record failures in TEST-RESULTS section
+- Do NOT fix code; only document findings
 
-**Problem**: Checkboxes stay checked after clearing filters
-- Visual state not syncing with data model
-- Low priority (cosmetic only)
+**Expected Results**:
+- All filters working correctly
+- Dialogs opening and closing properly
+- Cancel side effect working as expected
+- URL updates and chip display working
+- Combined filters working (intersection, not union)
 
-**Investigation**:
-- Verify checkbox model state syncs with data
-- Test Clear All button behavior
-- Check if form control state is being reset
+### 2. Bug #13 - Keyboard Navigation Testing
 
-### 3. Execute Full MANUAL-TEST-PLAN Phase 2
+**Included in Phase 2.1** (Search/Filter in Dialog, Keyboard Navigation in Dialog sections)
 
-Run comprehensive Query Control test suite:
-- Test all filter types (multiselect, range)
-- Test pop-out Query Control windows
-- Verify chip behavior
-- Test drag-drop panel ordering persistence
+**Expected Outcome**:
+- Tab navigation: ✅ Expected to work
+- Space to toggle: ✅ Expected to work
+- Arrow keys in field dropdown: ❌ Known broken (Bug #13)
+- Document exact failures for future investigation
 
-### 4. Add "Agriculture" Domain (After Phase 2 Complete)
+### 3. Bug #7 - Checkbox Visual State
 
-Create a new "agriculture" domain to validate the flexible domain architecture.
+**Included in Phase 2.1** (Clear/Edit Manufacturer Filter section)
+
+**Expected Outcome**:
+- Checkboxes should reset when Clear All is clicked
+- Document if checkboxes stay checked (visual sync issue)
+
+### 4. Document Phase 2 Results
+
+**Deliverable**: Complete TEST-RESULTS section in MANUAL-TEST-PLAN.md with:
+- Total tests run
+- Passed/Failed count per section
+- Critical issues found
+- Minor issues found
+- Any workarounds discovered
 
 ---
 
@@ -149,4 +167,4 @@ Before ending session:
 
 ---
 
-**Last Updated**: 2025-12-04
+**Last Updated**: 2025-12-04T18:30:00Z

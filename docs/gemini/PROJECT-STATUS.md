@@ -1,13 +1,13 @@
 # Project Status
 
-**Version**: 2.10
-**Timestamp**: 2025-12-04T06:45:00Z
+**Version**: 2.11
+**Timestamp**: 2025-12-04T18:30:00Z
 
 ---
 
 ## Current State
 
-### Port 4205 (generic-prime) - ALL CRITICAL FIXES COMPLETE ✓
+### Port 4205 (generic-prime) - READY FOR PHASE 2 MANUAL TESTING ✓
 - **All panel headers streamlined** - Consistent compact design pattern across all 4 panels
 - **Query Control refactored** - Header removed, dropdown + Clear All in shaded bar
 - **Results Table restructured** - Custom collapsible filter panel with shaded header
@@ -28,20 +28,52 @@
 
 ---
 
-## Session Summary (2025-12-04 - Compilation Error Fix & Build Verification)
+## Session Summary (2025-12-04 - UX Documentation & Test Plan Updates)
 
-### Quick Resolution
+### Part 1: Comprehensive UX Documentation (~1.5 hours)
 
-**Issue**: QueryControlComponent template referenced missing `onDropdownKeydown($event)` method
-**Status**: ✓ RESOLVED in ~15 minutes
+**Objective**: Understand industry-standard dropdown UX patterns and translate to PrimeNG implementation
 
-**Steps Taken**:
-1. Identified compilation error from template reference
-2. Added placeholder `onDropdownKeydown(_event: KeyboardEvent)` method to component
-3. Verified build succeeds (32.3 seconds, no errors)
-4. Updated documentation
+**Deliverables**:
+1. **UX.md** - Framework-agnostic standards for dropdown filters with search
+   - Part A: Single-select dropdown (ARIA Combobox pattern)
+   - Part B: Multi-select with checkboxes (Modal Dialog pattern)
+   - Full keyboard navigation and mouse interaction specifications
 
-**Key Finding**: The method stub was deleted in an earlier merge that refactored the dropdown but didn't clean up the template binding. This is now fixed and the build is healthy.
+2. **UX-IMPLEMENTATION.md** - Angular 14 + PrimeNG specific guide
+   - Component properties and configurations
+   - Keyboard support analysis (Built-in vs Manual)
+   - Bug #13 investigation: Arrow keys with `[filter]="true"` unreliable
+   - Change detection requirements (OnPush strategy)
+
+**Key Research Findings**:
+- PrimeNG `<p-dropdown [filter]="true">` correctly implements ARIA Combobox
+- Arrow key navigation **should work** per ARIA spec but is broken in current version
+- Multi-select with checkboxes requires explicit Apply/Cancel buttons (no auto-close)
+- Dialog focus trapping and modal behavior correct per ARIA patterns
+
+### Part 2: Manual Test Plan Updates (~0.5 hours)
+
+**Issue**: Original test plan assumed direct filter selection; actual workflow different
+
+**Updates Made**:
+- **Phase 2.1-2.4**: Completely rewritten to reflect actual workflow
+  - Field selector dropdown → Multiselect/Range dialog → Apply/Cancel → Chips
+  - Added "Dialog Cancel Behavior (Side Effect)" test verifying expected UX
+  - Added keyboard navigation, search, edit, and remove tests
+- **Phase 2.5-2.6**: Clarified (Search and Size are not dialog-based)
+- **Phase 2.7**: Updated for combined filter testing
+
+**Critical Discovery**: Dialog Cancel Side Effect
+- When selecting a new filter field, previous dialog's Cancel button is exercised
+- This is **user-facing UX** that must be tested
+- Tests added to Phase 2.1 to verify correct dialog opens
+
+### Status After This Session
+- ✅ All code compiles (no errors)
+- ✅ Phase 1 manual tests PASSED (initial state, panel controls)
+- ⏳ Phase 2 manual tests ready for execution (updated test plan with actual workflow)
+- ⏳ Bug #13 (keyboard nav) requires further investigation or PrimeNG version evaluation
 
 ---
 
@@ -158,10 +190,22 @@ Critical focus: **Fix URL-First state management so controls update when URL cha
 
 ## Files Modified This Session (2025-12-04)
 
-- `frontend/src/framework/components/query-control/query-control.component.ts` - Added `onDropdownKeydown()` method + fixed IDE hints
-- `frontend/src/framework/components/query-control/query-control.component.html` - (from earlier session - dialog event handlers)
-- `docs/gemini/STATUS-HISTORY.md` - Appended session 2025-12-04 snapshot
-- `docs/gemini/PROJECT-STATUS.md` - Updated version to 2.10, documented fix
+### New Files Created
+- `docs/gemini/UX.md` - Industry-standard dropdown UX patterns (framework-agnostic)
+- `docs/gemini/UX-IMPLEMENTATION.md` - Angular 14 + PrimeNG implementation guide
+
+### Files Updated
+- `MANUAL-TEST-PLAN.md` - Phase 2 sections (2.1-2.7) rewritten for actual workflow
+- `docs/gemini/STATUS-HISTORY.md` - Appended this session's snapshot
+- `docs/gemini/PROJECT-STATUS.md` - Updated to v2.11, documented UX investigation
+
+---
+
+## Governing Tactic
+
+**Understand dropdown UX patterns → Execute Phase 2 manual tests → Resolve Bug #13 if needed**
+
+Current focus: Validate that all filter workflows (multiselect dialogs, range inputs, search) work correctly per updated test plan and UX standards.
 
 ---
 

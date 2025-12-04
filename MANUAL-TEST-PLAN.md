@@ -10,9 +10,9 @@
 ## Prerequisites & Test Methodology
 
 ### Test Data Setup
-- [x] **Action**: Ensure the backend database is seeded with the standard `v1` test dataset.
-- [x] **Verification**: The application should show a total of ~4,887 records on initial load.
-- [x] **Verification**: The manufacturer filter should list 72 unique manufacturers.
+- [ ] **Action**: Ensure the backend database is seeded with the standard `v1` test dataset.
+- [ ] **Verification**: The application should show a total of ~4,887 records on initial load.
+- [ ] **Verification**: The manufacturer filter should list 72 unique manufacturers.
 
 ### URL-First Architecture
 All state changes must be reflected in the URL and vice versa. Controls must update when URL changes, regardless of whether the control is in the main Discover page or popped out.
@@ -33,33 +33,33 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 **Estimated Time**: 5 minutes
 
 ### 1.1 Initial Page Load
-- [x] Navigate to http://localhost:4205/discover
-- [x] Verify page loads without errors
-- [x] Verify all 4 panels visible (Query Control, Picker, Results Table, Statistics)
-- [x] Verify all panels expanded by default
-- [x] Verify URL is clean: `http://localhost:4205/discover` (no query params)
-- [x] Verify Results Table shows all records (~4,887 total)
-- [x] Verify Statistics Panel shows all data aggregations (Manufacturers: 72, etc.)
+- [X] Navigate to http://localhost:4205/discover
+- [X] Verify page loads without errors
+- [X] Verify all 4 panels visible (Query Control, Picker, Results Table, Statistics)
+- [X] Verify all panels expanded by default
+- [X] Verify URL is clean: `http://localhost:4205/discover` (no query params)
+- [X] Verify Results Table shows all records (~4,887 total)
+- [X] Verify Statistics Panel shows all data aggregations (Manufacturers: 72, etc.)
 
 ### 1.2 Panel Collapse/Expand (Main Page)
-- [x] Click collapse button on Query Control panel header
-- [x] Verify panel collapses and content hidden
-- [x] Verify collapse button changes to expand icon
-- [x] Click to expand - verify content reappears
-- [x] Repeat collapse/expand for each panel:
-  - [x] Manufacturer-Model Picker
-  - [x] Results Table
-  - [x] Statistics Panel
-- [x] Verify collapsed state does NOT affect URL
+- [X] Click collapse button on Query Control panel header
+- [X] Verify panel collapses and content hidden
+- [X] Verify collapse button changes to expand icon
+- [X] Click to expand - verify content reappears
+- [X] Repeat collapse/expand for each panel:
+  - [X] Manufacturer-Model Picker
+  - [X] Results Table
+  - [X] Statistics Panel
+- [X] Verify collapsed state does NOT affect URL
 
 ### 1.3 Panel Drag-Drop Reordering (Main Page)
-- [x] Drag Query Control panel to bottom position
-- [x] Verify panel reorders visually
-- [X] Verify all controls still functional in new position Fail
-- [x] Drag Picker panel to top
-- [x] Drag Results Table above Statistics
-- [x] Verify drag-drop does NOT affect URL state
-- [x] Refresh page - verify panels return to original order
+- [X] Drag Query Control panel to bottom position
+- [X] Verify panel reorders visually
+- [X] Verify all controls still functional in new position
+- [X] Drag Picker panel to top
+- [X] Drag Results Table above Statistics
+- [X] Verify drag-drop does NOT affect URL state
+- [X] Refresh page - verify panels return to original order
   - They do, but this is a bug. Panels should remain in the order selected by user
 
 ---
@@ -68,152 +68,246 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 **Priority**: P0-Critical (Smoke Test)
 **Estimated Time**: 15 minutes
 
-### 2.1 Manufacturer Dropdown Filter
+### 2.1 Manufacturer Filter (Multiselect Dialog Workflow)
 
-#### Interaction Tests
-- [x] Click "Add Filter" or dropdown in Query Control header
-- [x] Select single manufacturer (e.g., "Brammo")
-- [x] Verify URL updates: `?manufacturer=Brammo`
-- [-] Verify Results Table updates to show only Brammo results
- -  Brammo selected, URL updated but the controls did not ![image](/uploads/16f2bf7638009cf02e8549e62c56c3b3/image.png){width=1310 height=449} ![image](/uploads/24972d80a1b5719688abba1c463ef182/image.png){width=1307 height=547}
- - After page refresh, controls are updated correctly, but drag order was not persisted. Query Control returned to top of page. ![image](/uploads/0a0ecae8ae4f8cbda32c811c7a2e129f/image.png){width=1281 height=744}
+#### Single Selection Workflow
+- [ ] Click field selector dropdown in Query Control header
+- [ ] Select "Manufacturer" from dropdown
+- [ ] Verify multiselect dialog opens with title "Select Manufacturer"
+- [ ] Verify list shows available manufacturers (~72 options)
+- [ ] Click checkbox next to "Brammo" to select it
+- [ ] Verify checkbox becomes checked
+- [ ] Click "Apply" button in dialog
+- [ ] Verify dialog closes and chip appears: "Manufacturer: Brammo"
+- [ ] Verify URL updates: `?manufacturer=Brammo`
+- [ ] Verify Results Table updates to show only Brammo results
 - [ ] Verify Statistics Panel updates (charts reflect Brammo data only)
-- [ ] Verify result count shows filtered total
 
-#### Clear/Reset Tests
-- [ ] Click "X" to clear manufacturer filter
+#### Dialog Cancel Behavior (Side Effect)
+- [ ] With "Manufacturer: Brammo" chip visible, click field selector dropdown
+- [ ] Select "Model" from dropdown
+- [ ] Verify "Cancel" button was exercised on Manufacturer dialog (no error)
+- [ ] Verify Model multiselect dialog opens (not Manufacturer dialog)
+- [ ] Click "Cancel" button
+- [ ] Verify Manufacturer filter remains: "Manufacturer: Brammo" chip still visible
+
+#### Multiple Selection Tests
+- [ ] Click field selector dropdown
+- [ ] Select "Manufacturer"
+- [ ] In dialog, select multiple: Brammo, Ford, GMC (3 checkboxes)
+- [ ] Verify all 3 checkboxes are checked
+- [ ] Click "Apply"
+- [ ] Verify URL shows: `?manufacturer=Brammo,Ford,GMC`
+- [ ] Verify Results Table shows only records from those 3 manufacturers
+- [ ] Verify Statistics reflect only selected manufacturers
+
+#### Search/Filter in Dialog
+- [ ] Click field selector dropdown, select "Manufacturer"
+- [ ] In dialog, type "bra" in search box
+- [ ] Verify list filters to show matching options (e.g., Brammo)
+- [ ] Verify non-matching options hidden (e.g., Ford)
+- [ ] Clear search box
+- [ ] Verify all options reappear
+- [ ] Click "Cancel" without applying
+
+#### Keyboard Navigation in Dialog
+- [ ] Click field selector dropdown, select "Manufacturer"
+- [ ] In dialog, Tab to first checkbox
+- [ ] Press Space to toggle checkbox
+- [ ] Verify checkbox becomes checked
+- [ ] Tab to "Apply" button
+- [ ] Press Enter to apply filter
+- [ ] Verify filter applied and URL updated
+
+#### Clear/Edit Manufacturer Filter
+- [ ] With "Manufacturer: Brammo" chip visible, click the chip (not X)
+- [ ] Verify Manufacturer dialog reopens
+- [ ] Verify "Brammo" checkbox is still checked (pre-populated)
+- [ ] Uncheck Brammo and check Ford instead
+- [ ] Click "Apply"
+- [ ] Verify URL changes: `?manufacturer=Ford`
+- [ ] Verify Results Table updates to Ford only
+
+#### Remove Manufacturer Filter
+- [ ] With "Manufacturer: Brammo" chip visible, click X on chip
+- [ ] Verify chip removed
 - [ ] Verify URL reverts to clean state (no manufacturer param)
 - [ ] Verify Results Table shows all manufacturers again
 - [ ] Verify Statistics Panel shows all data again
 
-#### Multiple Selection Tests
-- [ ] Select multiple manufacturers (Brammo, Honda, Ford)
-- [ ] Verify URL shows: `?manufacturer=Brammo,Honda,Ford` (or similar)
-- [ ] Verify Results Table shows only records from those 3 manufacturers
-- [ ] Verify row counts match filtered set
-- [ ] Verify Statistics reflect only selected manufacturers
+### 2.2 Model Filter (Multiselect Dialog Workflow)
 
-#### Dropdown Search Tests
-- [ ] Click manufacturer dropdown
-- [ ] Type "toy" to search
-- [ ] Verify dropdown filters to show matching options (Brammo, Toyoda, etc.)
-- [ ] Verify ESC key closes dropdown without selection
-- [ ] Verify arrow keys navigate dropdown options
-- [ ] Select option with Enter key
-- [ ] Verify URL updates correctly
-
-### 2.2 Model Dropdown Filter
-
-#### Interaction Tests
-- [ ] Select single model (e.g., "Civic")
-- [ ] Verify URL updates: `?model=Civic`
+#### Single Selection Workflow
+- [ ] Click field selector dropdown
+- [ ] Select "Model"
+- [ ] Verify Model multiselect dialog opens
+- [ ] Select single model (e.g., "Scooter")
+- [ ] Click "Apply"
+- [ ] Verify URL updates: `?model=Scooter`
 - [ ] Verify Results Table filters to that model
 - [ ] Verify Statistics Panel reflects model-filtered data
 
 #### Combined Filters Test
-- [ ] Set Manufacturer to "Honda"
-- [ ] Set Model to "Civic"
-- [ ] Verify URL shows both: `?manufacturer=Honda&model=Civic`
-- [ ] Verify Results Table shows only Honda Civics
+- [ ] First, set Manufacturer to "Brammo" (using steps from 2.1)
+- [ ] Then, click field selector dropdown and select "Model"
+- [ ] In dialog, select "Scooter"
+- [ ] Click "Apply"
+- [ ] Verify URL shows both: `?manufacturer=Brammo&model=Scooter`
+- [ ] Verify Results Table shows only Brammo Scooters
 - [ ] Verify result count reflects intersection (not sum)
 
-#### Clear Model Filter
-- [ ] Clear Model filter
-- [ ] Verify URL keeps manufacturer: `?manufacturer=Honda`
-- [ ] Verify Results Table shows all Honda models again
+#### Edit Model Filter
+- [ ] With both filters applied, click "Model: Scooter" chip
+- [ ] Verify dialog reopens with "Scooter" checked
+- [ ] Uncheck Scooter, select different model
+- [ ] Click "Apply"
+- [ ] Verify URL updates with new model
+- [ ] Verify Manufacturer filter still active: `?manufacturer=Brammo&model=<NewModel>`
 
-### 2.3 Body Class Dropdown Filter
+#### Remove Model Filter
+- [ ] With both filters applied, click X on "Model: Scooter" chip
+- [ ] Verify chip removed
+- [ ] Verify URL keeps manufacturer: `?manufacturer=Brammo`
+- [ ] Verify Results Table shows all Brammo models again
 
-#### Interaction Tests
+### 2.3 Body Class Filter (Multiselect Dialog Workflow)
+
+#### Single Selection Workflow
+- [ ] Click field selector dropdown
+- [ ] Select "Body Class"
+- [ ] Verify Body Class multiselect dialog opens
 - [ ] Select single body class (e.g., "SUV")
+- [ ] Click "Apply"
 - [ ] Verify URL updates: `?bodyClass=SUV`
 - [ ] Verify Results Table shows only SUVs
 - [ ] Verify Statistics Panel reflects SUV data
 
 #### Multiple Body Classes
-- [ ] Select multiple body classes (SUV, Sedan, Truck)
+- [ ] Click field selector dropdown, select "Body Class"
+- [ ] In dialog, select multiple: SUV, Sedan, Truck
+- [ ] Click "Apply"
 - [ ] Verify URL shows: `?bodyClass=SUV,Sedan,Truck`
 - [ ] Verify Results Table shows only those 3 body classes
 
 #### Combined with Previous Filters
-- [ ] Set: Manufacturer=Honda, Model=CR-V, BodyClass=SUV
-- [ ] Verify URL shows all three parameters
-- [ ] Verify Results Table shows Honda CR-Vs that are SUVs
+- [ ] Set: Manufacturer=Brammo (via 2.1)
+- [ ] Set: Model=Scooter (via 2.2)
+- [ ] Set: Body Class=SUV (via above)
+- [ ] Verify URL shows all three: `?manufacturer=Brammo&model=Scooter&bodyClass=SUV`
+- [ ] Verify Results Table shows Brammo Scooters that are SUVs
 - [ ] Verify all Statistics reflect combined filters
 
-### 2.4 Year Range Filter
+#### Remove Body Class Filter
+- [ ] Click X on "Body Class: SUV" chip
+- [ ] Verify URL keeps other filters: `?manufacturer=Brammo&model=Scooter`
+- [ ] Verify Results Table shows all body classes for filtered manufacturer/model
+
+### 2.4 Year Range Filter (Range Dialog Workflow)
 
 #### Minimum Year Tests
-- [ ] Click Year filter control
-- [ ] Enter minimum year (e.g., 2020)
+- [ ] Click field selector dropdown
+- [ ] Select "Year"
+- [ ] Verify Year Range dialog opens with "Start Year" and "End Year" inputs
+- [ ] Enter minimum year (e.g., 2020) in "Start Year" field
+- [ ] Leave "End Year" blank
+- [ ] Click "Apply"
 - [ ] Verify URL updates: `?yearMin=2020`
 - [ ] Verify Results Table shows only cars from 2020+
 - [ ] Verify Statistics reflect 2020+ data only
 
 #### Maximum Year Tests
-- [ ] Enter maximum year (e.g., 2024)
+- [ ] With yearMin=2020 active, click "Year: 2020" chip
+- [ ] Verify Year Range dialog reopens with "Start Year"=2020 pre-filled
+- [ ] Enter maximum year (e.g., 2024) in "End Year" field
+- [ ] Click "Apply"
 - [ ] Verify URL updates to: `?yearMin=2020&yearMax=2024`
 - [ ] Verify Results Table shows cars 2020-2024
 - [ ] Verify Statistics reflect this range
 
-#### Clear Year Range
-- [ ] Clear year filters (click X buttons)
+#### Year Range Only (Min and Max)
+- [ ] Click field selector dropdown
+- [ ] Select "Year"
+- [ ] Enter only "End Year"=2024, leave "Start Year" blank
+- [ ] Click "Apply"
+- [ ] Verify URL updates: `?yearMax=2024`
+- [ ] Verify Results Table shows all cars up to 2024
+
+#### Remove Year Range Filter
+- [ ] With year filters active, click X on "Year: 2020-2024" chip
+- [ ] Verify chip removed
 - [ ] Verify URL removes yearMin and yearMax params
 - [ ] Verify Results Table shows all years again
 - [ ] Verify Statistics show all-time data
 
 #### Invalid Range Tests
-- [ ] Enter yearMin=2024, yearMax=2020 (invalid)
-- [ ] Verify application either rejects or swaps values
-- [ ] Verify error message displays if applicable
+- [ ] Click field selector, select "Year"
+- [ ] Enter yearMin=2024, yearMax=2020 (invalid - min > max)
+- [ ] Click "Apply"
+- [ ] Verify application either: rejects the input, swaps values, or shows error
+- [ ] Verify URL reflects final state
 
 ### 2.5 Search/Text Filter
 
-#### Basic Search
-- [ ] Locate "Search" text input in Query Control
+#### Basic Search Workflow
+- [ ] In Query Control, locate "Search" text input field
 - [ ] Enter search term (e.g., "Hybrid")
 - [ ] Verify URL updates: `?search=Hybrid`
-- [ ] Verify Results Table filters to matching rows
+- [ ] Verify Results Table filters to matching rows (live/immediate)
+- [ ] Verify result count updates
 - [ ] Verify Statistics reflect search results
 
-#### Search with Other Filters
-- [ ] Set Manufacturer=Brammo, then Search=Hybrid
+#### Search Combined with Other Filters
+- [ ] Set Manufacturer=Brammo (using steps from 2.1)
+- [ ] Then enter search term "Hybrid" in Search field
 - [ ] Verify URL shows: `?manufacturer=Brammo&search=Hybrid`
-- [ ] Verify Results Table shows Brammo Hybrids only
+- [ ] Verify Results Table shows only Brammo vehicles matching "Hybrid" search
+- [ ] Verify Statistics reflect intersection (Brammo + Hybrid)
 
 #### Clear Search
-- [ ] Click X to clear search
+- [ ] With search active, click X button to clear search field
 - [ ] Verify URL removes search param
-- [ ] Verify Results Table returns to previous filter state
+- [ ] Verify Results Table returns to previous filter state (Brammo only)
 
-### 2.6 Page Size Filter
+### 2.6 Page Size Filter (Table Control)
 
 #### Change Page Size
-- [ ] Locate "Size" selector (rows per page)
+- [ ] In Results Table panel, locate "Size" selector (rows per page dropdown)
 - [ ] Select size=10
 - [ ] Verify URL updates: `?size=10`
 - [ ] Verify Results Table shows 10 rows per page
-- [ ] Verify pagination controls show proper page count
+- [ ] Verify pagination controls show proper page count (e.g., "1 of 489" for 4,887 records)
 
 #### Page Size Options
 - [ ] Test all available sizes: [10, 20, 50, 100] (or configured values)
-- [ ] Verify each size updates URL correctly
+- [ ] For each size, verify URL updates correctly with `?size=<N>`
 - [ ] Verify table adjusts row count appropriately
 
-#### Size with Filters
-- [ ] Apply manufacturer filter, then set size=20
+#### Size with Query Filters
+- [ ] Set Manufacturer=Brammo (using 2.1 steps)
+- [ ] Then set page size to 20
 - [ ] Verify URL shows both: `?manufacturer=Brammo&size=20`
-- [ ] Verify table shows 20 filtered rows per page
+- [ ] Verify table shows 20 filtered rows per page (Brammo only)
 
-### 2.7 "Clear All" Button
+### 2.7 "Clear All" Button (Combined Dialog Workflow)
 
 #### Clear All Filters
-- [ ] Apply multiple filters (manufacturer, model, year, search, size)
+- [ ] Apply multiple filters using dialog workflow:
+  - [ ] Manufacturer=Brammo (via 2.1)
+  - [ ] Model=Scooter (via 2.2)
+  - [ ] Year=2020-2024 (via 2.4)
+  - [ ] Search="Hybrid" (via 2.5)
+  - [ ] Size=20 (via 2.6)
+- [ ] Verify chips displayed: "Manufacturer: Brammo", "Model: Scooter", "Year: 2020-2024"
+- [ ] Verify Search field shows "Hybrid"
+- [ ] Verify URL shows all params: `?manufacturer=Brammo&model=Scooter&yearMin=2020&yearMax=2024&search=Hybrid&size=20`
 - [ ] Click "Clear All Filters" button
-- [ ] Verify ALL URL parameters removed (clean URL)
-- [ ] Verify all input fields cleared
-- [ ] Verify Results Table shows unfiltered data
-- [ ] Verify Statistics show unfiltered data
+- [ ] Verify "Cancel" button exercised on any open dialog (no error)
+- [ ] Verify ALL URL parameters removed (clean URL: `/discover`)
+- [ ] Verify all filter chips removed
+- [ ] Verify Search field cleared
+- [ ] Verify page size reset to default
+- [ ] Verify Results Table shows unfiltered data (~4,887 records)
+- [ ] Verify Statistics show all-time data
 
 ---
 
@@ -350,9 +444,9 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 
 #### Complex Filter Scenario
 - [ ] In Query Control, set Year: 2020-2024
-- [ ] In Picker, select Manufacturer: Honda
-- [ ] Verify URL shows: `?yearMin=2020&yearMax=2024&pickedManufacturer=Honda`
-- [ ] Verify Results Table shows Honda cars from 2020-2024
+- [ ] In Picker, select Manufacturer: Brammo
+- [ ] Verify URL shows: `?yearMin=2020&yearMax=2024&pickedManufacturer=Brammo`
+- [ ] Verify Results Table shows Brammo cars from 2020-2024
 - [ ] Verify Statistics reflect this intersection
 
 ---
@@ -384,8 +478,8 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Verify all charts reflect Brammo-only data
 
 #### Multiple Filters
-- [ ] Set Manufacturer=Honda, Year=2020-2024
-- [ ] Verify all charts show Honda data from 2020-2024 only
+- [ ] Set Manufacturer=Brammo, Year=2020-2024
+- [ ] Verify all charts show Brammo data from 2020-2024 only
 - [ ] Verify totals in charts match filtered result count
 
 #### Clear Filters
@@ -424,10 +518,10 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 ### 6.2 URL Synchronization (Pop-Out)
 
 #### URL State Sync
-- [ ] In main window, add manufacturer filter: Honda
-- [ ] Verify main window URL updates: `?manufacturer=Honda`
+- [ ] In main window, add manufacturer filter: Brammo
+- [ ] Verify main window URL updates: `?manufacturer=Brammo`
 - [ ] Switch to pop-out window
-- [ ] Verify pop-out Query Control shows Honda selected
+- [ ] Verify pop-out Query Control shows Brammo selected
 - [ ] Verify pop-out window reflects main URL state
 
 #### Pop-Out Filter Change
@@ -439,14 +533,14 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Verify Statistics show Brammo data
 
 #### Complex Sync Test
-- [ ] In main window: Set Manufacturer=Honda, Year=2020-2024
+- [ ] In main window: Set Manufacturer=Brammo, Year=2020-2024
 - [ ] In main Results Table: Change page size to 50
-- [ ] Verify main URL: `?manufacturer=Honda&yearMin=2020&yearMax=2024&size=50`
+- [ ] Verify main URL: `?manufacturer=Brammo&yearMin=2020&yearMax=2024&size=50`
 - [ ] Switch to pop-out Query Control window
 - [ ] Verify all three filters visible/selected in pop-out
 - [ ] Modify Year to 2022-2023 in pop-out
 - [ ] Switch to main window
-- [ ] Verify main URL updated: `?manufacturer=Honda&yearMin=2022&yearMax=2023&size=50`
+- [ ] Verify main URL updated: `?manufacturer=Brammo&yearMin=2022&yearMax=2023&size=50`
 - [ ] Verify Results Table reflects new year range
 - [ ] Verify page still shows 50 rows per page
 
@@ -506,7 +600,7 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 
 #### Selection in Pop-Out
 - [ ] In pop-out Picker, select a manufacturer
-- [ ] Verify pop-out URL updates: `?pickedManufacturer=Honda`
+- [ ] Verify pop-out URL updates: `?pickedManufacturer=Brammo`
 - [ ] Switch to main window
 - [ ] Verify main Results Table shows selected manufacturer
 - [ ] Verify main URL updated
@@ -546,12 +640,12 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Verify all 4 windows open with correct components
 
 #### Multi-Window Filter Sync
-- [ ] In pop-out Query Control: Set Manufacturer=Honda
-- [ ] Verify pop-out Query Control shows Honda
-- [ ] Verify pop-out Results Table shows Honda results
+- [ ] In pop-out Query Control: Set Manufacturer=Brammo
+- [ ] Verify pop-out Query Control shows Brammo
+- [ ] Verify pop-out Results Table shows Brammo results
 - [ ] Switch to main window - verify filters applied
 - [ ] In pop-out Picker: Select Brammo
-- [ ] Verify pop-out Query Control NOW shows Brammo (overrides Honda)
+- [ ] Verify pop-out Query Control NOW shows Brammo (overrides Brammo)
 - [ ] Verify pop-out Results Table shows Brammo
 - [ ] Verify pop-out Statistics show Brammo
 - [ ] Verify main window updated to Brammo
@@ -586,9 +680,9 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 ### 7.1 URL Direct Navigation
 
 #### Manually Type URL with Params
-- [ ] Type URL directly: `http://localhost:4205/discover?manufacturer=Honda&yearMin=2020&yearMax=2024`
+- [ ] Type URL directly: `http://localhost:4205/discover?manufacturer=Brammo&yearMin=2020&yearMax=2024`
 - [ ] Press Enter
-- [ ] Verify page loads with Honda, 2020-2024 year range pre-selected
+- [ ] Verify page loads with Brammo, 2020-2024 year range pre-selected
 - [ ] Verify Results Table shows filtered results
 - [ ] Verify Statistics show filtered data
 - [ ] Verify Query Control shows all filters applied
@@ -607,7 +701,7 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 ### 7.2 Rapid Filter Changes
 
 #### Quick Filter Switching
-- [ ] Rapidly change manufacturer 3 times (Brammo → Honda → Ford)
+- [ ] Rapidly change manufacturer 3 times (Brammo → Brammo → Ford)
 - [ ] Verify Results Table updates to final selection (Ford)
 - [ ] Verify URL shows Ford
 - [ ] Verify no orphaned/stale data displays
@@ -632,29 +726,29 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Verify pagination controls show 1 page
 
 #### Page Doesn't Exist
-- [ ] Manually type URL: `?manufacturer=Honda&first=10000`
+- [ ] Manually type URL: `?manufacturer=Brammo&first=10000`
 - [ ] Verify page either shows last valid page or empty results gracefully
 - [ ] Verify no JavaScript errors
 
 ### 7.4 Persistence Across Navigation
 
 #### Filter Persistence on Panel Toggle
-- [ ] Set manufacturer=Honda, expand and collapse Query Control
-- [ ] Verify Honda still selected
+- [ ] Set manufacturer=Brammo, expand and collapse Query Control
+- [ ] Verify Brammo still selected
 - [ ] Verify URL unchanged
 
 #### Filter Persistence on Panel Drag
-- [ ] Set manufacturer=Honda
+- [ ] Set manufacturer=Brammo
 - [ ] Drag Query Control panel to different position
-- [ ] Verify Honda still selected
+- [ ] Verify Brammo still selected
 - [ ] Verify URL unchanged
 
 #### Filter Persistence on Page Refresh
-- [ ] Set: manufacturer=Honda, year=2020-2024, size=20
-- [ ] Verify URL: `?manufacturer=Honda&yearMin=2020&yearMax=2024&size=20`
+- [ ] Set: manufacturer=Brammo, year=2020-2024, size=20
+- [ ] Verify URL: `?manufacturer=Brammo&yearMin=2020&yearMax=2024&size=20`
 - [ ] Press F5 (refresh page)
 - [ ] Verify page reloads with all filters still applied
-- [ ] Verify Results Table shows Honda 2020-2024
+- [ ] Verify Results Table shows Brammo 2020-2024
 - [ ] Verify page size is 20
 
 ### 7.5 Browser Back/Forward
@@ -678,12 +772,12 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 
 #### Complex Workflow 1: Discover → Filter → Pop-Out → Modify → Sync Check
 - [ ] Navigate to clean page
-- [ ] Use Query Control to set: Manufacturer=Honda, Year=2020-2024
-- [ ] Verify Results Table shows 200 Honda cars (estimate)
+- [ ] Use Query Control to set: Manufacturer=Brammo, Year=2020-2024
+- [ ] Verify Results Table shows 200 Brammo cars (estimate)
 - [ ] Verify result count accurate
 - [ ] Pop out Results Table to new window
 - [ ] In pop-out, navigate to page 2
-- [ ] Verify pop-out shows page 2 of Honda results
+- [ ] Verify pop-out shows page 2 of Brammo results
 - [ ] In main window, switch page size from default to 50
 - [ ] Switch to pop-out Results Table
 - [ ] Verify pop-out now shows 50 rows per page (page 1)
@@ -692,17 +786,17 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Verify both windows showing same URLs
 
 #### Complex Workflow 2: Chained Filters via Multiple Controls
-- [ ] Use Query Control: Set Model=Civic
-- [ ] Use Picker: Select Manufacturer=Honda
-- [ ] Verify URL: `?model=Civic&pickedManufacturer=Honda`
-- [ ] Verify Results Table shows: Honda Civics only
+- [ ] Use Query Control: Set Model=Scooter
+- [ ] Use Picker: Select Manufacturer=Brammo
+- [ ] Verify URL: `?model=Scooter&pickedManufacturer=Brammo`
+- [ ] Verify Results Table shows: Brammo Scooters only
 - [ ] In Results Table filter panel: Add Year=2020-2024
-- [ ] Verify URL: `?model=Civic&pickedManufacturer=Honda&yearMin=2020&yearMax=2024`
-- [ ] Verify Results Table shows: Honda Civics 2020-2024
-- [ ] Verify Statistics show same data (Honda Civics 2020-2024)
+- [ ] Verify URL: `?model=Scooter&pickedManufacturer=Brammo&yearMin=2020&yearMax=2024`
+- [ ] Verify Results Table shows: Brammo Scooters 2020-2024
+- [ ] Verify Statistics show same data (Brammo Scooters 2020-2024)
 - [ ] Clear Model filter in Query Control
 - [ ] Verify URL removes model param
-- [ ] Verify Results Table now shows all Honda models (2020-2024)
+- [ ] Verify Results Table now shows all Brammo models (2020-2024)
 - [ ] Verify Statistics updated
 
 ---
