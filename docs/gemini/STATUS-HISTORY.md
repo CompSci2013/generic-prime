@@ -4,6 +4,105 @@
 
 ---
 
+## Session 2025-12-04 (Evening - Phase 2.1 Continuation - Dialog & Sync Issues Discovered)
+
+**Version**: 2.12 → 2.13
+**Timestamp**: 2025-12-04T23:00:00Z
+**Duration**: ~1.5 hours
+**Status**: ⏸️ PAUSED - TWO CRITICAL BUGS DISCOVERED
+
+### Achievements
+
+#### 1. Executed Phase 2.1 Dialog Cancel Behavior Tests (BLOCKED)
+- **Tests Executed**: 2.1.9 (Dialog Cancel Behavior - First Step)
+- **Result**: BLOCKED - Cannot proceed due to Bug #15
+- **Finding**: When attempting to re-select "Manufacturer" filter after applying initial selection, dropdown closes silently with no dialog appearing
+
+#### 2. Executed Phase 2.1 Multiple Selection Tests (BLOCKED)
+- **Tests Executed**: 2.1.14 (Multiple Selection - Using chip edit workaround)
+- **Setup**: Used chip click to edit existing "Manufacturer: Brammo" filter instead of dropdown re-selection (Bug #15 workaround)
+- **Action**: Added Ford and GMC to selection (3 total: Brammo, Ford, GMC)
+- **Result**: URL updated correctly to `?manufacturer=Brammo,Ford,GMC` BUT Results Table and Statistics Panel did NOT update
+- **Required**: Manual page refresh (F5) to see correct filtered data
+- **Finding**: CRITICAL - Violates URL-First architecture (URL updated but components didn't sync)
+
+#### 3. Discovered Bug #15 (Multiselect Dialog Reopen Failure)
+- **Severity**: CRITICAL
+- **Issue**: Dialog fails to reopen on second selection of same filter field after applying a value
+- **Root Cause**: Two-way binding issue with PrimeNG Dialog `[(visible)]` property - state change from `false` → `true` not detected on second invocation
+- **Workaround**: Click on existing filter chip to edit (circumvents dropdown)
+- **Files**: `frontend/src/framework/components/query-control/query-control.component.ts:72` and `query-control.component.html:70-152`
+- **Documentation**: Created `docs/gemini/BUG-15-DIALOG-REOPEN.md` with full analysis and suggested fixes
+
+#### 4. Discovered Bug #16 (Results Table Sync Failure - Architecture Violation)
+- **Severity**: CRITICAL
+- **Issue**: When filter is modified, URL updates but Results Table and Statistics Panel don't immediately refresh (stale data shown)
+- **Root Cause**: Likely async/await race condition in DiscoverComponent event chain (similar to Bug #1.3)
+- **Workaround**: Manual page refresh (F5)
+- **Impact**: Core URL-First architecture principle violated - URL is not the reliable single source of truth
+- **Files**: Likely `discover.component.ts` event handlers and `resource-management.service.ts` subscription chain
+- **Documentation**: Created `docs/gemini/BUG-16-RESULTS-TABLE-SYNC.md` with full analysis and investigation steps
+
+### Test Status Summary
+
+```
+Phase 2.1 Single Selection Workflow (2.1.1-2.1.8):
+  ✅ 8/8 PASSED
+
+Phase 2.1 Dialog Cancel Behavior (2.1.9):
+  ❌ BLOCKED by Bug #15
+  - Can't re-select "Manufacturer" via dropdown
+
+Phase 2.1 Multiple Selection (2.1.14):
+  ⚠️  PARTIAL - URL works but data doesn't sync (Bug #16)
+  - Dialog opens via chip edit ✓
+  - 3 manufacturers selected ✓
+  - URL updates ✓
+  - Results Table updates with page refresh only ✗
+
+Remaining Phase 2.1 Tests:
+  ⏳ Search/Filter in Dialog (4 tests)
+  ⏳ Keyboard Navigation in Dialog (4 tests)
+  ⏳ Clear/Edit Manufacturer Filter (3 tests)
+  ⏳ Remove Manufacturer Filter (3 tests)
+```
+
+### Critical Findings
+
+**Bug #15 - Dialog Reopen Failure**:
+- Blocks "Dialog Cancel Behavior" test workflow
+- Affects workflow that requires switching between different filter fields
+- Workaround exists (chip edit) but doesn't test Cancel side effect
+
+**Bug #16 - Results Sync Failure** (MORE CRITICAL):
+- Violates core URL-First architecture principle
+- User sees stale data even though URL is correct
+- Creates confusion: "Why did the URL update but results didn't?"
+- Likely affects ALL filter operations (not just manufacturer)
+
+### Files Modified This Session
+
+1. `docs/gemini/BUG-15-DIALOG-REOPEN.md` - New file (detailed bug analysis)
+2. `docs/gemini/BUG-16-RESULTS-TABLE-SYNC.md` - New file (detailed bug analysis)
+3. `docs/gemini/PROJECT-STATUS.md` - Updated critical bugs table
+4. `MANUAL-TEST-PLAN.md` - Updated test results with Bug #15 and #16 findings
+
+### Session Impact
+
+- ❌ **Progress**: Blocked by two critical bugs, unable to continue Phase 2.1 tests
+- ✅ **Discovery**: Identified architecture-level sync issue (Bug #16) that was hidden by initial Phase 2.1.1-2.1.8 success
+- ✅ **Documentation**: Both bugs thoroughly documented with root cause analysis and suggested fixes
+- ⏸️ **Next Steps**: Either fix Bug #15 and #16 first, or continue Phase 2.1 tests with documented blockers
+
+### Recommendation
+
+Given the critical nature of Bug #16 (URL-First architecture violation), recommend **prioritizing fixes** before continuing manual testing:
+1. Fix Bug #16 (Results Table sync) - Most critical (core architecture violation)
+2. Fix Bug #15 (Dialog reopen) - Important (blocks workflow testing)
+3. Resume Phase 2.1 testing with fixed components
+
+---
+
 ## Session 2025-12-04 (Afternoon - Phase 2.1 Manual Testing - Single Selection Workflow)
 
 **Version**: 2.11 → 2.12

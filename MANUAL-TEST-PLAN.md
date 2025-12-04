@@ -84,22 +84,24 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [X] Verify Statistics Panel updates (charts reflect Brammo data only)
 
 #### Dialog Cancel Behavior (Side Effect)
-- [ ] With "Manufacturer: Brammo" chip visible, click field selector dropdown
-- [ ] Select "Model" from dropdown
-- [ ] Verify "Cancel" button was exercised on Manufacturer dialog (no error)
-- [ ] Verify Model multiselect dialog opens (not Manufacturer dialog)
-- [ ] Click "Cancel" button
-- [ ] Verify Manufacturer filter remains: "Manufacturer: Brammo" chip still visible
+- [BLOCKED] With "Manufacturer: Brammo" chip visible, click field selector dropdown
+- [BLOCKED] Select "Model" from dropdown
+- [BLOCKED] Verify "Cancel" button was exercised on Manufacturer dialog (no error)
+- [BLOCKED] Verify Model multiselect dialog opens (not Manufacturer dialog)
+- [BLOCKED] Click "Cancel" button
+- [BLOCKED] Verify Manufacturer filter remains: "Manufacturer: Brammo" chip still visible
+- **BLOCKING ISSUE**: BUG #15 - Dialog fails to reopen when filter already active. Attempting to re-select "Manufacturer" after applying initial Brammo filter results in dropdown closing silently with no dialog appearing. Cannot proceed with remaining Dialog Cancel Behavior tests until Bug #15 is fixed.
 
 #### Multiple Selection Tests
-- [ ] Click field selector dropdown
-- [ ] Select "Manufacturer"
-- [ ] In dialog, select multiple: Brammo, Ford, GMC (3 checkboxes)
-- [ ] Verify all 3 checkboxes are checked
-- [ ] Click "Apply"
-- [ ] Verify URL shows: `?manufacturer=Brammo,Ford,GMC`
-- [ ] Verify Results Table shows only records from those 3 manufacturers
-- [ ] Verify Statistics reflect only selected manufacturers
+- [X] Click field selector dropdown - Used chip edit workaround instead of dropdown (due to Bug #15)
+- [X] Select "Manufacturer" - Clicked chip to reopen dialog with existing filter
+- [X] In dialog, select multiple: Brammo, Ford, GMC (3 checkboxes) - Added Ford and GMC to existing Brammo
+- [X] Verify all 3 checkboxes are checked - Confirmed all three checked before apply
+- [X] Click "Apply" - Dialog closed successfully
+- [X] Verify URL shows: `?manufacturer=Brammo,Ford,GMC` - URL updated correctly ✓
+- [fail] Verify Results Table shows only records from those 3 manufacturers - **BUG #16**: Results Table still shows only Brammo (stale data). Required page refresh to update ✗
+- [fail] Verify Statistics reflect only selected manufacturers - **BUG #16**: Statistics still showed only Brammo data (stale). Required page refresh to update ✗
+- **BLOCKING ISSUE**: BUG #16 - Results Table and Statistics fail to update immediately when filter is modified. URL updates correctly but components don't sync until F5 refresh. This violates URL-First architecture.
 
 #### Search/Filter in Dialog
 - [ ] Click field selector dropdown, select "Manufacturer"
@@ -861,6 +863,15 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Document any intentional differences.
 
 ### 9.5 Known Issues
+- [ ] Bug #16: Results Table sync failure - **BLOCKING** (critical issue)
+  - [ ] URL updates correctly when filter modified
+  - [ ] Results Table doesn't update immediately (stale data shown)
+  - [ ] Page refresh (F5) restores correct data
+  - [ ] Fix required for URL-First architecture compliance
+- [ ] Bug #15: Multiselect dialog reopen failure - **BLOCKING** (critical issue)
+  - [ ] Dialog fails to open on second selection of same filter field
+  - [ ] Workaround: Click on existing chip to edit filter (works for Multiple Selection tests)
+  - [ ] Fix required before proceeding with Dialog Cancel Behavior tests
 - [ ] Bug #13: Dropdown keyboard navigation - **Expected to fail** (known issue)
   - [ ] Verify dropdowns work with mouse.
   - [ ] Document if keyboard nav broken (as expected).
@@ -889,10 +900,12 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Phase 9 (Verification): _____ / _____ passed
 
 ### Critical Issues Found
-1. Bug #14 - Field selector dropdown auto-opens dialog on arrow key navigation (not a bug, current design - use mouse click workaround)
+1. Bug #16 - Results Table doesn't update when filter modified (URL updates but components don't sync - requires page refresh) - BLOCKS Multiple Selection tests
+2. Bug #15 - Multiselect dialog fails to reopen when filter already active (two-way binding issue with PrimeNG Dialog - BLOCKS Dialog Cancel Behavior tests)
+3. Bug #14 - Field selector dropdown auto-opens dialog on arrow key navigation (not a bug, current design - use mouse click workaround)
 
 ### Minor Issues Found
-1. None found during Phase 2.1 testing
+1. None found during Phase 2.1 testing (Dialog Cancel Behavior blocked by Bug #15, Multiple Selection blocked by Bug #16)
 
 ### Notes
 - Phase 2.1 tests 2.1.1-2.1.8 (Single Selection Workflow) PASSED 8/8

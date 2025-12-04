@@ -1,7 +1,7 @@
 # Project Status
 
-**Version**: 2.12
-**Timestamp**: 2025-12-04T22:15:00Z
+**Version**: 2.13
+**Timestamp**: 2025-12-04T23:00:00Z
 
 ---
 
@@ -202,6 +202,8 @@ Critical focus: **Fix URL-First state management so controls update when URL cha
 
 | Bug | Severity | Status | Summary | Root Cause |
 |-----|----------|--------|---------|---|
+| #16 | CRITICAL | Not started | Results Table doesn't update when filter modified (requires page refresh) | URL updates but components don't sync - likely async/await race condition in DiscoverComponent event chain (similar to Bug #1.3) |
+| #15 | CRITICAL | Not started | Multiselect dialog fails to reopen when filter already active | Two-way binding issue with PrimeNG Dialog `[(visible)]` property - state change from `false` → `true` not detected on second invocation |
 | #1.3 | CRITICAL | ✓ FIXED | Query Control not updating when URL changes | combineLatest race condition - highlights$ doesn't emit when only regular filters change, blocking subscription |
 | #13 | Medium | Not started | Dropdown keyboard navigation (arrow keys, Enter/Space) broken with `[filter]="true"` | PrimeNG version compatibility issue or accessibility feature disabled |
 | #7 | Low | Not started | Checkboxes stay checked after clearing | Visual state not syncing with data model |
