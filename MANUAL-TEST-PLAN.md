@@ -71,17 +71,17 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 ### 2.1 Manufacturer Filter (Multiselect Dialog Workflow)
 
 #### Single Selection Workflow
-- [ ] Click field selector dropdown in Query Control header
-- [ ] Select "Manufacturer" from dropdown
-- [ ] Verify multiselect dialog opens with title "Select Manufacturer"
-- [ ] Verify list shows available manufacturers (~72 options)
-- [ ] Click checkbox next to "Brammo" to select it
-- [ ] Verify checkbox becomes checked
-- [ ] Click "Apply" button in dialog
-- [ ] Verify dialog closes and chip appears: "Manufacturer: Brammo"
-- [ ] Verify URL updates: `?manufacturer=Brammo`
-- [ ] Verify Results Table updates to show only Brammo results
-- [ ] Verify Statistics Panel updates (charts reflect Brammo data only)
+- [X] Click field selector dropdown in Query Control header
+- [X] Select "Manufacturer" from dropdown
+- [X] Verify multiselect dialog opens with title "Select Manufacturer"
+- [X] Verify list shows available manufacturers (~72 options)
+- [X] Click checkbox next to "Brammo" to select it
+- [X] Verify checkbox becomes checked
+- [X] Click "Apply" button in dialog
+- [X] Verify dialog closes and chip appears: "Manufacturer: Brammo"
+- [X] Verify URL updates: `?manufacturer=Brammo`
+- [X] Verify Results Table updates to show only Brammo results
+- [X] Verify Statistics Panel updates (charts reflect Brammo data only)
 
 #### Dialog Cancel Behavior (Side Effect)
 - [ ] With "Manufacturer: Brammo" chip visible, click field selector dropdown
@@ -889,18 +889,16 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 - [ ] Phase 9 (Verification): _____ / _____ passed
 
 ### Critical Issues Found
-1. ___________________________________________
-2. ___________________________________________
-3. ___________________________________________
+1. Bug #14 - Field selector dropdown auto-opens dialog on arrow key navigation (not a bug, current design - use mouse click workaround)
 
 ### Minor Issues Found
-1. ___________________________________________
-2. ___________________________________________
+1. None found during Phase 2.1 testing
 
 ### Notes
-___________________________________________
-___________________________________________
-___________________________________________
+- Phase 2.1 tests 2.1.1-2.1.8 (Single Selection Workflow) PASSED 8/8
+- Discovered that field selector dropdown opens dialog on Down Arrow navigation (per UX.md mouse click pattern, this is expected)
+- Workaround: Use mouse clicks instead of keyboard navigation for field selection
+- Remaining Phase 2.1 tests (Dialog Cancel Behavior, Multiple Selection, Search/Filter, Keyboard Nav, Edit/Remove) pending execution
 
 ---
 

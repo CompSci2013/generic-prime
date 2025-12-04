@@ -14,59 +14,77 @@
 
 ---
 
-## Current Priority: Execute Phase 2 Manual Tests (Updated Test Plan)
+## Current Priority: Execute Phase 2 Manual Tests - Continue from Phase 2.1
 
-**Status**: Build compiles successfully. UX standards documented. Test plan updated for actual workflow. Ready for manual testing.
+**Status**: Phase 2.1 Single Selection workflow tests PASSED (8/8). Ready to continue with remaining Phase 2.1 subsections.
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Understand dropdown UX patterns → Execute Phase 2 manual tests → Resolve Bug #13 if needed**
-> **Current focus: Validate that all filter workflows (multiselect dialogs, range inputs, search) work correctly per updated test plan and UX standards.**
+> **Execute Phase 2 manual tests systematically → Document findings → Resolve any critical bugs if needed**
+> **Current focus: Complete Phase 2.1 remaining subsections (Dialog Cancel Behavior, Multiple Selection, Search/Filter, Keyboard Navigation, Edit/Remove) before moving to Phase 2.2+**
 
 ---
 
-## Completed This Session (2025-12-04 - UX Documentation & Test Plan Updates)
+## Completed This Session (2025-12-04 Afternoon - Phase 2.1 Manual Testing)
 
-### Session 2025-12-04 Achievements
+### Session 2025-12-04 Afternoon Achievements
 
-1. **UX Standards Documentation - COMPLETED ✓**
-   - Created `docs/gemini/UX.md` (industry-standard dropdown UX patterns)
-   - Created `docs/gemini/UX-IMPLEMENTATION.md` (Angular 14 + PrimeNG implementation)
-   - Comprehensive research on ARIA Combobox and Modal Dialog patterns
-   - Bug #13 investigation complete: Arrow keys **should work** but don't with `[filter]="true"`
+1. **Phase 2.1 Single Selection Workflow Tests - COMPLETED ✓**
+   - Executed tests 2.1.1 through 2.1.8 (8 tests total)
+   - Result: 8/8 PASSED ✓
+   - Verified manufacturer filter workflow: field selector → dialog → checkbox → apply → chip
+   - URL updates correctly: `?manufacturer=Brammo`
+   - Results Table and Statistics Panel filter to selected manufacturer
 
-2. **Manual Test Plan Updated - COMPLETED ✓**
-   - Phase 2 sections (2.1-2.7) completely rewritten for actual workflow
-   - Added "Dialog Cancel Behavior (Side Effect)" tests
-   - Aligned tests with real user workflows (field selector → dialog → chips)
-   - Test plan now reflects dialog workflow + side effect behavior
+2. **Bug #14 Discovery & Documentation - COMPLETED ✓**
+   - Discovered field selector auto-opens dialog on arrow key navigation
+   - Clarified with user: This is current implementation behavior (not a bug)
+   - Per UX.md mouse click pattern, this is expected
+   - Workaround: Use mouse clicks instead of keyboard navigation
+   - Documented in MANUAL-TEST-PLAN.md TEST RESULTS section
 
-3. **Documentation Updated**
-   - Appended session snapshot to STATUS-HISTORY.md
-   - Updated PROJECT-STATUS.md to v2.11
-   - Updated NEXT-STEPS.md (this file)
+3. **Documentation Updated - COMPLETED ✓**
+   - Updated MANUAL-TEST-PLAN.md with Phase 2.1 results and Bug #14 findings
+   - Appended PROJECT-STATUS.md v2.11 session snapshot to STATUS-HISTORY.md
+   - Updated PROJECT-STATUS.md to v2.12 with current session summary
+   - Updated NEXT-STEPS.md governing tactic and completed items (this file)
 
 ---
 
 ## Immediate Actions (Next Session)
 
-### 1. Execute MANUAL-TEST-PLAN Phase 2 Tests
+### 1. Continue Phase 2.1 Manufacturer Filter Tests
 
-**Priority**: HIGH - This tests the core filter workflow
+**Priority**: HIGH - Phase 2.1 is foundational for all remaining Phase 2 tests
 
-**Tests to Execute** (in order from updated test plan):
-- **2.1 Manufacturer Filter** - Multiselect dialog workflow with side effect test
-- **2.2 Model Filter** - Combined with Manufacturer
-- **2.3 Body Class Filter** - Combined with previous filters
-- **2.4 Year Range Filter** - Range dialog workflow
-- **2.5 Search Filter** - Live text filtering
-- **2.6 Page Size** - Results table control
-- **2.7 Clear All** - Combined filter clearing
+**Remaining Phase 2.1 Subsections** (in order):
+- **Dialog Cancel Behavior (Side Effect)** - 5 tests pending
+  - Verify Cancel button exercised when switching to Model filter
+  - Verify correct dialog opens for new filter
+  - Verify previous filter remains active
+- **Multiple Selection Tests** - 5 tests pending
+  - Select 3 manufacturers: Brammo, Ford, GMC
+  - Verify URL shows: `?manufacturer=Brammo,Ford,GMC`
+  - Verify Results Table shows intersection (all 3 only)
+- **Search/Filter in Dialog** - 4 tests pending
+  - Type "bra" in search box
+  - Verify list filters to matching options
+  - Verify clear search shows all options again
+- **Keyboard Navigation in Dialog** - 4 tests pending
+  - Tab to checkbox, Space to toggle
+  - Tab to Apply button, Enter to apply
+- **Clear/Edit Manufacturer Filter** - 3 tests pending
+  - Click chip to reopen dialog with pre-selected checkbox
+  - Uncheck and select different value
+  - Verify URL updates correctly
+- **Remove Manufacturer Filter** - 3 tests pending
+  - Click X on chip to remove filter
+  - Verify URL reverts to clean state
 
 **Testing Workflow**:
-- Execute each test item one-by-one
-- Mark checkbox `[X]` on success, or `fail` with description
-- Record failures in TEST-RESULTS section
+- Execute each subsection one-by-one
+- Mark checkbox `[X]` on success, or record `fail` with description
+- Use mouse clicks (not keyboard navigation) for field selection per current behavior
 - Do NOT fix code; only document findings
 
 **Expected Results**:
@@ -167,4 +185,4 @@ Before ending session:
 
 ---
 
-**Last Updated**: 2025-12-04T18:30:00Z
+**Last Updated**: 2025-12-04T22:15:00Z

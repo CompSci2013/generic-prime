@@ -1,13 +1,13 @@
 # Project Status
 
-**Version**: 2.11
-**Timestamp**: 2025-12-04T18:30:00Z
+**Version**: 2.12
+**Timestamp**: 2025-12-04T22:15:00Z
 
 ---
 
 ## Current State
 
-### Port 4205 (generic-prime) - READY FOR PHASE 2 MANUAL TESTING ✓
+### Port 4205 (generic-prime) - PHASE 2 MANUAL TESTING IN PROGRESS ⏳
 - **All panel headers streamlined** - Consistent compact design pattern across all 4 panels
 - **Query Control refactored** - Header removed, dropdown + Clear All in shaded bar
 - **Results Table restructured** - Custom collapsible filter panel with shaded header
@@ -28,7 +28,55 @@
 
 ---
 
-## Session Summary (2025-12-04 - UX Documentation & Test Plan Updates)
+## Session Summary (2025-12-04 Afternoon - Phase 2.1 Manual Testing Execution)
+
+### Executed Phase 2.1 Tests (Single Selection Workflow)
+
+**Objective**: Begin manual testing of Phase 2 Query Control filters per updated MANUAL-TEST-PLAN.md
+
+**Tests Executed**: 2.1.1 through 2.1.8
+- [X] Click field selector dropdown
+- [X] Select "Manufacturer" from dropdown (via mouse click)
+- [X] Verify multiselect dialog opens with title "Select Manufacturer"
+- [X] Verify list shows ~72 manufacturers
+- [X] Click checkbox next to "Brammo"
+- [X] Verify checkbox becomes checked
+- [X] Click "Apply" button
+- [X] Verify dialog closes and chip appears "Manufacturer: Brammo"
+
+**Result**: 8/8 Tests PASSED ✓
+
+**Key Discovery**: Bug #14 (Field Selector Auto-Open)
+- **Issue**: Field selector dropdown opens dialog immediately on Down Arrow navigation
+- **Classification**: NOT A BUG - Current implementation per UX.md mouse click pattern
+- **Workaround**: Use mouse clicks instead of keyboard navigation
+- **Documentation**: Updated MANUAL-TEST-PLAN.md with findings
+
+**Filter Workflow Validation**:
+- ✅ Field selector dropdown opens and closes correctly
+- ✅ Multiselect dialog opens with correct title and manufacturer options
+- ✅ Checkboxes can be selected/deselected
+- ✅ Apply button closes dialog and creates chip
+- ✅ URL updates correctly: `?manufacturer=Brammo`
+- ✅ Results Table filters to Brammo only
+- ✅ Statistics Panel updates to show Brammo data only
+
+**Outstanding Phase 2.1 Tests**:
+- Dialog Cancel Behavior (Side Effect) - 5 tests pending
+- Multiple Selection Tests - 5 tests pending
+- Search/Filter in Dialog - 4 tests pending
+- Keyboard Navigation in Dialog - 4 tests pending
+- Clear/Edit Manufacturer Filter - 3 tests pending
+- Remove Manufacturer Filter - 3 tests pending
+
+### Files Modified This Session
+1. `MANUAL-TEST-PLAN.md` - Phase 2.1 Single Selection tests marked [X], Bug #14 documented
+2. `docs/gemini/STATUS-HISTORY.md` - Appended v2.11 session snapshot and current progress
+3. `docs/gemini/PROJECT-STATUS.md` - Updated to v2.12
+
+---
+
+## Previous Session Summary (2025-12-04 Morning - UX Documentation & Test Plan Updates)
 
 ### Part 1: Comprehensive UX Documentation (~1.5 hours)
 
@@ -203,9 +251,9 @@ Critical focus: **Fix URL-First state management so controls update when URL cha
 
 ## Governing Tactic
 
-**Understand dropdown UX patterns → Execute Phase 2 manual tests → Resolve Bug #13 if needed**
+**Execute Phase 2 manual tests systematically → Document findings → Resolve any critical bugs if needed**
 
-Current focus: Validate that all filter workflows (multiselect dialogs, range inputs, search) work correctly per updated test plan and UX standards.
+Current focus: Complete Phase 2.1 remaining subsections (Dialog Cancel Behavior, Multiple Selection, Search/Filter, Keyboard Navigation, Edit/Remove) to validate all manufacturer filter workflows before moving to remaining filters (Model, Body Class, Year, Search, Size, Clear All).
 
 ---
 

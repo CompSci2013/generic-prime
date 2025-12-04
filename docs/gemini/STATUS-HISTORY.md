@@ -4,6 +4,89 @@
 
 ---
 
+## Session 2025-12-04 (Afternoon - Phase 2.1 Manual Testing - Single Selection Workflow)
+
+**Version**: 2.11 → 2.12
+**Timestamp**: 2025-12-04T22:15:00Z
+**Duration**: ~1.5 hours
+**Status**: ✓ COMPLETED
+
+### Achievements
+
+#### 1. Executed Phase 2.1 Manual Tests (Single Selection Workflow)
+- **Tests Executed**: 2.1.1 through 2.1.8
+- **Tests Passed**: 8/8 ✓
+- **Result**: All tests completed successfully
+
+**Test Items Executed**:
+```
+2.1.1 - Click field selector dropdown [X]
+2.1.2 - Select "Manufacturer" from dropdown (using mouse click) [X]
+2.1.3 - Verify multiselect dialog opens with title [X]
+2.1.4 - Verify list shows available manufacturers (~72 options) [X]
+2.1.5 - Click checkbox next to "Brammo" [X]
+2.1.6 - Verify checkbox becomes checked [X]
+2.1.7 - Click "Apply" button [X]
+2.1.8 - Verify dialog closes and chip appears [X]
+```
+
+#### 2. Discovered Bug #14 (Field Selector Auto-Open Behavior)
+- **Issue**: Field selector dropdown opens dialog immediately on arrow key navigation (Down Arrow)
+- **Expected** (per standard): Navigate → Highlight → Select (Enter/Space) → Dialog Opens
+- **Actual**: Navigate (Down Arrow) → Dialog Opens (without explicit selection)
+- **Classification**: NOT A BUG - User clarified this is current implementation behavior
+- **Workaround**: Use mouse clicks instead of keyboard navigation for field selection
+- **Documentation**: Bug #14 noted in MANUAL-TEST-PLAN.md TEST RESULTS
+
+#### 3. Outstanding Test Coverage
+- **Completed**: Phase 2.1.1 Single Selection Workflow (8 tests)
+- **Pending**: Phase 2.1 remaining sections:
+  - Dialog Cancel Behavior (Side Effect) - 5 tests
+  - Multiple Selection Tests - 5 tests
+  - Search/Filter in Dialog - 4 tests
+  - Keyboard Navigation in Dialog - 4 tests
+  - Clear/Edit Manufacturer Filter - 3 tests
+  - Remove Manufacturer Filter - 3 tests
+
+### Key Findings
+
+#### Test Execution Notes
+- Field selector dropdown behavior: Opens dialog on Down Arrow navigation (discovered in Test 2.1.2)
+- User clarified: Per UX.md mouse click pattern specification, this is expected behavior
+- Solution: Execute remaining tests using mouse clicks instead of keyboard navigation
+- Result: All 8 tests passed using mouse click workflow
+
+#### Filter Workflow Validation
+- ✅ Field selector dropdown opens correctly
+- ✅ Dialog opens with correct title and manufacturer options
+- ✅ Checkbox selection works correctly
+- ✅ Dialog closes on Apply button click
+- ✅ Chip appears with correct manufacturer name
+- ✅ URL updates with correct parameter: `?manufacturer=Brammo`
+- ✅ Results Table filters to correct results
+- ✅ Statistics Panel updates to filtered data
+
+### Files Modified This Session
+
+1. `MANUAL-TEST-PLAN.md`
+   - Updated Phase 2.1 "Single Selection Workflow" tests (lines 74-84) from `[ ]` to `[X]`
+   - Added Bug #14 documentation in TEST RESULTS section
+   - Added test execution notes and findings
+
+### Test Status After This Session
+- ✅ Phase 1 (Initial State): COMPLETED ✓
+- ⏳ Phase 2 (Query Control): IN PROGRESS - Phase 2.1 Single Selection 8/8 passed, remaining subsections pending
+- ⏳ Phase 3-9: PENDING
+
+### Session Impact
+
+- ✅ **Progress**: Advanced Phase 2 testing from 0% to ~15% (8 tests of ~50 total in Phase 2)
+- ✅ **Discovery**: Identified and documented field selector behavior (Bug #14)
+- ✅ **Validation**: Confirmed filter selection workflow (single selection) works correctly
+- ⏳ **Next Steps**: Continue Phase 2.1 remaining subsections (Dialog Cancel, Multiple Selection, Search, etc.)
+
+---
+
 ## Session 2025-12-04 (UX Documentation & Manual Test Plan Update)
 
 **Version**: 2.10 → 2.11
