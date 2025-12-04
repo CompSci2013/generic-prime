@@ -68,6 +68,7 @@
 
   <!-- Multiselect Filter Dialog -->
   <p-dialog
+    #multiselectDialog
     [(visible)]="showMultiselectDialog"
     [header]="multiselectDialogTitle"
     [modal]="true"
@@ -75,6 +76,7 @@
     [closable]="true"
     [draggable]="false"
     [resizable]="false"
+    (onShow)="onMultiselectDialogShow()"
     (onHide)="onDialogHide()">
 
     <ng-template pTemplate="header">
@@ -151,6 +153,7 @@
 
   <!-- Year Range Filter Dialog -->
   <p-dialog
+    #yearRangeDialog
     [(visible)]="showYearRangeDialog"
     header="Select Year Range"
     [modal]="true"
@@ -158,6 +161,7 @@
     [closable]="true"
     [draggable]="false"
     [resizable]="false"
+    (onShow)="onYearRangeDialogShow()"
     (onHide)="onDialogHide()">
 
     <p class="dialog-subtitle">Select a year range to filter results. You can select just a start year, end year, or both.</p>

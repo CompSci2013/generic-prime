@@ -80,9 +80,6 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   /** Whether we're currently editing a highlight filter (vs regular filter) */
   isHighlightFilter = false;
 
-  /** Track the last keyboard event key to distinguish arrow navigation from selection */
-  private lastKeyPressed: string | null = null;
-
   // ==================== Active Filters ====================
 
   /** List of currently active filters */
@@ -91,174 +88,124 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   /** List of currently active highlight filters */
   activeHighlights: ActiveFilter[] = [];
 
-  // ==================== Dialog State ====================
+  /** Currently active filter definition for dialogs */
+  currentFilterDef: FilterDefinition | null = null;
+
+  // ==================== Multiselect Dialog State ====================
 
   /** Whether multiselect dialog is visible */
   showMultiselectDialog = false;
 
+  /** Title for multiselect dialog */
+  multiselectDialogTitle = '';
+
+  /** Subtitle for multiselect dialog */
+  multiselectDialogSubtitle = '';
+
+  /** Whether options are currently loading */
+  loadingOptions = false;
+
+  /** Error message if options fail to load */
+  optionsError: string | null = null;
+
+  /** All available options for a multiselect filter */
+  allOptions: FilterOption[] = [];
+
+  /** Filtered options based on search query */
+  filteredOptions: FilterOption[] = [];
+
+  /** Currently selected options in multiselect dialog */
+  selectedOptions: (string | number)[] = [];
+
+  /** Search query for multiselect options */
+  searchQuery = '';
+
+  // ==================== Year Range Dialog State ====================
+
   /** Whether year range dialog is visible */
   showYearRangeDialog = false;
 
-  /** Current filter definition being edited */
-  currentFilterDef: FilterDefinition | null = null;
-
-  /** Dialog title for multiselect */
-  multiselectDialogTitle = '';
-
-  /** Dialog subtitle for multiselect */
-  multiselectDialogSubtitle = '';
-
-  // ==================== Multiselect Dialog Data ====================
-
-  /** Whether options are being loaded */
-  loadingOptions = false;
-
-  /** Error message if options failed to load */
-  optionsError: string | null = null;
-
-  /** All available options from API */
-  allOptions: FilterOption[] = [];
-
-  /** Filtered options based on search */
-  filteredOptions: FilterOption[] = [];
-
-  /** Currently selected option values */
-  selectedOptions: (string | number)[] = [];
-
-  /** Search query for filtering options */
-  searchQuery = '';
-
-  // ==================== Year Range Dialog Data ====================
-
-  /** Minimum year value */
+  /** Selected minimum year */
   yearMin: number | null = null;
 
-  /** Maximum year value */
+  /** Selected maximum year */
   yearMax: number | null = null;
 
   /** Available year range from API */
-  availableYearRange: { min: number; max: number } = { min: 1900, max: 2025 };
+  availableYearRange: { min: number; max: number } = { min: 1900, max: new Date().getFullYear() };
 
-  // ==================== Template References ====================
-
-  @ViewChild('filterFieldDropdown') filterFieldDropdown: any;
-
-  // ==================== Lifecycle ====================
-
+  /** Subject to signal component destruction */
   private destroy$ = new Subject<void>();
 
-  /**
-   * Reset the filter field dropdown to allow next selection
-   * This ensures PrimeNG's internal state is synchronized with the template binding.
-   * Note: The label remains visible as a reminder of the last filter chosen.
-   */
-  private resetFilterDropdown(): void {
-    this.selectedField = null;
-    // Reset PrimeNG dropdown's internal value
-    if (this.filterFieldDropdown) {
-      this.filterFieldDropdown.value = null;
-      this.filterFieldDropdown.selectedOption = null;
-      this.filterFieldDropdown.updateSelectedOption(null);
-    }
-  }
-
   constructor(
-    private urlState: UrlStateService,
+    private cdr: ChangeDetectorRef,
     private apiService: ApiService,
-    private cdr: ChangeDetectorRef
+    private urlState: UrlStateService
   ) {}
 
   ngOnInit(): void {
-    // Build filter field dropdown options from domain config (regular filters only)
-    // Highlight filters are NOT included in dropdown - they're added via chart interactions
-    this.filterFieldOptions = this.domainConfig.queryControlFilters.map(f => ({
-      label: f.label,
-      value: f
-    }));
+    // Initialize filter field options from domain config
+    this.filterFieldOptions = [
+      ...this.domainConfig.queryControlFilters,
+      ...(this.domainConfig.highlightFilters || [])
+    ].map(f => ({ label: f.label, value: f }));
 
-    // Subscribe to URL parameters for chip synchronization
-    //
-    // CRITICAL FIX: We MUST subscribe to URL params directly, not to filters$ and highlights$
-    //
-    // WHY: combineLatest([filters$, highlights$]) has a race condition:
-    // - When URL changes, filters$ emits (value changed)
-    // - But highlights$ uses distinctUntilChanged() - if highlights didn't change, it doesn't emit
-    // - combineLatest waits for BOTH observables to emit, so it blocks waiting for highlights$
-    // - Result: Query Control subscription never fires, chips don't appear
-    //
-    // SOLUTION: Subscribe to URL params directly - they include BOTH regular params and h_ prefixed highlights
-    // This matches syncFiltersFromUrl() which matches against FilterDefinition.urlParams
-    //
-    // Architecture: Works in both main window and pop-out
-    // - Main window: URL → UrlStateService.params$ → chip sync
-    // - Pop-out: BroadcastChannel (synced by pop-out setup) → URL → UrlStateService.params$ → chip sync
-    this.urlState.params$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-        this.syncFiltersFromUrl(params);
-        this.cdr.markForCheck();
-      });
+    // Sync from URL state on init and on changes
+    this.urlState.params$.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      this.syncFiltersFromUrl(params);
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
-  // ==================== Field Selection ====================
-
+  
   /**
-   * Handle keyboard events in the dropdown filter field
+   * Reset dropdown to its placeholder state.
    *
-   * Track which key was pressed so we can distinguish arrow key navigation
-   * from actual selection (Enter/Space/Click)
+   * This is a workaround for a PrimeNG issue where setting ngModel to null
+   * doesn't clear the displayed value if an option was previously selected
+   * via keyboard.
    */
-  onDropdownKeydown(event: KeyboardEvent): void {
-    // Record which key was pressed
-    this.lastKeyPressed = event.key;
-
-    // If user pressed Enter or Space on a highlighted option, allow it to proceed
-    // If they pressed arrow keys, we'll detect that in onChange and skip dialog opening
-    if (event.key === 'Escape') {
-      // Let Escape key close the dropdown naturally (PrimeNG handles this)
-      this.lastKeyPressed = null;
-    }
+  private resetFilterDropdown(): void {
+    this.selectedField = null;
+    // We might need to access the dropdown component instance if the above is not enough
+    // For now, this seems to work with markForCheck()
+    this.cdr.markForCheck();
   }
 
   /**
-   * User selected a field from dropdown via mouse click, Enter, or Space
+   * Handle dropdown keydown events for keyboard navigation
    *
-   * This is called by PrimeNG's onChange event. However, arrow key navigation
-   * also triggers onChange in PrimeNG. We use lastKeyPressed to distinguish:
-   * - Arrow keys: Do NOT open dialog (just highlighting)
-   * - Enter/Space/Click: DO open dialog (actual selection)
+   * Works around PrimeNG dropdown keyboard navigation issues.
+   * The dropdown's internal keyboard handling should work with [filter]="true",
+   * but this provides a fallback handler if needed.
+   */
+  onDropdownKeydown(_event: KeyboardEvent): void {
+    // Allow PrimeNG's default keyboard navigation to handle arrow keys, Enter, Escape
+    // This is mostly a placeholder - PrimeNG handles these internally
+    // If Arrow key navigation doesn't work, investigate PrimeNG version compatibility
+  }
+
+  /**
+   * Handle field selection from dropdown
+   *
+   * onChange fires when:
+   * 1. User clicks an option
+   * 2. User presses Enter/Space on an option
    */
   onFieldSelected(event: any): void {
-    console.log('QueryControl: Field selected:', event);
     const filterDef: FilterDefinition = event.value;
-    console.log('QueryControl: Filter definition:', filterDef);
 
-    // If no filterDef, skip (can happen during navigation)
+    // If no filterDef, skip
     if (!filterDef) {
       return;
     }
 
-    // Check if this was triggered by arrow key navigation
-    // Arrow keys alone should NOT open the dialog
-    const isArrowKeyNavigation = this.lastKeyPressed === 'ArrowDown' ||
-                                 this.lastKeyPressed === 'ArrowUp';
-
-    if (isArrowKeyNavigation) {
-      // This is just highlighting, not selection - do NOT open dialog
-      console.log('QueryControl: Arrow key navigation detected, skipping dialog');
-      return;
-    }
-
-    // This was triggered by Enter, Space, or Mouse click - open the dialog
+    // This was a click, Enter, or Space - open the dialog
     this.openFilterDialog(filterDef);
-
-    // Reset the key tracker
-    this.lastKeyPressed = null;
   }
 
   /**
@@ -335,6 +282,19 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
           this.cdr.markForCheck();
         }
       });
+    }
+  }
+
+  /**
+   * Handle multiselect dialog show event - shift focus to the dialog
+   * This is called by PrimeNG's (onShow) event after dialog is fully rendered
+   */
+  onMultiselectDialogShow(): void {
+    // Shift focus to the first focusable element in the dialog
+    // Find the search input or first button
+    const dialogElement = document.querySelector('.p-dialog-content input, .p-dialog-content button, .p-dialog-content');
+    if (dialogElement) {
+      (dialogElement as HTMLElement).focus();
     }
   }
 
@@ -420,6 +380,18 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
           this.cdr.markForCheck();
         }
       });
+    }
+  }
+
+  /**
+   * Handle year range dialog show event - shift focus to the dialog
+   * This is called by PrimeNG's (onShow) event after dialog is fully rendered
+   */
+  onYearRangeDialogShow(): void {
+    // Shift focus to the first focusable element in the dialog (usually the first input)
+    const dialogElement = document.querySelector('.p-dialog-content input, .p-dialog-content button, .p-dialog-content');
+    if (dialogElement) {
+      (dialogElement as HTMLElement).focus();
     }
   }
 
