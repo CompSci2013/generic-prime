@@ -4,6 +4,91 @@
 
 ---
 
+## Session 2025-12-04 (Late Evening - Phase 2.1 Manual Testing Resume + Bug Discovery)
+
+**Version**: 2.14 → 2.15
+**Timestamp**: 2025-12-04T23:45:00Z (start) → 2025-12-05T00:30:00Z (end)
+**Duration**: ~45 minutes
+**Status**: ✅ PHASE 2.1 TESTING RESUMED - BUG #15 FIX VALIDATED, NEW BUG FOUND
+
+### Achievements
+
+#### 1. Completed Bug Fix Review & Analysis
+- **Reviewed Bug #15 Fix**: Two-way binding → one-way binding in query-control.component.html
+- **Reviewed Bug #16 Fix**: combineLatest → independent subscriptions in results-table.component.ts
+- **Codebase Analysis**: Confirmed both fixes are isolated to their specific components, no other components affected
+- **Documentation Created**:
+  - `BUG-FIX-ANALYSIS-ACROSS-CODEBASE.md` (400+ lines, comprehensive analysis)
+  - `BUG-FIX-REVIEW-SUMMARY.md` (quick reference guide)
+
+#### 2. Executed Phase 2.1 Manual Tests
+- **Tests Completed**: 3 of 24 (12.5%)
+- **Test 2.1.9**: ✅ PASS - Dialog Cancel Behavior (Multiselect to Multiselect)
+- **Test 2.1.10**: ✅ PASS - Cancel Behavior (Multiselect to Range)
+- **Test 2.1.11**: ✅ PASS - **Dialog Reopen After Apply - BUG #15 FIX VALIDATED** ⚡
+
+#### 3. Validated Bug #15 Fix
+- **Critical Validation**: Applied Manufacturer filter, then reopened dialog for editing
+- **Result**: Dialog reopened successfully with previous selection (Brammo) pre-checked
+- **Confirmation**: This was broken before the fix - now working perfectly
+- **Status**: ✅ BUG #15 FIX VERIFIED AND WORKING
+
+#### 4. Discovered New Bug (Modal Dialog Close Handlers)
+- **Severity**: MEDIUM
+- **Issue**: X button and Escape key don't close dialogs (industry standard expects them to)
+- **Current State**: Only Cancel button works to close dialogs
+- **Expected**: Both X button and Escape key should close dialogs with Cancel behavior (per ARIA standard)
+- **Documentation**: Created `BUG-REPORT-MODAL-DIALOG-CLOSE.md` with full details
+- **Impact**: UX/Usability issue, not blocking core functionality
+
+### Test Results Summary
+
+```
+Phase 2.1 Dialog Cancel Behavior Tests (2.1.9-2.1.13):
+  ✅ 2.1.9: Multiselect to Multiselect - PASS
+  ✅ 2.1.10: Multiselect to Range - PASS
+  ✅ 2.1.11: Dialog Reopen After Apply (Bug #15 Validation) - PASS ⚡
+  ⏳ 2.1.12: Range Dialog Reopen - NOT YET TESTED
+  ⏳ 2.1.13: Multiple Filters Active - NOT YET TESTED
+
+Overall Progress: 3 of 24 tests completed (12.5%)
+```
+
+### Bugs Discovered This Session
+
+| Bug ID | Severity | Description | Status |
+|--------|----------|-------------|--------|
+| **BUG-NEW** | MEDIUM | Modal Dialog Close Handlers Not Working | NEW - Report filed |
+
+### Key Findings
+
+1. **Bug #15 fix is working perfectly** - Dialog reopen validated in critical test
+2. **Bug #16 fix is working** - Results sync immediately (verified in earlier session)
+3. **New UX issue found** - X button and Escape key don't close dialogs (should per ARIA)
+4. **Modal behavior is correct** - Field selector dropdown properly blocked while dialog open
+5. **Cancel button works** - All dialog closes via Cancel button functioning correctly
+
+### Files Created/Updated
+
+**Created**:
+- `BUG-REPORT-MODAL-DIALOG-CLOSE.md` - New bug report
+- `PHASE-2.1-TEST-EXECUTION-GUIDE.md` - Comprehensive test guide
+- `PHASE-2.1-TEST-RESULTS.md` - Results tracking
+
+**Updated**:
+- `MANUAL-TEST-PLAN.md` - Added testing progress summary
+- `BUG-FIX-ANALYSIS-ACROSS-CODEBASE.md` - Comprehensive analysis
+- `BUG-FIX-REVIEW-SUMMARY.md` - Quick reference
+
+### Next Session Actions
+
+1. **Resume Test 2.1.12** - Range Dialog Reopen (Bug #15 validation for range filters)
+2. **Continue Phase 2.1** - Tests 2.1.13 through 2.1.32 (21 tests remaining)
+3. **Consider Bug-NEW fix** - Modal dialog close handlers (X button, Escape key)
+4. **After Phase 2.1 Complete** - Progress to Phase 2.2 (Model filter tests)
+
+---
+
 ## Session 2025-12-04 (Evening - Phase 2.1 Continuation - Dialog & Sync Issues Discovered)
 
 **Version**: 2.12 → 2.13

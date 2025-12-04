@@ -1011,21 +1011,27 @@ This test plan covers:
 
 ## Test Execution Summary
 
-**Date:** _______________
-**Tester:** _______________
-**Environment:** _______________
+**Date:** 2025-12-04
+**Tester:** Manual Testing Session
+**Environment:** http://192.168.0.244:4205/discover
+
+### Phase 2.1 Testing Progress (In Progress)
+
+| Test Group | Total Tests | Passed | Failed | Pending | Pass Rate |
+|---------|-------------|--------|--------|---------|-----------|
+| **Dialog Cancel Behavior** | 5 | 3 | 0 | 2 | 60% |
+| **Multiple Selection** | 5 | 0 | 0 | 5 | 0% |
+| **Search/Filter in Dialog** | 4 | 0 | 0 | 4 | 0% |
+| **Keyboard Navigation** | 4 | 0 | 0 | 4 | 0% |
+| **Clear/Edit Filter** | 3 | 0 | 0 | 3 | 0% |
+| **Remove Filter** | 3 | 0 | 0 | 3 | 0% |
+| **PHASE 2.1 TOTAL** | **24** | **3** | **0** | **21** | **12.5%** |
+
+### Previous Phases (Completed)
 
 | Section | Total Tests | Passed | Failed | N/A | Pass Rate |
 |---------|-------------|--------|--------|-----|-----------|
-| Section 1: Basic Panel Functionality | 10 | | | | |
-| Section 2: Panel Collapse | 3 | | | | |
-| Section 3: Panel Drag-Drop | 3 | | | | |
-| Section 4: Single Panel Pop-Out | 9 | | | | |
-| Section 5: Multiple Panel Pop-Outs | 4 | | | | |
-| Section 6: URL State Management | 7 | | | | |
-| Section 7: Edge Cases | 7 | | | | |
-| Section 8: Accessibility | 3 | | | | |
-| **TOTAL** | **46** | | | | |
+| Phase 1: Initial State + Single Selection (Tests 2.1.1-2.1.8) | 8 | 8 | 0 | 0 | 100% |
 
 ---
 
@@ -1033,7 +1039,7 @@ This test plan covers:
 
 | Test Case | Severity | Description | Status |
 |-----------|----------|-------------|--------|
-| | | | |
+| **BUG-NEW** | MEDIUM | Modal Dialog Close Handlers Not Working (X button, Escape key don't close dialogs) | NEW - Bug report filed: BUG-REPORT-MODAL-DIALOG-CLOSE.md |
 
 ---
 
