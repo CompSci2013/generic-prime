@@ -145,10 +145,10 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
 
   ngOnInit(): void {
     // Initialize filter field options from domain config
-    this.filterFieldOptions = [
-      ...this.domainConfig.queryControlFilters,
-      ...(this.domainConfig.highlightFilters || [])
-    ].map(f => ({ label: f.label, value: f }));
+    // Only include queryControlFilters, NOT highlightFilters
+    // (highlightFilters are for highlighting data, not for main filter selection)
+    this.filterFieldOptions = this.domainConfig.queryControlFilters
+      .map(f => ({ label: f.label, value: f }));
 
     // Sync from URL state on init and on changes
     this.urlState.params$.pipe(takeUntil(this.destroy$)).subscribe(params => {
@@ -179,22 +179,63 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   /**
    * Handle dropdown keydown events for keyboard navigation
    *
-   * Works around PrimeNG dropdown keyboard navigation issues.
-   * The dropdown's internal keyboard handling should work with [filter]="true",
-   * but this provides a fallback handler if needed.
+   * Intercepts spacebar to select the highlighted option in filtered dropdown.
+   * Reference: PrimeNG Issue #17779 - spacebar doesn't select when filter is active
+   *
+   * When [filter]="true" is set, the filter input captures spacebar events,
+   * preventing selection. This handler detects spacebar and manually triggers selection
+   * if an option is currently highlighted.
    */
-  onDropdownKeydown(_event: KeyboardEvent): void {
-    // Allow PrimeNG's default keyboard navigation to handle arrow keys, Enter, Escape
-    // This is mostly a placeholder - PrimeNG handles these internally
-    // If Arrow key navigation doesn't work, investigate PrimeNG version compatibility
+  onDropdownKeydown(event: KeyboardEvent): void {
+    // Only handle spacebar
+    if (event.key !== ' ') {
+      return;
+    }
+
+    // When spacebar is pressed on a focused option (not in filter input),
+    // we need to manually trigger the selection since PrimeNG's filter input
+    // will capture the spacebar for typing
+
+    // Check if there's a currently highlighted/focused option in the dropdown
+    // PrimeNG 14 uses the 'p-highlight' CSS class for highlighted options
+    const highlightedOption = document.querySelector('.p-dropdown-items .p-highlight');
+
+    if (highlightedOption) {
+      // Prevent the spacebar from being added to the filter input
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Get the data-ng-reflect-ng-value or other data attribute that contains the selected value
+      // PrimeNG stores the option data on the element
+      const selectedIndex = Array.from(document.querySelectorAll('.p-dropdown-items li'))
+        .indexOf(highlightedOption as HTMLElement);
+
+      if (selectedIndex >= 0 && this.filterFieldOptions[selectedIndex]) {
+        // Directly call onFieldSelected with the highlighted option
+        // Create a synthetic onChange event with the correct value
+        const syntheticEvent = {
+          value: this.filterFieldOptions[selectedIndex].value,
+          originalEvent: event
+        };
+        this.onFieldSelected(syntheticEvent);
+      }
+    }
   }
 
   /**
    * Handle field selection from dropdown
    *
-   * onChange fires when:
-   * 1. User clicks an option
-   * 2. User presses Enter/Space on an option
+   * PrimeNG's onChange event fires on:
+   * 1. Mouse clicks on an option
+   * 2. Arrow key navigation (keyboard up/down)
+   * 3. Enter/Space on an option
+   *
+   * We only want to open dialogs for #1 and #3, not #2.
+   * Solution: Check the originalEvent to detect arrow key navigation.
+   *
+   * Reference: PrimeNG GitHub Issue #5335, #11703
+   * The onChange event includes originalEvent which is the browser's keyboard/mouse event.
+   * Arrow key navigation triggers onChange but the originalEvent.key will be 'ArrowUp' or 'ArrowDown'.
    */
   onFieldSelected(event: any): void {
     const filterDef: FilterDefinition = event.value;
@@ -202,6 +243,18 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     // If no filterDef, skip
     if (!filterDef) {
       return;
+    }
+
+    // Check if this onChange was triggered by arrow key navigation
+    // The event.originalEvent contains the browser event that triggered the change
+    if (event.originalEvent && event.originalEvent instanceof KeyboardEvent) {
+      const key = event.originalEvent.key;
+
+      // If it was an arrow key, this is just navigation - don't open dialog
+      // Users are just browsing the dropdown, not making a selection
+      if (['ArrowUp', 'ArrowDown'].includes(key)) {
+        return;
+      }
     }
 
     // This was a click, Enter, or Space - open the dialog
@@ -213,6 +266,11 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    * Extracted into separate method for reuse from keyboard and mouse handlers
    */
   private openFilterDialog(filterDef: FilterDefinition): void {
+    // Close any currently open dialogs before opening a new one
+    // This prevents multiple dialogs from being open simultaneously
+    this.showMultiselectDialog = false;
+    this.showYearRangeDialog = false;
+
     this.currentFilterDef = filterDef;
 
     // Determine if this is a highlight filter by checking if urlParams starts with 'h_'

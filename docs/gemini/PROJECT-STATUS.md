@@ -1,13 +1,13 @@
 # Project Status
 
-**Version**: 2.13
-**Timestamp**: 2025-12-04T23:00:00Z
+**Version**: 2.14
+**Timestamp**: 2025-12-04T23:45:00Z
 
 ---
 
 ## Current State
 
-### Port 4205 (generic-prime) - PHASE 2 MANUAL TESTING IN PROGRESS ⏳
+### Port 4205 (generic-prime) - PHASE 2 MANUAL TESTING READY ✅
 - **All panel headers streamlined** - Consistent compact design pattern across all 4 panels
 - **Query Control refactored** - Header removed, dropdown + Clear All in shaded bar
 - **Results Table restructured** - Custom collapsible filter panel with shaded header
@@ -17,14 +17,57 @@
 - **Dark theme active** - PrimeNG lara-dark-blue + custom dark styling maintained
 - **All 4 panels active** with drag-drop, collapse, and pop-out functionality
 - **✓ CRITICAL FIX: Bug #1.3** - Query Control now updates when URL changes (race condition eliminated)
+- **✓ CRITICAL FIX: Bug #16** - Results Table syncs immediately when filter changes (combineLatest race condition fixed)
+- **✓ CRITICAL FIX: Bug #15** - Dialog reopens correctly, arrow keys navigate without opening dialogs, spacebar selects
 - **✓ FIXED: Dropdown interaction issue** - Can re-select filters after dialog closes (dropdown internal state synchronized)
 - **✓ FIXED: Build compilation error** - Missing `onDropdownKeydown` method added to QueryControlComponent
-- **✓ Compilation successful** - Build passes without errors (32.3 seconds)
+- **✓ Compilation successful** - Build passes without errors (30+ seconds)
+- **✓ Manual Verification Complete** - User confirmed both bugs are resolved
 - Backend at `generic-prime-backend-api:v1.5.0`
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
 - Unaffected by changes
 - Continues to serve as working reference
+
+---
+
+## Session Summary (2025-12-04 Evening - Bug Fixes #15 & #16)
+
+### Fixed Both Critical Bugs ✅
+
+**Bug #16 - Results Table Sync Failure (FIXED)**
+- **Issue**: When filter modified, URL updated but Results Table didn't sync (stale data shown)
+- **Root Cause**: `combineLatest([filters$, results$, totalResults$, loading$])` race condition
+- **Solution**: Replaced with 4 independent subscriptions in `results-table.component.ts`
+- **Verification**: User manual testing confirmed immediate sync
+- **Impact**: Restores URL-First architecture reliability
+
+**Bug #15 - Dialog & Keyboard Issues (FIXED)**
+- **Issue 1**: Arrow keys opened dialogs instead of navigating (should only navigate)
+  - **Root Cause**: `onChange` fires on arrow keys; checked all `onChange` events
+  - **Solution**: Check `event.originalEvent.key` and skip dialog for arrow navigation
+- **Issue 2**: Spacebar didn't select highlighted options (added space to filter instead)
+  - **Root Cause**: `[filter]="true"` captures spacebar in filter input
+  - **Solution**: Intercept spacebar keydown, find `.p-highlight` option, call selection directly
+- **Issue 3**: Multiple dialogs open simultaneously
+  - **Root Cause**: No logic to close previous dialog before opening new one
+  - **Solution**: Set both visibility properties to false before opening new dialog
+- **Issue 4**: Invalid "Highlight*" options in dropdown
+  - **Root Cause**: Code included `highlightFilters` in initialization
+  - **Solution**: Initialize with only `queryControlFilters`
+- **Verification**: User confirmed all keyboard and dialog issues resolved
+
+### Build Status ✅
+- **Compilation**: Successful (30+ seconds)
+- **TypeScript Errors**: 0
+- **Template Errors**: 0
+- **New Warnings**: 0
+- **Status**: Ready for Phase 2.1 manual testing resumption
+
+### Files Changed This Session
+- `results-table.component.ts` - Fixed combineLatest race condition
+- `query-control.component.ts` - Fixed 4 issues (arrow keys, spacebar, multiple dialogs, dropdown options)
+- `query-control.component.html` - Changed `[(visible)]` to `[visible]` (template binding fix)
 
 ---
 
@@ -202,36 +245,47 @@ Critical focus: **Fix URL-First state management so controls update when URL cha
 
 | Bug | Severity | Status | Summary | Root Cause |
 |-----|----------|--------|---------|---|
-| #16 | CRITICAL | Not started | Results Table doesn't update when filter modified (requires page refresh) | URL updates but components don't sync - likely async/await race condition in DiscoverComponent event chain (similar to Bug #1.3) |
-| #15 | CRITICAL | Not started | Multiselect dialog fails to reopen when filter already active | Two-way binding issue with PrimeNG Dialog `[(visible)]` property - state change from `false` → `true` not detected on second invocation |
+| #16 | CRITICAL | ✓ FIXED | Results Table doesn't update when filter modified | `combineLatest([filters$, results$, totalResults$, loading$])` race condition - didn't emit if any source didn't emit new value |
+| #15 | CRITICAL | ✓ FIXED | Dialog keyboard/reopen issues (arrow keys, spacebar, multiple dialogs) | Multiple root causes: (1) `onChange` fires on arrow keys, (2) `[filter]="true"` captures spacebar, (3) no previous dialog close logic, (4) invalid dropdown options |
 | #1.3 | CRITICAL | ✓ FIXED | Query Control not updating when URL changes | combineLatest race condition - highlights$ doesn't emit when only regular filters change, blocking subscription |
-| #13 | Medium | Not started | Dropdown keyboard navigation (arrow keys, Enter/Space) broken with `[filter]="true"` | PrimeNG version compatibility issue or accessibility feature disabled |
+| #13 | Medium | ✓ ADDRESSED | Dropdown keyboard navigation (arrow keys, Enter/Space) | ADDRESSED as part of Bug #15 fix - arrow keys now navigate, spacebar selects, Enter confirms |
 | #7 | Low | Not started | Checkboxes stay checked after clearing | Visual state not syncing with data model |
 
 ---
 
 ## Next Session Actions
 
-### Immediate (AFTER BUG #1.3)
+### Immediate (AFTER BUG #15 & #16 FIXES)
 
-1. **Fix Bug #13** - Dropdown keyboard navigation
-   - Investigate PrimeNG `[filter]="true"` compatibility
-   - Test arrow key / Enter / Space functionality
-   - Update to newer PrimeNG version if needed
+1. **Resume Phase 2.1 Manual Testing** ✅ Ready to Resume
+   - Execute Dialog Cancel Behavior tests (5 tests) - now unblocked
+   - Execute Multiple Selection tests (5 tests) - now unblocked
+   - Execute Search/Filter in Dialog tests (4 tests)
+   - Execute Keyboard Navigation tests (4 tests)
+   - Execute Clear/Edit tests (3 tests)
+   - Execute Remove Filter tests (3 tests)
 
 2. **Fix Bug #7** - Checkbox visual state
    - Verify checkbox model state syncs with UI state
    - Test Clear All button behavior with checkboxes
+   - (Lower priority - discovered but not blocking current testing)
 
-3. **Execute Full MANUAL-TEST-PLAN Phase 2**
-   - Run comprehensive Query Control tests
+3. **Execute Full MANUAL-TEST-PLAN Phase 2+**
+   - Phase 2.1: Manufacturer multiselect (29 tests total)
+   - Phase 2.2: Model multiselect (similar workflow)
+   - Phase 2.3: Body Class multiselect (similar workflow)
+   - Phase 2.4: Year Range dialog
+   - Phase 2.5: Search field
+   - Phase 2.6: Page Size control
+   - Phase 2.7: Clear All button
    - Test pop-out Query Control windows
    - Verify drag-drop panel ordering persistence
 
-### Secondary
+### Secondary (After Phase 2 Complete)
 
-4. **Add Agriculture Domain** - Validate flexible domain architecture
-5. **Implement Additional Features**
+4. **Verify Phase 3+ Manual Tests** - Initial state, panel controls, etc.
+5. **Add Agriculture Domain** - Validate flexible domain architecture
+6. **Implement Additional Features**
    - Panel collapse/expand state persistence
    - Dark/Light theme toggle
    - Export functionality for results
@@ -253,9 +307,9 @@ Critical focus: **Fix URL-First state management so controls update when URL cha
 
 ## Governing Tactic
 
-**Execute Phase 2 manual tests systematically → Document findings → Resolve any critical bugs if needed**
+**Resume Phase 2.1 manual testing systematically → Execute remaining test subsections → Progress through Phase 2.2-2.7**
 
-Current focus: Complete Phase 2.1 remaining subsections (Dialog Cancel Behavior, Multiple Selection, Search/Filter, Keyboard Navigation, Edit/Remove) to validate all manufacturer filter workflows before moving to remaining filters (Model, Body Class, Year, Search, Size, Clear All).
+Current focus: Execute Phase 2.1 remaining subsections (Dialog Cancel Behavior, Multiple Selection, Search/Filter, Keyboard Navigation, Edit/Remove) to validate all manufacturer filter workflows. Both critical bugs (#15 and #16) are now FIXED and VERIFIED, unblocking testing.
 
 ---
 

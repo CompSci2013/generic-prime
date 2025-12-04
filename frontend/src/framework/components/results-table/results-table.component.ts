@@ -2,13 +2,12 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  Inject,
   Input,
   OnDestroy,
   OnInit
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject, combineLatest } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DomainConfig, FilterOption } from '../../models/domain-config.interface';
 import { ResourceManagementService } from '../../services/resource-management.service';
@@ -109,21 +108,36 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
     this.error$ = this.resourceService.error$;
     this.statistics$ = this.resourceService.statistics$;
 
-    // Combine all state streams into single subscription for proper cleanup
-    combineLatest([
-      this.filters$,
-      this.results$,
-      this.totalResults$,
-      this.loading$
-    ]).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(([filters, results, totalResults, loading]) => {
-      this.currentFilters = { ...filters as any };
-      this.results = results;
-      this.totalResults = totalResults;
-      this.loading = loading;
-      this.cdr.markForCheck();
-    });
+    // Subscribe to each stream independently to avoid combineLatest race condition
+    // (Bug #1.3 / #16: combineLatest won't emit if one source doesn't change)
+
+    this.filters$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(filters => {
+        this.currentFilters = { ...filters as any };
+        this.cdr.markForCheck();
+      });
+
+    this.results$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(results => {
+        this.results = results;
+        this.cdr.markForCheck();
+      });
+
+    this.totalResults$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(totalResults => {
+        this.totalResults = totalResults;
+        this.cdr.markForCheck();
+      });
+
+    this.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(loading => {
+        this.loading = loading;
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnDestroy(): void {

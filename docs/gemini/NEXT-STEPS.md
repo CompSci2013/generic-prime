@@ -14,113 +14,95 @@
 
 ---
 
-## Current Priority: FIX CRITICAL BUGS #15 AND #16 BEFORE RESUMING TESTING
+## Current Priority: RESUME PHASE 2.1 MANUAL TESTING
 
-**Status**: ⏸️ MANUAL TESTING PAUSED - Two critical bugs discovered that block further progress
+**Status**: ✅ BUGS FIXED - Ready to Resume Testing
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Phase 2.1 Single Selection tests PASSED (8/8) but BLOCKED by two critical bugs:**
-> 1. **Bug #16** (HIGHEST PRIORITY): Results Table doesn't sync with URL - violates core URL-First architecture
-> 2. **Bug #15** (HIGH PRIORITY): Dialog reopen broken via dropdown - blocks Dialog Cancel Behavior tests
+> **Bug #15 and #16 are NOW FIXED and VERIFIED:**
+> 1. **Bug #16** ✅ FIXED: Results Table syncs immediately with filter changes (combineLatest race condition eliminated)
+> 2. **Bug #15** ✅ FIXED: Dialog reopens correctly, arrow keys navigate, spacebar selects
 >
-> **Recommendation: Fix bugs first, then resume testing**
+> **Phase 2.1 testing can now resume with all remaining subsections:**
 
 ---
 
-## Completed This Session (2025-12-04 Evening - Phase 2.1 Continuation & Bug Discovery)
+## Completed This Session (2025-12-04 Evening - Bug Fixes #15 & #16)
 
-### Session 2025-12-04 Evening Achievements
+### Session 2025-12-04 Evening Achievements ✅
 
-1. **Phase 2.1 Dialog Cancel Behavior Tests - STARTED BUT BLOCKED ✗**
-   - Attempted tests 2.1.9 (Dialog Cancel Behavior - First Step)
-   - **Blocker**: Bug #15 - Dialog fails to reopen when re-selecting filter via dropdown
-   - Cannot proceed without fix
+1. **Fixed Bug #16 (Results Table Sync) - COMPLETED ✓**
+   - **Root Cause**: `combineLatest([filters$, results$, totalResults$, loading$])` race condition
+   - **Solution**: Replaced with 4 independent subscriptions in `results-table.component.ts`
+   - **Verification**: User manual testing confirmed results update immediately when filters change
+   - **Build**: Compiles successfully (30+ seconds)
 
-2. **Phase 2.1 Multiple Selection Tests - EXECUTED WITH BUG DISCOVERY ⚠️**
-   - Executed test 2.1.14 using chip edit workaround (Bug #15 circumvention)
-   - Successfully selected 3 manufacturers: Brammo, Ford, GMC
-   - **CRITICAL FINDING**: URL updated correctly BUT Results Table didn't sync
-   - Required manual page refresh (F5) to see filtered data
-   - Identified Bug #16 (Results Table sync failure)
+2. **Fixed Bug #15 (Dialog & Keyboard Issues) - COMPLETED ✓**
+   - **Issue 1 - Arrow Keys**: Changed from opening dialogs to navigating only
+     - Solution: Check `event.originalEvent.key` and skip dialog for arrow navigation
+   - **Issue 2 - Spacebar**: Now selects highlighted options instead of adding space
+     - Solution: Intercept spacebar keydown, find `.p-highlight` option, call selection
+   - **Issue 3 - Multiple Dialogs**: Prevented simultaneous dialog opens
+     - Solution: Close previous dialogs before opening new one
+   - **Issue 4 - Invalid Options**: Removed "Highlight*" options from dropdown
+     - Solution: Initialize with only `queryControlFilters`, not `highlightFilters`
+   - **Verification**: User confirmed all issues resolved
 
-3. **Bug #15 Discovery & Documentation - COMPLETED ✓**
-   - **Issue**: Multiselect dialog fails to reopen on second selection of same filter field
-   - **Root Cause**: Two-way binding issue with PrimeNG Dialog `[(visible)]` property
-   - **Impact**: Blocks Dialog Cancel Behavior test workflow
-   - **Workaround**: Click chip to edit filter (circumvents dropdown)
-   - **Documentation**: Created `docs/gemini/BUG-15-DIALOG-REOPEN.md` with full analysis
+3. **Comprehensive Documentation Created - COMPLETED ✓**
+   - `docs/gemini/BUG-16-FIX-DOCUMENTATION.md` - With 3 Mermaid diagrams
+   - `docs/gemini/BUG-15-FIX-DOCUMENTATION.md` - Two-way binding analysis
+   - `docs/gemini/BUG-15-ACTUAL-ROOT-CAUSE.md` - Arrow key and spacebar issues
+   - `docs/gemini/SESSION-2025-12-04-BUGS-15-16-FIXES.md` - Complete session summary
 
-4. **Bug #16 Discovery & Documentation - COMPLETED ✓**
-   - **Issue**: Results Table and Statistics don't update when filter is modified (stale data)
-   - **Root Cause**: Likely async/await race condition in DiscoverComponent event chain
-   - **Impact**: CRITICAL - Violates URL-First architecture (URL is not reliable source of truth)
-   - **Workaround**: Manual page refresh (F5)
-   - **Documentation**: Created `docs/gemini/BUG-16-RESULTS-TABLE-SYNC.md` with full analysis and investigation steps
-
-5. **Documentation Updated - COMPLETED ✓**
-   - Updated MANUAL-TEST-PLAN.md with Phase 2.1 Dialog Cancel Behavior and Multiple Selection results
-   - Added Bug #15 and #16 to MANUAL-TEST-PLAN.md Critical Issues Found section
-   - Updated PROJECT-STATUS.md Critical Bugs table (added #16, prioritized #15)
-   - Appended current session to STATUS-HISTORY.md (v2.12 → v2.13)
-   - Updated NEXT-STEPS.md with bug fix priority recommendation
+4. **Documentation Updated - COMPLETED ✓**
+   - Updated STATUS-HISTORY.md with complete session snapshot (v2.13 → v2.14)
+   - Updated PROJECT-STATUS.md with both bugs marked as FIXED
+   - Updated NEXT-STEPS.md to reflect ready-to-resume status
+   - Appended current session timestamp and findings
 
 ---
 
 ## Immediate Actions (Next Session)
 
-### PRIORITY 1: FIX BUG #16 (CRITICAL - Architecture Violation)
+### PRIORITY 1: RESUME PHASE 2.1 MANUAL TESTING ✅ Ready to Resume
 
-**Why First**: Violates core URL-First principle - URL updates but components don't sync. This is a fundamental architecture problem that invalidates the entire testing approach.
+**Why First**: Both blocking bugs are now FIXED. Testing can proceed without workarounds.
 
-**Investigation Required**:
-1. Trace event chain: ApplyFilter → urlParamsChange → DiscoverComponent.onUrlParamsChange()
-2. Verify `setParams()` is being properly awaited in DiscoverComponent
-3. Check ResourceManagementService.watchUrlChanges() subscription
-4. Verify ResultsTableComponent receives data update observable
-5. Check if change detection is triggered properly
+**Phase 2.1 Remaining Subsections** (in execution order):
+1. **Dialog Cancel Behavior (Side Effect)** - 5 tests
+   - Verify dialog closes when user opens different filter field
+   - Verify Cancel button side effect is exercised automatically
+2. **Multiple Selection Tests** - 5 tests
+   - Select multiple values in single filter (e.g., Brammo, Ford, GMC)
+   - Verify all values appear in chip
+   - Verify URL updates with all values
+3. **Search/Filter in Dialog** - 4 tests
+   - Type text in dialog search field
+   - Verify list filters to matching options
+   - Test search with 0 results
+4. **Keyboard Navigation in Dialog** - 4 tests
+   - Tab/Shift+Tab between checkboxes
+   - Arrow keys to navigate list
+   - Space to toggle checkboxes
+   - Enter to Apply, Escape to Cancel
+5. **Clear/Edit Manufacturer Filter** - 3 tests
+   - Click existing filter chip to edit
+   - Verify previous selections are pre-checked
+   - Add/remove values and Apply
+6. **Remove Manufacturer Filter** - 3 tests
+   - Click X on filter chip to remove
+   - Verify URL updates
+   - Verify Results Table updates
 
-**Files to Review**:
-- `discover.component.ts` - Event handlers and async/await chain
-- `resource-management.service.ts` - watchUrlChanges() method
-- `results-table.component.ts` - Change detection strategy and subscriptions
-- `url-state.service.ts` - BehaviorSubject emission
-
-**Expected Fix**: Similar to Bug #1.3 fix - likely missing await on setParams() or change detection not triggering
-
-### PRIORITY 2: FIX BUG #15 (HIGH - Blocks Testing)
-
-**Why Second**: Blocks Dialog Cancel Behavior tests and dropdown filter re-selection workflow. Must be fixed to fully test Phase 2.1.
-
-**Investigation Required**:
-1. Replace `[(visible)]="showMultiselectDialog"` with one-way binding `[visible]="showMultiselectDialog"`
-2. Add explicit `(onHide)="onDialogHide()"` event handler
-3. Test if state change from `false` → `true` is properly detected
-4. May need to use `detectChanges()` instead of `markForCheck()` in openMultiselectDialog()
-
-**Files to Review**:
-- `query-control.component.html` - Dialog visible binding (line 72)
-- `query-control.component.ts` - openMultiselectDialog() method (line 250)
-
-**Expected Fix**: Replace two-way binding with explicit one-way binding + event handler
-
-### PRIORITY 3: RESUME PHASE 2.1 TESTING (After Bugs Fixed)
-
-**Remaining Phase 2.1 Subsections** (in order):
-- **Dialog Cancel Behavior (Side Effect)** - 5 tests (was blocked by Bug #15)
-- **Multiple Selection Tests** - 5 tests (was blocked by Bug #16)
-- **Search/Filter in Dialog** - 4 tests
-- **Keyboard Navigation in Dialog** - 4 tests
-- **Clear/Edit Manufacturer Filter** - 3 tests
-- **Remove Manufacturer Filter** - 3 tests
-
-**Testing Workflow** (Once bugs are fixed):
+**Testing Workflow**:
 - Execute each subsection sequentially
 - Mark tests as `[X]` on success or document failures
-- Use mouse clicks for field selection (keyboard nav works differently per Bug #14)
-- Continue with remaining Phase 2.2, 2.3, etc.
+- Use mouse clicks for initial field selection (arrow nav works differently per Bug #14)
+- Document any new findings or regressions
+- Build verification before committing
 
-### PRIORITY 4: Document Testing Results
+### PRIORITY 2: FIX BUG #7 (LOW - After Phase 2.1)
 
 **Deliverable**: Update TEST-RESULTS section in MANUAL-TEST-PLAN.md with:
 - Phase 2.1 final test count and status
@@ -192,4 +174,5 @@ Before ending session:
 
 ---
 
-**Last Updated**: 2025-12-04T22:15:00Z
+**Last Updated**: 2025-12-04T23:45:00Z
+**Status**: ✅ Both critical bugs fixed and verified, ready for Phase 2.1 testing resumption
