@@ -1045,7 +1045,51 @@ This test plan covers:
 
 ## Notes and Observations
 
-(Space for tester notes, screenshots, or additional observations)
+### Phase 2.1 Detailed Test Results (2025-12-05)
+
+**Dialog Cancel Behavior Tests (2.1.9-2.1.13)**:
+- [X] 2.1.9: Cancel Behavior - Multiselect to Multiselect - **PASS**
+- [X] 2.1.10: Cancel Behavior - Multiselect to Range - **PASS**
+- [X] 2.1.11: Dialog Reopen After Apply (Bug #15 Validation) - **PASS** ⚡ CRITICAL
+- [ ] 2.1.12: Range Dialog Reopen - NOT YET TESTED
+- [ ] 2.1.13: Multiple Filters Active - NOT YET TESTED
+
+**Multiple Selection Tests (2.1.14-2.1.18)**:
+- [ ] 2.1.14: Select Two Values - NOT YET TESTED
+- [ ] 2.1.15: Select Three Values - NOT YET TESTED
+- [ ] 2.1.16: Uncheck and Reapply - NOT YET TESTED
+- [ ] 2.1.17: Select Many Then Deselect One - NOT YET TESTED
+- [ ] 2.1.18: All Values Unchecked - NOT YET TESTED
+
+**Search/Filter Tests (2.1.19-2.1.22)**:
+- [ ] 2.1.19: Search Narrows List - NOT YET TESTED
+- [ ] 2.1.20: Search Case-Insensitive - NOT YET TESTED
+- [ ] 2.1.21: Search with No Matches - NOT YET TESTED
+- [ ] 2.1.22: Clear Search Restores List - NOT YET TESTED
+
+**Keyboard Navigation Tests (2.1.23-2.1.26)**:
+- [ ] 2.1.23: Tab Navigation - NOT YET TESTED
+- [ ] 2.1.24: Space to Select - NOT YET TESTED
+- [ ] 2.1.25: Arrow Keys Navigate - NOT YET TESTED
+- [ ] 2.1.26: Enter to Apply, Escape to Cancel - NOT YET TESTED
+
+**Clear/Edit Tests (2.1.27-2.1.29)**:
+- [ ] 2.1.27: Edit - Add More Values - NOT YET TESTED
+- [ ] 2.1.28: Edit - Remove Values - NOT YET TESTED
+- [ ] 2.1.29: Cancel Doesn't Affect Filter - NOT YET TESTED
+
+**Remove Filter Tests (2.1.30-2.1.32)**:
+- [ ] 2.1.30: Click X to Remove - NOT YET TESTED
+- [ ] 2.1.31: Remove One of Multiple - NOT YET TESTED
+- [ ] 2.1.32: Remove Then Re-add Different Value - NOT YET TESTED
+
+**Key Findings**:
+- Bug #15 fix (two-way binding) is working correctly - dialog reopens with pre-checked selections
+- Bug #16 fix (observable sync) verified in previous session - results update immediately
+- New Issue Found: X button and Escape key don't close dialogs (MEDIUM severity, reported separately)
+- Modal behavior is correct - field selector dropdown properly blocked while dialog open
+
+**Full Details**: See `PHASE-2.1-TEST-EXECUTION-GUIDE.md` and `PHASE-2.1-TEST-RESULTS.md` for comprehensive test information.
 
 ---
 
