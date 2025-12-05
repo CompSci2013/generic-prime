@@ -1,0 +1,32 @@
+# Use the official Playwright image which comes with browsers and OS dependencies.
+# Using v1.57.0 to match @playwright/test version in package.json
+FROM mcr.microsoft.com/playwright:v1.57.0-jammy
+
+# Set the base working directory.
+WORKDIR /app
+
+# Copy package files first to leverage Docker layer caching.
+# This layer only gets rebuilt if package.json or package-lock.json changes.
+COPY frontend/package*.json ./frontend/
+
+# Change to the frontend directory and install all dependencies.
+WORKDIR /app/frontend
+
+# Install dependencies
+# Use --legacy-peer-deps to handle Angular 14 + newer dependencies compatibility
+RUN npm install --legacy-peer-deps
+
+# Now that dependencies are installed, copy the rest of the project source code.
+WORKDIR /app
+COPY . .
+
+# Change back to the frontend directory to run the build.
+WORKDIR /app/frontend
+
+# Build the application
+RUN npm run build
+
+# Default entrypoint: Start dev server and then run E2E tests
+# This allows for quick test development cycles
+ENTRYPOINT ["sh", "-c"]
+CMD ["npm start -- --host 0.0.0.0 --port 4205 & sleep 5 && IN_DOCKER=true npm run test:e2e"]

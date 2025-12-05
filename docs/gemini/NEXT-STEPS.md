@@ -14,90 +14,156 @@
 
 ---
 
-## Current Priority: CONTINUE PHASE 2.2 MANUAL TESTING
+## Current Priority: IMPLEMENT E2E TEST AUTOMATION (Option 2 Environment-Based)
 
-**Status**: ⏳ PHASE 2.2 IN PROGRESS - 2 of 4 test groups complete (50%)
+**Status**: ✅ INFRASTRUCTURE COMPLETE - Awaiting Component HTML Updates
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Phase 2.2 testing in progress. Resume remaining tests systematically.**
-> 1. **Phase 2.1** ✅ COMPLETE: All 24 tests passed (24/24)
-> 2. **Phase 2.2** ⏳ IN PROGRESS: 2 of 4 test groups complete
->    - ✅ Test 2.2.1: Single Selection - PASS
->    - ✅ Test 2.2.2: Combined Filters - PASS
->    - ⏳ Test 2.2.3: Edit Model Filter (next)
->    - ⏳ Test 2.2.4: Remove Model Filter
-> 3. **Phase 2.3-2.7** ⏳ PENDING: Body Class, Year, Search, Size, Clear All (~25 tests)
+> **E2E Test Automation is now ready for implementation. Use Option 2 (Environment-Based) approach to add test-ids without polluting production code.**
 >
-> **Continue testing with Phase 2.2 (Model Filter workflow):**
+> 1. **Phase 1: E2E Infrastructure** ✅ COMPLETE
+>    - Docker configuration ✓
+>    - Playwright setup ✓
+>    - Test suite (13 tests) ✓
+>    - All documentation ✓
+>
+> 2. **Phase 2: Add Component Test-IDs (Option 2 Approach)** ⏳ NEXT
+>    - Add `includeTestIds` flag to environment.ts and environment.prod.ts
+>    - Update 4 component templates to bind test-ids conditionally
+>    - Run tests and verify all 13 tests pass
+>
+> 3. **Phase 3: Expand Test Coverage** ⏳ AFTER PHASE 2
+>    - Add Phase 2.3-2.7 tests (Body Class, Year, Search, Size, Clear All)
+>    - Add pop-out window tests
+>    - Integrate into CI/CD
 
 ---
 
-## Completed This Session (2025-12-05 Continued - Phase 2.2 Model Filter Testing)
+## Completed This Session (2025-12-05 Evening - E2E Test Automation Setup)
 
 ### Session 2025-12-05 Achievements ✅
 
-1. **Phase 2.2 Model Filter Testing STARTED - 2 tests PASSED ✓**
-   - **Test 2.2.1 (Single Selection)**: 8 steps PASSED
-     - Model filter works identically to Manufacturer filter
-     - Scooter selection, URL update, Results/Stats sync all working
-   - **Test 2.2.2 (Combined Filters)**: 7 steps PASSED
-     - Manufacturer + Model filters use correct intersection logic
-     - Results Table shows 1 result (intersection, not sum)
-     - Multi-filter URL state maintained correctly
+1. **E2E Test Automation Framework IMPLEMENTED - COMPLETE ✓**
+   - **Port Configuration**: Fixed playwright.config.ts (4200 → 4205)
+   - **Docker Setup**: Updated Dockerfile.e2e with dev server startup + test execution
+   - **Playwright Upgrade**: v1.44.0 → v1.57.0 (matching @playwright/test package)
+   - **Dependencies**: Added @playwright/test:^1.57.0 and playwright:^1.57.0
+   - **Test Suite**: Expanded from 1 test to 13 comprehensive test cases
+     - Phase 1: Initial state & panel controls (3 tests)
+     - Phase 2.1: Manufacturer filter dialogs (6 test groups, 19 cases)
+     - Phase 2.2: Model filter dialogs (2 test groups)
+     - Phase 3+: Results table & statistics (2 tests)
 
-2. **Phase 2.1 Manual Testing COMPLETED - All 24 tests PASSED ✓**
-   - **Tests 2.1.12-2.1.13 (Dialog Cancel Behavior)**: 2 tests PASSED
-     - Range Dialog Reopen validation - Dialog opens/closes correctly
-     - Multiple Filters Active behavior - Correct dialogs open when switching
-   - **Tests 2.1.14-2.1.18 (Multiple Selection)**: 5 tests PASSED
-     - Selected 3 models, URL updated correctly, Results Table synced immediately
-     - BUG #16 fix validated - no stale data
-   - **Tests 2.1.19-2.1.22 (Search/Filter in Dialog)**: 4 tests PASSED
-     - Search filters list correctly, all results reappear when cleared
-   - **Tests 2.1.23-2.1.26 (Keyboard Navigation)**: 4 tests PASSED
-     - Tab/Space/Enter all work; Shift+Tab efficient for backward navigation
-   - **Tests 2.1.27-2.1.29 (Clear/Edit Filter)**: 3 tests PASSED
-     - Chip editing reopens dialog with previous selections pre-checked
-   - **Tests 2.1.30-2.1.32 (Remove Filter)**: 3 tests PASSED
-     - X button removes chips and updates URL/Results Table
+2. **Critical Issues Identified & FIXED ✓**
+   - **Issue 1**: Port mismatch (4200 vs 4205) - FIXED
+   - **Issue 2**: Docker web server config (unconditional http-server) - Made conditional
+   - **Issue 3**: Dockerfile incomplete (no server/test execution) - Added full startup
+   - **Issue 4**: Test coverage too small (1 test) - Expanded to 13 tests
 
-2. **Bug Fixes Validated ✓**
-   - **BUG #15**: Dialog reopen, arrow keys, spacebar all confirmed working
-   - **BUG #16**: Results Table and Statistics sync immediately when filters change
+3. **Infrastructure Validation ✓**
+   - **Docker Build**: ✅ Successful with playwright:v1.57.0
+   - **Dev Server**: ✅ Starts on 0.0.0.0:4205 correctly
+   - **Tests**: ✅ 13 tests discovered and executing
+   - **Current Status**: Tests fail due to missing data-testid (EXPECTED - next step)
 
-3. **Documentation Updated - COMPLETED ✓**
-   - Updated MANUAL-TEST-PLAN.md with all Phase 2.1 test results
-   - Updated PROJECT-STATUS.md to v2.16
-   - Updated NEXT-STEPS.md to reflect Phase 2.1 completion
+4. **Documentation Created - COMPREHENSIVE ✓**
+   - **E2E-TEST-SETUP.md** (201 lines) - User guide for running tests
+   - **E2E-TEST-IDS-REQUIRED.md** (265 lines) - Component modification spec
+   - **E2E-AUTOMATION-ANALYSIS.md** (401 lines) - Technical deep-dive
+   - **QUICKSTART-E2E-TESTS.md** (125 lines) - 5-minute quick reference
+   - **SUMMARY-E2E-FIXES.txt** - Implementation checklist
+   - **E2E-ISSUES-VISUAL.txt** - Visual before/after diagrams
+
+5. **Test-ID Strategy Decided ✓**
+   - **Approach**: Option 2 (Environment-Based) to avoid production pollution
+   - **Design**: `includeTestIds` flag in environment configs
+   - **Implementation**: Deferred to next session as requested by user
 
 ---
 
-## Immediate Actions (Next Session - PHASE 2.2 CONTINUATION)
+## Immediate Actions (Next Session - E2E TEST-ID IMPLEMENTATION)
 
-### PRIORITY 1: CONTINUE PHASE 2.2 MANUAL TESTING ⏳ Resume In Progress
+### PRIORITY 1: IMPLEMENT OPTION 2 (ENVIRONMENT-BASED TEST-IDS) ⏳ Next Session
 
-**Current Progress**: Phase 2.2 in progress (2 of 4 test groups complete)
-- ✅ Phase 2.1: Manufacturer Filter - COMPLETE (24 tests, 100% passed)
-- ⏳ Phase 2.2: Model Filter - IN PROGRESS (2 of 4 tests passed)
+**Objective**: Add test-id attributes to components without polluting production code
 
-**Next Immediate Action**: Resume Test 2.2.3 (Edit Model Filter)
-- Step 1: Click on "Model: Scooter" chip to open dialog for editing
-- Step 2: Uncheck Scooter, select different model
-- Step 3: Click Apply and verify URL/Results/Stats updated
+**Timeline**: Estimated 1-2 hours
 
-**Phases 2.2-2.7 Remaining** (estimated ~25 tests):
-1. **Phase 2.2: Model Filter** (~5 tests pending)
-   - Single Selection Workflow
-   - Combined Filters Test
-   - Edit Model Filter
-   - Remove Model Filter
-2. **Phase 2.3: Body Class Filter** (~4 tests pending)
-   - Single Selection Workflow
-   - Multiple Body Classes
-   - Combined with Previous Filters
-   - Remove Body Class Filter
-3. **Phase 2.4: Year Range Filter** (~5 tests pending)
+**Steps**:
+
+1. **Update Environment Configs** (5 min)
+   - Edit `frontend/src/environments/environment.ts`:
+     ```typescript
+     export const environment = {
+       production: false,
+       includeTestIds: true,  // ← Add this
+     };
+     ```
+   - Edit `frontend/src/environments/environment.prod.ts`:
+     ```typescript
+     export const environment = {
+       production: true,
+       includeTestIds: false,  // ← Add this
+     };
+     ```
+
+2. **Update Component Templates** (30-45 min)
+   - `query-control.component.html` (3 test-ids):
+     ```html
+     <p-panel [attr.data-testid]="environment.includeTestIds ? 'query-control-panel' : null">
+       <p-dropdown [attr.data-testid]="environment.includeTestIds ? 'filter-field-dropdown' : null"></p-dropdown>
+       <!-- Chip close buttons: [attr.data-testid]="environment.includeTestIds ? ('chip-close-' + filter.field) : null" -->
+     </p-panel>
+     ```
+   - `picker.component.html` (1 test-id):
+     ```html
+     <p-panel [attr.data-testid]="environment.includeTestIds ? 'picker-panel' : null">
+     ```
+   - `results-table.component.html` (2 test-ids):
+     ```html
+     <p-panel [attr.data-testid]="environment.includeTestIds ? 'results-table-panel' : null">
+       <p-table [attr.data-testid]="environment.includeTestIds ? 'results-table' : null"></p-table>
+     </p-panel>
+     ```
+   - `statistics-panel.component.html` (2+ test-ids):
+     ```html
+     <p-panel [attr.data-testid]="environment.includeTestIds ? 'statistics-panel' : null">
+       <p-chart *ngFor="let config of chartConfigs"
+         [attr.data-testid]="environment.includeTestIds ? ('chart-' + config.id) : null"></p-chart>
+     </p-panel>
+     ```
+
+3. **Verify Production Build Strips Test-IDs** (10 min)
+   ```bash
+   ng build --configuration production
+   # Search dist/frontend/main.*.js for "data-testid" - should find NONE
+   ```
+
+4. **Run Tests** (30 min)
+   ```bash
+   podman build --no-cache -f frontend/Dockerfile.e2e -t generic-prime-e2e .
+   podman run --rm --ipc=host generic-prime-e2e
+   # Verify all 13 tests PASS ✓
+   ```
+
+5. **Commit Changes** (5 min)
+   ```bash
+   git add frontend/src/environments/
+   git add frontend/src/app/features/discover/panels/*/
+   git commit -m "feat: Add environment-based test-ids for E2E testing"
+   ```
+
+**Documentation**:
+- See [E2E-TEST-IDS-REQUIRED.md](E2E-TEST-IDS-REQUIRED.md) for detailed implementation guide
+- See [E2E-TEST-SETUP.md](E2E-TEST-SETUP.md) for full setup instructions
+
+### PRIORITY 2: EXPAND TEST COVERAGE (After Priority 1) ⏳ Later in Next Session
+
+After all 13 tests pass, expand with:
+- Phase 2.3-2.7 tests (Body Class, Year, Search, Size, Clear All)
+- Pop-out window tests
+- CI/CD integration
    - Minimum Year Tests
    - Maximum Year Tests
    - Year Range Only
