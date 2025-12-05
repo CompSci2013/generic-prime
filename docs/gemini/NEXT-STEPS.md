@@ -14,26 +14,39 @@
 
 ---
 
-## Current Priority: RESUME PHASE 2.2 MANUAL TESTING
+## Current Priority: CONTINUE PHASE 2.2 MANUAL TESTING
 
-**Status**: ✅ PHASE 2.1 COMPLETE - All 24 tests passed
+**Status**: ⏳ PHASE 2.2 IN PROGRESS - 2 of 4 test groups complete (50%)
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Phase 2.1 Complete. Resume Phase 2.2-2.7 testing systematically.**
+> **Phase 2.2 testing in progress. Resume remaining tests systematically.**
 > 1. **Phase 2.1** ✅ COMPLETE: All 24 tests passed (24/24)
-> 2. **Phase 2.2** ⏳ PENDING: Model Filter testing (~5 tests)
-> 3. **Phase 2.3-2.7** ⏳ PENDING: Body Class, Year, Search, Size, Clear All (~30 tests)
+> 2. **Phase 2.2** ⏳ IN PROGRESS: 2 of 4 test groups complete
+>    - ✅ Test 2.2.1: Single Selection - PASS
+>    - ✅ Test 2.2.2: Combined Filters - PASS
+>    - ⏳ Test 2.2.3: Edit Model Filter (next)
+>    - ⏳ Test 2.2.4: Remove Model Filter
+> 3. **Phase 2.3-2.7** ⏳ PENDING: Body Class, Year, Search, Size, Clear All (~25 tests)
 >
 > **Continue testing with Phase 2.2 (Model Filter workflow):**
 
 ---
 
-## Completed This Session (2025-12-05 Continued - Phase 2.1 Manual Testing)
+## Completed This Session (2025-12-05 Continued - Phase 2.2 Model Filter Testing)
 
 ### Session 2025-12-05 Achievements ✅
 
-1. **Phase 2.1 Manual Testing COMPLETED - All 24 tests PASSED ✓**
+1. **Phase 2.2 Model Filter Testing STARTED - 2 tests PASSED ✓**
+   - **Test 2.2.1 (Single Selection)**: 8 steps PASSED
+     - Model filter works identically to Manufacturer filter
+     - Scooter selection, URL update, Results/Stats sync all working
+   - **Test 2.2.2 (Combined Filters)**: 7 steps PASSED
+     - Manufacturer + Model filters use correct intersection logic
+     - Results Table shows 1 result (intersection, not sum)
+     - Multi-filter URL state maintained correctly
+
+2. **Phase 2.1 Manual Testing COMPLETED - All 24 tests PASSED ✓**
    - **Tests 2.1.12-2.1.13 (Dialog Cancel Behavior)**: 2 tests PASSED
      - Range Dialog Reopen validation - Dialog opens/closes correctly
      - Multiple Filters Active behavior - Correct dialogs open when switching
@@ -60,16 +73,20 @@
 
 ---
 
-## Immediate Actions (Next Session - PHASE 2.2+)
+## Immediate Actions (Next Session - PHASE 2.2 CONTINUATION)
 
-### PRIORITY 1: CONTINUE PHASE 2.2+ MANUAL TESTING ✅ Ready to Resume
+### PRIORITY 1: CONTINUE PHASE 2.2 MANUAL TESTING ⏳ Resume In Progress
 
-**Current Progress**: Phase 2.1 complete (24/24 tests)
+**Current Progress**: Phase 2.2 in progress (2 of 4 test groups complete)
 - ✅ Phase 2.1: Manufacturer Filter - COMPLETE (24 tests, 100% passed)
+- ⏳ Phase 2.2: Model Filter - IN PROGRESS (2 of 4 tests passed)
 
-**Next Immediate Action**: Begin Phase 2.2 (Model Filter testing)
+**Next Immediate Action**: Resume Test 2.2.3 (Edit Model Filter)
+- Step 1: Click on "Model: Scooter" chip to open dialog for editing
+- Step 2: Uncheck Scooter, select different model
+- Step 3: Click Apply and verify URL/Results/Stats updated
 
-**Phases 2.2-2.7 Remaining** (estimated ~30 tests):
+**Phases 2.2-2.7 Remaining** (estimated ~25 tests):
 1. **Phase 2.2: Model Filter** (~5 tests pending)
    - Single Selection Workflow
    - Combined Filters Test
@@ -173,5 +190,5 @@ Before ending session:
 
 ---
 
-**Last Updated**: 2025-12-05T02:15:00Z
-**Status**: ✅ Phase 2.1 testing complete - 24/24 tests passed, ready for Phase 2.2
+**Last Updated**: 2025-12-05T XX:XX:XXZ
+**Status**: ⏳ Phase 2.2 in progress - 2 of 4 tests passed, ready to resume Test 2.2.3
