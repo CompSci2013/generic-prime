@@ -14,107 +14,100 @@
 
 ---
 
-## Current Priority: RESUME PHASE 2.1 MANUAL TESTING
+## Current Priority: RESUME PHASE 2.2 MANUAL TESTING
 
-**Status**: ✅ BUGS FIXED - Ready to Resume Testing
+**Status**: ✅ PHASE 2.1 COMPLETE - All 24 tests passed
 
 ### Governing Tactic (from PROJECT-STATUS.md)
 
-> **Bug #15 and #16 are NOW FIXED and VERIFIED:**
-> 1. **Bug #16** ✅ FIXED: Results Table syncs immediately with filter changes (combineLatest race condition eliminated)
-> 2. **Bug #15** ✅ FIXED: Dialog reopens correctly, arrow keys navigate, spacebar selects
+> **Phase 2.1 Complete. Resume Phase 2.2-2.7 testing systematically.**
+> 1. **Phase 2.1** ✅ COMPLETE: All 24 tests passed (24/24)
+> 2. **Phase 2.2** ⏳ PENDING: Model Filter testing (~5 tests)
+> 3. **Phase 2.3-2.7** ⏳ PENDING: Body Class, Year, Search, Size, Clear All (~30 tests)
 >
-> **Phase 2.1 testing can now resume with all remaining subsections:**
+> **Continue testing with Phase 2.2 (Model Filter workflow):**
 
 ---
 
-## Completed This Session (2025-12-04 Evening - Bug Fixes #15 & #16)
+## Completed This Session (2025-12-05 Continued - Phase 2.1 Manual Testing)
 
-### Session 2025-12-04 Evening Achievements ✅
+### Session 2025-12-05 Achievements ✅
 
-1. **Fixed Bug #16 (Results Table Sync) - COMPLETED ✓**
-   - **Root Cause**: `combineLatest([filters$, results$, totalResults$, loading$])` race condition
-   - **Solution**: Replaced with 4 independent subscriptions in `results-table.component.ts`
-   - **Verification**: User manual testing confirmed results update immediately when filters change
-   - **Build**: Compiles successfully (30+ seconds)
+1. **Phase 2.1 Manual Testing COMPLETED - All 24 tests PASSED ✓**
+   - **Tests 2.1.12-2.1.13 (Dialog Cancel Behavior)**: 2 tests PASSED
+     - Range Dialog Reopen validation - Dialog opens/closes correctly
+     - Multiple Filters Active behavior - Correct dialogs open when switching
+   - **Tests 2.1.14-2.1.18 (Multiple Selection)**: 5 tests PASSED
+     - Selected 3 models, URL updated correctly, Results Table synced immediately
+     - BUG #16 fix validated - no stale data
+   - **Tests 2.1.19-2.1.22 (Search/Filter in Dialog)**: 4 tests PASSED
+     - Search filters list correctly, all results reappear when cleared
+   - **Tests 2.1.23-2.1.26 (Keyboard Navigation)**: 4 tests PASSED
+     - Tab/Space/Enter all work; Shift+Tab efficient for backward navigation
+   - **Tests 2.1.27-2.1.29 (Clear/Edit Filter)**: 3 tests PASSED
+     - Chip editing reopens dialog with previous selections pre-checked
+   - **Tests 2.1.30-2.1.32 (Remove Filter)**: 3 tests PASSED
+     - X button removes chips and updates URL/Results Table
 
-2. **Fixed Bug #15 (Dialog & Keyboard Issues) - COMPLETED ✓**
-   - **Issue 1 - Arrow Keys**: Changed from opening dialogs to navigating only
-     - Solution: Check `event.originalEvent.key` and skip dialog for arrow navigation
-   - **Issue 2 - Spacebar**: Now selects highlighted options instead of adding space
-     - Solution: Intercept spacebar keydown, find `.p-highlight` option, call selection
-   - **Issue 3 - Multiple Dialogs**: Prevented simultaneous dialog opens
-     - Solution: Close previous dialogs before opening new one
-   - **Issue 4 - Invalid Options**: Removed "Highlight*" options from dropdown
-     - Solution: Initialize with only `queryControlFilters`, not `highlightFilters`
-   - **Verification**: User confirmed all issues resolved
+2. **Bug Fixes Validated ✓**
+   - **BUG #15**: Dialog reopen, arrow keys, spacebar all confirmed working
+   - **BUG #16**: Results Table and Statistics sync immediately when filters change
 
-3. **Comprehensive Documentation Created - COMPLETED ✓**
-   - `docs/gemini/BUG-16-FIX-DOCUMENTATION.md` - With 3 Mermaid diagrams
-   - `docs/gemini/BUG-15-FIX-DOCUMENTATION.md` - Two-way binding analysis
-   - `docs/gemini/BUG-15-ACTUAL-ROOT-CAUSE.md` - Arrow key and spacebar issues
-   - `docs/gemini/SESSION-2025-12-04-BUGS-15-16-FIXES.md` - Complete session summary
-
-4. **Documentation Updated - COMPLETED ✓**
-   - Updated STATUS-HISTORY.md with complete session snapshot (v2.13 → v2.14)
-   - Updated PROJECT-STATUS.md with both bugs marked as FIXED
-   - Updated NEXT-STEPS.md to reflect ready-to-resume status
-   - Appended current session timestamp and findings
+3. **Documentation Updated - COMPLETED ✓**
+   - Updated MANUAL-TEST-PLAN.md with all Phase 2.1 test results
+   - Updated PROJECT-STATUS.md to v2.16
+   - Updated NEXT-STEPS.md to reflect Phase 2.1 completion
 
 ---
 
-## Immediate Actions (Next Session - SESSION CONTINUATION)
+## Immediate Actions (Next Session - PHASE 2.2+)
 
-### PRIORITY 1: CONTINUE PHASE 2.1 MANUAL TESTING ✅ In Progress (12.5% Complete)
+### PRIORITY 1: CONTINUE PHASE 2.2+ MANUAL TESTING ✅ Ready to Resume
 
-**Current Progress**: 3 of 24 tests complete
-- ✅ Test 2.1.9: Dialog Cancel Behavior (Multiselect to Multiselect) - PASS
-- ✅ Test 2.1.10: Cancel Behavior (Multiselect to Range) - PASS
-- ✅ Test 2.1.11: Dialog Reopen After Apply (**BUG #15 FIX VALIDATED**) - PASS
+**Current Progress**: Phase 2.1 complete (24/24 tests)
+- ✅ Phase 2.1: Manufacturer Filter - COMPLETE (24 tests, 100% passed)
 
-**Next Immediate Action**: Resume with Test 2.1.12
+**Next Immediate Action**: Begin Phase 2.2 (Model Filter testing)
 
-**Phase 2.1 Remaining Subsections** (in execution order):
-1. **Remaining Dialog Cancel Behavior Tests** (Tests 2.1.12-2.1.13) - 2 tests pending
-   - ✅ 2.1.9-2.1.11: COMPLETE
-   - ⏳ 2.1.12: Range Dialog Reopen validation
-   - ⏳ 2.1.13: Multiple Filters Active behavior
-2. **Multiple Selection Tests** (Tests 2.1.14-2.1.18) - 5 tests pending
-   - Select multiple values in single filter (e.g., Brammo, Ford, GMC)
-   - Verify all values appear in chip
-   - Verify URL updates with all values
-3. **Search/Filter in Dialog** (Tests 2.1.19-2.1.22) - 4 tests pending
-   - Type text in dialog search field
-   - Verify list filters to matching options
-   - Test search with 0 results
-4. **Keyboard Navigation in Dialog** (Tests 2.1.23-2.1.26) - 4 tests pending
-   - Tab/Shift+Tab between checkboxes
-   - Arrow keys to navigate list
-   - Space to toggle checkboxes
-   - Enter to Apply, Escape to Cancel
-5. **Clear/Edit Manufacturer Filter** (Tests 2.1.27-2.1.29) - 3 tests pending
-   - Click existing filter chip to edit
-   - Verify previous selections are pre-checked
-   - Add/remove values and Apply
-6. **Remove Manufacturer Filter** (Tests 2.1.30-2.1.32) - 3 tests pending
-   - Click X on filter chip to remove
-   - Verify URL updates
-   - Verify Results Table updates
+**Phases 2.2-2.7 Remaining** (estimated ~30 tests):
+1. **Phase 2.2: Model Filter** (~5 tests pending)
+   - Single Selection Workflow
+   - Combined Filters Test
+   - Edit Model Filter
+   - Remove Model Filter
+2. **Phase 2.3: Body Class Filter** (~4 tests pending)
+   - Single Selection Workflow
+   - Multiple Body Classes
+   - Combined with Previous Filters
+   - Remove Body Class Filter
+3. **Phase 2.4: Year Range Filter** (~5 tests pending)
+   - Minimum Year Tests
+   - Maximum Year Tests
+   - Year Range Only
+   - Remove Year Range Filter
+   - Invalid Range Tests
+4. **Phase 2.5: Search/Text Filter** (~3 tests pending)
+   - Basic Search Workflow
+   - Search Combined with Other Filters
+   - Clear Search
+5. **Phase 2.6: Page Size Filter** (~3 tests pending)
+   - Change Page Size
+   - Page Size Options
+   - Size with Query Filters
+6. **Phase 2.7: Clear All Button** (~1 test pending)
+   - Clear All Filters with multiple active
 
 **Testing Workflow**:
 - Execute each subsection sequentially
 - Mark tests as `[X]` on success or document failures
-- Use mouse clicks for initial field selection (arrow nav works differently per Bug #14)
+- One test step at a time, pause for user response
 - Document any new findings or regressions
-- Build verification before committing
 
-### PRIORITY 2: FIX BUG #7 (LOW - After Phase 2.1)
+### PRIORITY 2: OPTIONAL - Minor Issues to Fix (After Phase 2)
 
-**Deliverable**: Update TEST-RESULTS section in MANUAL-TEST-PLAN.md with:
-- Phase 2.1 final test count and status
-- Complete list of bugs found
-- Workarounds discovered
-- Ready for Phase 2.2+ testing
+**Low Priority Fixes** (non-blocking):
+1. Focus management: Dialog opens via spacebar, focus should go to first input (currently goes to search)
+2. Tab order inefficiency: Shift+Tab works immediately to Apply, Tab requires ~50 presses
 
 ---
 
@@ -180,5 +173,5 @@ Before ending session:
 
 ---
 
-**Last Updated**: 2025-12-05T00:30:00Z
-**Status**: ✅ Phase 2.1 testing resumed - 3 tests complete, 21 tests pending, 1 new bug found
+**Last Updated**: 2025-12-05T02:15:00Z
+**Status**: ✅ Phase 2.1 testing complete - 24/24 tests passed, ready for Phase 2.2
