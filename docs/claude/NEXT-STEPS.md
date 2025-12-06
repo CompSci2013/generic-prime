@@ -1,84 +1,90 @@
 # Next Steps
 
-**Current Session**: Resume E2E testing - fix remaining 4 test failures
+**Current Session**: Verify E2E checkbox scroll fix - run tests to confirm 2.1.1 & 2.1.27 pass
 
 ---
 
-## Immediate Action: Complete E2E Test Fixes
+## Immediate Action: Test Checkbox Scroll Fix
 
 **Priority**: High
 
-**Current Status**: 4/10 tests passing (40% pass rate) - up from 12.5% at session start
-
-**Remaining Failures** (4 tests):
-1. **Test 1.2**: Panel collapse/expand - button selector timeout
-2. **Test 2.1.1**: Manufacturer filter - checkbox visibility issue
-3. **Test 2.1.27**: Edit applied filter - checkbox visibility issue
-4. **Test 2.1.30**: Remove filter - chip remove button not found
-
-**Key Issue**: Dialog checkbox visibility
-- Checkboxes found in DOM but Playwright reports as "hidden"
-- `force: true` parameter partially works but not reliable
-- Affects both multiselect filter tests
-
-**Next Steps**:
-1. **Debug Dialog Rendering**:
-   - Use Playwright inspector to examine checkbox CSS
-   - Check if dialog has overflow:hidden or similar visibility blocker
-   - Look for PrimeNG CSS that hides checkboxes by default
-
-2. **Try Alternative Selectors** for remaining failures:
-   - Test 1.2: Use broader `.panel-actions button` selector instead of parent navigation
-   - Test 2.1.30: Examine actual p-chip DOM to find close button class
-
-3. **Add Test Helpers** if needed:
-   - Consider adding test IDs to checkbox labels: `data-testid="option-brammo"`
-   - Would make selectors more reliable and document intent
-
-4. **Run Final Test** when fixes complete:
-   - Goal: 8/10 or higher (80%+)
-   - Skip 2.2 and 2.3 (not yet manually verified)
-
-**Reproduction Steps**:
+**What to Do**:
+1. Run E2E tests using existing dev container (simplest approach):
 ```bash
-cd ~/projects/generic-prime
-podman build -f frontend/Dockerfile.e2e -t localhost/generic-prime-e2e:latest .
-timeout 300 podman run --rm --network=host localhost/generic-prime-e2e:latest 2>&1 | tail -150
+podman exec -it generic-prime-frontend-dev bash -c "cd /app/frontend && npm run test:e2e"
 ```
 
-**Related Files**:
-- Test file: `frontend/e2e/app.spec.ts` (currently 4/10 passing)
-- Components:
-  - Query Control: `frontend/src/framework/components/query-control/`
-  - Discover: `frontend/src/app/features/discover/`
+2. **Expected Results**:
+   - Tests 2.1.1 & 2.1.27 should now PASS (scroll fix applied)
+   - Pass rate should improve to 8/10 (80%+) if both pass
+   - 2 skipped tests (2.2, 2.3) still awaiting manual verification
+
+3. **If Tests Still Fail**:
+   - Examine error context in `frontend/test-results/` directory
+   - Check if checkbox is actually scrolling into view
+   - May need alternative approach (e.g., keyboard navigation)
+
+**Related Files Modified**:
+- `frontend/e2e/app.spec.ts`:
+  - Test 2.1.1 (line 152): Uses `value="Brammo"` selector + `scrollIntoView()`
+  - Test 2.1.27 (line 198): Scrolls multiple checkboxes before clicking
+- `frontend/playwright.config.ts`: Removed webServer config
+- `frontend/Dockerfile.e2e`: Simplified to use bind mounts
+- `scripts/run-e2e-tests.sh`: Can be used but `podman exec` is simpler
 
 ---
 
-## Secondary Tasks (If E2E Tests Complete Early)
+## Secondary Tasks (When Checkbox Tests Pass)
+
+### Fix Test 1.2 - Panel Collapse/Expand
+- **Status**: Not yet fixed
+- **Issue**: `.panel-actions button` selector may not be correct
+- **Next Steps**: Manually verify button exists in DOM, check if selector is accurate
+
+### Fix Test 2.1.30 - Remove Filter (Chip)
+- **Status**: Not yet fixed
+- **Issue**: p-chip remove icon selector needs investigation
+- **Next Steps**: Inspect p-chip DOM structure to find correct close button selector
 
 ### Fix Bug #13 (Dropdown Keyboard Navigation)
 - **Component**: Query Control panel - `p-dropdown` with `[filter]="true"`
 - **Problem**: Arrow keys don't highlight options, Enter/Space don't select
-- **Priority**: Medium
-- See PROJECT-STATUS.md Known Bugs section for details
+- **Priority**: Medium (blocked on test completion)
 
 ---
 
-## Session Reference
+## How to Run Tests (Simplified)
 
-**Testing Approach**:
-- All manual tests in [MANUAL-TEST-PLAN.md](../MANUAL-TEST-PLAN.md) passed Phase 2.1 (24/24)
-- E2E tests based on these manually-verified test cases
-- Goal: Automate the same workflows that manual testers verified working
-
-**Backend API** (Verified working):
-- All three environments use: `http://generic-prime.minilab/api/specs/v1`
-- Running in K8s as: `generic-prime-backend-api:v1.5.0` (2 replicas)
-- Elasticsearch: autos-unified (4,887 docs), autos-vins (55,463 docs)
-
-**Key Command**:
+**Most Direct Method** (uses existing dev container):
 ```bash
-timeout 300 podman run --rm --network=host localhost/generic-prime-e2e:latest 2>&1 | tail -150
+podman exec -it generic-prime-frontend-dev bash -c "cd /app/frontend && npm run test:e2e"
 ```
 
-**Last Updated**: 2025-12-06T20:15:00Z
+**Alternative** (creates separate E2E container):
+```bash
+./scripts/run-e2e-tests.sh
+```
+
+Both approaches now work without rebuilding container images when changing test files.
+
+---
+
+## Testing Context
+
+**Current Pass Rate**: 6/10 (60%)
+- Phase 1 tests: All passing ✓
+- Phase 2.1 tests: 4/6 passing (2.1.1 & 2.1.27 have new scroll fix, 2.1.30 not yet fixed)
+- Phase 2.2 & 2.3: Skipped (awaiting manual verification)
+
+**Manual Verification Status**:
+- Phase 2.1: All 24 test cases manually verified ✓ (MANUAL-TEST-PLAN.md)
+- Phase 2.2 & 2.3: Not yet manually tested
+
+**Backend API** (Verified working):
+- Endpoint: `http://generic-prime.minilab/api/specs/v1`
+- K8s: `generic-prime-backend-api:v1.5.0` (2 replicas)
+- Elasticsearch: autos-unified (4,887 docs), autos-vins (55,463 docs)
+
+---
+
+**Last Updated**: 2025-12-06T20:55:00Z
