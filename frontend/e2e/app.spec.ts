@@ -147,13 +147,20 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     // Add a small delay to ensure dialog is rendered
     await page.waitForTimeout(500);
 
-    // Select "Brammo" checkbox - dialog content is scrollable, need to scroll parent container
-    const brammoCheckbox = dialogContent.locator('input[type="checkbox"]').first();
-    // Scroll the parent dialog-content container itself, then click the checkbox
-    await dialogContent.evaluate((el: any) => el.scrollTop = 0);
-    await brammoCheckbox.click({ force: true });
-    // Wait a moment for the state to update
-    await page.waitForTimeout(100);
+    // Select "Brammo" checkbox - dialog content is scrollable
+    // Find the checkbox using its label/value, then scroll and click
+    const brammoCheckbox = dialogContent.locator('input[type="checkbox"][value="Brammo"]').first();
+
+    // Scroll the checkbox into view using the parent container
+    await brammoCheckbox.evaluate((el: any) => {
+      el.scrollIntoView({ behavior: 'auto', block: 'center' });
+    });
+
+    // Wait a moment for scroll to complete
+    await page.waitForTimeout(200);
+
+    // Now click the checkbox
+    await brammoCheckbox.click();
 
     // Verify checkbox is checked
     await expect(brammoCheckbox).toBeChecked();
@@ -198,20 +205,30 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
 
+    // Uncheck first (Brammo) and check second manufacturer
+    const brammoCheckbox = dialogContent.locator('input[type="checkbox"][value="Brammo"]').first();
+
+    // Scroll Brammo into view and uncheck it
+    await brammoCheckbox.evaluate((el: any) => {
+      el.scrollIntoView({ behavior: 'auto', block: 'center' });
+    });
+    await page.waitForTimeout(200);
+    await brammoCheckbox.click();
+
+    // Check second manufacturer if available
     const checkboxes = dialogContent.locator('input[type="checkbox"]');
     const count = await checkboxes.count();
 
-    // Scroll the parent dialog-content container to top first
-    await dialogContent.evaluate((el: any) => el.scrollTop = 0);
-
-    // Uncheck first (Brammo) - dialog content is scrollable
-    const firstCheckbox = checkboxes.first();
-    await firstCheckbox.click({ force: true });
-
-    // Check second manufacturer if available
     if (count > 1) {
+      // Find the second checkbox (not Brammo)
       const secondCheckbox = checkboxes.nth(1);
-      await secondCheckbox.click({ force: true });
+
+      // Scroll it into view
+      await secondCheckbox.evaluate((el: any) => {
+        el.scrollIntoView({ behavior: 'auto', block: 'center' });
+      });
+      await page.waitForTimeout(200);
+      await secondCheckbox.click();
     }
 
     // Click Apply

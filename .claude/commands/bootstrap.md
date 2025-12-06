@@ -30,4 +30,8 @@ Provide:
 - Working directory: `~/projects/generic-prime`
 - Expert in Angular 14 and Web Applications
 - Constraints: NO `ng build`, NO dev server (ask user if build succeeded)
-- Follow Session End Protocol when ending
+
+**Session End Protocol** (when ending session, use `/exit` command):
+1. Update PROJECT-STATUS.md (bump version, update timestamp, document findings)
+2. Update NEXT-STEPS.md (immediate actions for next session)
+3. Commit all changes with descriptive message

@@ -6,31 +6,27 @@
 
 ## Directive
 
-Execute the following 4 steps to properly end the session:
+Execute the following 3 steps to properly end the session:
 
-1. **Append PROJECT-STATUS.md snapshot to STATUS-HISTORY.md**
-   - Preserve the complete historical record
-   - Include version number, timestamp, and all sections
-
-2. **Update PROJECT-STATUS.md**
+1. **Update PROJECT-STATUS.md**
    - Bump version number (increment decimal)
    - Update timestamp to current session time
    - Document what was accomplished
    - Note any new blockers or decisions
 
-3. **Update NEXT-STEPS.md**
+2. **Update NEXT-STEPS.md**
    - Document the ONE immediate action for the next session
    - Include reproduction steps if it's a bug
    - Reference related files
 
-4. **Commit all changes to `docs/claude/` directory**
+3. **Commit all changes to `docs/claude/` directory**
    - Use descriptive commit message
    - Example: `git commit -m "docs: session summary - Added agriculture domain"`
    - Git history serves as the historical record (use `git log` to view past versions)
 
 ---
 
-## After All 4 Steps Complete
+## After All 3 Steps Complete
 
 Provide:
 1. **Summary** of what was accomplished this session
@@ -40,7 +36,7 @@ Provide:
 ---
 
 **Session protocol**:
-- Always append to STATUS-HISTORY.md before updating PROJECT-STATUS.md
 - Include version bump and timestamp in all PROJECT-STATUS updates
 - Use git log to verify commits were successful
+- Git history serves as the historical record for tracking changes
 - This protocol ensures continuity across sessions
