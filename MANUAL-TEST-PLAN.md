@@ -931,7 +931,9 @@ Tests are organized by control type, then by location (Main vs Pop-Out) to minim
 
 - **Main App**: http://localhost:4205/discover
 - **Reference App**: http://localhost:4201
-- **Backend API**: http://localhost:3000 (or configured URL)
+- **Backend API**: http://generic-prime.minilab/api/specs/v1 (Traefik ingress via /etc/hosts mapping to 192.168.0.244)
+  - See [ORIENTATION.md - Backend API Testing](../claude/ORIENTATION.md#backend-api-testing-across-three-environments) for detailed access instructions across all environments (Thor SSH, dev container, E2E container)
+  - ~~http://localhost:3000~~ (old reference - not used in current architecture)
 - **Bug #13**: Dropdown keyboard navigation (arrow keys, Enter/Space)
 - **Bug #7**: Checkbox visual state persistence
 
