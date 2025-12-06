@@ -47,21 +47,10 @@ export default defineConfig({
     },
   ],
 
-  // IMPORTANT: In Docker, the app is already built and available at http://localhost:4205
-  // The test assumes the dev server OR production server is already running
-  // Inside the Dockerfile.e2e container, run the dev server before tests:
-  //   npm start -- --host 0.0.0.0 --port 4205 &
-  // OR use webServer below only if running outside Docker
+  // IMPORTANT: The dev server (npm start) should already be running on the configured PORT
+  // The tests will connect to http://localhost:4205 where the dev server is running
+  // Don't start another server - the dev server handles live reload and compilation
 
-  // Conditionally use webServer only when NOT in Docker container
-  ...(process.env['IN_DOCKER'] ? {} : {
-    webServer: {
-      // Command to execute. Runs the production build from dist/frontend
-      command: `npx http-server ./dist/frontend -p ${PORT} --silent`,
-      // URL to wait for before starting tests.
-      url: `http://localhost:${PORT}`,
-      // Reuse the server if it's already running.
-      reuseExistingServer: !process.env['CI'],
-    },
-  }),
+  // Skip webServer config - assumes dev server is already running
+  // (started by scripts/run-e2e-tests.sh or manually by user)
 });
