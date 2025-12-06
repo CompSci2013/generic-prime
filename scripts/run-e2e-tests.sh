@@ -27,5 +27,25 @@ podman run -d --name generic-prime-e2e --network host \
 # Wait for container to be ready
 sleep 2
 
-# Run tests with IN_DOCKER env var to skip webServer config
-podman exec -it generic-prime-e2e bash -c "cd /app/frontend && IN_DOCKER=true npm run test:e2e"
+# Start dev server in background (takes ~15-20 seconds to build)
+echo "Starting dev server..."
+podman exec -d generic-prime-e2e bash -c "cd /app/frontend && npm start -- --host 0.0.0.0 --port 4205 2>&1 | tee /tmp/dev-server.log" > /dev/null
+
+# Wait for dev server to be ready (watch for "Compiled successfully" message)
+echo "Waiting for dev server to compile and start..."
+for i in {1..60}; do
+  if podman exec generic-prime-e2e sh -c "grep -q 'Compiled successfully' /tmp/dev-server.log 2>/dev/null" 2>/dev/null; then
+    echo "Dev server ready!"
+    break
+  fi
+  sleep 1
+  if [ $i -eq 60 ]; then
+    echo "Dev server failed to start after 60 seconds"
+    exit 1
+  fi
+done
+
+sleep 2
+
+# Run tests (app should now be at http://localhost:4205)
+podman exec -it generic-prime-e2e bash -c "cd /app/frontend && npx playwright test"
