@@ -70,4 +70,4 @@ See [NEXT-STEPS.md](NEXT-STEPS.md) for immediate work.
 
 ---
 
-**When this status changes, append it to STATUS-HISTORY.md before updating.**
+**Historical record**: Use `git log docs/claude/PROJECT-STATUS.md` to view past versions.

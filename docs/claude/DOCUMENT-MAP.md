@@ -33,9 +33,8 @@
 | File | Purpose |
 |------|---------|
 | `ORIENTATION.md` | High-level project overview, infrastructure |
-| `PROJECT-STATUS.md` | **Current project state, approach, and constraints (VERSIONED)** |
+| `PROJECT-STATUS.md` | **Current project state and constraints (VERSIONED)** |
 | `NEXT-STEPS.md` | Actionable items for current session |
-| `STATUS-HISTORY.md` | Archive of previous PROJECT-STATUS versions |
 
 ---
 

@@ -28,26 +28,23 @@ For each new session, type `/bootstrap` to read project context files.
 
 ## Session End Protocol
 
-Before ending each session, you MUST perform these 4 steps:
+Before ending each session, you MUST perform these 3 steps:
 
-1. **Append current `docs/claude/PROJECT-STATUS.md` snapshot to `docs/claude/STATUS-HISTORY.md`**
-   - Preserve historical record by appending (do not overwrite)
-   - Include version number and timestamp
-
-2. **Update `docs/claude/PROJECT-STATUS.md`**
+1. **Update `docs/claude/PROJECT-STATUS.md`**
    - Bump version number
    - Update timestamp to current session time
    - Document what was accomplished
    - Note any new blockers or decisions
 
-3. **Update `docs/claude/NEXT-STEPS.md`**
+2. **Update `docs/claude/NEXT-STEPS.md`**
    - Document the ONE immediate action for the next session
    - Include reproduction steps if it's a bug
    - Reference related files
 
-4. **Commit all changes to `docs/claude/` directory**
+3. **Commit all changes to `docs/claude/` directory**
    - Use descriptive commit message
    - Example: `git commit -m "docs: session summary - Added agriculture domain"`
+   - Git history serves as the historical record (use `git log` to view past versions)
 
 ---
 
@@ -66,8 +63,8 @@ Before ending each session, you MUST perform these 4 steps:
 - **ORIENTATION.md**: Understand project structure and architecture (read once per session)
 - **PROJECT-STATUS.md**: Know current state and active bugs (read once per session)
 - **NEXT-STEPS.md**: See immediate work for this session (read once per session)
-- **STATUS-HISTORY.md**: Check historical progress (only if asked by user)
 - **DOCUMENT-MAP.md**: Find specialized documentation for specific tasks
+- **Git history**: Check historical PROJECT-STATUS.md versions via `git log docs/claude/PROJECT-STATUS.md`
 
 ---
 
