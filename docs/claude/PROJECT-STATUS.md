@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 2.7
-**Timestamp**: 2025-12-06T00:00:00Z
-**Updated By**: Documentation Restructuring Session
+**Version**: 2.8
+**Timestamp**: 2025-12-06T15:30:00Z
+**Updated By**: Network Documentation Session
 
 ---
 
@@ -47,20 +47,34 @@
 
 ## What Changed This Session
 
-**Documentation Restructuring**:
-1. Removed all Gemini references (24 files deleted)
-2. Rebuilt CLAUDE.md - Static constraints only, no architecture
-3. Rebuilt ORIENTATION.md - Static infrastructure knowledge only
-4. Rebuilt PROJECT-STATUS.md - Current snapshot only, no session history
-5. Rebuilt NEXT-STEPS.md - Ultra-focused immediate work only
-6. Created .claude/commands/bootstrap.md - Clean bootstrap directive
-7. Updated README.md and DOCUMENT-MAP.md
+**Network & Backend Documentation Enhancement**:
+1. Added comprehensive "Backend Project Structure" section explaining multi-project data-broker umbrella architecture
+2. Added detailed "Docker/Podman Infrastructure" section with all 4 container images documented:
+   - Frontend dev container (--network host for K8s service access)
+   - E2E container (hardcoded /etc/hosts for isolated network)
+   - Backend API container (K8s ClusterIP deployment)
+   - Production frontend container
+3. Added "Network Configuration & Debugging" section with:
+   - /etc/hosts entry explanations
+   - Complete network access path visualization
+   - Curl debugging commands specific to THREE environments:
+     - Thor host SSH (via ingress or ClusterIP)
+     - Dev container (Podman with --network host)
+     - E2E container (Docker/Playwright with hardcoded hostname mapping)
+   - Troubleshooting checklist with 5-step debugging workflow
 
 **Goals Achieved**:
-- Eliminated circular references across documentation
-- Reduced token waste from duplicate information
-- Clear separation of concerns: CLAUDE (constraints) → ORIENTATION (architecture) → PROJECT-STATUS (current state) → NEXT-STEPS (immediate work)
-- `/bootstrap` now reads 4 focused files instead of 8 redundant ones
+- Developers can now successfully debug backend data retrieval across all three execution environments
+- Backend project structure clearly documented (separate ~/projects/data-broker/generic-prime repo)
+- All Dockerfiles and K8s manifests referenced with exact locations
+- Network topology visualized with clear data flow paths
+- Exact curl commands provided for each environment context
+
+---
+
+## Known Blockers
+
+**None at this time**. Documentation is comprehensive and actionable.
 
 ---
 

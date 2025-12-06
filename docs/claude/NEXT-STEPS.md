@@ -33,4 +33,11 @@
 
 ---
 
+## Session Preparation Notes
+
+**Documentation References**:
+- Network/backend data retrieval issues: See [ORIENTATION.md - Network Configuration & Debugging](ORIENTATION.md#network-configuration--debugging)
+- Backend code location: `~/projects/data-broker/generic-prime/src/` (separate repo)
+- Curl debugging commands for all 3 environments provided in ORIENTATION.md
+
 **Last Updated**: 2025-12-06
