@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 2.8
-**Timestamp**: 2025-12-06T15:30:00Z
-**Updated By**: Network Documentation Session
+**Version**: 2.9
+**Timestamp**: 2025-12-06T19:00:00Z
+**Updated By**: Backend API Documentation & Cleanup Session
 
 ---
 
@@ -47,28 +47,44 @@
 
 ## What Changed This Session
 
-**Network & Backend Documentation Enhancement**:
-1. Added comprehensive "Backend Project Structure" section explaining multi-project data-broker umbrella architecture
-2. Added detailed "Docker/Podman Infrastructure" section with all 4 container images documented:
-   - Frontend dev container (--network host for K8s service access)
-   - E2E container (hardcoded /etc/hosts for isolated network)
-   - Backend API container (K8s ClusterIP deployment)
-   - Production frontend container
-3. Added "Network Configuration & Debugging" section with:
-   - /etc/hosts entry explanations
-   - Complete network access path visualization
-   - Curl debugging commands specific to THREE environments:
-     - Thor host SSH (via ingress or ClusterIP)
-     - Dev container (Podman with --network host)
-     - E2E container (Docker/Playwright with hardcoded hostname mapping)
-   - Troubleshooting checklist with 5-step debugging workflow
+**Session 2: Backend API Configuration & Documentation Cleanup**
+
+### 1. Fixed generic-prime-dockview Pollution
+- **Root Cause Found**: Development environment configuration incorrectly used `generic-prime-dockview.minilab` instead of proper `generic-prime.minilab`
+- **Files Fixed**:
+  - `frontend/src/environments/environment.ts`: Changed API base URL to `http://generic-prime.minilab/api/specs/v1`
+  - `frontend/Dockerfile.e2e`: Updated /etc/hosts entry from generic-prime-dockview to generic-prime
+  - Added `/etc/hosts` entry on Thor: `192.168.0.244 generic-prime generic-prime.minilab`
+
+### 2. Verified Backend API Access Across All Three Environments
+- ✅ **Thor Host SSH**: `curl http://generic-prime.minilab/api/specs/v1/vehicles/details`
+- ✅ **Dev Container** (`podman exec generic-prime-dev`): Node.js HTTP requests to `generic-prime.minilab:80`
+- ✅ **E2E Container** (`podman run --network=host`): Node.js HTTP requests with /etc/hosts mapping
+- **Verification Method**: Direct API calls retrieving Brammo vehicle data (5 records returned)
+
+### 3. Updated Critical Documentation
+- **ORIENTATION.md**: Rewrote "Backend API Testing Across Three Environments" section
+  - Removed misleading K8s ClusterIP-only approach
+  - Documented proper Traefik ingress access via /etc/hosts mapping
+  - Provided working examples for all three environments
+  - Added comprehensive troubleshooting checklist
+- **MANUAL-TEST-PLAN.md**: Updated backend API references
+  - Changed from `localhost:3000` to `generic-prime.minilab/api/specs/v1`
+  - Added link to ORIENTATION.md for environment-specific instructions
+- Removed duplicate outdated `docs/quality/MANUAL-TEST-PLAN.md` (kept root-level version only)
+
+### 4. Key Principle Established
+The `/etc/hosts` mapping serves its intended purpose: **abstracting K8s internals from application code**
+- All environments use the same hostname: `generic-prime.minilab`
+- Routes through Traefik ingress (port 80) → Backend service (port 3000)
+- No hardcoded K8s ClusterIP addresses in application or test code
 
 **Goals Achieved**:
-- Developers can now successfully debug backend data retrieval across all three execution environments
-- Backend project structure clearly documented (separate ~/projects/data-broker/generic-prime repo)
-- All Dockerfiles and K8s manifests referenced with exact locations
-- Network topology visualized with clear data flow paths
-- Exact curl commands provided for each environment context
+- ✅ Eliminated generic-prime-dockview pollution from generic-prime codebase
+- ✅ All three environments verified working with correct URLs
+- ✅ Documentation now matches actual verified behavior
+- ✅ Single source of truth for test plan (removed duplicate)
+- ✅ Developers can access backend from any environment without K8s knowledge
 
 ---
 
