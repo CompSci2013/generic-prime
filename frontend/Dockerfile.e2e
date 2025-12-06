@@ -2,9 +2,9 @@
 # Using v1.57.0 to match @playwright/test version in package.json
 FROM mcr.microsoft.com/playwright:v1.57.0-jammy
 
-# Add generic-prime-dockview.minilab hostname mapping
-# The backend API is served through dockview on IP 192.168.0.244 (thor)
-RUN echo "192.168.0.244 generic-prime-dockview generic-prime-dockview.minilab" >> /etc/hosts
+# Add generic-prime.minilab hostname mapping for backend API access
+# Maps to Traefik ingress on Thor (192.168.0.244)
+RUN echo "192.168.0.244 generic-prime generic-prime.minilab" >> /etc/hosts
 
 # Set the base working directory.
 WORKDIR /app

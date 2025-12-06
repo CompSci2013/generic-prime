@@ -4,9 +4,9 @@
 
 export const environment = {
   production: false,
-  // Backend deployed to generic-prime namespace with v1.0.1 (bodyClass fix)
-  // Using generic-prime-dockview.minilab which is already in /etc/hosts on thor (192.168.0.244)
-  apiBaseUrl: 'http://generic-prime-dockview.minilab/api/specs/v1',
+  // Backend API accessed via Traefik ingress on generic-prime.minilab
+  // Available in all environments: Thor SSH, dev container, and E2E tests
+  apiBaseUrl: 'http://generic-prime.minilab/api/specs/v1',
   // Enable test-id attributes for E2E testing (stripped in production build)
   includeTestIds: true
 };

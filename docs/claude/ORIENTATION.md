@@ -242,16 +242,15 @@ FRONTEND (Angular App)
 
 ### Backend API Testing Across Three Environments
 
-**VERIFIED WORKING APPROACH**: All three environments access the backend via the K8s ClusterIP (`10.43.254.90:3000`).
+**VERIFIED WORKING APPROACH**: All three environments access the backend via `generic-prime.minilab/api/specs/v1/` (Traefik ingress).
+
+The frontend is configured to use `http://generic-prime.minilab/api/specs/v1/` in development. This hostname is available in all three environments via `/etc/hosts` mapping to `192.168.0.244` (Thor).
 
 #### **1. Thor Host SSH**
 
 ```bash
-# Test health endpoint
-curl -s http://10.43.254.90:3000/health | jq .
-
-# Test vehicle data retrieval
-curl -s "http://10.43.254.90:3000/api/specs/v1/vehicles/details?manufacturer=Brammo&size=2" | jq .
+# Test vehicle data retrieval (via Traefik ingress)
+curl -s "http://generic-prime.minilab/api/specs/v1/vehicles/details?manufacturer=Brammo&size=2" | jq .
 
 # Verify backend pods are running
 kubectl get pods -n generic-prime
@@ -260,86 +259,70 @@ kubectl get pods -n generic-prime
 **Expected response**:
 ```json
 {
-  "status": "ok",
-  "service": "auto-discovery-specs-api",
-  "timestamp": "2025-12-06T18:24:59.474Z",
-  "index": "autos-unified"
+  "total": 5,
+  "page": 1,
+  "size": 2,
+  "results": [
+    {
+      "vehicle_id": "nhtsa-ram-brammo-street-bikes-1972",
+      "manufacturer": "Brammo",
+      "model": "Brammo Street Bikes",
+      "year": 1972,
+      "body_class": "Sedan"
+    }
+  ],
+  "statistics": {
+    "byManufacturer": {"Brammo": 5},
+    "totalCount": 5
+  }
 }
 ```
 
 #### **2. Development Container (Podman exec)**
 
-```bash
-# Test health endpoint via Node.js (curl not installed in dev container)
-podman exec generic-prime-dev node -e "
-const http = require('http');
-const options = {
-  hostname: '10.43.254.90',
-  port: 3000,
-  path: '/health',
-  method: 'GET'
-};
-const req = http.request(options, (res) => {
-  let data = '';
-  res.on('data', chunk => data += chunk);
-  res.on('end', () => console.log(data));
-});
-req.end();
-"
+The dev container has `--network host`, so it can access `generic-prime.minilab` just like Thor SSH:
 
-# Test vehicle data
+```bash
+# The dev container doesn't have curl, so use Node.js
 podman exec generic-prime-dev node -e "
 const http = require('http');
 const options = {
-  hostname: '10.43.254.90',
-  port: 3000,
+  hostname: 'generic-prime.minilab',
+  port: 80,
   path: '/api/specs/v1/vehicles/details?manufacturer=Brammo&size=1',
   method: 'GET'
 };
 const req = http.request(options, (res) => {
   let data = '';
   res.on('data', chunk => data += chunk);
-  res.on('end', () => console.log(JSON.stringify(JSON.parse(data), null, 2)));
+  res.on('end', () => {
+    try {
+      const json = JSON.parse(data);
+      console.log('Total records:', json.total);
+      console.log('First vehicle:', json.results[0]?.manufacturer, '-', json.results[0]?.model);
+    } catch(e) {
+      console.error('Parse error:', e.message);
+    }
+  });
 });
+req.on('error', (e) => console.error('Error:', e.message));
 req.end();
 "
 ```
 
+**Expected output**: `Total records: 5` and `First vehicle: Brammo - Brammo Street Bikes`
+
 #### **3. E2E Container (Podman run with --network host)**
 
-```bash
-# Test health endpoint
-podman run --rm --network=host --entrypoint node localhost/generic-prime-e2e:latest -e "
-const http = require('http');
-const options = {
-  hostname: '10.43.254.90',
-  port: 3000,
-  path: '/health',
-  method: 'GET'
-};
-const req = http.request(options, (res) => {
-  let data = '';
-  res.on('data', chunk => data += chunk);
-  res.on('end', () => {
-    console.log('Status: ' + res.statusCode);
-    console.log('Data: ' + data);
-    process.exit(0);
-  });
-});
-req.on('error', (e) => {
-  console.error('Error: ' + e.message);
-  process.exit(1);
-});
-req.end();
-setTimeout(() => process.exit(2), 3000);
-"
+The E2E container has `/etc/hosts` entry for `generic-prime.minilab` pointing to `192.168.0.244`:
 
+```bash
 # Test vehicle data
 podman run --rm --network=host --entrypoint node localhost/generic-prime-e2e:latest -e "
 const http = require('http');
 const options = {
-  hostname: '10.43.254.90',
-  port: 3000,
+  hostname: 'generic-prime.minilab',
+  port: 80,
   path: '/api/specs/v1/vehicles/details?manufacturer=Brammo&size=1',
   method: 'GET'
 };
@@ -367,42 +350,59 @@ setTimeout(() => process.exit(2), 3000);
 "
 ```
 
+Or run the full E2E test suite to verify frontend + backend integration:
+```bash
+timeout 300 podman run --rm --network=host generic-prime-e2e 2>&1 | tail -50
+```
+
 ### Troubleshooting: Cannot Access Backend API
 
-**Important**: All three environments should use the K8s ClusterIP (`10.43.254.90:3000`), NOT hostname-based access.
+**Access path**: All three environments → `generic-prime.minilab` (via /etc/hosts) → Traefik ingress (port 80) → Backend service (port 3000).
 
 **Quick Checklist**:
-1. ✅ Verify backend pods are running:
+1. ✅ Verify `/etc/hosts` has the correct entry:
+   ```bash
+   grep generic-prime /etc/hosts
+   # Expected: 192.168.0.244 generic-prime generic-prime.minilab
+   ```
+
+2. ✅ Verify backend pods are running:
    ```bash
    kubectl get pods -n generic-prime
    # Expected: 2 pods (generic-prime-backend-api-*) in Running state
    ```
 
-2. ✅ Verify backend service exists:
+3. ✅ Verify backend service exists:
    ```bash
    kubectl get svc -n generic-prime
    # Expected: generic-prime-backend-api   ClusterIP   10.43.254.90   <none>        3000/TCP
    ```
 
-3. ✅ Test health endpoint from Thor SSH:
+4. ✅ Verify Traefik ingress is configured:
    ```bash
-   curl -s http://10.43.254.90:3000/health | jq .
-   # Expected: { "status": "ok", "service": "auto-discovery-specs-api", ... }
+   kubectl get ingress -n generic-prime
+   # Expected: generic-prime-ingress with HOST: generic-prime.minilab
    ```
 
-4. ✅ Verify dev container is running:
+5. ✅ Test from Thor SSH:
+   ```bash
+   curl -s "http://generic-prime.minilab/api/specs/v1/vehicles/details?manufacturer=Brammo&size=1" | jq '.total'
+   # Expected: 5
+   ```
+
+6. ✅ Verify dev container is running:
    ```bash
    podman ps | grep generic-prime-dev
-   # Expected: generic-prime-dev container should be running
+   # Expected: generic-prime-dev container with --network host
    ```
 
-5. ✅ Verify E2E container image exists:
+7. ✅ Verify E2E container image exists:
    ```bash
    podman images | grep generic-prime-e2e
    # If not found, rebuild: podman build -f frontend/Dockerfile.e2e -t localhost/generic-prime-e2e:latest .
    ```
 
-6. ✅ Check backend logs:
+8. ✅ Check backend logs:
    ```bash
    kubectl logs -n generic-prime deployment/generic-prime-backend-api --tail=50
    ```
