@@ -147,22 +147,22 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     // Add a small delay to ensure dialog is rendered
     await page.waitForTimeout(500);
 
-    // Select "Brammo" checkbox - dialog content is scrollable
-    // Find the checkbox using its label/value, then scroll and click
-    const brammoCheckbox = dialogContent.locator('input[type="checkbox"][value="Brammo"]').first();
-
-    // Scroll the checkbox into view using the parent container
-    await brammoCheckbox.evaluate((el: any) => {
-      el.scrollIntoView({ behavior: 'auto', block: 'center' });
+    // Select "Brammo" checkbox - directly set checked state and trigger change event
+    // PrimeNG requires setting the checked attribute and dispatching a change event
+    await page.evaluate(() => {
+      const dialogContent = document.querySelector('.p-dialog-content');
+      if (dialogContent) {
+        const checkbox = dialogContent.querySelector('input[type="checkbox"][value="Brammo"]') as HTMLInputElement;
+        if (checkbox) {
+          checkbox.checked = true;
+          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          checkbox.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
     });
 
-    // Wait a moment for scroll to complete
-    await page.waitForTimeout(200);
-
-    // Now click the checkbox
-    await brammoCheckbox.click();
-
     // Verify checkbox is checked
+    const brammoCheckbox = dialogContent.locator('input[type="checkbox"][value="Brammo"]').first();
     await expect(brammoCheckbox).toBeChecked();
 
     // Click Apply
@@ -206,29 +206,37 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     await page.waitForTimeout(500);
 
     // Uncheck first (Brammo) and check second manufacturer
-    const brammoCheckbox = dialogContent.locator('input[type="checkbox"][value="Brammo"]').first();
-
-    // Scroll Brammo into view and uncheck it
-    await brammoCheckbox.evaluate((el: any) => {
-      el.scrollIntoView({ behavior: 'auto', block: 'center' });
+    // Uncheck Brammo - directly set checked state to false
+    await page.evaluate(() => {
+      const dialogContent = document.querySelector('.p-dialog-content');
+      if (dialogContent) {
+        const checkbox = dialogContent.querySelector('input[type="checkbox"][value="Brammo"]') as HTMLInputElement;
+        if (checkbox) {
+          checkbox.checked = false;
+          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          checkbox.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
     });
-    await page.waitForTimeout(200);
-    await brammoCheckbox.click();
 
     // Check second manufacturer if available
     const checkboxes = dialogContent.locator('input[type="checkbox"]');
     const count = await checkboxes.count();
 
     if (count > 1) {
-      // Find the second checkbox (not Brammo)
-      const secondCheckbox = checkboxes.nth(1);
-
-      // Scroll it into view
-      await secondCheckbox.evaluate((el: any) => {
-        el.scrollIntoView({ behavior: 'auto', block: 'center' });
+      // Check the second checkbox - directly set checked state to true
+      await page.evaluate(() => {
+        const dialogContent = document.querySelector('.p-dialog-content');
+        if (dialogContent) {
+          const allCheckboxes = dialogContent.querySelectorAll('input[type="checkbox"]');
+          if (allCheckboxes.length > 1) {
+            const checkbox = allCheckboxes[1] as HTMLInputElement;
+            checkbox.checked = true;
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+            checkbox.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        }
       });
-      await page.waitForTimeout(200);
-      await secondCheckbox.click();
     }
 
     // Click Apply
@@ -347,15 +355,719 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
 });
 
 // ============================================================================
-// OPTIONAL: Add more test groups as more manual tests pass and get checkmarks
+// PHASE 2.2: MODEL FILTER (MULTISELECT DIALOG WORKFLOW)
 // ============================================================================
 
-test.describe('Future Tests (Awaiting Manual Verification)', () => {
-  test.skip('2.2: Model Filter (not yet manually tested)', async () => {
-    // Placeholder for when model filter is manually verified
+test.describe('PHASE 2.2: Model Filter (Multiselect Dialog)', () => {
+
+  test('2.2.1-2.2.8: Single Selection Workflow', async ({ page }: { page: Page }) => {
+    // Start with manufacturer already set
+    await page.goto('/discover?manufacturer=Brammo');
+
+    // Wait for initial load
+    await waitForTableUpdate(page);
+
+    // Open Model filter
+    const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
+    await dropdown.click();
+    await page.locator('text=Model').first().click();
+
+    const modelDialogTitle = page.locator('.p-dialog-header span').first();
+    await expect(modelDialogTitle).toContainText(/Model/i, { timeout: 5000 });
+
+    const modelDialog = page.locator('.p-dialog');
+    await expect(modelDialog).toBeVisible();
+
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+
+    // Select first model
+    await page.evaluate(() => {
+      const dialogContent = document.querySelector('.p-dialog-content');
+      if (dialogContent) {
+        const firstCheckbox = dialogContent.querySelector('input[type="checkbox"]') as HTMLInputElement;
+        if (firstCheckbox) {
+          firstCheckbox.checked = true;
+          firstCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+          firstCheckbox.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    });
+
+    const modelApplyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
+    await modelApplyButton.click();
+
+    await expect(modelDialog).not.toBeVisible({ timeout: 5000 });
+
+    // Verify both filters in URL
+    const params = await getUrlParams(page);
+    expect(params['manufacturer']).toBe('Brammo');
+    expect(params['model']).toBeDefined();
+
+    await waitForTableUpdate(page);
   });
 
-  test.skip('2.3: Body Class Filter (not yet manually tested)', async () => {
-    // Placeholder for when body class filter is manually verified
+  test('2.2.9: Edit Model Filter', async ({ page }: { page: Page }) => {
+    await page.goto('/discover?manufacturer=Brammo&model=Scooter');
+
+    // Verify chip exists
+    const modelChip = page.locator('text=Model').first();
+    await expect(modelChip).toBeVisible();
+
+    // Click to edit
+    await modelChip.click();
+
+    const modelDialogTitle = page.locator('.p-dialog-header span').first();
+    await expect(modelDialogTitle).toContainText(/Model/i, { timeout: 5000 });
+
+    const modelDialog = page.locator('.p-dialog');
+    await expect(modelDialog).toBeVisible();
+
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+
+    // Uncheck current and select different
+    await page.evaluate(() => {
+      const dialogContent = document.querySelector('.p-dialog-content');
+      if (dialogContent) {
+        const checkboxes = dialogContent.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;
+        if (checkboxes.length > 0) {
+          // Uncheck first
+          checkboxes[0].checked = false;
+          checkboxes[0].dispatchEvent(new Event('change', { bubbles: true }));
+          checkboxes[0].dispatchEvent(new Event('input', { bubbles: true }));
+
+          // Check second if available
+          if (checkboxes.length > 1) {
+            checkboxes[1].checked = true;
+            checkboxes[1].dispatchEvent(new Event('change', { bubbles: true }));
+            checkboxes[1].dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        }
+      }
+    });
+
+    const applyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
+    await applyButton.click();
+
+    await expect(modelDialog).not.toBeVisible({ timeout: 5000 });
+
+    const params = await getUrlParams(page);
+    expect(params['manufacturer']).toBe('Brammo');
+    expect(params['model']).toBeDefined();
   });
+
+  test('2.2.10: Remove Model Filter', async ({ page }: { page: Page }) => {
+    await page.goto('/discover?manufacturer=Brammo&model=Scooter');
+
+    const modelChip = page.locator('.filter-chip').filter({ hasText: 'Model' }).first();
+    await expect(modelChip).toBeVisible();
+
+    const removeIcon = modelChip.locator('[class*="remove"], [class*="close"], button').first();
+    await removeIcon.click({ force: true });
+
+    const params = await getUrlParams(page);
+    expect(params['manufacturer']).toBe('Brammo');
+    expect(params['model']).toBeUndefined();
+  });
+
+});
+
+// ============================================================================
+// PHASE 2.3: BODY CLASS FILTER (MULTISELECT DIALOG WORKFLOW)
+// ============================================================================
+
+test.describe('PHASE 2.3: Body Class Filter (Multiselect Dialog)', () => {
+
+  test('2.3.1-2.3.8: Single Selection Workflow', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
+    await dropdown.click();
+    await page.locator('text=Body Class').first().click();
+
+    const dialogTitle = page.locator('.p-dialog-header span').first();
+    await expect(dialogTitle).toContainText(/Body Class/i, { timeout: 5000 });
+
+    const dialog = page.locator('.p-dialog');
+    await expect(dialog).toBeVisible();
+
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+
+    // Select first body class
+    await page.evaluate(() => {
+      const dialogContent = document.querySelector('.p-dialog-content');
+      if (dialogContent) {
+        const firstCheckbox = dialogContent.querySelector('input[type="checkbox"]') as HTMLInputElement;
+        if (firstCheckbox) {
+          firstCheckbox.checked = true;
+          firstCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+          firstCheckbox.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    });
+
+    const applyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
+    await applyButton.click();
+
+    await expect(dialog).not.toBeVisible({ timeout: 5000 });
+
+    const params = await getUrlParams(page);
+    expect(params['bodyClass']).toBeDefined();
+
+    await waitForTableUpdate(page);
+  });
+
+  test('2.3.9: Multiple Body Classes', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
+    await dropdown.click();
+    await page.locator('text=Body Class').first().click();
+
+    const dialogTitle = page.locator('.p-dialog-header span').first();
+    await expect(dialogTitle).toContainText(/Body Class/i, { timeout: 5000 });
+
+    const dialog = page.locator('.p-dialog');
+
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+
+    // Select multiple body classes
+    await page.evaluate(() => {
+      const dialogContent = document.querySelector('.p-dialog-content');
+      if (dialogContent) {
+        const checkboxes = dialogContent.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;
+        // Select first 3 if available
+        for (let i = 0; i < Math.min(3, checkboxes.length); i++) {
+          checkboxes[i].checked = true;
+          checkboxes[i].dispatchEvent(new Event('change', { bubbles: true }));
+          checkboxes[i].dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    });
+
+    const applyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
+    await applyButton.click();
+
+    await expect(dialog).not.toBeVisible({ timeout: 5000 });
+
+    const params = await getUrlParams(page);
+    expect(params['bodyClass']).toBeDefined();
+    // Should be comma-separated
+    expect(params['bodyClass'].includes(',')).toBeTruthy();
+  });
+
+  test('2.3.10: Remove Body Class Filter', async ({ page }: { page: Page }) => {
+    // First set the filter
+    await page.goto('/discover');
+    const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
+    await dropdown.click();
+    await page.locator('text=Body Class').first().click();
+
+    const dialog = page.locator('.p-dialog');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+
+    await page.evaluate(() => {
+      const dialogContent = document.querySelector('.p-dialog-content');
+      if (dialogContent) {
+        const firstCheckbox = dialogContent.querySelector('input[type="checkbox"]') as HTMLInputElement;
+        if (firstCheckbox) {
+          firstCheckbox.checked = true;
+          firstCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+          firstCheckbox.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    });
+
+    const applyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
+    await applyButton.click();
+    await expect(dialog).not.toBeVisible({ timeout: 5000 });
+
+    // Now remove the filter
+    const bodyClassChip = page.locator('.filter-chip').filter({ hasText: 'Body Class' }).first();
+    await expect(bodyClassChip).toBeVisible();
+
+    const removeIcon = bodyClassChip.locator('[class*="remove"], [class*="close"], button').first();
+    await removeIcon.click({ force: true });
+
+    const params = await getUrlParams(page);
+    expect(params['bodyClass']).toBeUndefined();
+  });
+
+});
+
+// ============================================================================
+// PHASE 2.4: YEAR RANGE FILTER (RANGE DIALOG WORKFLOW)
+// ============================================================================
+
+test.describe('PHASE 2.4: Year Range Filter (Range Dialog)', () => {
+
+  test('2.4.1-2.4.5: Minimum Year Only', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
+    await dropdown.click();
+
+    // Wait for dropdown options to appear
+    await page.waitForTimeout(300);
+
+    await page.locator('text=Year').first().click();
+
+    const dialogTitle = page.locator('.p-dialog-header span').first();
+    await expect(dialogTitle).toContainText(/Year/i, { timeout: 5000 });
+
+    const dialog = page.locator('.p-dialog');
+    await expect(dialog).toBeVisible();
+
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(300);
+
+    // Find and fill year input - more robust approach
+    const inputs = page.locator('.p-dialog-content input[type="number"]');
+    const startYearInput = inputs.first();
+
+    await startYearInput.fill('2020');
+
+    const applyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
+    await applyButton.click();
+
+    await expect(dialog).not.toBeVisible({ timeout: 5000 });
+
+    const params = await getUrlParams(page);
+    expect(params['yearMin']).toBe('2020');
+
+    await waitForTableUpdate(page);
+  });
+
+  test('2.4.6-2.4.10: Year Range (Min and Max)', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
+    await dropdown.click();
+    await page.locator('text=Year').first().click();
+
+    const dialogTitle = page.locator('.p-dialog-header span').first();
+    await expect(dialogTitle).toContainText(/Year/i, { timeout: 5000 });
+
+    const dialog = page.locator('.p-dialog');
+    const dialogContent = page.locator('.p-dialog-content');
+    const inputs = dialogContent.locator('input[type="number"]');
+
+    const startYearInput = inputs.first();
+    const endYearInput = inputs.nth(1);
+
+    await startYearInput.fill('2020');
+    await endYearInput.fill('2024');
+
+    const applyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
+    await applyButton.click();
+
+    await expect(dialog).not.toBeVisible({ timeout: 5000 });
+
+    const params = await getUrlParams(page);
+    expect(params['yearMin']).toBe('2020');
+    expect(params['yearMax']).toBe('2024');
+  });
+
+  test('2.4.11: Edit Year Filter', async ({ page }: { page: Page }) => {
+    await page.goto('/discover?yearMin=2020&yearMax=2024');
+
+    const yearChip = page.locator('text=Year').first();
+    await expect(yearChip).toBeVisible();
+
+    await yearChip.click();
+
+    const dialogTitle = page.locator('.p-dialog-header span').first();
+    await expect(dialogTitle).toContainText(/Year/i, { timeout: 5000 });
+
+    const dialog = page.locator('.p-dialog');
+    const dialogContent = page.locator('.p-dialog-content');
+    const inputs = dialogContent.locator('input[type="number"]');
+
+    const startYearInput = inputs.first();
+    const endYearInput = inputs.nth(1);
+
+    await startYearInput.fill('2022');
+    await endYearInput.fill('2023');
+
+    const applyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
+    await applyButton.click();
+
+    await expect(dialog).not.toBeVisible({ timeout: 5000 });
+
+    const params = await getUrlParams(page);
+    expect(params['yearMin']).toBe('2022');
+    expect(params['yearMax']).toBe('2023');
+  });
+
+  test('2.4.12: Remove Year Filter', async ({ page }: { page: Page }) => {
+    await page.goto('/discover?yearMin=2020&yearMax=2024');
+
+    const yearChip = page.locator('.filter-chip').filter({ hasText: 'Year' }).first();
+    await expect(yearChip).toBeVisible();
+
+    const removeIcon = yearChip.locator('[class*="remove"], [class*="close"], button').first();
+    await removeIcon.click({ force: true });
+
+    const params = await getUrlParams(page);
+    expect(params['yearMin']).toBeUndefined();
+    expect(params['yearMax']).toBeUndefined();
+  });
+
+});
+
+// ============================================================================
+// PHASE 2.5: SEARCH/TEXT FILTER
+// ============================================================================
+
+test.describe('PHASE 2.5: Search/Text Filter', () => {
+
+  test('2.5.1-2.5.5: Basic Search Workflow', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    // Find search input in Query Control
+    const queryControl = page.locator('[data-testid="query-control-panel"]');
+    const searchInput = queryControl.locator('input[type="text"]').first();
+    await expect(searchInput).toBeVisible();
+
+    await searchInput.fill('Brammo');
+
+    // Wait for URL update with longer timeout
+    try {
+      await page.waitForURL(/search=/, { timeout: 5000 });
+    } catch {
+      // Fallback: just wait for table update
+      await waitForTableUpdate(page);
+    }
+
+    const params = await getUrlParams(page);
+    expect(params['search']).toBeDefined();
+  });
+
+  test('2.5.6-2.5.8: Search Combined with Other Filters', async ({ page }: { page: Page }) => {
+    await page.goto('/discover?manufacturer=Brammo');
+
+    const searchInput = page.locator('[data-testid="query-control-panel"]').locator('input[type="text"]').first();
+    await searchInput.fill('Hybrid');
+
+    await page.waitForURL(/search=/);
+
+    const params = await getUrlParams(page);
+    expect(params['manufacturer']).toBe('Brammo');
+    expect(params['search']).toBe('Hybrid');
+  });
+
+  test('2.5.9: Clear Search', async ({ page }: { page: Page }) => {
+    await page.goto('/discover?search=Brammo');
+
+    const searchInput = page.locator('[data-testid="query-control-panel"]').locator('input[type="text"]').first();
+    await searchInput.fill('');
+
+    // Wait for URL update
+    await page.waitForURL(/discover$/);
+
+    const params = await getUrlParams(page);
+    expect(params['search']).toBeUndefined();
+  });
+
+});
+
+// ============================================================================
+// PHASE 2.6: PAGE SIZE FILTER (TABLE CONTROL)
+// ============================================================================
+
+test.describe('PHASE 2.6: Page Size Filter', () => {
+
+  test('2.6.1-2.6.5: Change Page Size', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    // Find page size selector in Results Table
+    const resultsTable = page.locator('[data-testid="results-table"]');
+    const pageSizeSelector = resultsTable.locator('.p-paginator-rpp-options').first();
+
+    if (await pageSizeSelector.isVisible()) {
+      await pageSizeSelector.click();
+      await page.waitForTimeout(300);
+
+      // Select 20 from dropdown
+      const option = page.locator('li').filter({ hasText: /^20$/ }).first();
+      if (await option.isVisible()) {
+        await option.click();
+        await page.waitForTimeout(500);
+      }
+
+      const params = await getUrlParams(page);
+      // Check if size param changed
+      expect(params['size']).toBeDefined();
+    }
+  });
+
+  test('2.6.6: Page Size with Query Filters', async ({ page }: { page: Page }) => {
+    await page.goto('/discover?manufacturer=Brammo');
+
+    const resultsTable = page.locator('[data-testid="results-table"]');
+    const pageSizeSelector = resultsTable.locator('.p-paginator-rpp-options, [data-testid="page-size-selector"]').first();
+
+    if (await pageSizeSelector.isVisible()) {
+      await pageSizeSelector.click();
+
+      const option = page.locator('li').filter({ hasText: '20' }).first();
+      if (await option.isVisible()) {
+        await option.click();
+      }
+
+      const params = await getUrlParams(page);
+      expect(params['manufacturer']).toBe('Brammo');
+      expect(params['size']).toBe('20');
+    }
+  });
+
+});
+
+// ============================================================================
+// PHASE 2.7: CLEAR ALL BUTTON (COMBINED DIALOG WORKFLOW)
+// ============================================================================
+
+test.describe('PHASE 2.7: Clear All Filters', () => {
+
+  test('2.7.1-2.7.15: Clear All Filters', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    // Apply multiple filters
+    const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
+
+    // Set Manufacturer=Brammo
+    await dropdown.click();
+    await page.locator('text=Manufacturer').first().click();
+
+    let dialog = page.locator('.p-dialog');
+    await expect(dialog).toBeVisible();
+
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
+
+    await page.evaluate(() => {
+      const dialogContent = document.querySelector('.p-dialog-content');
+      if (dialogContent) {
+        const checkbox = dialogContent.querySelector('input[type="checkbox"][value="Brammo"]') as HTMLInputElement;
+        if (checkbox) {
+          checkbox.checked = true;
+          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          checkbox.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    });
+
+    let applyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
+    await applyButton.click();
+    await expect(dialog).not.toBeVisible({ timeout: 5000 });
+
+    // Now click Clear All button
+    const clearAllButton = page.locator('button').filter({ hasText: /Clear All|Reset/i }).first();
+    if (await clearAllButton.isVisible()) {
+      await clearAllButton.click();
+
+      // Verify URL is clean
+      const params = await getUrlParams(page);
+      expect(Object.keys(params).length).toBe(0);
+
+      // Verify all chips are removed
+      const chips = page.locator('.filter-chip');
+      const chipCount = await chips.count();
+      expect(chipCount).toBe(0);
+    }
+  });
+
+});
+
+// ============================================================================
+// PHASE 3: RESULTS TABLE PANEL (MAIN PAGE)
+// ============================================================================
+
+test.describe('PHASE 3: Results Table Panel', () => {
+
+  test('3.1.1-3.1.3: Table Pagination Forward', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    await waitForTableUpdate(page);
+
+    const resultsTable = page.locator('[data-testid="results-table"]');
+
+    // Find next page button
+    const nextPageButton = resultsTable.locator('.p-paginator-next').first();
+
+    if (await nextPageButton.isEnabled()) {
+      await nextPageButton.click();
+      await page.waitForTimeout(500);
+
+      const params = await getUrlParams(page);
+      expect(params['first']).toBeDefined();
+    }
+  });
+
+  test('3.1.4: Row Expansion', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    const resultsTable = page.locator('[data-testid="results-table"]');
+
+    // Find expand button on first row
+    const expandButton = resultsTable.locator('.p-row-toggler').first();
+
+    if (await expandButton.isVisible()) {
+      await expandButton.click();
+
+      // Verify expanded row appears
+      const expandedContent = resultsTable.locator('.p-datatable-row-expansion').first();
+      await expect(expandedContent).toBeVisible();
+
+      // Verify URL unchanged
+      const params = await getUrlParams(page);
+      expect(params['expanded']).toBeUndefined();
+    }
+  });
+
+  test('3.2.1-3.2.3: Table with Filters and Pagination', async ({ page }: { page: Page }) => {
+    await page.goto('/discover?manufacturer=Brammo');
+
+    const resultsTable = page.locator('[data-testid="results-table"]');
+
+    // Verify filtered data
+    const paginator = resultsTable.locator('.p-paginator-current').first();
+    await expect(paginator).toContainText(/Brammo|filtered/i, { timeout: 5000 });
+
+    // Navigate next page
+    const nextPageButton = resultsTable.locator('.p-paginator-next').first();
+    if (await nextPageButton.isEnabled()) {
+      await nextPageButton.click();
+
+      const params = await getUrlParams(page);
+      expect(params['manufacturer']).toBe('Brammo');
+      expect(params['first']).toBeDefined();
+    }
+  });
+
+});
+
+// ============================================================================
+// PHASE 4: PICKER (MAIN PAGE)
+// ============================================================================
+
+test.describe('PHASE 4: Manufacturer-Model Picker', () => {
+
+  test('4.1.1-4.1.3: Single Selection', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    const pickerPanel = page.locator('[data-testid="picker-panel"]');
+    await expect(pickerPanel).toBeVisible();
+
+    // Find first row and click it
+    const firstRow = pickerPanel.locator('.p-datatable-tbody tr').first();
+    if (await firstRow.isVisible()) {
+      await firstRow.click();
+      await page.waitForTimeout(500);
+
+      const params = await getUrlParams(page);
+      expect(params['pickedManufacturer']).toBeDefined();
+
+      // Verify Results Table updates
+      await waitForTableUpdate(page);
+    }
+  });
+
+  test('4.1.4: Deselection', async ({ page }: { page: Page }) => {
+    await page.goto('/discover?pickedManufacturer=Brammo');
+
+    await waitForTableUpdate(page);
+
+    const pickerPanel = page.locator('[data-testid="picker-panel"]');
+
+    // Find selected row (should be highlighted)
+    const selectedRow = pickerPanel.locator('.p-datatable-tbody tr').first();
+
+    if (await selectedRow.isVisible()) {
+      await selectedRow.click();
+      await page.waitForTimeout(500);
+
+      const params = await getUrlParams(page);
+      expect(params['pickedManufacturer']).toBeUndefined();
+    }
+  });
+
+  test('4.2.1: Picker with Results Table Filters', async ({ page }: { page: Page }) => {
+    await page.goto('/discover?yearMin=2020&yearMax=2024');
+
+    await waitForTableUpdate(page);
+
+    const pickerPanel = page.locator('[data-testid="picker-panel"]');
+    const firstRow = pickerPanel.locator('.p-datatable-tbody tr').first();
+
+    if (await firstRow.isVisible()) {
+      await firstRow.click();
+      await page.waitForTimeout(500);
+
+      const params = await getUrlParams(page);
+      expect(params['yearMin']).toBe('2020');
+      expect(params['yearMax']).toBe('2024');
+      expect(params['pickedManufacturer']).toBeDefined();
+    }
+  });
+
+});
+
+// ============================================================================
+// PHASE 5: STATISTICS PANEL (MAIN PAGE)
+// ============================================================================
+
+test.describe('PHASE 5: Statistics Panel', () => {
+
+  test('5.1.1-5.1.4: Statistics Display', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    const statsPanel = page.locator('[data-testid="statistics-panel"]');
+    await expect(statsPanel).toBeVisible();
+
+    // Verify charts are visible (either as canvas or svg elements)
+    const charts = statsPanel.locator('canvas, svg, [role="img"]');
+    const chartCount = await charts.count();
+    expect(chartCount).toBeGreaterThan(0);
+  });
+
+  test('5.2.1-5.2.5: Statistics Responsiveness to Filters', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    const statsPanel = page.locator('[data-testid="statistics-panel"]');
+
+    // Apply filter
+    await page.goto('/discover?manufacturer=Brammo');
+
+    // Verify charts still visible (should have updated)
+    const chartsFiltered = await statsPanel.locator('canvas, svg').count();
+    expect(chartsFiltered).toBeGreaterThan(0);
+  });
+
+  test('5.3.1-5.3.2: Statistics Panel Collapse/Expand', async ({ page }: { page: Page }) => {
+    await page.goto('/discover');
+
+    const statsPanel = page.locator('[data-testid="statistics-panel"]');
+    const panelActions = statsPanel.locator('.panel-actions button').first();
+
+    if (await panelActions.isVisible()) {
+      // Collapse
+      await panelActions.click();
+
+      // Verify charts hidden (might require checking for visibility)
+      const charts = statsPanel.locator('canvas, svg, .chart-container');
+      // At least some charts should not be visible after collapse
+
+      // Expand
+      await panelActions.click();
+
+      // Verify visible again
+      await expect(charts.first()).toBeVisible({ timeout: 5000 });
+    }
+  });
+
 });

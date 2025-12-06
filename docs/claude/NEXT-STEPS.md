@@ -1,46 +1,39 @@
 # Next Steps
 
-**Current Session**: Expand E2E tests to cover Model Filter (2.2) and Body Class Filter (2.3) from MANUAL-TEST-PLAN.md
+**Current Session**: Refine failing E2E tests and address selector/timing issues
 
 ---
 
-## Immediate Action: Verify Report Route After Build
+## Immediate Action: Debug and Fix Failing E2E Tests
 
-**Priority**: Medium (Feature Complete, Verification Needed)
+**Priority**: High (Test Suite Stability)
 
 **What to Do**:
 
-1. **Build the Angular application**:
-   ```bash
-   podman exec -it generic-prime-frontend-dev ng build
-   ```
+1. **Identify failing test patterns**:
+   - Model Filter (2.2.1): Dialog opening timeout
+   - Year Range Filter (2.4.1, 2.4.6, 2.4.11): Input field interaction issues
+   - Search Filter (2.5.1, 2.5.6, 2.5.9): URL not updating on fill
+   - Page Size (2.6.1, 2.6.6): Selector not found in some contexts
+   - Pagination (3.1.1, 3.2.1): Navigation state not reflected in URL
+   - Picker selection (4.1.1, 4.2.1): URL not updating after click
 
-2. **Verify the report directory is included**:
-   ```bash
-   ls -la frontend/dist/frontend/report/
-   # Should show: index.html and other Playwright report files
-   ```
+2. **Root causes to investigate**:
+   - Dialog may have multiple selector variations (verify dialog structure)
+   - Input fills may need debounce/blur event triggers
+   - URL state updates may be event-driven vs imperative
+   - Picker row selection may require specific click coordinates
 
-3. **Test the report route in dev server**:
-   - Access: `http://192.168.0.244:4205/report`
-   - Should redirect to `/report/index.html`
-   - Playwright report should display correctly (not iframe artifacts like before)
+3. **Fix approach**:
+   - Use `page.locator('text=...').click()` instead of complex selectors for dialog triggers
+   - Add `blur()` or `keydown('Enter')` after input fills
+   - Replace `waitForURL()` with element visibility checks
+   - Use `page.waitForLoadState('domcontentloaded')` before assertions
 
-4. **Verify URL navigation works both ways**:
-   - From `/discover` → click/navigate to `/report` → should load report
-   - From `/report` → navigate to `/discover` → should load discover interface
-
-### Implementation Details:
-- Report component redirects via `window.location.href = '/report/index.html'`
-- Avoids iframe sandbox/styling issues from previous attempt
-- Static asset served directly by Angular dev server and production nginx
-- No additional server-side routing required
-
-### Success Criteria:
-- ✓ Playwright report displays correctly at `/report` URL
-- ✓ No iframe rendering artifacts or styling issues
-- ✓ Navigation between `/discover` and `/report` works smoothly
-- ✓ Report loads in ~1-2 seconds
+4. **Verify fixes**:
+   - Run: `npm run test:e2e` (should show improved pass rate)
+   - Check that ~25+ tests pass (75%+)
+   - Document any remaining issues for Phase 6-9 work
 
 ---
 
