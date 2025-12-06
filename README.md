@@ -1,5 +1,7 @@
 # Generic Prime
 
-**This document is deprecated.**
+A domain-agnostic Angular 14 application for browsing and analyzing data.
 
-The primary source of truth for this project is now managed within the `docs/gemini/` directory. Please refer to the documents in that directory for the latest project status, orientation, and next steps.
+**Documentation**: Refer to `docs/claude/` for project status, orientation, and next steps.
+
+Start with: `/bootstrap` command in Claude Code sessions.

@@ -8,9 +8,9 @@
 
 | Need To... | Read This |
 |------------|-----------|
-| Understand project structure | [../gemini/ORIENTATION.md](../gemini/ORIENTATION.md) |
-| Know current state & approach | [../gemini/PROJECT-STATUS.md](../gemini/PROJECT-STATUS.md) |
-| See what to work on next | [../gemini/NEXT-STEPS.md](../gemini/NEXT-STEPS.md) |
+| Understand project structure | [ORIENTATION.md](ORIENTATION.md) |
+| Know current state & approach | [PROJECT-STATUS.md](PROJECT-STATUS.md) |
+| See what to work on next | [NEXT-STEPS.md](NEXT-STEPS.md) |
 | Debug a bug | [../status/KNOWN-BUGS.md](../status/KNOWN-BUGS.md) |
 | Understand API contracts | [../specs/02-api-contracts-data-models.md](../specs/02-api-contracts-data-models.md) |
 | Add a new domain | [../plan/05-IMPLEMENTATION-GUIDE.md](../plan/05-IMPLEMENTATION-GUIDE.md) |
@@ -23,21 +23,18 @@
 
 | File | Purpose | When to Read |
 |------|---------|--------------|
-| `GEMINI.md` | Technical reference for Gemini | Auto-loaded by Gemini |
 | `README.md` | Project introduction | New to project |
-| `TLDR.md` | **DEPRECATED** - Complete implementation status | Deep dive on current state |
-| `CLAUDE.md` | **DEPRECATED** - Technical reference for Claude Code | Auto-loaded by Claude Code |
+| `CLAUDE.md` | Technical reference for Claude Code | Auto-loaded by Claude Code |
 
 ---
 
-## docs/gemini/ (Session Bootstrap)
+## docs/claude/ (Session Bootstrap)
 
 | File | Purpose |
 |------|---------|
 | `ORIENTATION.md` | High-level project overview, infrastructure |
 | `PROJECT-STATUS.md` | **Current project state, approach, and constraints (VERSIONED)** |
 | `NEXT-STEPS.md` | Actionable items for current session |
-| `SESSION-PROTOCOL.md` | Instructions for Gemini session |
 | `STATUS-HISTORY.md` | Archive of previous PROJECT-STATUS versions |
 
 ---
