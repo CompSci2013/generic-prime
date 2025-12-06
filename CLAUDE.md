@@ -1,5 +1,74 @@
 # Claude Code Guidance
 
-This file is for guidance when using Claude Code (claude.ai/code).
+**This file is auto-loaded by Claude Code sessions.**
 
-The primary source of truth for this project is now managed within the `docs/gemini/` directory. Please refer to the documents in that directory for the latest project status, orientation, and next steps.
+---
+
+## Session Initialization
+
+For each new session, type `/bootstrap` to read project context files.
+
+---
+
+## Constraints
+
+- **Do NOT use context from past chat sessions.** Always start FRESH.
+- **Working directory**: `~/projects/generic-prime` (do not change)
+- **You are an expert** in Angular 14 application development and Web Applications architecture.
+
+---
+
+## Development Constraints
+
+- ❌ **Do NOT perform `ng build` actions.**
+- ❌ **Do NOT attempt to run the development server.**
+- ✅ The development container runs in a separate SSH session. When needed, **ask the user if the build succeeded.**
+
+---
+
+## Session End Protocol
+
+Before ending each session, you MUST perform these 4 steps:
+
+1. **Append current `docs/claude/PROJECT-STATUS.md` snapshot to `docs/claude/STATUS-HISTORY.md`**
+   - Preserve historical record by appending (do not overwrite)
+   - Include version number and timestamp
+
+2. **Update `docs/claude/PROJECT-STATUS.md`**
+   - Bump version number
+   - Update timestamp to current session time
+   - Document what was accomplished
+   - Note any new blockers or decisions
+
+3. **Update `docs/claude/NEXT-STEPS.md`**
+   - Document the ONE immediate action for the next session
+   - Include reproduction steps if it's a bug
+   - Reference related files
+
+4. **Commit all changes to `docs/claude/` directory**
+   - Use descriptive commit message
+   - Example: `git commit -m "docs: session summary - Added agriculture domain"`
+
+---
+
+## Critical Development Rules
+
+1. **Do NOT modify frontend code** without understanding the full data flow
+2. **Data-First Investigation**: When debugging, query Elasticsearch directly before touching code
+3. **URL-First State**: Never call `router.navigate()` directly; use `UrlStateService`
+4. **OnPush Change Detection**: Pop-out windows require `detectChanges()`, not `markForCheck()`
+5. **No Unit Tests**: Testing is out of scope for this project
+
+---
+
+## When to Use Other Documentation
+
+- **ORIENTATION.md**: Understand project structure and architecture (read once per session)
+- **PROJECT-STATUS.md**: Know current state and active bugs (read once per session)
+- **NEXT-STEPS.md**: See immediate work for this session (read once per session)
+- **STATUS-HISTORY.md**: Check historical progress (only if asked by user)
+- **DOCUMENT-MAP.md**: Find specialized documentation for specific tasks
+
+---
+
+**Last Updated**: 2025-12-06
