@@ -240,100 +240,169 @@ FRONTEND (Angular App)
   Elasticsearch: elasticsearch.data.svc.cluster.local:9200
 ```
 
-### Curl Debugging Across Three Environments
+### Backend API Testing Across Three Environments
 
-#### **1. Thor Host SSH (Direct Access)**
+**VERIFIED WORKING APPROACH**: All three environments access the backend via the K8s ClusterIP (`10.43.254.90:3000`).
+
+#### **1. Thor Host SSH**
 
 ```bash
-# Via Traefik ingress (recommended)
-curl -v http://generic-prime.minilab/api/specs/v1/search \
-  -H "Content-Type: application/json" \
-  -d '{"query":{"body_class":"Sedan"}}'
+# Test health endpoint
+curl -s http://10.43.254.90:3000/health | jq .
 
-# Or direct to backend service via ClusterIP
-curl -v http://10.43.254.90:3000/api/specs/v1/search \
-  -H "Content-Type: application/json" \
-  -d '{"query":{"body_class":"Sedan"}}'
+# Test vehicle data retrieval
+curl -s "http://10.43.254.90:3000/api/specs/v1/vehicles/details?manufacturer=Brammo&size=2" | jq .
 
-# List backend pods
+# Verify backend pods are running
 kubectl get pods -n generic-prime
-
-# Port-forward to backend pod
-kubectl port-forward -n generic-prime svc/generic-prime-backend-api 3000:3000
-# Then curl localhost:3000
-
-# Check Elasticsearch from host
-curl -s http://elasticsearch.data.svc.cluster.local:9200/_cat/indices 2>&1 || \
-  echo "Note: Only accessible from K8s pods, not from host SSH"
 ```
 
-#### **2. Dev Container (Podman with --network host)**
-
-```bash
-# Start container first
-podman run -d --name generic-prime-frontend-dev --network host \
-  -v $(pwd):/app:z -w /app localhost/generic-prime-frontend:dev
-
-# Then execute curl commands inside container
-podman exec -it generic-prime-frontend-dev bash
-
-# Inside container shell:
-curl -v http://generic-prime.minilab/api/specs/v1/search \
-  -H "Content-Type: application/json" \
-  -d '{"query":{"body_class":"Sedan"}}'
-
-# Test Elasticsearch access (only from K8s pods)
-curl -s elasticsearch.data.svc.cluster.local:9200/_cat/indices || \
-  echo "Elasticsearch only accessible from K8s pods"
-
-# Check backend service
-curl -v http://generic-prime-backend-api.generic-prime.svc.cluster.local:3000/health
+**Expected response**:
+```json
+{
+  "status": "ok",
+  "service": "auto-discovery-specs-api",
+  "timestamp": "2025-12-06T18:24:59.474Z",
+  "index": "autos-unified"
+}
 ```
 
-#### **3. E2E Container (Docker/Playwright)**
+#### **2. Development Container (Podman exec)**
 
 ```bash
-# E2E container has special /etc/hosts configured in Dockerfile.e2e
-# Run tests (automatically uses generic-prime-dockview.minilab)
-docker run --rm -v $(pwd):/app -w /app/frontend \
-  mcr.microsoft.com/playwright:v1.57.0-jammy \
-  bash -c "curl http://generic-prime-dockview.minilab:3000/health"
+# Test health endpoint via Node.js (curl not installed in dev container)
+podman exec generic-prime-dev node -e "
+const http = require('http');
+const options = {
+  hostname: '10.43.254.90',
+  port: 3000,
+  path: '/health',
+  method: 'GET'
+};
+const req = http.request(options, (res) => {
+  let data = '';
+  res.on('data', chunk => data += chunk);
+  res.on('end', () => console.log(data));
+});
+req.end();
+"
 
-# Or access from dev container running e2e tests
-podman exec -it generic-prime-frontend-dev bash -c \
-  "curl -v http://generic-prime-dockview.minilab/api/specs/v1/search \
-    -H 'Content-Type: application/json' \
-    -d '{\"query\":{\"body_class\":\"Sedan\"}}'"
+# Test vehicle data
+podman exec generic-prime-dev node -e "
+const http = require('http');
+const options = {
+  hostname: '10.43.254.90',
+  port: 3000,
+  path: '/api/specs/v1/vehicles/details?manufacturer=Brammo&size=1',
+  method: 'GET'
+};
+const req = http.request(options, (res) => {
+  let data = '';
+  res.on('data', chunk => data += chunk);
+  res.on('end', () => console.log(JSON.stringify(JSON.parse(data), null, 2)));
+});
+req.end();
+"
+```
+
+#### **3. E2E Container (Podman run with --network host)**
+
+```bash
+# Test health endpoint
+podman run --rm --network=host --entrypoint node localhost/generic-prime-e2e:latest -e "
+const http = require('http');
+const options = {
+  hostname: '10.43.254.90',
+  port: 3000,
+  path: '/health',
+  method: 'GET'
+};
+const req = http.request(options, (res) => {
+  let data = '';
+  res.on('data', chunk => data += chunk);
+  res.on('end', () => {
+    console.log('Status: ' + res.statusCode);
+    console.log('Data: ' + data);
+    process.exit(0);
+  });
+});
+req.on('error', (e) => {
+  console.error('Error: ' + e.message);
+  process.exit(1);
+});
+req.end();
+setTimeout(() => process.exit(2), 3000);
+"
+
+# Test vehicle data
+podman run --rm --network=host --entrypoint node localhost/generic-prime-e2e:latest -e "
+const http = require('http');
+const options = {
+  hostname: '10.43.254.90',
+  port: 3000,
+  path: '/api/specs/v1/vehicles/details?manufacturer=Brammo&size=1',
+  method: 'GET'
+};
+const req = http.request(options, (res) => {
+  let data = '';
+  res.on('data', chunk => data += chunk);
+  res.on('end', () => {
+    try {
+      const json = JSON.parse(data);
+      console.log('Total records:', json.total);
+      console.log('First vehicle:', json.results[0]?.manufacturer, '-', json.results[0]?.model);
+      process.exit(0);
+    } catch(e) {
+      console.error('Parse error:', e.message);
+      process.exit(1);
+    }
+  });
+});
+req.on('error', (e) => {
+  console.error('Error: ' + e.message);
+  process.exit(1);
+});
+req.end();
+setTimeout(() => process.exit(2), 3000);
+"
 ```
 
 ### Troubleshooting: Cannot Access Backend API
 
-**Symptom**: `curl: (7) Failed to connect`
+**Important**: All three environments should use the K8s ClusterIP (`10.43.254.90:3000`), NOT hostname-based access.
 
 **Quick Checklist**:
-1. ✅ Are you using the correct hostname for your environment?
-   - Thor host: Use `generic-prime.minilab` (via ingress) or `10.43.254.90:3000` (direct K8s IP)
-   - Dev container: Use `generic-prime.minilab` (requires `--network host`)
-   - E2E container: Use `generic-prime-dockview.minilab` (hardcoded in Dockerfile.e2e)
-
-2. ✅ Is the backend pod running?
+1. ✅ Verify backend pods are running:
    ```bash
    kubectl get pods -n generic-prime
+   # Expected: 2 pods (generic-prime-backend-api-*) in Running state
    ```
 
-3. ✅ Is the backend service accessible?
+2. ✅ Verify backend service exists:
    ```bash
    kubectl get svc -n generic-prime
-   # Should show: generic-prime-backend-api   ClusterIP   10.43.254.90   3000/TCP
+   # Expected: generic-prime-backend-api   ClusterIP   10.43.254.90   <none>        3000/TCP
    ```
 
-4. ✅ Test backend health endpoint:
+3. ✅ Test health endpoint from Thor SSH:
    ```bash
-   curl http://generic-prime.minilab/api/specs/v1/health
-   # Expected: { "status": "ok" }
+   curl -s http://10.43.254.90:3000/health | jq .
+   # Expected: { "status": "ok", "service": "auto-discovery-specs-api", ... }
    ```
 
-5. ✅ Check backend logs:
+4. ✅ Verify dev container is running:
+   ```bash
+   podman ps | grep generic-prime-dev
+   # Expected: generic-prime-dev container should be running
+   ```
+
+5. ✅ Verify E2E container image exists:
+   ```bash
+   podman images | grep generic-prime-e2e
+   # If not found, rebuild: podman build -f frontend/Dockerfile.e2e -t localhost/generic-prime-e2e:latest .
+   ```
+
+6. ✅ Check backend logs:
    ```bash
    kubectl logs -n generic-prime deployment/generic-prime-backend-api --tail=50
    ```
