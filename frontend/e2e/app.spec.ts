@@ -52,19 +52,20 @@ test.describe('PHASE 1: Initial State & Basic Navigation', () => {
     // Find the results-table p-table and its paginator (not the picker table)
     const resultsTable = page.locator('[data-testid="results-table"]');
     const resultsTablePaginator = resultsTable.locator('.p-paginator-current').first();
-    await expect(resultsTablePaginator).toContainText(/4,887/, { timeout: 10000 });
+    await expect(resultsTablePaginator).toContainText(/4887/, { timeout: 10000 });
   });
 
   test('1.2: Panel collapse/expand - state independent of URL', async ({ page }) => {
     await page.goto('/discover');
 
     // Collapse Query Control panel
-    const queryControlCollapse = page.locator('[data-testid="query-control-panel"] .p-panel-header-icon').first();
+    // The collapse button is in .panel-actions, not .p-panel-header-icon
+    const queryControlCollapse = page.locator('[data-testid="query-control-panel"] .panel-actions button').first();
     await queryControlCollapse.click();
 
-    // Verify it's collapsed
-    const queryControlContent = page.locator('[data-testid="query-control-panel"] .p-panel-content');
-    await expect(queryControlContent).not.toBeVisible();
+    // Verify it's collapsed - check if the component inside is hidden
+    const queryControlComponent = page.locator('[data-testid="query-control-panel"] app-query-control');
+    await expect(queryControlComponent).not.toBeVisible();
 
     // Verify URL remains clean
     const params = await getUrlParams(page);
@@ -72,18 +73,22 @@ test.describe('PHASE 1: Initial State & Basic Navigation', () => {
 
     // Expand it back
     await queryControlCollapse.click();
-    await expect(queryControlContent).toBeVisible();
+    await expect(queryControlComponent).toBeVisible();
 
     // Test other panels
     const panels = ['picker-panel', 'results-table-panel', 'statistics-panel'];
     for (const panelId of panels) {
-      const collapse = page.locator(`[data-testid="${panelId}"] .p-panel-header-icon`).first();
-      const content = page.locator(`[data-testid="${panelId}"] .p-panel-content`);
+      const collapse = page.locator(`[data-testid="${panelId}"] .panel-actions button`).first();
+      // For other panels, check the component content area (not visible when collapsed)
+      const panelWrapper = page.locator(`[data-testid="${panelId}"]`);
 
       await collapse.click();
-      await expect(content).not.toBeVisible();
+      // Verify content is hidden by checking if the inner content div is not visible
+      const panelContent = panelWrapper.locator('> div:nth-child(2)'); // The content div after panel header
+      await expect(panelContent).not.toBeVisible({ timeout: 5000 });
+
       await collapse.click();
-      await expect(content).toBeVisible();
+      await expect(panelContent).toBeVisible({ timeout: 5000 });
     }
   });
 
@@ -137,8 +142,13 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     await page.locator('text=Manufacturer').first().click();
 
     // Verify multiselect dialog opens with title
-    const dialogTitle = page.locator('.p-dialog-title');
+    // Dialog title is in .p-dialog-header as a span (custom template)
+    const dialogTitle = page.locator('.p-dialog-header span').first();
     await expect(dialogTitle).toContainText(/Manufacturer|manufacturer/i, { timeout: 5000 });
+
+    // Verify dialog is visible
+    const dialog = page.locator('.p-dialog');
+    await expect(dialog).toBeVisible();
 
     // Verify list shows available manufacturers
     const dialogContent = page.locator('.p-dialog-content');
@@ -146,17 +156,19 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
 
     // Select "Brammo" checkbox
     const brammoCheckbox = dialogContent.locator('input[type="checkbox"]').first();
+    // Scroll to the checkbox to make sure it's visible
+    await brammoCheckbox.scrollIntoViewIfNeeded();
     await brammoCheckbox.check();
 
     // Verify checkbox is checked
     await expect(brammoCheckbox).toBeChecked();
 
     // Click Apply
-    const applyButton = page.locator('.p-dialog-footer button:has-text("Apply")').first();
+    const applyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
     await applyButton.click();
 
     // Verify dialog closes
-    await expect(dialogTitle).not.toBeVisible();
+    await expect(dialog).not.toBeVisible({ timeout: 5000 });
 
     // Verify URL updates with manufacturer parameter
     const params = await getUrlParams(page);
@@ -177,8 +189,12 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     await chip.click();
 
     // Verify dialog reopens
-    const dialogTitle = page.locator('.p-dialog-title');
+    const dialogTitle = page.locator('.p-dialog-header span').first();
     await expect(dialogTitle).toContainText(/Manufacturer/i, { timeout: 5000 });
+
+    // Verify dialog is visible
+    const dialog = page.locator('.p-dialog');
+    await expect(dialog).toBeVisible();
 
     // Change selection to different manufacturer
     const dialogContent = page.locator('.p-dialog-content');
@@ -196,11 +212,11 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     }
 
     // Click Apply
-    const applyButton = page.locator('.p-dialog-footer button:has-text("Apply")').first();
+    const applyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
     await applyButton.click();
 
     // Verify dialog closes
-    await expect(dialogTitle).not.toBeVisible();
+    await expect(dialog).not.toBeVisible({ timeout: 5000 });
 
     // Verify URL updated
     const params = await getUrlParams(page);
@@ -210,9 +226,10 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
   test('2.1.30-2.1.32: Remove Filter', async ({ page }: { page: Page }) => {
     await page.goto('/discover?manufacturer=Brammo');
 
-    // Find the chip's X button (using data-testid wildcard for chip-close)
-    const chipClose = page.locator('[data-testid*="chip-close"]').first();
-    await chipClose.click();
+    // Find the chip and its close button
+    // p-chip renders a removable icon inside, look for the internal close icon
+    const chipRemoveIcon = page.locator('.filter-chip .p-chip-remove-icon').first();
+    await chipRemoveIcon.click({ timeout: 5000 });
 
     // Verify URL no longer contains manufacturer parameter
     const params = await getUrlParams(page);
@@ -221,7 +238,7 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     // Verify Results Table updates to show all records
     const resultsTable = page.locator('[data-testid="results-table"]');
     const resultsTablePaginator = resultsTable.locator('.p-paginator-current').first();
-    await expect(resultsTablePaginator).toContainText(/4,887/, { timeout: 10000 });
+    await expect(resultsTablePaginator).toContainText(/4887/, { timeout: 10000 });
   });
 
   test('2.1.19-2.1.22: Search in Dialog', async ({ page }: { page: Page }) => {
@@ -233,8 +250,12 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     await page.locator('text=Manufacturer').first().click();
 
     // Wait for dialog
-    const dialogTitle = page.locator('.p-dialog-title');
+    const dialogTitle = page.locator('.p-dialog-header span').first();
     await expect(dialogTitle).toContainText(/Manufacturer/i, { timeout: 5000 });
+
+    // Verify dialog is open
+    const dialog = page.locator('.p-dialog');
+    await expect(dialog).toBeVisible();
 
     // Find search input and type
     const dialogContent = page.locator('.p-dialog-content');
@@ -251,7 +272,7 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     }
 
     // Click somewhere to close the dialog
-    const closeButton = page.locator('.p-dialog-header .p-dialog-header-icons button').first();
+    const closeButton = page.locator('.p-dialog-header button').first();
     await closeButton.click();
   });
 
@@ -264,8 +285,12 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     await page.locator('text=Manufacturer').first().click();
 
     // Wait for dialog
-    const dialogTitle = page.locator('.p-dialog-title');
+    const dialogTitle = page.locator('.p-dialog-header span').first();
     await expect(dialogTitle).toContainText(/Manufacturer/i, { timeout: 5000 });
+
+    // Verify dialog is open
+    const dialog = page.locator('.p-dialog');
+    await expect(dialog).toBeVisible();
 
     const dialogContent = page.locator('.p-dialog-content');
     const firstCheckbox = dialogContent.locator('input[type="checkbox"]').first();
@@ -278,12 +303,12 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
     await expect(firstCheckbox).toBeChecked();
 
     // Navigate to Apply with keyboard
-    const applyButton = page.locator('.p-dialog-footer button:has-text("Apply")').first();
+    const applyButton = page.locator('.p-dialog-footer button').filter({ hasText: 'Apply' }).first();
     await applyButton.focus();
     await page.keyboard.press('Enter');
 
     // Verify dialog closes
-    await expect(dialogTitle).not.toBeVisible();
+    await expect(dialog).not.toBeVisible({ timeout: 5000 });
   });
 
 });
