@@ -1,4 +1,4 @@
-<div class="picker-container" *ngIf="activeConfig">
+<div class="picker-container" *ngIf="activeConfig" [attr.data-testid]="environment.includeTestIds ? 'picker-panel' : null">
   <!-- Table -->
   <p-table
     [value]="state.data"
@@ -13,6 +13,7 @@
     (onLazyLoad)="onLazyLoad($event)"
     styleClass="p-datatable-gridlines"
     responsiveLayout="scroll"
+    [attr.data-testid]="environment.includeTestIds ? 'picker-table' : null"
   >
     <!-- Caption with search and actions -->
     <ng-template pTemplate="caption">

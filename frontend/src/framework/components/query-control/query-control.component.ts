@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 import { DomainConfig } from '../../models/domain-config.interface';
 import {
   FilterDefinition,
@@ -59,6 +60,9 @@ interface ActiveFilter {
 })
 export class QueryControlComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {
+
+  /** Environment configuration for conditional test-id rendering */
+  readonly environment = environment;
 
   /** Domain configuration with filter definitions */
   @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;

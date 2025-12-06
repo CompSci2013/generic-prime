@@ -2,6 +2,10 @@
 # Using v1.57.0 to match @playwright/test version in package.json
 FROM mcr.microsoft.com/playwright:v1.57.0-jammy
 
+# Add generic-prime.minilab hostname mapping for Kubernetes Traefik ingress
+# The backend API is served through Traefik ingress on IP 192.168.0.244 (thor)
+RUN echo "192.168.0.244 generic-prime generic-prime.minilab" >> /etc/hosts
+
 # Set the base working directory.
 WORKDIR /app
 

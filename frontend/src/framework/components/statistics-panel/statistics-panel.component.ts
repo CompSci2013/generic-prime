@@ -19,6 +19,7 @@ import {
 import { ActivatedRoute, Params } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 import { ChartConfig, DomainConfig } from '../../models/domain-config.interface';
 import { PopOutMessageType } from '../../models/popout.interface';
 import { PopOutContextService } from '../../services/popout-context.service';
@@ -47,6 +48,9 @@ import { ChartDataSource } from '../base-chart/base-chart.component';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StatisticsPanelComponent implements OnInit, OnDestroy {
+  /** Environment configuration for conditional test-id rendering */
+  readonly environment = environment;
+
   /**
    * Domain configuration
    */

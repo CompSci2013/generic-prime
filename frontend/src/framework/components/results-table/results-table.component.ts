@@ -9,6 +9,7 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 import { DomainConfig, FilterOption } from '../../models/domain-config.interface';
 import { ResourceManagementService } from '../../services/resource-management.service';
 
@@ -37,6 +38,9 @@ import { ResourceManagementService } from '../../services/resource-management.se
 })
 export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {
+  /** Environment configuration for conditional test-id rendering */
+  readonly environment = environment;
+
   /**
    * Domain configuration (required)
    * Contains all configuration for filters, table, API, etc.

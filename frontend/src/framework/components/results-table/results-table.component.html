@@ -1,4 +1,4 @@
-<div class="results-table-container">
+<div class="results-table-container" [attr.data-testid]="environment.includeTestIds ? 'results-table-panel' : null">
   <!-- Filter Panel - Domain Agnostic -->
   <div class="filter-panel-container" [ngClass]="{'collapsed': filterPanelCollapsed}">
     <div class="filter-panel-header" (click)="toggleFilterPanel()">
@@ -177,7 +177,8 @@
       (onPage)="onPageChange($event)"
       (onSort)="onSort($event)"
       [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results">
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results"
+      [attr.data-testid]="environment.includeTestIds ? 'results-table' : null">
 
       <!-- Caption with result count -->
       <ng-template pTemplate="caption">

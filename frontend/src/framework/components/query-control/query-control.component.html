@@ -1,4 +1,4 @@
-<div class="query-control-panel">
+<div class="query-control-panel" [attr.data-testid]="environment.includeTestIds ? 'query-control-panel' : null">
   <!-- Compact Header Bar with Dropdown and Actions -->
   <div class="control-header">
     <p-dropdown
@@ -13,7 +13,8 @@
       [showClear]="false"
       optionLabel="label"
       optionValue="value"
-      styleClass="filter-field-dropdown">
+      styleClass="filter-field-dropdown"
+      [attr.data-testid]="environment.includeTestIds ? 'filter-field-dropdown' : null">
     </p-dropdown>
     <p-button
       label="Clear All"

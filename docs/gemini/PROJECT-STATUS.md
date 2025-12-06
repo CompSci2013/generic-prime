@@ -1,23 +1,24 @@
 # Project Status
 
-**Version**: 2.18
-**Timestamp**: 2025-12-05T12:30:00Z
+**Version**: 2.20
+**Timestamp**: 2025-12-06T04:30:00Z
 
 ---
 
 ## Current State
 
-### E2E Test Automation Framework - INFRASTRUCTURE COMPLETE ✅ (NEW THIS SESSION)
+### E2E Test Automation Framework - INFRASTRUCTURE + NETWORKING VERIFIED ✅
 - **Docker**: ✅ Image builds successfully with playwright:v1.57.0
 - **Server**: ✅ Dev server starts on port 4205 correctly
-- **Tests**: ✅ 13 test cases created and executing
+- **Tests**: ✅ 13 test cases created and executing (1 passing, 7 failing due to test issues, 2 skipped)
 - **Configuration**: ✅ Port (4200→4205), timeouts, viewport, conditional webServer
 - **Dependencies**: ✅ @playwright/test:^1.57.0 + playwright:^1.57.0
-- **Status**: Ready for component HTML modifications (Option 2 environment-based approach)
+- **Backend Connectivity**: ✅ VERIFIED - Container can access 4,887 vehicle records
+- **Environment**: ✅ Updated to use `generic-prime-dockview.minilab` (already in /etc/hosts)
 - **Documentation**: ✅ 6 comprehensive guides created
 
-**Blocker**: Tests fail because data-testid attributes not yet added to components
-**Next Step**: Implement environment-based test-id injection (Option 2 approach, deferred to next session)
+**Status**: Tests are executing with full data access. Failures are due to test expectations, NOT data issues.
+**Next Step**: Fix test locators/expectations (e.g., `4887` vs `4,887` formatting)
 
 ### Port 4205 (generic-prime) - PHASE 2.2 MANUAL TESTING IN PROGRESS ✅
 

@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 import {
   getDefaultPickerState,
   PickerApiParams,
@@ -53,6 +54,9 @@ import { UrlStateService } from '../../services/url-state.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BasePickerComponent<T> implements OnInit, OnDestroy {
+  /** Environment configuration for conditional test-id rendering */
+  readonly environment = environment;
+
   /**
    * Picker configuration ID (loads from registry)
    * Either configId or config must be provided

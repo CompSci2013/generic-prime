@@ -324,6 +324,12 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
    * @param filters - Filters to apply
    */
   private fetchData(filters: TFilters): void {
+    console.log('[ResourceManagementService.fetchData] Fetching data', {
+      filters,
+      autoFetch: this.config.autoFetch,
+      isInPopOut: this.popOutContext.isInPopOut()
+    });
+
     // Set loading state
     this.updateState({ loading: true, error: null });
 
@@ -335,7 +341,7 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
       .pipe(
         takeUntil(this.destroy$),
         catchError(error => {
-          console.error('Error fetching data:', error);
+          console.error('[ResourceManagementService] Error fetching data:', error);
           this.updateState({
             loading: false,
             error: error instanceof Error ? error : new Error(String(error)),

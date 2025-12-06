@@ -2,7 +2,8 @@
 <p-panel
   [toggleable]="true"
   [(collapsed)]="panelCollapsed"
-  [style]="{'margin-bottom': '1rem'}">
+  [style]="{'margin-bottom': '1rem'}"
+  [attr.data-testid]="environment.includeTestIds ? 'statistics-panel' : null">
 
   <ng-template pTemplate="header">
     <div class="panel-header">
@@ -23,7 +24,8 @@
     <div class="charts-grid" *ngIf="statistics">
       <div
         *ngFor="let item of visibleCharts; trackBy: trackByChartId"
-        class="chart-container">
+        class="chart-container"
+        [attr.data-testid]="environment.includeTestIds ? ('chart-' + item.config.id) : null">
 
         <div class="chart-title">{{ item.config.title }}</div>
         <app-base-chart
