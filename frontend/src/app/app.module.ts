@@ -15,12 +15,14 @@ import { DOMAIN_CONFIG } from '../framework/services/domain-config-registry.serv
 import { createAutomobileDomainConfig } from '../domain-config/automobile';
 import { DiscoverComponent } from './features/discover/discover.component';
 import { PanelPopoutComponent } from './features/panel-popout/panel-popout.component';
+import { ReportComponent } from './features/report/report.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DiscoverComponent,
-    PanelPopoutComponent
+    PanelPopoutComponent,
+    ReportComponent
   ],
   imports: [
     BrowserModule,
