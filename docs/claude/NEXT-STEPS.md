@@ -1,14 +1,63 @@
 # Next Steps
 
-**Current Session**: Extend E2E test coverage to Phases 6-9 (optional/lower priority)
+**Current Session**: Implement error handling for backend service failures
 
 ---
 
-## Immediate Action: E2E Test Suite Complete
+## Immediate Action: Add Frontend Error Handling for Backend Failures
 
-**Status**: ✅ All 33 tests passing (100% pass rate)
+**Priority**: Medium (User Experience)
 
-**Completed in Session 8**:
+**What to Do**:
+
+1. **Create Error Boundary Component**
+   - Location: `frontend/src/app/features/error/`
+   - Implement global error handler for HTTP failures
+   - Display user-friendly error messages
+   - Auto-retry with exponential backoff
+
+2. **Update HTTP Interceptor**
+   - File: Add error handling to existing HTTP client
+   - Catch 5xx errors (backend down)
+   - Catch network timeouts
+   - Prevent silent failures
+
+3. **Add Loading States**
+   - Show spinner during initial API calls
+   - Display timeout messages after 10+ seconds
+   - Allow manual retry button
+
+4. **Testing**
+   - Scale backend to zero again
+   - Verify error message displays
+   - Test retry functionality
+   - Test recovery when backend returns
+
+**Verification Steps**:
+```bash
+# Scale backend to zero
+kubectl scale deployment generic-prime-backend-api -n generic-prime --replicas=0
+
+# Open http://localhost:4205
+# Should see error message (not blank/frozen UI)
+
+# Scale backend back to 2
+kubectl scale deployment generic-prime-backend-api -n generic-prime --replicas=2
+
+# Should recover gracefully with retry
+```
+
+---
+
+## Completed Work
+
+**Session 9: Kubernetes Infrastructure Testing**
+- ✅ Tested backend service scaling to zero replicas
+- ✅ Verified service recovery and auto-restart
+- ✅ Identified missing error handling in frontend
+- ✅ Documented all findings and recovery procedures
+
+**Session 8: E2E Test Suite Complete**
 - ✅ Refactored 10 failing tests using URL-first approach
 - ✅ Achieved 100% pass rate (33/33 tests)
 - ✅ Improved execution time: 39.5 seconds (down from 51.6s with failures)
@@ -69,4 +118,4 @@
 
 ---
 
-**Last Updated**: 2025-12-06T23:50:00Z
+**Last Updated**: 2025-12-07T02:30:00Z
