@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.6
-**Timestamp**: 2025-12-07T09:30:00Z
-**Updated By**: Session 11 - Live Report Updates Investigation
+**Version**: 5.7
+**Timestamp**: 2025-12-07T09:00:00Z
+**Updated By**: Session 12 - Live Report Updates Research & Architectural Analysis
 
 ---
 
@@ -33,6 +33,7 @@
 |-----|-----------|----------|--------|
 | #13 | p-dropdown (Query Control) | Medium | Not Started |
 | #7 | p-multiSelect (Body Class) | Low | Not Started |
+| Live Report Updates | Playwright Report Component | Low | Investigation Complete - Deferred |
 
 **Bug #13**: Keyboard navigation broken with `[filter]="true"`
 - Arrow keys should highlight options, currently do nothing
@@ -43,9 +44,83 @@
 - Actual filtering works correctly
 - Only visual state is wrong
 
+**Live Report Updates** (Low Priority - Deferred):
+- Reports require full Angular rebuild to display fresh test results
+- Browser HTTP caching defeats client-side cache-busting techniques (iframe + timestamp)
+- Proxy-based server-side cache-control headers + bypass function not effective with Angular dev-server
+- Root cause: Webpack dev-server's interaction with static asset serving
+- See "Session 12" for research findings and architectural solution
+
 ---
 
 ## What Changed This Session
+
+**Session 12: Live Report Updates - Deep Research & Architectural Analysis**
+
+### Summary
+Extensive research into browser HTTP caching, Playwright report architecture, and Angular dev-server limitations revealed that live report updates require a fundamentally different architecture. The issue is not configuration—it's architectural.
+
+### Investigation Process
+1. **Deep Web Research**: Consulted 20+ sources including:
+   - GitHub Playwright issues (#30098 - caching behavior)
+   - Stack Overflow Angular proxy patterns
+   - Webpack dev-server documentation
+   - Production cache-busting best practices
+
+2. **Attempted Solutions**:
+   - **Session 11**: `proxy.conf.json` with cache headers → Failed (JSON syntax error)
+   - **Session 12A**: `proxy.conf.js` with Node.js bypass function → Partially implemented
+   - **Session 12B**: ReportComponent iframe with timestamp query parameter → Still required rebuild
+
+3. **Root Cause Findings**:
+   - Browser caches `/report/index.html` aggressively
+   - Query parameter cache-busting (`?t=timestamp`) doesn't work for iframe `src` attribute in this context
+   - Proxy bypass function not invoked by Angular dev-server (architectural issue)
+   - Webpack dev-server doesn't support request-time cache header injection for static assets
+
+### Key Technical Insights
+- **What Works in Theory**: Server-side cache-control headers + client-side cache-busting
+- **What Fails in Practice**: Angular dev-server doesn't reliably invoke proxy bypass for static assets
+- **Real Problem**: Playwright HTML report is static, generated once per test run
+  - Single file generation means no "live" aspect without external file polling
+  - Browser's HTTP cache prevents showing fresh generated reports
+
+### What Changed in Code
+- Added `proxy.conf.js` with aggressive no-cache headers and ETag rotation
+- Updated `ReportComponent` to load report via iframe with timestamp cache-busting
+- Updated `angular.json` to use proxy configuration
+- **Result**: Changes committed but feature remains incomplete (still requires rebuild)
+
+### Status: DEFERRED
+The live report feature cannot be achieved within the current architecture. Implementation would require:
+
+**Option A** (Recommended - Moderate Effort):
+- Separate lightweight Node.js/Express server for serving Playwright reports
+- Service runs on separate port (e.g., 4206)
+- Serves `playwright-report/` directory with no-cache headers + proper MIME types
+- Angular app embeds report via iframe: `http://localhost:4206/report/index.html`
+- Benefits: Clean separation, guaranteed fresh content, no Angular rebuilds needed
+
+**Option B** (High Effort - Not Recommended):
+- Implement WebSocket-based report watcher
+- Poll file system for `playwright-report/` changes
+- Push updates to browser via socket
+- Requires custom Angular component + backend service
+
+**Option C** (Out of Scope - Production Grade):
+- Integrate with third-party test reporting service (Currents.dev, Testomat.io)
+- Provides live dashboards, historical tracking, CI/CD integration
+- Would solve problem comprehensively but adds external dependency
+
+### Commits
+- `baf963c`: Initial proxy.conf.js implementation
+- `b6e9c8f`: iframe cache-busting + improved proxy
+
+All code changes left in place for future developer reference and potential refinement.
+
+---
+
+## What Changed Previous Sessions
 
 **Session 11: Live Report Updates Investigation & Proxy Configuration Attempt**
 

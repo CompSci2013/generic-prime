@@ -1,49 +1,81 @@
 # Next Steps
 
-**Current Session**: Enable live Playwright report updates without rebuild
+**Current Session**: Fix Known PrimeNG Bugs (Bug #13: Dropdown Keyboard Navigation)
 
 ---
 
-## Immediate Action: Implement Proper Proxy Configuration for Live Report Updates
+## Immediate Action: Fix PrimeNG Dropdown Keyboard Navigation (Bug #13)
 
-**Priority**: Medium (Developer Experience)
+**Priority**: Medium (User Experience - Filter Usability)
+
+**Bug Details**:
+- Component: `p-dropdown` in Query Control panel (Manufacturer filter)
+- Issue: Keyboard navigation broken with `[filter]="true"` attribute
+- Expected: Arrow keys highlight options, Enter/Space selects
+- Actual: Keyboard keys do nothing, mouse click is only workaround
 
 **What to Do**:
 
-1. **Create Proper Proxy Configuration**
-   - Create `frontend/proxy.conf.js` (JavaScript file, not JSON)
-   - Configure to serve `playwright-report/` directory via `/report` path
-   - Set HTTP cache-control headers: `no-cache, no-store, must-revalidate`
-   - Import proper Node.js modules: `fs`, `path`
-   - Use bypass function pattern from Angular Webpack dev-server docs
+1. **Investigate Root Cause**
+   - Located in: `frontend/src/domain-config/automobile/configs/filter-definitions.ts`
+   - PrimeNG version: 14.2.3
+   - Check if issue is PrimeNG bug or configuration conflict
+   - Test with filter disabled to isolate the cause
 
-2. **Update angular.json Dev Server**
-   - Update `serve.options.proxyConfig` to point to `proxy.conf.js`
-   - Verify schema allows `.js` files (not just `.json`)
+2. **Attempt Fixes** (in order of complexity):
+   - Verify `[showToggleAll]="true"` doesn't interfere with keyboard handling
+   - Check if `[editable]="true"` and `[filter]="true"` together cause issue
+   - Inspect DOM for missing `tabindex` or accessibility attributes
+   - Test with `onKeyDown` event handler as workaround if needed
 
-3. **Update ReportComponent**
-   - Use iframe to load `/report/index.html`
-   - Add cache-busting query parameter: `?t=${Date.now()}`
-   - Use DomSanitizer to mark iframe src as safe
-   - Keep inline template/styles (avoid unnecessary files)
+3. **Verify PrimeNG Version**
+   - Current: 14.2.3
+   - Check if newer version (14.3+) or patch fixes this
+   - Document version constraint if upgrade needed
 
 4. **Testing**
-   - Restart dev-server to load new proxy config
-   - Run E2E tests: `npx playwright test`
-   - Navigate to `/report` in Windows 11 browser
-   - Verify latest test results display (not stale cached data)
-   - Confirm report updates immediately after test runs
+   - Verify arrow keys highlight options in dropdown
+   - Verify Enter key selects highlighted option
+   - Verify Space key selects highlighted option
+   - Ensure mouse interaction still works
+   - Test with other filters (Body Class, etc.)
 
-**Reproduction Steps for Next Session**:
-1. Restart dev container
-2. Browser to http://192.168.0.244:4205/report
-3. Run: `podman exec generic-prime-e2e bash -c "cd /app/frontend && npx playwright test"`
-4. Check if report shows latest results or cached old results
-5. Expected: Should show current test run data (all skipped except test 6.2)
+---
+
+## Deferred Work: Live Report Updates (Architectural Issue)
+
+**Status**: Investigation Complete - Deferred (Low Priority)
+
+**Why Deferred**:
+- Root cause: Angular dev-server cannot inject cache-control headers for static assets
+- Client-side cache-busting (iframe + timestamp) insufficient due to browser caching layers
+- **Solution requires architectural change**: Separate Node.js/Express server
+- Not worth time investment when tests generate fresh data on each run
+
+**Future Options** (if prioritized):
+- **Option A** (Recommended): Lightweight Node.js/Express server on port 4206 serving `playwright-report/`
+- **Option B** (Complex): WebSocket-based report watcher with real-time updates
+- **Option C** (Production Grade): Third-party service integration (Currents.dev, Testomat.io)
+
+**Code Status**:
+- `proxy.conf.js` implemented and left in place for reference
+- `ReportComponent` updated with iframe + timestamp cache-busting
+- Both approaches documented in `PROJECT-STATUS.md` Session 12
+
+See `docs/claude/PROJECT-STATUS.md` for complete technical analysis and architectural solutions.
 
 ---
 
 ## Completed Work
+
+**Session 12: Live Report Updates Research**
+- ✅ Deep research into browser caching (20+ sources)
+- ✅ Analyzed Playwright report architecture
+- ✅ Investigated Angular dev-server proxy limitations
+- ✅ Implemented proxy.conf.js with cache headers + ETag rotation
+- ✅ Updated ReportComponent with iframe cache-busting
+- ✅ Documented root causes and architectural solutions
+- ✅ Documented why problem persists despite attempted fixes
 
 **Session 11: Live Report Updates Investigation**
 - ✅ Investigated Playwright report caching issues
