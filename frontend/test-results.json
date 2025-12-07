@@ -1,0 +1,1455 @@
+{
+  "config": {
+    "configFile": "/app/frontend/playwright.config.ts",
+    "rootDir": "/app/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/app/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/app/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 3000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 16,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "app.spec.ts",
+      "file": "app.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "PHASE 1: Initial State & Basic Navigation",
+          "file": "app.spec.ts",
+          "line": 35,
+          "column": 6,
+          "specs": [
+            {
+              "title": "1.1: Initial page load - 4,887 records displayed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 728,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:01.103Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-d08edec1fd6b5bc6aac9",
+              "file": "app.spec.ts",
+              "line": 37,
+              "column": 7
+            },
+            {
+              "title": "1.2: Panel collapse/expand - state independent of URL",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 754,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:01.865Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-c2faac0051e7ac53e527",
+              "file": "app.spec.ts",
+              "line": 58,
+              "column": 7
+            },
+            {
+              "title": "1.3: Panel drag-drop reordering - does not affect URL",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 792,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:02.626Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-ecccd7f6a07296a81f3f",
+              "file": "app.spec.ts",
+              "line": 82,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "PHASE 2.1: Manufacturer Filter (Multiselect Dialog)",
+          "file": "app.spec.ts",
+          "line": 119,
+          "column": 6,
+          "specs": [
+            {
+              "title": "2.1.1-2.1.8: Single Selection Workflow - SELECT",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2471,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:03.424Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-2ab946eeac8715b1efd3",
+              "file": "app.spec.ts",
+              "line": 121,
+              "column": 7
+            },
+            {
+              "title": "2.1.27-2.1.29: Edit Applied Filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2242,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:05.900Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-2e4c9eec9f21dec92c60",
+              "file": "app.spec.ts",
+              "line": 183,
+              "column": 7
+            },
+            {
+              "title": "2.1.30-2.1.32: Remove Filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 756,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:08.146Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-dfb547068be0bb0bb45f",
+              "file": "app.spec.ts",
+              "line": 254,
+              "column": 7
+            },
+            {
+              "title": "2.1.19-2.1.22: Search in Dialog",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1254,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:08.907Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-27234609c743914731de",
+              "file": "app.spec.ts",
+              "line": 285,
+              "column": 7
+            },
+            {
+              "title": "2.1.23-2.1.26: Keyboard Navigation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1423,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:10.171Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-c0c603a2ebe527b917a1",
+              "file": "app.spec.ts",
+              "line": 320,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "PHASE 2.2: Model Filter (Multiselect Dialog)",
+          "file": "app.spec.ts",
+          "line": 361,
+          "column": 6,
+          "specs": [
+            {
+              "title": "2.2.1-2.2.8: Single Selection Workflow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2485,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:11.598Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-82df24f4c0cfd32b06f2",
+              "file": "app.spec.ts",
+              "line": 363,
+              "column": 7
+            },
+            {
+              "title": "2.2.9: Edit Model Filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2293,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:14.088Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-097863876056475c907b",
+              "file": "app.spec.ts",
+              "line": 410,
+              "column": 7
+            },
+            {
+              "title": "2.2.10: Remove Model Filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 735,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:16.385Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-2d82b93da859b5551742",
+              "file": "app.spec.ts",
+              "line": 460,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "PHASE 2.3: Body Class Filter (Multiselect Dialog)",
+          "file": "app.spec.ts",
+          "line": 480,
+          "column": 6,
+          "specs": [
+            {
+              "title": "2.3.1-2.3.8: Single Selection Workflow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2451,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:17.129Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-9ff403f3f6afe02baab8",
+              "file": "app.spec.ts",
+              "line": 482,
+              "column": 7
+            },
+            {
+              "title": "2.3.9: Multiple Body Classes",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2235,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:19.584Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-891e46d29b66ae22f756",
+              "file": "app.spec.ts",
+              "line": 522,
+              "column": 7
+            },
+            {
+              "title": "2.3.10: Remove Body Class Filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2525,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:21.823Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-8f2f1cce40558bce85e9",
+              "file": "app.spec.ts",
+              "line": 562,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "PHASE 2.4: Year Range Filter (Range Dialog)",
+          "file": "app.spec.ts",
+          "line": 606,
+          "column": 6,
+          "specs": [
+            {
+              "title": "2.4.1-2.4.5: Minimum Year Only",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 701,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:24.352Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-33b7d105639369540d8a",
+              "file": "app.spec.ts",
+              "line": 608,
+              "column": 7
+            },
+            {
+              "title": "2.4.6-2.4.10: Year Range (Min and Max)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 700,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:25.057Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-c712a3bda616dbf85325",
+              "file": "app.spec.ts",
+              "line": 628,
+              "column": 7
+            },
+            {
+              "title": "2.4.11: Edit Year Filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 905,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:25.761Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-1748213d1f0421710292",
+              "file": "app.spec.ts",
+              "line": 649,
+              "column": 7
+            },
+            {
+              "title": "2.4.12: Remove Year Filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 739,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:26.670Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-67f6c2a1734725da1a0b",
+              "file": "app.spec.ts",
+              "line": 671,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "PHASE 2.5: Search/Text Filter",
+          "file": "app.spec.ts",
+          "line": 691,
+          "column": 6,
+          "specs": [
+            {
+              "title": "2.5.1-2.5.5: Basic Search Workflow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 700,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:27.411Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-73f26d7ec9bcae1f43c6",
+              "file": "app.spec.ts",
+              "line": 693,
+              "column": 7
+            },
+            {
+              "title": "2.5.6-2.5.8: Search Combined with Other Filters",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 681,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:28.114Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-1509aa57fac4064f3587",
+              "file": "app.spec.ts",
+              "line": 709,
+              "column": 7
+            },
+            {
+              "title": "2.5.9: Clear Search",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 934,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:28.799Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-3295eafceb548fe11d33",
+              "file": "app.spec.ts",
+              "line": 726,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "PHASE 2.6: Page Size Filter",
+          "file": "app.spec.ts",
+          "line": 752,
+          "column": 6,
+          "specs": [
+            {
+              "title": "2.6.1-2.6.5: Change Page Size",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 699,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:29.736Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-49c56b8009d70cae4616",
+              "file": "app.spec.ts",
+              "line": 754,
+              "column": 7
+            },
+            {
+              "title": "2.6.6: Page Size with Query Filters",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 687,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:30.439Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-4988097e68e2082e254c",
+              "file": "app.spec.ts",
+              "line": 782,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "PHASE 2.7: Clear All Filters",
+          "file": "app.spec.ts",
+          "line": 813,
+          "column": 6,
+          "specs": [
+            {
+              "title": "2.7.1-2.7.15: Clear All Filters",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2545,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:31.130Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-99eeb36615b04ea77c9a",
+              "file": "app.spec.ts",
+              "line": 815,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "PHASE 3: Results Table Panel",
+          "file": "app.spec.ts",
+          "line": 869,
+          "column": 6,
+          "specs": [
+            {
+              "title": "3.1.1-3.1.3: Table Pagination Forward",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 722,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:33.678Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-35b10ef9eeab3268135c",
+              "file": "app.spec.ts",
+              "line": 871,
+              "column": 7
+            },
+            {
+              "title": "3.1.4: Row Expansion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 691,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:34.404Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-5c32370dd1f861fbf0c4",
+              "file": "app.spec.ts",
+              "line": 891,
+              "column": 7
+            },
+            {
+              "title": "3.2.1-3.2.3: Table with Filters and Pagination",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 695,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:35.098Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-793156cf72e22dfd45c0",
+              "file": "app.spec.ts",
+              "line": 912,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "PHASE 4: Manufacturer-Model Picker",
+          "file": "app.spec.ts",
+          "line": 948,
+          "column": 6,
+          "specs": [
+            {
+              "title": "4.1.1-4.1.3: Single Selection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 695,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:35.796Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-9075bf1e2837773daea6",
+              "file": "app.spec.ts",
+              "line": 950,
+              "column": 7
+            },
+            {
+              "title": "4.1.4: Deselection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 923,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:36.495Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-9a0b926cd04c9ac27d71",
+              "file": "app.spec.ts",
+              "line": 972,
+              "column": 7
+            },
+            {
+              "title": "4.2.1: Picker with Results Table Filters",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 698,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:37.421Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-bed0ea55981e9332c44b",
+              "file": "app.spec.ts",
+              "line": 992,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "PHASE 5: Statistics Panel",
+          "file": "app.spec.ts",
+          "line": 1021,
+          "column": 6,
+          "specs": [
+            {
+              "title": "5.1.1-5.1.4: Statistics Display",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 695,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:38.122Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-8db89625785a5163240b",
+              "file": "app.spec.ts",
+              "line": 1023,
+              "column": 7
+            },
+            {
+              "title": "5.2.1-5.2.5: Statistics Responsiveness to Filters",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 916,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:38.820Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-620e024b0e72f8f6cb6e",
+              "file": "app.spec.ts",
+              "line": 1035,
+              "column": 7
+            },
+            {
+              "title": "5.3.1-5.3.2: Statistics Panel Collapse/Expand",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 703,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:39.739Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-d1dd72fcdb8ac4c934ff",
+              "file": "app.spec.ts",
+              "line": 1048,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "PHASE 6: Pop-Out Windows & Cross-Window Communication",
+          "file": "app.spec.ts",
+          "line": 1100,
+          "column": 6,
+          "specs": [
+            {
+              "title": "6.1: Chart selection in pop-out Statistics panel updates all other popped-out controls",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1609,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at /app/frontend/e2e/app.spec.ts:1198:23",
+                        "location": {
+                          "file": "/app/frontend/e2e/app.spec.ts",
+                          "column": 23,
+                          "line": 1198
+                        },
+                        "snippet": "  1196 |     // BUG CHECK: With the bug, chipCount will be 0\n  1197 |     // Without bug, chipCount should be > 0\n> 1198 |     expect(chipCount).toBeGreaterThan(0);\n       |                       ^\n  1199 |\n  1200 |     // Step 7: Verify Picker pop-out shows highlight for selected filter\n  1201 |     const pickerComponent = pickerPanelPopout.locator('app-base-picker');"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "column": 23,
+                            "line": 1198
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n  1196 |     // BUG CHECK: With the bug, chipCount will be 0\n  1197 |     // Without bug, chipCount should be > 0\n> 1198 |     expect(chipCount).toBeGreaterThan(0);\n       |                       ^\n  1199 |\n  1200 |     // Step 7: Verify Picker pop-out shows highlight for selected filter\n  1201 |     const pickerComponent = pickerPanelPopout.locator('app-base-picker');\n    at /app/frontend/e2e/app.spec.ts:1198:23"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "[Test] Statistics panel popped out: http://localhost:4205/panel/discover/statistics-panel/statistics\n"
+                        },
+                        {
+                          "text": "[Test] Query Control panel popped out: http://localhost:4205/panel/discover/query-control/query-control\n"
+                        },
+                        {
+                          "text": "[Test] Picker panel popped out: http://localhost:4205/panel/discover/manufacturer-model-picker/picker\n"
+                        },
+                        {
+                          "text": "[Test] Results Table panel popped out: http://localhost:4205/panel/discover/results-table/results\n"
+                        },
+                        {
+                          "text": "[Test] All panels popped out, proceeding with chart selection test\n"
+                        },
+                        {
+                          "text": "[Test] Results before chart selection: Showing 1 to 20 of 4887 results\n"
+                        },
+                        {
+                          "text": "[Test] Filter chips in Query Control pop-out: 0\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:40.446Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/app/frontend/test-results/app-PHASE-6-Pop-Out-Window-6635e-l-other-popped-out-controls-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "column": 23,
+                        "line": 1198
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-d1628d66e7b7cb0f2029",
+              "file": "app.spec.ts",
+              "line": 1102,
+              "column": 7
+            },
+            {
+              "title": "6.2: Multiple pop-outs stay in sync when any pop-out makes a selection",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 3000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1426,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at /app/frontend/e2e/app.spec.ts:1297:72",
+                        "location": {
+                          "file": "/app/frontend/e2e/app.spec.ts",
+                          "column": 72,
+                          "line": 1297
+                        },
+                        "snippet": "  1295 |\n  1296 |     // BUG CHECK: All should have at least 1 indication of the filter\n> 1297 |     expect(statsFilterCount + queryFilterCount + pickerHighlightCount).toBeGreaterThan(0);\n       |                                                                        ^\n  1298 |\n  1299 |     // Verify main window also shows the filter\n  1300 |     const mainFilterChips = page.locator('#panel-query-control').locator('p-chip');"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "column": 72,
+                            "line": 1297
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n  1295 |\n  1296 |     // BUG CHECK: All should have at least 1 indication of the filter\n> 1297 |     expect(statsFilterCount + queryFilterCount + pickerHighlightCount).toBeGreaterThan(0);\n       |                                                                        ^\n  1298 |\n  1299 |     // Verify main window also shows the filter\n  1300 |     const mainFilterChips = page.locator('#panel-query-control').locator('p-chip');\n    at /app/frontend/e2e/app.spec.ts:1297:72"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "[Test 6.2] Initial result count: Showing 1 to 20 of 4887 results\n"
+                        },
+                        {
+                          "text": "[Test 6.2] After selection 1: Stats=0, Query=0, Picker=0\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-07T12:50:42.332Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/app/frontend/test-results/app-PHASE-6-Pop-Out-Window-6b271-y-pop-out-makes-a-selection-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "column": 72,
+                        "line": 1297
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-c758d8076ff4cfdc3528",
+              "file": "app.spec.ts",
+              "line": 1243,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-12-07T12:50:00.848Z",
+    "duration": 42969.869,
+    "expected": 33,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

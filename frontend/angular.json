@@ -72,17 +72,6 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              {
-                "glob": "**/*",
-                "input": "playwright-report",
-                "output": "/playwright-report"
-              }
-            ]
-          },
           "configurations": {
             "production": {
               "browserTarget": "frontend:build:production"
