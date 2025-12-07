@@ -1104,11 +1104,10 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     await page.goto('/discover');
 
     // Wait for initial load
-    await expect(page.locator('[data-testid="results-table"]')).toBeVisible();
+    await expect(page.locator('#panel-results-table')).toBeVisible();
 
     // Step 1: Pop out the Statistics panel
-    const statsPanel = page.locator('[data-testid="statistics-panel"]');
-    const statsPopoutBtn = statsPanel.locator('[data-testid="panel-popout-button"]').first();
+    const statsPopoutBtn = page.locator('#popout-statistics-panel');
 
     // Track the new window that will open
     const [statsPanelPopout] = await Promise.all([
@@ -1120,8 +1119,7 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     console.log(`[Test] Statistics panel popped out: ${statsPanelPopout.url()}`);
 
     // Step 2: Pop out the Query Control panel
-    const queryPanel = page.locator('[data-testid="query-control-panel"]');
-    const queryPopoutBtn = queryPanel.locator('[data-testid="panel-popout-button"]').first();
+    const queryPopoutBtn = page.locator('#popout-query-control');
 
     const [queryPanelPopout] = await Promise.all([
       context.waitForEvent('page'),
@@ -1132,8 +1130,7 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     console.log(`[Test] Query Control panel popped out: ${queryPanelPopout.url()}`);
 
     // Step 3: Pop out the Picker panel
-    const pickerPanel = page.locator('[data-testid="picker-panel"]');
-    const pickerPopoutBtn = pickerPanel.locator('[data-testid="panel-popout-button"]').first();
+    const pickerPopoutBtn = page.locator('#popout-manufacturer-model-picker');
 
     const [pickerPanelPopout] = await Promise.all([
       context.waitForEvent('page'),
@@ -1144,8 +1141,7 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     console.log(`[Test] Picker panel popped out: ${pickerPanelPopout.url()}`);
 
     // Step 4: Pop out the Results Table panel
-    const resultsPanel = page.locator('[data-testid="results-table-panel"]');
-    const resultsPopoutBtn = resultsPanel.locator('[data-testid="panel-popout-button"]').first();
+    const resultsPopoutBtn = page.locator('#popout-results-table');
 
     const [resultsPanelPopout] = await Promise.all([
       context.waitForEvent('page'),
@@ -1157,21 +1153,21 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
 
     // At this point, ALL panels are popped out
     // Main window should show empty grid
-    await expect(page.locator('[data-testid="query-control-panel"]')).not.toBeVisible();
-    await expect(page.locator('[data-testid="picker-panel"]')).not.toBeVisible();
-    await expect(page.locator('[data-testid="statistics-panel"]')).not.toBeVisible();
-    await expect(page.locator('[data-testid="results-table-panel"]')).not.toBeVisible();
+    await expect(page.locator('#panel-query-control')).not.toBeVisible();
+    await expect(page.locator('#panel-manufacturer-model-picker')).not.toBeVisible();
+    await expect(page.locator('#panel-statistics-panel')).not.toBeVisible();
+    await expect(page.locator('#panel-results-table')).not.toBeVisible();
 
     // Step 5: In Statistics pop-out, click on a chart (year distribution - "2024")
     // First, get reference values BEFORE the chart selection
-    const resultsTableBefore = resultsPanelPopout.locator('[data-testid="results-table"]');
+    const resultsTableBefore = resultsPanelPopout.locator('app-results-table');
     const paginatorBefore = resultsTableBefore.locator('.p-paginator-current').first();
     const textBefore = await paginatorBefore.textContent();
     console.log(`[Test] Results before chart selection: ${textBefore}`);
 
     // In Statistics panel pop-out, find and click a chart element
     // The chart is rendered as SVG/Canvas, so we need to find a clickable chart bar
-    const chartContainer = statsPanelPopout.locator('[data-testid="statistics-panel"]');
+    const chartContainer = statsPanelPopout.locator('app-statistics-panel');
     const plotlyChart = chartContainer.locator('canvas').first();
 
     if (await plotlyChart.isVisible()) {
@@ -1192,8 +1188,8 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     // Step 6: Verify that Query Control pop-out updated with new filters
     // The query control should show the selected filter
     // If the bug exists, it will NOT show the selection
-    const queryControlFilters = queryPanelPopout.locator('[data-testid="query-control-panel"]');
-    const filterChips = queryControlFilters.locator('p-chip, .p-chip, [role="button"][data-label]');
+    const queryControlComponent = queryPanelPopout.locator('app-query-control');
+    const filterChips = queryControlComponent.locator('p-chip');
 
     // After chart selection, at least one filter chip should be visible (the year range)
     // If bug exists, no chips will appear
@@ -1205,8 +1201,8 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     expect(chipCount).toBeGreaterThan(0);
 
     // Step 7: Verify Picker pop-out shows highlight for selected filter
-    const pickerComponent = pickerPanelPopout.locator('[data-testid="picker-panel"]');
-    const pickerHighlights = pickerComponent.locator('[class*="highlight"], [class*="selected"]');
+    const pickerComponent = pickerPanelPopout.locator('app-base-picker');
+    const pickerHighlights = pickerComponent.locator('tr[class*="selected"]');
 
     const highlightCount = await pickerHighlights.count();
     console.log(`[Test] Highlighted items in Picker pop-out: ${highlightCount}`);
@@ -1215,7 +1211,7 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     expect(highlightCount).toBeGreaterThan(0);
 
     // Step 8: Verify Results Table pop-out shows filtered results
-    const resultsTableAfter = resultsPanelPopout.locator('[data-testid="results-table"]');
+    const resultsTableAfter = resultsPanelPopout.locator('app-results-table');
     const paginatorAfter = resultsTableAfter.locator('.p-paginator-current').first();
 
     // Wait for potential update
@@ -1231,10 +1227,10 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
 
     // Step 9: Verify that main window ALSO reflects the change
     // (this is secondary verification - main window should always work)
-    const mainWindowFilters = page.locator('[data-testid="query-control-panel"]');
-    await expect(mainWindowFilters).toBeVisible({ timeout: 5000 });
+    const mainWindowComponent = page.locator('#panel-query-control');
+    await expect(mainWindowComponent).toBeVisible({ timeout: 5000 });
 
-    const mainFilterChips = mainWindowFilters.locator('p-chip, .p-chip, [role="button"][data-label]');
+    const mainFilterChips = mainWindowComponent.locator('p-chip');
     const mainChipCount = await mainFilterChips.count();
     console.log(`[Test] Filter chips in main window: ${mainChipCount}`);
 
@@ -1251,38 +1247,35 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     // Similar to 6.1 but verifies multiple selections don't cause desynchronization
     await page.goto('/discover');
 
-    await expect(page.locator('[data-testid="results-table"]')).toBeVisible();
+    await expect(page.locator('#panel-results-table')).toBeVisible();
 
     // Pop out all 4 panels
-    const statsPanel = page.locator('[data-testid="statistics-panel"]');
     const [statsPanelPopout] = await Promise.all([
       context.waitForEvent('page'),
-      statsPanel.locator('[data-testid="panel-popout-button"]').first().click()
+      page.locator('#popout-statistics-panel').click()
     ]);
     await statsPanelPopout.waitForLoadState('networkidle');
 
-    const queryPanel = page.locator('[data-testid="query-control-panel"]');
     const [queryPanelPopout] = await Promise.all([
       context.waitForEvent('page'),
-      queryPanel.locator('[data-testid="panel-popout-button"]').first().click()
+      page.locator('#popout-query-control').click()
     ]);
     await queryPanelPopout.waitForLoadState('networkidle');
 
-    const pickerPanel = page.locator('[data-testid="picker-panel"]');
     const [pickerPanelPopout] = await Promise.all([
       context.waitForEvent('page'),
-      pickerPanel.locator('[data-testid="panel-popout-button"]').first().click()
+      page.locator('#popout-manufacturer-model-picker').click()
     ]);
     await pickerPanelPopout.waitForLoadState('networkidle');
 
     // Get initial result count from Results Table in main window
-    const mainResults = page.locator('[data-testid="results-table"]');
+    const mainResults = page.locator('app-results-table');
     const mainPaginator = mainResults.locator('.p-paginator-current').first();
     const initialCount = await mainPaginator.textContent();
     console.log(`[Test 6.2] Initial result count: ${initialCount}`);
 
     // Make first selection in Statistics pop-out (year chart)
-    const statChart = statsPanelPopout.locator('[data-testid="statistics-panel"]').locator('canvas').first();
+    const statChart = statsPanelPopout.locator('app-statistics-panel').locator('canvas').first();
     if (await statChart.isVisible()) {
       const box = await statChart.boundingBox();
       if (box) {
@@ -1292,13 +1285,13 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     }
 
     // Verify all pop-outs updated
-    const statsFilters = statsPanelPopout.locator('[data-testid="statistics-panel"]').locator('[class*="selected"]');
+    const statsFilters = statsPanelPopout.locator('app-statistics-panel').locator('[class*="selected"]');
     const statsFilterCount = await statsFilters.count();
 
-    const queryFilters = queryPanelPopout.locator('[data-testid="query-control-panel"]').locator('p-chip, .p-chip');
+    const queryFilters = queryPanelPopout.locator('app-query-control').locator('p-chip');
     const queryFilterCount = await queryFilters.count();
 
-    const pickerHighlights = pickerPanelPopout.locator('[data-testid="picker-panel"]').locator('[class*="highlight"]');
+    const pickerHighlights = pickerPanelPopout.locator('app-base-picker').locator('tr[class*="selected"]');
     const pickerHighlightCount = await pickerHighlights.count();
 
     console.log(`[Test 6.2] After selection 1: Stats=${statsFilterCount}, Query=${queryFilterCount}, Picker=${pickerHighlightCount}`);
@@ -1307,7 +1300,7 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     expect(statsFilterCount + queryFilterCount + pickerHighlightCount).toBeGreaterThan(0);
 
     // Verify main window also shows the filter
-    const mainFilterChips = page.locator('[data-testid="query-control-panel"]').locator('p-chip, .p-chip');
+    const mainFilterChips = page.locator('#panel-query-control').locator('p-chip');
     const mainFilterCount = await mainFilterChips.count();
     expect(mainFilterCount).toBeGreaterThan(0);
 
