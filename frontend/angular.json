@@ -25,7 +25,12 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "playwright-report",
+                "output": "/report"
+              }
             ],
             "styles": [
               "src/styles.scss"
@@ -67,6 +72,17 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "playwright-report",
+                "output": "/playwright-report"
+              }
+            ]
+          },
           "configurations": {
             "production": {
               "browserTarget": "frontend:build:production"
@@ -93,7 +109,12 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "playwright-report",
+                "output": "/report"
+              }
             ],
             "styles": [
               "src/styles.scss"
