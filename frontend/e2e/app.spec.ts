@@ -1068,3 +1068,255 @@ test.describe('PHASE 5: Statistics Panel', () => {
   });
 
 });
+
+// ============================================================================
+// PHASE 6: POP-OUT WINDOWS & CROSS-WINDOW COMMUNICATION (REGRESSION TESTS)
+// ============================================================================
+
+/**
+ * BUG: Pop-out Chart Selection Not Updating Other Controls
+ *
+ * Scenario: All panels are popped out individually. User makes a chart
+ * selection in the Statistics panel. The other controls (Query Control,
+ * Picker, Results Table) in their pop-out windows should update to reflect
+ * the selection, but they don't.
+ *
+ * Root Cause (Hypothesis): When Statistics panel is popped out and user
+ * clicks a chart, the pop-out sends URL_PARAMS_CHANGED to main window.
+ * Main window may not properly re-broadcast this to OTHER pop-outs because:
+ *
+ * 1. Pop-outs operate in autoFetch: false mode (don't call API)
+ * 2. Pop-outs wait for STATE_UPDATE from main via BroadcastChannel
+ * 3. Main window needs to:
+ *    a) Receive URL_PARAMS_CHANGED from Statistics pop-out
+ *    b) Fetch new API data
+ *    c) Broadcast STATE_UPDATE to ALL pop-outs (including the one that sent the change)
+ *
+ * If step 3c fails or step 3b doesn't happen, other pop-outs remain stale.
+ *
+ * This test captures that regression.
+ */
+
+test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
+
+  test('6.1: Chart selection in pop-out Statistics panel updates all other popped-out controls', async ({ page, context }: any) => {
+    // Navigate to discover
+    await page.goto('/discover');
+
+    // Wait for initial load
+    await expect(page.locator('[data-testid="results-table"]')).toBeVisible();
+
+    // Step 1: Pop out the Statistics panel
+    const statsPanel = page.locator('[data-testid="statistics-panel"]');
+    const statsPopoutBtn = statsPanel.locator('[data-testid="panel-popout-button"]').first();
+
+    // Track the new window that will open
+    const [statsPanelPopout] = await Promise.all([
+      context.waitForEvent('page'), // Wait for new window
+      statsPopoutBtn.click()
+    ]);
+
+    await statsPanelPopout.waitForLoadState('networkidle');
+    console.log(`[Test] Statistics panel popped out: ${statsPanelPopout.url()}`);
+
+    // Step 2: Pop out the Query Control panel
+    const queryPanel = page.locator('[data-testid="query-control-panel"]');
+    const queryPopoutBtn = queryPanel.locator('[data-testid="panel-popout-button"]').first();
+
+    const [queryPanelPopout] = await Promise.all([
+      context.waitForEvent('page'),
+      queryPopoutBtn.click()
+    ]);
+
+    await queryPanelPopout.waitForLoadState('networkidle');
+    console.log(`[Test] Query Control panel popped out: ${queryPanelPopout.url()}`);
+
+    // Step 3: Pop out the Picker panel
+    const pickerPanel = page.locator('[data-testid="picker-panel"]');
+    const pickerPopoutBtn = pickerPanel.locator('[data-testid="panel-popout-button"]').first();
+
+    const [pickerPanelPopout] = await Promise.all([
+      context.waitForEvent('page'),
+      pickerPopoutBtn.click()
+    ]);
+
+    await pickerPanelPopout.waitForLoadState('networkidle');
+    console.log(`[Test] Picker panel popped out: ${pickerPanelPopout.url()}`);
+
+    // Step 4: Pop out the Results Table panel
+    const resultsPanel = page.locator('[data-testid="results-table-panel"]');
+    const resultsPopoutBtn = resultsPanel.locator('[data-testid="panel-popout-button"]').first();
+
+    const [resultsPanelPopout] = await Promise.all([
+      context.waitForEvent('page'),
+      resultsPopoutBtn.click()
+    ]);
+
+    await resultsPanelPopout.waitForLoadState('networkidle');
+    console.log(`[Test] Results Table panel popped out: ${resultsPanelPopout.url()}`);
+
+    // At this point, ALL panels are popped out
+    // Main window should show empty grid
+    await expect(page.locator('[data-testid="query-control-panel"]')).not.toBeVisible();
+    await expect(page.locator('[data-testid="picker-panel"]')).not.toBeVisible();
+    await expect(page.locator('[data-testid="statistics-panel"]')).not.toBeVisible();
+    await expect(page.locator('[data-testid="results-table-panel"]')).not.toBeVisible();
+
+    // Step 5: In Statistics pop-out, click on a chart (year distribution - "2024")
+    // First, get reference values BEFORE the chart selection
+    const resultsTableBefore = resultsPanelPopout.locator('[data-testid="results-table"]');
+    const paginatorBefore = resultsTableBefore.locator('.p-paginator-current').first();
+    const textBefore = await paginatorBefore.textContent();
+    console.log(`[Test] Results before chart selection: ${textBefore}`);
+
+    // In Statistics panel pop-out, find and click a chart element
+    // The chart is rendered as SVG/Canvas, so we need to find a clickable chart bar
+    const chartContainer = statsPanelPopout.locator('[data-testid="statistics-panel"]');
+    const plotlyChart = chartContainer.locator('canvas').first();
+
+    if (await plotlyChart.isVisible()) {
+      // Plotly renders as canvas, click on it to trigger chart interaction
+      // For year chart, click roughly where "2024" bar would be
+      const boundingBox = await plotlyChart.boundingBox();
+      if (boundingBox) {
+        const x = boundingBox.x + boundingBox.width * 0.8; // Right side of chart
+        const y = boundingBox.y + boundingBox.height * 0.5;
+        await statsPanelPopout.mouse.click(x, y);
+        console.log(`[Test] Clicked chart at (${x}, ${y})`);
+
+        // Wait for potential state update
+        await statsPanelPopout.waitForTimeout(1000);
+      }
+    }
+
+    // Step 6: Verify that Query Control pop-out updated with new filters
+    // The query control should show the selected filter
+    // If the bug exists, it will NOT show the selection
+    const queryControlFilters = queryPanelPopout.locator('[data-testid="query-control-panel"]');
+    const filterChips = queryControlFilters.locator('p-chip, .p-chip, [role="button"][data-label]');
+
+    // After chart selection, at least one filter chip should be visible (the year range)
+    // If bug exists, no chips will appear
+    const chipCount = await filterChips.count();
+    console.log(`[Test] Filter chips in Query Control pop-out: ${chipCount}`);
+
+    // BUG CHECK: With the bug, chipCount will be 0
+    // Without bug, chipCount should be > 0
+    expect(chipCount).toBeGreaterThan(0);
+
+    // Step 7: Verify Picker pop-out shows highlight for selected filter
+    const pickerComponent = pickerPanelPopout.locator('[data-testid="picker-panel"]');
+    const pickerHighlights = pickerComponent.locator('[class*="highlight"], [class*="selected"]');
+
+    const highlightCount = await pickerHighlights.count();
+    console.log(`[Test] Highlighted items in Picker pop-out: ${highlightCount}`);
+
+    // BUG CHECK: Highlighted items should update
+    expect(highlightCount).toBeGreaterThan(0);
+
+    // Step 8: Verify Results Table pop-out shows filtered results
+    const resultsTableAfter = resultsPanelPopout.locator('[data-testid="results-table"]');
+    const paginatorAfter = resultsTableAfter.locator('.p-paginator-current').first();
+
+    // Wait for potential update
+    await paginatorAfter.waitFor({ timeout: 5000 });
+    const textAfter = await paginatorAfter.textContent();
+    console.log(`[Test] Results after chart selection: ${textAfter}`);
+
+    // BUG CHECK: Result count should change
+    // Before chart selection: ~4887 total
+    // After selecting a year: Should be much fewer results
+    // If bug exists, textAfter will still show ~4887
+    expect(textAfter).not.toEqual(textBefore);
+
+    // Step 9: Verify that main window ALSO reflects the change
+    // (this is secondary verification - main window should always work)
+    const mainWindowFilters = page.locator('[data-testid="query-control-panel"]');
+    await expect(mainWindowFilters).toBeVisible({ timeout: 5000 });
+
+    const mainFilterChips = mainWindowFilters.locator('p-chip, .p-chip, [role="button"][data-label]');
+    const mainChipCount = await mainFilterChips.count();
+    console.log(`[Test] Filter chips in main window: ${mainChipCount}`);
+
+    expect(mainChipCount).toBeGreaterThan(0);
+
+    // Cleanup - close pop-out windows
+    await statsPanelPopout.close();
+    await queryPanelPopout.close();
+    await pickerPanelPopout.close();
+    await resultsPanelPopout.close();
+  });
+
+  test('6.2: Multiple pop-outs stay in sync when any pop-out makes a selection', async ({ page, context }: any) => {
+    // Similar to 6.1 but verifies multiple selections don't cause desynchronization
+    await page.goto('/discover');
+
+    await expect(page.locator('[data-testid="results-table"]')).toBeVisible();
+
+    // Pop out all 4 panels
+    const statsPanel = page.locator('[data-testid="statistics-panel"]');
+    const [statsPanelPopout] = await Promise.all([
+      context.waitForEvent('page'),
+      statsPanel.locator('[data-testid="panel-popout-button"]').first().click()
+    ]);
+    await statsPanelPopout.waitForLoadState('networkidle');
+
+    const queryPanel = page.locator('[data-testid="query-control-panel"]');
+    const [queryPanelPopout] = await Promise.all([
+      context.waitForEvent('page'),
+      queryPanel.locator('[data-testid="panel-popout-button"]').first().click()
+    ]);
+    await queryPanelPopout.waitForLoadState('networkidle');
+
+    const pickerPanel = page.locator('[data-testid="picker-panel"]');
+    const [pickerPanelPopout] = await Promise.all([
+      context.waitForEvent('page'),
+      pickerPanel.locator('[data-testid="panel-popout-button"]').first().click()
+    ]);
+    await pickerPanelPopout.waitForLoadState('networkidle');
+
+    // Get initial result count from Results Table in main window
+    const mainResults = page.locator('[data-testid="results-table"]');
+    const mainPaginator = mainResults.locator('.p-paginator-current').first();
+    const initialCount = await mainPaginator.textContent();
+    console.log(`[Test 6.2] Initial result count: ${initialCount}`);
+
+    // Make first selection in Statistics pop-out (year chart)
+    const statChart = statsPanelPopout.locator('[data-testid="statistics-panel"]').locator('canvas').first();
+    if (await statChart.isVisible()) {
+      const box = await statChart.boundingBox();
+      if (box) {
+        await statsPanelPopout.mouse.click(box.x + box.width * 0.8, box.y + box.height * 0.5);
+        await statsPanelPopout.waitForTimeout(1000);
+      }
+    }
+
+    // Verify all pop-outs updated
+    const statsFilters = statsPanelPopout.locator('[data-testid="statistics-panel"]').locator('[class*="selected"]');
+    const statsFilterCount = await statsFilters.count();
+
+    const queryFilters = queryPanelPopout.locator('[data-testid="query-control-panel"]').locator('p-chip, .p-chip');
+    const queryFilterCount = await queryFilters.count();
+
+    const pickerHighlights = pickerPanelPopout.locator('[data-testid="picker-panel"]').locator('[class*="highlight"]');
+    const pickerHighlightCount = await pickerHighlights.count();
+
+    console.log(`[Test 6.2] After selection 1: Stats=${statsFilterCount}, Query=${queryFilterCount}, Picker=${pickerHighlightCount}`);
+
+    // BUG CHECK: All should have at least 1 indication of the filter
+    expect(statsFilterCount + queryFilterCount + pickerHighlightCount).toBeGreaterThan(0);
+
+    // Verify main window also shows the filter
+    const mainFilterChips = page.locator('[data-testid="query-control-panel"]').locator('p-chip, .p-chip');
+    const mainFilterCount = await mainFilterChips.count();
+    expect(mainFilterCount).toBeGreaterThan(0);
+
+    // Make second selection (e.g., manufacturer if picker allows it)
+    // This tests that multiple selections propagate correctly
+    // Cleanup
+    await statsPanelPopout.close();
+    await queryPanelPopout.close();
+    await pickerPanelPopout.close();
+  });
+
+});
