@@ -148,17 +148,23 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   ) {}
 
   ngOnInit(): void {
+    console.log('[QueryControl] ngOnInit() starting...');
+
     // Initialize filter field options from domain config
     // Only include queryControlFilters, NOT highlightFilters
     // (highlightFilters are for highlighting data, not for main filter selection)
     this.filterFieldOptions = this.domainConfig.queryControlFilters
       .map(f => ({ label: f.label, value: f }));
+    console.log('[QueryControl] ✅ Initialized filter field options:', this.filterFieldOptions.length);
 
     // Sync from URL state on init and on changes
     this.urlState.params$.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      console.log('[QueryControl] 📨 URL params changed:', params);
       this.syncFiltersFromUrl(params);
+      console.log('[QueryControl] ✅ Called syncFiltersFromUrl(), marking for check');
       this.cdr.markForCheck();
     });
+    console.log('[QueryControl] ✅ ngOnInit() complete, subscribed to URL params$');
   }
 
   ngOnDestroy(): void {
@@ -633,20 +639,28 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    * Sync active filters from URL params
    */
   private syncFiltersFromUrl(params: any): void {
+    console.log('[QueryControl] 🔄 syncFiltersFromUrl() starting...');
+    console.log('[QueryControl] Input params:', params);
+
     this.activeFilters = [];
     this.activeHighlights = [];
 
     // Sync regular filters
     for (const filterDef of this.domainConfig.queryControlFilters) {
+      console.log(`[QueryControl] Processing regular filter: ${filterDef.label}`);
       this.syncFilterFromUrl(params, filterDef, this.activeFilters);
     }
+    console.log('[QueryControl] ✅ Regular filters synced. Count:', this.activeFilters.length);
 
     // Sync highlight filters
     if (this.domainConfig.highlightFilters) {
       for (const filterDef of this.domainConfig.highlightFilters) {
+        console.log(`[QueryControl] Processing highlight filter: ${filterDef.label}`);
         this.syncFilterFromUrl(params, filterDef, this.activeHighlights);
       }
     }
+    console.log('[QueryControl] ✅ Highlight filters synced. Count:', this.activeHighlights.length);
+    console.log('[QueryControl] ✅ syncFiltersFromUrl() complete');
   }
 
   /**

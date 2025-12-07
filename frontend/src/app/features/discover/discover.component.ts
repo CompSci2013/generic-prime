@@ -130,37 +130,48 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   }
 
   ngOnInit(): void {
+    console.log('[Discover] ngOnInit() called');
+
     // Register picker configurations
     const pickerConfigs = createAutomobilePickerConfigs(this.injector);
     this.pickerRegistry.registerMultiple(pickerConfigs);
+    console.log('[Discover] Picker configs registered:', pickerConfigs.length);
 
     // Initialize as parent window
     this.popOutContext.initializeAsParent();
+    console.log('[Discover] Initialized as parent window');
 
     // Close all pop-outs when main window refreshes/closes
     window.addEventListener('beforeunload', this.beforeUnloadHandler);
+    console.log('[Discover] beforeunload handler attached');
 
     // Subscribe to messages from pop-out windows
     this.popOutContext
       .getMessages$()
       .pipe(takeUntil(this.destroy$))
       .subscribe(message => {
+        console.log('[Discover] PopOutContextService message received:', message);
         this.handlePopOutMessage('', message);
       });
+    console.log('[Discover] Subscribed to popOutContext messages');
 
     // Subscribe to pop-out messages (RxJS Observable Pattern)
     // This brings BroadcastChannel events into Angular zone for change detection
     this.popoutMessages$
       .pipe(takeUntil(this.destroy$))
       .subscribe(({ panelId, event }) => {
+        console.log('[Discover] BroadcastChannel message from panel:', panelId, event.data);
         this.handlePopOutMessage(panelId, event.data);
       });
+    console.log('[Discover] Subscribed to popoutMessages$ subject');
 
     // Subscribe to state changes and broadcast to ALL pop-outs
     // URL-First: Main window URL → state$ → BroadcastChannel → pop-out components
     this.resourceService.state$.pipe(takeUntil(this.destroy$)).subscribe(state => {
+      console.log('[Discover] State changed, broadcasting to pop-outs:', state);
       this.broadcastStateToPopOuts(state);
     });
+    console.log('[Discover] Subscribed to resourceService.state$ for broadcasting');
   }
 
   /**
@@ -244,14 +255,17 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * @param panelType - Panel type for routing (e.g., 'query-control', 'picker', 'statistics', 'results')
    */
   popOutPanel(panelId: string, panelType: string): void {
+    console.log(`[Discover] popOutPanel() called - panelId: ${panelId}, panelType: ${panelType}`);
+
     // Check if already popped out
     if (this.poppedOutPanels.has(panelId)) {
-      console.warn(`Panel ${panelId} is already popped out`);
+      console.warn(`[Discover] Panel ${panelId} is already popped out`);
       return;
     }
 
     // Build pop-out URL (NO query params - state comes via BroadcastChannel)
     const url = `/panel/${this.gridId}/${panelId}/${panelType}`;
+    console.log(`[Discover] Opening pop-out window at URL: ${url}`);
 
     // Window features
     const features = buildWindowFeatures({
@@ -265,9 +279,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
 
     // Open window (state will be broadcast via BroadcastChannel, not URL)
     const popoutWindow = window.open(url, `panel-${panelId}`, features);
+    console.log(`[Discover] window.open() returned:`, popoutWindow ? 'SUCCESS' : 'BLOCKED');
 
     if (!popoutWindow) {
       // Pop-up blocked
+      console.error(`[Discover] Pop-up BLOCKED for panel: ${panelId}`);
       this.messageService.add({
         severity: 'warn',
         summary: 'Pop-up Blocked',
@@ -279,22 +295,28 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
 
     // Track as popped out
     this.poppedOutPanels.add(panelId);
+    console.log(`[Discover] Marked panel as popped out. Total popped out: ${this.poppedOutPanels.size}`);
 
     // Set up BroadcastChannel for this panel
     const channel = this.popOutContext.createChannelForPanel(panelId);
+    console.log(`[Discover] Created BroadcastChannel for panel: ${panelId}`);
 
     // Listen for messages from pop-out (Observable Pattern)
     // Push browser API events to RxJS Subject for handling in Angular zone
     channel.onmessage = event => {
+      console.log(`[Discover] BroadcastChannel.onmessage received from ${panelId}:`, event.data);
       this.popoutMessages$.next({ panelId, event });
     };
+    console.log(`[Discover] Set up channel.onmessage listener for panel: ${panelId}`);
 
     // Monitor for window close
     const checkInterval = window.setInterval(() => {
       if (popoutWindow.closed) {
+        console.log(`[Discover] Detected pop-out window closed for panel: ${panelId}`);
         this.onPopOutClosed(panelId, channel, checkInterval);
       }
     }, 500);
+    console.log(`[Discover] Set up window close monitor for panel: ${panelId}`);
 
     // Store reference
     this.popoutWindows.set(panelId, {
@@ -304,11 +326,12 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       panelId,
       panelType
     });
+    console.log(`[Discover] Stored popout reference. Total popouts: ${this.popoutWindows.size}`);
 
     // Trigger change detection to hide panel
     this.cdr.markForCheck();
 
-    console.log(`[Discover] Popped out panel: ${panelId}`);
+    console.log(`[Discover] ✅ Successfully popped out panel: ${panelId}`);
   }
 
   /**

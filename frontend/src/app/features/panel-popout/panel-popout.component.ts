@@ -98,11 +98,13 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    console.log('[PanelPopout] ngOnInit() starting...');
+
     // Register picker configurations (needed for BasePickerComponent in pop-out)
     // TODO: Make this domain-agnostic by using domain config
     const pickerConfigs = createAutomobilePickerConfigs(this.injector);
     this.pickerRegistry.registerMultiple(pickerConfigs);
-    console.log('[PanelPopout] Registered picker configs');
+    console.log('[PanelPopout] ✅ Registered picker configs');
 
     // Extract route parameters
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
@@ -111,14 +113,16 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       this.panelType = params['type'];
 
       console.log(
-        `[PanelPopout] Initialized - Grid: ${this.gridId}, Panel: ${this.panelId}, Type: ${this.panelType}`
+        `[PanelPopout] ✅ Route params received - Grid: ${this.gridId}, Panel: ${this.panelId}, Type: ${this.panelType}`
       );
 
       // Initialize as pop-out
       this.popOutContext.initializeAsPopOut(this.panelId);
+      console.log('[PanelPopout] ✅ Initialized as pop-out in PopOutContextService');
 
       // Trigger change detection
       this.cdr.markForCheck();
+      console.log('[PanelPopout] ✅ Triggered change detection via markForCheck()');
     });
 
     // Subscribe to messages from main window
@@ -126,8 +130,12 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       .getMessages$()
       .pipe(takeUntil(this.destroy$))
       .subscribe(message => {
+        console.log('[PanelPopout] ⬇️  Message received from PopOutContextService:', message);
         this.handleMessage(message);
       });
+    console.log('[PanelPopout] ✅ Subscribed to PopOutContextService messages');
+
+    console.log('[PanelPopout] ✅ ngOnInit() complete');
   }
 
   /**
@@ -136,10 +144,11 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
    * @param message - Message from main window
    */
   private handleMessage(message: PopOutMessage): void {
-    console.log('[PanelPopout] Received message:', message.type);
+    console.log('[PanelPopout] 📨 handleMessage() processing:', message.type);
 
     switch (message.type) {
       case PopOutMessageType.CLOSE_POPOUT:
+        console.log('[PanelPopout] 🔴 Received CLOSE_POPOUT message, closing window...');
         // Close window when requested
         window.close();
         break;
@@ -148,11 +157,19 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
         // Sync full state from main window
         // Main window URL → state$ → BroadcastChannel → pop-out
         if (message.payload && message.payload.state) {
-          console.log('[PanelPopout] Syncing state from main window');
+          console.log('[PanelPopout] 🟢 Received STATE_UPDATE message');
+          console.log('[PanelPopout] State payload:', message.payload.state);
           this.resourceService.syncStateFromExternal(message.payload.state);
+          console.log('[PanelPopout] ✅ Called resourceService.syncStateFromExternal()');
           this.cdr.markForCheck();
+          console.log('[PanelPopout] ✅ Triggered change detection');
+        } else {
+          console.warn('[PanelPopout] ⚠️  STATE_UPDATE missing payload.state');
         }
         break;
+
+      default:
+        console.warn('[PanelPopout] ⚠️  Unknown message type:', message.type);
     }
   }
 

@@ -1,0 +1,25 @@
+{
+  "/report": {
+    "target": "http://localhost:4205",
+    "pathRewrite": {
+      "^/report": "."
+    },
+    "bypass": function(req, res, proxyOptions) {
+      // Serve files from the playwright-report directory
+      // This allows the dev server to serve report files without caching issues
+      const fs = require('fs');
+      const path = require('path');
+
+      if (req.path.startsWith('/report')) {
+        const filePath = path.join(__dirname, 'playwright-report', req.path.substring('/report'.length));
+        if (fs.existsSync(filePath)) {
+          // Set no-cache headers to prevent stale reports
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+          res.setHeader('Pragma', 'no-cache');
+          res.setHeader('Expires', '0');
+          return filePath;
+        }
+      }
+    }
+  }
+}
