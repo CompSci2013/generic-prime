@@ -1175,11 +1175,8 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
         const x = boundingBox.x + boundingBox.width * 0.8; // Right side of chart
         const y = boundingBox.y + boundingBox.height * 0.5;
 
-        // Press and hold 'H' to enable highlight mode, then click chart
-        await page.keyboard.press('KeyH');
         await statsPanelPopout.mouse.click(x, y);
-        await page.keyboard.release('KeyH');
-        console.log(`[Test] Clicked chart at (${x}, ${y}) with highlight mode enabled`);
+        console.log(`[Test] Clicked chart at (${x}, ${y})`);
 
         // Wait for potential state update
         await statsPanelPopout.waitForTimeout(1000);

@@ -363,13 +363,27 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
 
       case PopOutMessageType.URL_PARAMS_CHANGED:
         // Pop-out sent URL params change - update main window URL
-        // This will trigger: URL change → ResourceManagementService → state$ → BroadcastChannel → pop-outs
         console.log(
           '[Discover] URL params change from pop-out:',
           message.payload?.params
         );
         if (message.payload?.params) {
+          // 1. Update the single source of truth (the URL)
           await this.urlStateService.setParams(message.payload.params);
+
+          // 2. Construct the new state by merging the old state with the new filters from the message.
+          // This avoids a race condition where getCurrentState() might be stale.
+          const currentState = this.resourceService.getCurrentState();
+          const newState = {
+            ...currentState,
+            filters: {
+              ...currentState.filters,
+              ...message.payload.params
+            }
+          };
+
+          // 3. Broadcast the explicitly constructed new state.
+          this.broadcastStateToPopOuts(newState);
         }
         break;
 
