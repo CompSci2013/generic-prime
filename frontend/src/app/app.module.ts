@@ -21,6 +21,7 @@ import { AutomobileComponent } from './features/automobile/automobile.component'
 import { AgricultureComponent } from './features/agriculture/agriculture.component';
 import { PhysicsComponent } from './features/physics/physics.component';
 import { PhysicsSyllabusComponent } from './features/physics/physics-syllabus.component';
+import { PhysicsConceptGraphComponent } from './features/physics/physics-concept-graph.component';
 import { ChemistryComponent } from './features/chemistry/chemistry.component';
 import { MathComponent } from './features/math/math.component';
 
@@ -35,6 +36,7 @@ import { MathComponent } from './features/math/math.component';
     AgricultureComponent,
     PhysicsComponent,
     PhysicsSyllabusComponent,
+    PhysicsConceptGraphComponent,
     ChemistryComponent,
     MathComponent
   ],

@@ -8,6 +8,7 @@ import { AutomobileComponent } from './features/automobile/automobile.component'
 import { AgricultureComponent } from './features/agriculture/agriculture.component';
 import { PhysicsComponent } from './features/physics/physics.component';
 import { PhysicsSyllabusComponent } from './features/physics/physics-syllabus.component';
+import { PhysicsConceptGraphComponent } from './features/physics/physics-concept-graph.component';
 import { ChemistryComponent } from './features/chemistry/chemistry.component';
 import { MathComponent } from './features/math/math.component';
 
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'agriculture', component: AgricultureComponent },
   { path: 'physics', component: PhysicsComponent },
   { path: 'physics/syllabus/:nodeId', component: PhysicsSyllabusComponent },
+  { path: 'physics/concept-graph', component: PhysicsConceptGraphComponent },
   { path: 'chemistry', component: ChemistryComponent },
   { path: 'math', component: MathComponent },
   { path: 'report', component: ReportComponent },

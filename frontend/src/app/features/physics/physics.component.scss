@@ -204,11 +204,44 @@
     }
   }
 
-  /* Back Link */
-  .back-link {
-    text-align: center;
+  /* Navigation Links */
+  .navigation-links {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
     margin-top: 3rem;
     animation: fadeInUp 0.8s ease-out 1s both;
+
+    .concept-graph-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #64c8ff;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      padding: 0.8rem 1.5rem;
+      border: 1px solid rgba(100, 200, 255, 0.5);
+      border-radius: 8px;
+      background: rgba(100, 200, 255, 0.05);
+      transition: all 0.3s ease;
+
+      .link-icon {
+        font-size: 1.2rem;
+      }
+
+      .link-text {
+        display: inline-block;
+      }
+
+      &:hover {
+        background: rgba(100, 200, 255, 0.15);
+        border-color: rgba(100, 200, 255, 0.7);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(100, 200, 255, 0.2);
+      }
+    }
 
     .back-button {
       display: inline-block;
@@ -285,6 +318,18 @@
           grid-template-columns: 1fr;
           gap: 1.5rem;
         }
+      }
+    }
+
+    .navigation-links {
+      flex-direction: column;
+      gap: 1rem;
+
+      .concept-graph-link,
+      .back-button {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
       }
     }
 
