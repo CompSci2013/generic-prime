@@ -71,17 +71,19 @@
 
   .canvas-wrapper {
     width: 100%;
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 400px;
     background: linear-gradient(135deg, rgba(100, 200, 255, 0.05) 0%, rgba(75, 163, 217, 0.02) 100%);
     border-radius: 12px;
-    border: 1px solid rgba(100, 200, 255, 0.1);
+    border: 2px solid rgba(100, 200, 255, 0.3);
     overflow: hidden;
     position: relative;
 
     // Cytoscape container fills the wrapper
-    > * {
-      width: 100%;
-      height: 100%;
+    canvas {
+      display: block !important;
+      width: 100% !important;
+      height: 100% !important;
       border-radius: 12px;
     }
   }

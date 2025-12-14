@@ -69,78 +69,98 @@ export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     console.log('[KnowledgeGraph] Building elements with', this.graphData.nodes.length, 'nodes and', this.graphData.edges.length, 'edges');
+    console.log('[KnowledgeGraph] Container element:', this.containerRef.nativeElement);
+    console.log('[KnowledgeGraph] Container size:', this.containerRef.nativeElement.offsetWidth, 'x', this.containerRef.nativeElement.offsetHeight);
+    console.log('[KnowledgeGraph] Container computed style:', window.getComputedStyle(this.containerRef.nativeElement));
+
+    // Ensure the container has proper display and sizing
+    const container = this.containerRef.nativeElement;
+    if (container.offsetHeight === 0 || container.offsetWidth === 0) {
+      console.warn('[KnowledgeGraph] Container has zero dimensions, attempting to force layout recalculation');
+      // Force reflow
+      void container.offsetHeight;
+    }
 
     // Convert data to Cytoscape format
     const elements = this.buildCytoscapeElements();
+    console.log('[KnowledgeGraph] Created elements:', elements.length);
 
-    // Initialize Cytoscape
-    this.cy = cytoscape({
-      container: this.containerRef.nativeElement,
-      elements: elements,
-      style: this.getCytoscapeStyle(),
-      layout: {
-        name: 'dagre',
-        rankDir: 'LR',
-        spacingFactor: 1.5,
-        nodeSep: 100,
-        rankSep: 150,
-        animate: true,
-        animationDuration: 500,
-        fit: true,
-        padding: 40
-      },
-      wheelSensitivity: 0.75,
-      panningEnabled: true,
-      userPanningEnabled: true,
-      zoomingEnabled: true,
-      userZoomingEnabled: true
-    });
+    try {
+      // Initialize Cytoscape
+      this.cy = cytoscape({
+        container: container,
+        elements: elements,
+        style: this.getCytoscapeStyle(),
+        layout: {
+          name: 'dagre',
+          rankDir: 'LR',
+          spacingFactor: 1.5,
+          nodeSep: 100,
+          rankSep: 150,
+          animate: false,
+          animationDuration: 0,
+          fit: true,
+          padding: 40
+        },
+        wheelSensitivity: 0.75,
+        panningEnabled: true,
+        userPanningEnabled: true,
+        zoomingEnabled: true,
+        userZoomingEnabled: true
+      });
+      console.log('[KnowledgeGraph] Cytoscape initialized successfully');
 
-    // Fit graph to container
-    this.cy.fit();
+      // Add event listeners for nodes
+      this.cy.on('tap', 'node', (evt: any) => {
+        const node = evt.target;
+        const nodeId = node.id();
+        this.selectedNode =
+          this.graphData!.nodes.find((n) => n.id === nodeId) || null;
+        console.log('[KnowledgeGraph] Selected node:', nodeId);
+      });
 
-    // Add event listeners for nodes
-    this.cy.on('tap', 'node', (evt: any) => {
-      const node = evt.target;
-      const nodeId = node.id();
-      this.selectedNode =
-        this.graphData.nodes.find((n) => n.id === nodeId) || null;
-      console.log('[KnowledgeGraph] Selected node:', nodeId);
-    });
+      // Add event listeners for edges - hover to show tooltip
+      this.cy.on('mouseover', 'edge', (evt: any) => {
+        const edge = evt.target;
+        this.hoveredEdgeLabel = edge.data('label');
+      });
 
-    // Add event listeners for edges - hover to show tooltip
-    this.cy.on('mouseover', 'edge', (evt: any) => {
-      const edge = evt.target;
-      this.hoveredEdgeLabel = edge.data('label');
-    });
+      this.cy.on('mouseout', 'edge', () => {
+        this.hoveredEdgeLabel = null;
+      });
 
-    this.cy.on('mouseout', 'edge', () => {
-      this.hoveredEdgeLabel = null;
-    });
+      // Add click outside graph to deselect
+      this.cy.on('tap', (evt: any) => {
+        if (evt.target === this.cy) {
+          this.selectedNode = null;
+        }
+      });
 
-    // Add mouse move listener to track cursor position for tooltip
-    this.mouseMoveListener = (e: MouseEvent) => {
-      if (this.hoveredEdgeLabel) {
-        this.tooltipPos = {
-          left: e.clientX + 'px',
-          top: (e.clientY + 12) + 'px'
-        };
-      }
-    };
-    document.addEventListener('mousemove', this.mouseMoveListener);
+      // Add mouse move listener to track cursor position for tooltip
+      this.mouseMoveListener = (e: MouseEvent) => {
+        if (this.hoveredEdgeLabel) {
+          this.tooltipPos = {
+            left: e.clientX + 'px',
+            top: (e.clientY + 12) + 'px'
+          };
+        }
+      };
+      document.addEventListener('mousemove', this.mouseMoveListener);
 
-    // Add click outside graph to deselect
-    this.cy.on('tap', (evt: any) => {
-      if (evt.target === this.cy) {
-        this.selectedNode = null;
-      }
-    });
+      // Handle window resize
+      this.resizeListener = () => this.handleResize();
+      window.addEventListener('resize', this.resizeListener);
 
-    // Handle window resize
-    this.resizeListener = () => this.handleResize();
-    window.addEventListener('resize', this.resizeListener);
+      // Fit graph to container after a short delay to ensure rendering
+      setTimeout(() => {
+        this.cy.fit();
+        console.log('[KnowledgeGraph] Graph fitted to view');
+      }, 200);
 
-    console.log('[KnowledgeGraph] Cytoscape initialized');
+      console.log('[KnowledgeGraph] Event listeners and resize handler attached');
+    } catch (error) {
+      console.error('[KnowledgeGraph] Error initializing Cytoscape:', error);
+    }
   }
 
   private buildCytoscapeElements(): any[] {
