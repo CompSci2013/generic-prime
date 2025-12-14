@@ -27,21 +27,76 @@ import { ResourceManagementService } from '../../../framework/services/resource-
 import { UrlStateService } from '../../../framework/services/url-state.service';
 
 /**
- * Discover Component
+ * Discover Component - Core discovery interface orchestrator
  *
- * **DOMAIN-AGNOSTIC** - Main feature component for data discovery.
- * Orchestrates display of domain-configured components.
+ * **DOMAIN-AGNOSTIC**: Works with any domain via dependency injection.
+ * Single component renders different UIs based on DOMAIN_CONFIG.
  *
- * Architecture:
- * - Configuration-driven component composition
- * - Delegates to reusable framework components
- * - Domain configuration injected via DOMAIN_CONFIG token
- * - Supports pop-out windows for multi-monitor setups
- * - Coordinates URL state between main window and pop-outs
+ * **Primary Responsibilities**:
+ * 1. Orchestrate 4 framework panels (QueryControl, Picker, Statistics, ResultsTable)
+ * 2. Manage panel lifecycle (collapse, drag-drop reorder, pop-out)
+ * 3. Handle URL state synchronization with ResourceManagementService
+ * 4. Manage pop-out windows (create, monitor, close)
+ * 5. Broadcast state changes to all open pop-outs via BroadcastChannel
+ * 6. Listen for messages from pop-outs and update URL/state
  *
- * @template TFilters - Domain-specific filter model type
- * @template TData - Domain-specific data model type
- * @template TStatistics - Domain-specific statistics model type
+ * **Architecture**: Configuration-Driven + URL-First + Pop-Out Aware
+ *
+ * ```
+ * DiscoverComponent (main window)
+ * ├─ URL changes
+ * │  └─ ResourceManagementService detects change → fetchData()
+ * │     └─ state$ emits new state
+ * │        └─ broadcastStateToPopOuts() sends via BroadcastChannel
+ * │
+ * ├─ Panel renders
+ * │  ├─ Query Control (filters$)
+ * │  ├─ Picker (results$ with filter)
+ * │  ├─ Statistics (statistics$)
+ * │  └─ Results Table (results$)
+ * │
+ * └─ Pop-outs
+ *    ├─ popOutPanel() opens new window
+ *    ├─ PanelPopoutComponent initializes
+ *    │  └─ ResourceManagementService (pop-out instance, autoFetch=false)
+ *    │
+ *    └─ BroadcastChannel sync
+ *       ├─ Main → Pop-out: STATE_UPDATE (on URL change)
+ *       └─ Pop-out → Main: PICKER_SELECTION_CHANGE, FILTER_ADD, etc.
+ * ```
+ *
+ * **Key Features**:
+ * - **Panel Management**: Collapse, drag-drop reorder, hide when popped out
+ * - **Pop-Out Windows**: Open secondary windows via window.open()
+ * - **BroadcastChannel**: Cross-window communication (one channel per panel)
+ * - **Window Close Detection**: Polls every 500ms to detect user-closed windows
+ * - **State Broadcasting**: Listens to state$ and broadcasts to all pop-outs
+ * - **Change Detection**: OnPush strategy with manual markForCheck()
+ * - **Cleanup**: Closes all pop-outs on beforeunload (page refresh/close)
+ *
+ * **Configuration**: Injected via DOMAIN_CONFIG token
+ * - Works with any domain (Automobile, Agriculture, Physics, etc.)
+ * - Domain config defines: filters, adapters, table columns, charts
+ * - No hardcoded domain logic - all driven by config
+ *
+ * **Observable Pattern**:
+ * - state$ from ResourceManagementService → broadcasts to pop-outs
+ * - Pop-out messages received → update URL → trigger state$ → components re-render
+ * - Messages flow: URL → state$ → BroadcastChannel → pop-out components
+ *
+ * @template TFilters - Domain-specific filter model (e.g., AutoSearchFilters)
+ * @template TData - Domain-specific data model (e.g., VehicleResult)
+ * @template TStatistics - Domain-specific statistics (e.g., VehicleStatistics)
+ *
+ * @example
+ * ```typescript
+ * // Works with any domain - same component, different configs
+ * // Automobile domain
+ * // <app-discover></app-discover> with AutomobileConfig
+ *
+ * // Agriculture domain (same component, different config)
+ * // <app-discover></app-discover> with AgricultureConfig
+ * ```
  */
 @Component({
   selector: 'app-discover',
@@ -129,23 +184,56 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     >;
   }
 
+  /**
+   * Angular lifecycle hook - Initialize component
+   *
+   * **Initialization Sequence**:
+   * 1. Register picker configs with registry (domain-specific pickers)
+   * 2. Initialize PopOutContextService as parent window
+   * 3. Set up beforeunload handler to close pop-outs on page refresh
+   * 4. Subscribe to pop-out context messages
+   * 5. Subscribe to pop-out BroadcastChannel messages via RxJS Subject
+   * 6. Subscribe to ResourceManagementService.state$ and broadcast to all pop-outs
+   *
+   * **Observable Subscriptions**:
+   * - popOutContext.getMessages$(): Pop-out context messages from PopOutContextService
+   * - popoutMessages$: BroadcastChannel messages wrapped in RxJS Subject
+   * - resourceService.state$: State changes that need to broadcast to pop-outs
+   *
+   * **Why RxJS Subject for BroadcastChannel?**
+   * BroadcastChannel callbacks run outside Angular's zone, bypassing change detection.
+   * By pushing events into popoutMessages$ Subject, we bring them into Angular zone
+   * so Angular automatically triggers change detection and component updates.
+   *
+   * **Memory Management**:
+   * All subscriptions are cleaned up via takeUntil(destroy$) in ngOnDestroy.
+   */
   ngOnInit(): void {
     console.log('[Discover] ngOnInit() called');
 
-    // Register picker configurations
+    // STEP 1: Register domain-specific picker configurations
+    // Pickers are domain-specific (e.g., ManufacturerModel for automobiles)
+    // createAutomobilePickerConfigs() returns an array of PickerConfig objects
+    // These are registered globally so any component can reference them by ID
     const pickerConfigs = createAutomobilePickerConfigs(this.injector);
     this.pickerRegistry.registerMultiple(pickerConfigs);
     console.log('[Discover] Picker configs registered:', pickerConfigs.length);
 
-    // Initialize as parent window
+    // STEP 2: Initialize PopOutContextService as parent (main) window
+    // This marks the service as "not a pop-out" (as opposed to PanelPopoutComponent)
+    // Allows PopOutContextService to distinguish main window from pop-outs
     this.popOutContext.initializeAsParent();
     console.log('[Discover] Initialized as parent window');
 
-    // Close all pop-outs when main window refreshes/closes
+    // STEP 3: Close all pop-outs when user refreshes/closes main window
+    // beforeunload is more reliable than unload for cleanup
+    // Ensures pop-out windows are explicitly closed before main window unloads
     window.addEventListener('beforeunload', this.beforeUnloadHandler);
     console.log('[Discover] beforeunload handler attached');
 
-    // Subscribe to messages from pop-out windows
+    // STEP 4: Listen for messages from pop-outs via PopOutContextService
+    // PopOutContextService maintains a global subscription to BroadcastChannel
+    // This captures any messages sent by pop-outs (PANEL_READY, PICKER_SELECTION_CHANGE, etc.)
     this.popOutContext
       .getMessages$()
       .pipe(takeUntil(this.destroy$))
@@ -155,8 +243,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       });
     console.log('[Discover] Subscribed to popOutContext messages');
 
-    // Subscribe to pop-out messages (RxJS Observable Pattern)
-    // This brings BroadcastChannel events into Angular zone for change detection
+    // STEP 5: Subscribe to pop-out BroadcastChannel messages
+    // BroadcastChannel.onmessage callbacks run OUTSIDE Angular zone
+    // We push them into popoutMessages$ Subject to bring them INTO Angular zone
+    // This ensures Angular detects changes and re-renders components
+    // Each panel's popOutPanel() method sets up channel.onmessage listener
     this.popoutMessages$
       .pipe(takeUntil(this.destroy$))
       .subscribe(({ panelId, event }) => {
@@ -165,8 +256,12 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       });
     console.log('[Discover] Subscribed to popoutMessages$ subject');
 
-    // Subscribe to state changes and broadcast to ALL pop-outs
-    // URL-First: Main window URL → state$ → BroadcastChannel → pop-out components
+    // STEP 6: Broadcast state changes to all open pop-outs
+    // URL-First Architecture: Main window is source of truth
+    // Flow: URL change → ResourceManagementService.fetchData() →
+    //       state$ emits → broadcastStateToPopOuts() → BroadcastChannel →
+    //       pop-outs' ResourceManagementService.syncStateFromExternal() → pop-out components re-render
+    // This subscription fires every time state$ emits (filters, results, loading, error, statistics)
     this.resourceService.state$.pipe(takeUntil(this.destroy$)).subscribe(state => {
       console.log('[Discover] State changed, broadcasting to pop-outs:', state);
       this.broadcastStateToPopOuts(state);
