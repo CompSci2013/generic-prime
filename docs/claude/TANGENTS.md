@@ -32,6 +32,41 @@ This document tracks discussion topics and questions that come up during session
 - `/docs/specs/11-navigation-authorization.md` (1,578 lines - ready for implementation)
 - `/frontend/src/framework/services/http-error.interceptor.ts` (partial infrastructure)
 
+### 2. Smart Domain Navigation Dropdown Menu in Banner
+**Date Raised**: 2025-12-14
+**Status**: Ready for Implementation
+**Summary**:
+- User requested a smart dropdown menu in the app header/banner
+- Should allow quick navigation between domains from any page
+- No need to click "Home" then select another domain
+- Should include flyout menus for sub-pages within domains (e.g., /automobiles, /automobiles/discover)
+
+**Investigation Completed**: ✅
+- Current app structure explored
+- All routes documented: 5 domains with landing pages + discover routes + report page
+- PrimeNG DropdownModule already imported and available
+- Banner location identified: `<header class="app-header">` in app.component.html
+- Current header only has simple "Home" link - room for enhancement
+
+**Implementation Approach**:
+- Enhance existing header with domain dropdown menu
+- Use PrimeNG p-dropdown component (already available)
+- Menu structure: Domains as main items, with sub-routes as flyout items
+- Routes to include: `/automobiles`, `/automobiles/discover`, `/agriculture`, `/physics`, `/chemistry`, `/math`, `/report`
+- Styling: Maintain dark theme consistency with accent colors
+
+**Related Files**:
+- `/frontend/src/app/app.component.html` (header location)
+- `/frontend/src/app/app.component.scss` (styling)
+- `/frontend/src/app/app-routing.module.ts` (routes reference)
+- `/frontend/src/app/primeng.module.ts` (DropdownModule already imported)
+
+**Next Steps**:
+- Design dropdown structure and styling
+- Implement in app.component
+- Test navigation from all pages
+- Verify menu UX on different routes
+
 ---
 
 ## Historical Tangents (Resolved)
