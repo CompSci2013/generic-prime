@@ -64,8 +64,27 @@ Before ending each session, you MUST perform these 3 steps:
 - **PROJECT-STATUS.md**: Know current state and active bugs (read once per session)
 - **NEXT-STEPS.md**: See immediate work for this session (read once per session)
 - **DOCUMENT-MAP.md**: Find specialized documentation for specific tasks
+- **TANGENTS.md**: Track follow-up topics and side discussions that aren't current tasks (reference as needed)
 - **Git history**: Check historical PROJECT-STATUS.md versions via `git log docs/claude/PROJECT-STATUS.md`
 
 ---
 
-**Last Updated**: 2025-12-06
+## Tangents & Follow-up Topics
+
+During discussions, side topics and questions come up that aren't the current task. These are documented in **TANGENTS.md** for future prioritization.
+
+### How It Works:
+1. **When a tangent arises**: It gets added to `/docs/claude/TANGENTS.md` with context and investigation status
+2. **Between major tasks**: I'll remind you of pending tangents for potential tasking
+3. **Periodically**: The tangents document is updated as topics progress or get resolved
+4. **For future sessions**: Tangents persist in git history, so context isn't lost
+
+### Current Tangents:
+Check `/docs/claude/TANGENTS.md` for:
+- Active discussion topics awaiting decisions
+- Partially investigated items needing clarification
+- Historical tangents that have been resolved
+
+---
+
+**Last Updated**: 2025-12-14
