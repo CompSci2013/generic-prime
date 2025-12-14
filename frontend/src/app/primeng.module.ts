@@ -19,6 +19,7 @@ import { MessageModule } from 'primeng/message';
 import { ChipModule } from 'primeng/chip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
+import { TieredMenuModule } from 'primeng/tieredmenu';
 
 const PRIMENG_MODULES = [
   TableModule,
@@ -37,7 +38,8 @@ const PRIMENG_MODULES = [
   MessageModule,
   ChipModule,
   ProgressSpinnerModule,
-  TooltipModule
+  TooltipModule,
+  TieredMenuModule
 ];
 
 @NgModule({

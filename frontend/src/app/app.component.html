@@ -5,23 +5,12 @@
 <header class="app-header">
   <a routerLink="/" class="home-link">🏠 Home</a>
 
-  <!-- Domain Navigation Dropdown with Organized Menu -->
-  <p-dropdown
-    [options]="domainMenuItems"
-    optionLabel="label"
-    placeholder="📚 Domains"
-    (onChange)="navigateToDomain($event)"
-    [showClear]="false"
-    styleClass="domain-dropdown"
-    appendTo="body">
-    <ng-template pTemplate="item" let-option>
-      <div *ngIf="!option.separator" class="dropdown-item-wrapper" [class.indent-item]="option.indent" [class.group-label]="option.groupLabel">
-        <span class="dropdown-item-icon">{{option.icon}}</span>
-        <span class="dropdown-item-label">{{option.label}}</span>
-      </div>
-      <hr *ngIf="option.separator" class="dropdown-separator">
-    </ng-template>
-  </p-dropdown>
+  <!-- Domain Navigation TieredMenu with Flyout Submenus -->
+  <p-tieredMenu
+    [model]="domainMenuItems"
+    styleClass="domain-menu"
+    [appendTo]="'body'">
+  </p-tieredMenu>
 </header>
 
 <!-- Application Content -->

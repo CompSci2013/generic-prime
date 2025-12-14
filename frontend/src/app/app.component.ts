@@ -1,5 +1,5 @@
 import { Component, Injector } from '@angular/core';
-import { Router } from '@angular/router';
+import { MenuItem } from 'primeng/api';
 import { DomainConfigRegistry } from '../framework/services';
 import { DOMAIN_PROVIDERS } from '../domain-config/domain-providers';
 
@@ -11,56 +11,59 @@ import { DOMAIN_PROVIDERS } from '../domain-config/domain-providers';
 export class AppComponent {
   title = 'generic-prime';
 
-  // Domain navigation menu items - flat structure with grouping labels
-  domainMenuItems = [
-    { label: 'Home', icon: '🏠', route: '/' },
+  // Domain navigation menu items with TieredMenu structure (nested items with flyout submenus)
+  domainMenuItems: MenuItem[] = [
+    { label: 'Home', icon: '🏠', routerLink: '/' },
     { separator: true },
-    { label: 'Automobiles', icon: '🚗', groupLabel: 'Automobiles' },
-    { label: 'Autos Home', icon: '🏠', route: '/automobiles', indent: true },
-    { label: 'Autos Discover', icon: '🔍', route: '/automobiles/discover', indent: true },
-    { label: 'Agriculture', icon: '🌾', groupLabel: 'Agriculture' },
-    { label: 'Agriculture Home', icon: '🏠', route: '/agriculture', indent: true },
-    { label: 'Agriculture Discover', icon: '🔍', route: '/agriculture/discover', indent: true },
-    { label: 'Physics', icon: '⚛️', groupLabel: 'Physics' },
-    { label: 'Physics Home', icon: '🏠', route: '/physics', indent: true },
-    { label: 'Physics Discover', icon: '🔍', route: '/physics/discover', indent: true },
-    { label: 'Chemistry', icon: '🧪', groupLabel: 'Chemistry' },
-    { label: 'Chemistry Home', icon: '🏠', route: '/chemistry', indent: true },
-    { label: 'Chemistry Discover', icon: '🔍', route: '/chemistry/discover', indent: true },
-    { label: 'Mathematics', icon: '📐', groupLabel: 'Mathematics' },
-    { label: 'Math Home', icon: '🏠', route: '/math', indent: true },
-    { label: 'Math Discover', icon: '🔍', route: '/math/discover', indent: true },
+    {
+      label: 'Automobiles',
+      icon: '🚗',
+      items: [
+        { label: 'Autos Home', icon: '🏠', routerLink: '/automobiles' },
+        { label: 'Autos Discover', icon: '🔍', routerLink: '/automobiles/discover' }
+      ]
+    },
+    {
+      label: 'Agriculture',
+      icon: '🌾',
+      items: [
+        { label: 'Agriculture Home', icon: '🏠', routerLink: '/agriculture' },
+        { label: 'Agriculture Discover', icon: '🔍', routerLink: '/agriculture/discover' }
+      ]
+    },
+    {
+      label: 'Physics',
+      icon: '⚛️',
+      items: [
+        { label: 'Physics Home', icon: '🏠', routerLink: '/physics' },
+        { label: 'Physics Discover', icon: '🔍', routerLink: '/physics/discover' }
+      ]
+    },
+    {
+      label: 'Chemistry',
+      icon: '🧪',
+      items: [
+        { label: 'Chemistry Home', icon: '🏠', routerLink: '/chemistry' },
+        { label: 'Chemistry Discover', icon: '🔍', routerLink: '/chemistry/discover' }
+      ]
+    },
+    {
+      label: 'Mathematics',
+      icon: '📐',
+      items: [
+        { label: 'Math Home', icon: '🏠', routerLink: '/math' },
+        { label: 'Math Discover', icon: '🔍', routerLink: '/math/discover' }
+      ]
+    },
     { separator: true },
-    { label: 'Test Reports', icon: '📋', route: '/report' }
+    { label: 'Test Reports', icon: '📋', routerLink: '/report' }
   ];
 
   constructor(
     private domainConfigRegistry: DomainConfigRegistry,
-    private injector: Injector,
-    private router: Router
+    private injector: Injector
   ) {
     this.domainConfigRegistry.registerDomainProviders(DOMAIN_PROVIDERS, this.injector);
-  }
-
-  /**
-   * Navigate to selected menu item
-   * Handles direct routes and navigates away from menu items with submenus
-   */
-  navigateToDomain(event: any) {
-    const selectedItem = event.value;
-
-    // Only navigate if the item has a direct route
-    if (selectedItem && selectedItem.route) {
-      this.router.navigate([selectedItem.route]);
-
-      // Reset dropdown after navigation
-      setTimeout(() => {
-        const dropdown = document.querySelector('.domain-dropdown .p-dropdown-trigger');
-        if (dropdown instanceof HTMLElement) {
-          dropdown.click();
-        }
-      }, 100);
-    }
   }
 }
 
