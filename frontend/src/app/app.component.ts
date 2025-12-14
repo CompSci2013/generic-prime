@@ -18,7 +18,8 @@ export class AppComponent {
       icon: '🚗',
       items: [
         { label: 'Autos Home', icon: '🏠', routerLink: '/automobiles' },
-        { label: 'Autos Discover', icon: '🔍', routerLink: '/automobiles/discover' }
+        { label: 'Autos Discover', icon: '🔍', routerLink: '/automobiles/discover' },
+        { label: 'View Test Reports', icon: '📋', url: 'playwright-report/index.html', target: '_blank' }
       ]
     },
     {
@@ -26,7 +27,8 @@ export class AppComponent {
       icon: '🌾',
       items: [
         { label: 'Agriculture Home', icon: '🏠', routerLink: '/agriculture' },
-        { label: 'Agriculture Discover', icon: '🔍', routerLink: '/agriculture/discover' }
+        { label: 'Agriculture Discover', icon: '🔍', routerLink: '/agriculture/discover' },
+        { label: 'View Test Reports', icon: '📋', url: 'playwright-report/index.html', target: '_blank' }
       ]
     },
     {
@@ -34,7 +36,8 @@ export class AppComponent {
       icon: '⚛️',
       items: [
         { label: 'Physics Home', icon: '🏠', routerLink: '/physics' },
-        { label: 'Physics Discover', icon: '🔍', routerLink: '/physics/discover' }
+        { label: 'Physics Discover', icon: '🔍', routerLink: '/physics/discover' },
+        { label: 'View Test Reports', icon: '📋', url: 'playwright-report/index.html', target: '_blank' }
       ]
     },
     {
@@ -42,7 +45,8 @@ export class AppComponent {
       icon: '🧪',
       items: [
         { label: 'Chemistry Home', icon: '🏠', routerLink: '/chemistry' },
-        { label: 'Chemistry Discover', icon: '🔍', routerLink: '/chemistry/discover' }
+        { label: 'Chemistry Discover', icon: '🔍', routerLink: '/chemistry/discover' },
+        { label: 'View Test Reports', icon: '📋', url: 'playwright-report/index.html', target: '_blank' }
       ]
     },
     {
@@ -50,14 +54,8 @@ export class AppComponent {
       icon: '📐',
       items: [
         { label: 'Math Home', icon: '🏠', routerLink: '/math' },
-        { label: 'Math Discover', icon: '🔍', routerLink: '/math/discover' }
-      ]
-    },
-    {
-      label: 'Test Reports',
-      icon: '📋',
-      items: [
-        { label: 'View Test Reports', icon: '📊', routerLink: '/report' }
+        { label: 'Math Discover', icon: '🔍', routerLink: '/math/discover' },
+        { label: 'View Test Reports', icon: '📋', url: 'playwright-report/index.html', target: '_blank' }
       ]
     }
   ];
