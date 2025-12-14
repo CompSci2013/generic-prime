@@ -94,6 +94,9 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
       this.selectedNode =
         this.conceptGraph.nodes.find((n) => n.id === nodeId) || null;
       console.log('[PhysicsConceptGraph] Selected node:', nodeId);
+
+      // Navigate to knowledge graph if node has one
+      this.navigateToNodeGraph(nodeId);
     });
 
     // Add event listeners for edges - hover to show tooltip
@@ -238,6 +241,14 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     if (this.cy) {
       this.cy.fit(null, 40);
     }
+  }
+
+  navigateToNodeGraph(nodeId: string): void {
+    // Navigate to knowledge graph for nodes that have them
+    if (nodeId === 'mechanics-foundations') {
+      this.router.navigate(['/physics/classical-mechanics-graph']);
+    }
+    // Add more node-to-graph mappings as knowledge graphs are created for other topics
   }
 
   goBack(): void {
