@@ -144,33 +144,33 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
       this.ctx.lineTo(endX, endY);
       this.ctx.stroke();
 
-      // Draw arrow at endpoint
-      this.drawArrow(startX, startY, endX, endY);
+      // Draw arrowhead at both ends
+      this.drawArrowHead(endX, endY, angle);
 
-      // Draw label with background
+      // Draw label with background - positioned far from nodes
       const midX = (startX + endX) / 2;
       const midY = (startY + endY) / 2;
 
       // Offset label perpendicular to the line (alternate above/below)
-      const offsetDistance = 15;
+      // Increased offset distance to avoid overlap with nodes
+      const offsetDistance = 35;
       const perpAngle = angle + (index % 2 === 0 ? Math.PI / 2 : -Math.PI / 2);
       const labelX = midX + offsetDistance * Math.cos(perpAngle);
       const labelY = midY + offsetDistance * Math.sin(perpAngle);
 
-      this.drawLabelWithBackground(edge.label, labelX, labelY, 0.75);
+      this.drawLabelWithBackground(edge.label, labelX, labelY, 0.7);
     });
   }
 
-  private drawArrow(fromX: number, fromY: number, toX: number, toY: number): void {
+  private drawArrowHead(x: number, y: number, angle: number): void {
     const headlen = 15;
-    const angle = Math.atan2(toY - fromY, toX - fromX);
 
     // Draw arrowhead at the endpoint
     this.ctx.fillStyle = 'rgba(100, 200, 255, 0.6)';
     this.ctx.beginPath();
-    this.ctx.moveTo(toX, toY);
-    this.ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
-    this.ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+    this.ctx.moveTo(x, y);
+    this.ctx.lineTo(x - headlen * Math.cos(angle - Math.PI / 6), y - headlen * Math.sin(angle - Math.PI / 6));
+    this.ctx.lineTo(x - headlen * Math.cos(angle + Math.PI / 6), y - headlen * Math.sin(angle + Math.PI / 6));
     this.ctx.closePath();
     this.ctx.fill();
   }
@@ -180,11 +180,11 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     this.ctx.font = `${fontSize}rem Arial`;
     const metrics = this.ctx.measureText(text);
     const textWidth = metrics.width;
-    const textHeight = fontSize * 16 * 1.2; // Approximate line height
+    const textHeight = fontSize * 16; // Actual font size in pixels
 
-    // Draw semi-transparent background
-    const padding = 4;
-    this.ctx.fillStyle = 'rgba(26, 26, 26, 0.8)';
+    // Draw semi-transparent background box
+    const padding = 6;
+    this.ctx.fillStyle = 'rgba(26, 26, 26, 0.9)';
     this.ctx.fillRect(
       x - textWidth / 2 - padding,
       y - textHeight / 2 - padding,
@@ -192,8 +192,8 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
       textHeight + padding * 2
     );
 
-    // Draw border
-    this.ctx.strokeStyle = 'rgba(100, 200, 255, 0.4)';
+    // Draw border for visibility
+    this.ctx.strokeStyle = 'rgba(100, 200, 255, 0.5)';
     this.ctx.lineWidth = 1;
     this.ctx.strokeRect(
       x - textWidth / 2 - padding,
@@ -203,7 +203,7 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     );
 
     // Draw text
-    this.ctx.fillStyle = '#b0b0b0';
+    this.ctx.fillStyle = '#e8e8e8';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText(text, x, y);
