@@ -19,7 +19,7 @@ export class AppComponent {
       items: [
         { label: 'Autos Home', icon: '🏠', routerLink: '/automobiles' },
         { label: 'Autos Discover', icon: '🔍', routerLink: '/automobiles/discover' },
-        { label: 'View Test Reports', icon: '📋', url: 'playwright-report/index.html', target: '_blank' }
+        { label: 'View Test Reports', icon: '📋', command: () => this.openTestReports() }
       ]
     },
     {
@@ -28,7 +28,7 @@ export class AppComponent {
       items: [
         { label: 'Agriculture Home', icon: '🏠', routerLink: '/agriculture' },
         { label: 'Agriculture Discover', icon: '🔍', routerLink: '/agriculture/discover' },
-        { label: 'View Test Reports', icon: '📋', url: 'playwright-report/index.html', target: '_blank' }
+        { label: 'View Test Reports', icon: '📋', command: () => this.openTestReports() }
       ]
     },
     {
@@ -37,7 +37,7 @@ export class AppComponent {
       items: [
         { label: 'Physics Home', icon: '🏠', routerLink: '/physics' },
         { label: 'Physics Discover', icon: '🔍', routerLink: '/physics/discover' },
-        { label: 'View Test Reports', icon: '📋', url: 'playwright-report/index.html', target: '_blank' }
+        { label: 'View Test Reports', icon: '📋', command: () => this.openTestReports() }
       ]
     },
     {
@@ -46,7 +46,7 @@ export class AppComponent {
       items: [
         { label: 'Chemistry Home', icon: '🏠', routerLink: '/chemistry' },
         { label: 'Chemistry Discover', icon: '🔍', routerLink: '/chemistry/discover' },
-        { label: 'View Test Reports', icon: '📋', url: 'playwright-report/index.html', target: '_blank' }
+        { label: 'View Test Reports', icon: '📋', command: () => this.openTestReports() }
       ]
     },
     {
@@ -55,7 +55,7 @@ export class AppComponent {
       items: [
         { label: 'Math Home', icon: '🏠', routerLink: '/math' },
         { label: 'Math Discover', icon: '🔍', routerLink: '/math/discover' },
-        { label: 'View Test Reports', icon: '📋', url: 'playwright-report/index.html', target: '_blank' }
+        { label: 'View Test Reports', icon: '📋', command: () => this.openTestReports() }
       ]
     }
   ];
@@ -65,6 +65,13 @@ export class AppComponent {
     private injector: Injector
   ) {
     this.domainConfigRegistry.registerDomainProviders(DOMAIN_PROVIDERS, this.injector);
+  }
+
+  /**
+   * Open Playwright test reports in a new tab
+   */
+  openTestReports(): void {
+    window.open('/report', '_blank');
   }
 }
 

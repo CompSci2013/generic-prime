@@ -7,6 +7,7 @@ import { HomeComponent } from './features/home/home.component';
 import { AutomobileComponent } from './features/automobile/automobile.component';
 import { AgricultureComponent } from './features/agriculture/agriculture.component';
 import { PhysicsComponent } from './features/physics/physics.component';
+import { PhysicsSyllabusComponent } from './features/physics/physics-syllabus.component';
 import { ChemistryComponent } from './features/chemistry/chemistry.component';
 import { MathComponent } from './features/math/math.component';
 
@@ -17,6 +18,7 @@ const routes: Routes = [
   { path: 'automobiles/discover', component: DiscoverComponent },
   { path: 'agriculture', component: AgricultureComponent },
   { path: 'physics', component: PhysicsComponent },
+  { path: 'physics/syllabus/:nodeId', component: PhysicsSyllabusComponent },
   { path: 'chemistry', component: ChemistryComponent },
   { path: 'math', component: MathComponent },
   { path: 'report', component: ReportComponent },

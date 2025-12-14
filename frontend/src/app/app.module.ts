@@ -20,6 +20,7 @@ import { HomeComponent } from './features/home/home.component';
 import { AutomobileComponent } from './features/automobile/automobile.component';
 import { AgricultureComponent } from './features/agriculture/agriculture.component';
 import { PhysicsComponent } from './features/physics/physics.component';
+import { PhysicsSyllabusComponent } from './features/physics/physics-syllabus.component';
 import { ChemistryComponent } from './features/chemistry/chemistry.component';
 import { MathComponent } from './features/math/math.component';
 
@@ -33,6 +34,7 @@ import { MathComponent } from './features/math/math.component';
     AutomobileComponent,
     AgricultureComponent,
     PhysicsComponent,
+    PhysicsSyllabusComponent,
     ChemistryComponent,
     MathComponent
   ],
