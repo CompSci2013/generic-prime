@@ -17,7 +17,7 @@
     <div class="canvas-wrapper" #cytoscapeContainer></div>
 
     <!-- Edge Label Tooltip -->
-    <div class="edge-tooltip" *ngIf="hoveredEdgeLabel">
+    <div class="edge-tooltip" *ngIf="hoveredEdgeLabel" [style.top]="tooltipPos?.top" [style.left]="tooltipPos?.left">
       {{ hoveredEdgeLabel }}
     </div>
   </div>

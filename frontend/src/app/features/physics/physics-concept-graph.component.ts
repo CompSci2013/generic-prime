@@ -38,10 +38,11 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
   conceptGraph = PHYSICS_CONCEPT_GRAPH;
   selectedNode: ConceptNode | null = null;
   hoveredEdgeLabel: string | null = null;
-  hoveredEdgeLabelPos: { x: number; y: number } | null = null;
+  tooltipPos: { top: string; left: string } | null = null;
 
   private cy: any;
   private resizeListener!: () => void;
+  private mouseMoveListener!: (e: MouseEvent) => void;
 
   constructor(private router: Router) {}
 
@@ -99,14 +100,22 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     this.cy.on('mouseover', 'edge', (evt: any) => {
       const edge = evt.target;
       this.hoveredEdgeLabel = edge.data('label');
-      const pos = evt.position || { x: 0, y: 0 };
-      this.hoveredEdgeLabelPos = pos;
     });
 
     this.cy.on('mouseout', 'edge', () => {
       this.hoveredEdgeLabel = null;
-      this.hoveredEdgeLabelPos = null;
     });
+
+    // Add mouse move listener to track cursor position for tooltip
+    this.mouseMoveListener = (e: MouseEvent) => {
+      if (this.hoveredEdgeLabel) {
+        this.tooltipPos = {
+          left: e.clientX + 'px',
+          top: (e.clientY + 12) + 'px'
+        };
+      }
+    };
+    document.addEventListener('mousemove', this.mouseMoveListener);
 
     // Add click outside graph to deselect
     this.cy.on('tap', (evt: any) => {
@@ -241,6 +250,9 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     }
     if (this.resizeListener) {
       window.removeEventListener('resize', this.resizeListener);
+    }
+    if (this.mouseMoveListener) {
+      document.removeEventListener('mousemove', this.mouseMoveListener);
     }
   }
 }
