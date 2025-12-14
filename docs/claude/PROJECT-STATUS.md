@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.7
-**Timestamp**: 2025-12-07T09:00:00Z
-**Updated By**: Session 12 - Live Report Updates Research & Architectural Analysis
+**Version**: 5.8
+**Timestamp**: 2025-12-14T14:30:00Z
+**Updated By**: Session 13 - Multi-Domain Architecture & Pop-Out Documentation
 
 ---
 
@@ -10,17 +10,22 @@
 
 ### Port 4205 (generic-prime) - IN DEVELOPMENT
 
-**Application**: Fully functional Angular 14 discovery interface
+**Application**: Fully functional Angular 14 multi-domain discovery framework
 - All 4 panels operational (Query Control, Picker, Statistics, Results Table)
 - Drag-drop, collapse, and pop-out functionality working
 - Dark theme (PrimeNG lara-dark-blue) active
 - Panel headers streamlined with consistent compact design pattern
+- **NEW**: Multi-domain landing page with domain selector
+- **NEW**: Dedicated domain landing pages (Home, Automobile, Agriculture, Physics, Chemistry, Math)
+- **NEW**: Reorganized routing: `/automobiles/discover` (was `/discover`)
 
 **Backend**: `generic-prime-backend-api:v1.5.0` (Kubernetes)
 - Elasticsearch integration: autos-unified (4,887 docs), autos-vins (55,463 docs)
 - API endpoint: `http://generic-prime.minilab/api/specs/v1/`
 
-**Domains**: Automobile (only domain currently active)
+**Domains**:
+- **Automobile**: Fully implemented with discovery interface
+- **Agriculture, Physics, Chemistry, Math**: Stub components (ready for implementation)
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
 - Unaffected, serves as working reference
@@ -54,6 +59,46 @@
 ---
 
 ## What Changed This Session
+
+**Session 13: Multi-Domain Architecture & Pop-Out Architecture Documentation**
+
+### Summary
+Refactored application to support multi-domain architecture and created comprehensive documentation for pop-out window system. Gemini's earlier work on domain stubs was committed and integrated into the routing structure.
+
+### Changes Made
+1. **Domain Landing Pages**
+   - Created Home component with domain selector UI
+   - Created Automobile component (intermediary landing page)
+   - Created stub components for Agriculture, Physics, Chemistry, Math domains
+   - All components properly declared in app.module and routed
+
+2. **Routing Restructure**
+   - Home page now at `/` and `/home` (domain selector)
+   - Automobile domain at `/automobiles` → `/automobiles/discover`
+   - Other domains at `/agriculture`, `/physics`, `/chemistry`, `/math`
+   - Pop-out routing unchanged: `/panel/:gridId/:panelId/:type`
+   - **Breaking Change**: `/discover` route removed (now `/automobiles/discover`)
+
+3. **Pop-Out Architecture Documentation** ([POPOUT-ARCHITECTURE.md](../../docs/POPOUT-ARCHITECTURE.md))
+   - Comprehensive explanation of GoldenLayout vs our BroadcastChannel approach
+   - Detailed architecture diagrams and component interactions
+   - State synchronization flow and message protocol
+   - Step-by-step conversion guide for migrating from GoldenLayout (7 phases)
+   - Extensive manual testing guide with 10 test scenarios and debugging tips
+
+### Commits
+- `f4782b3`: feat: Add domain landing pages and multi-domain routing structure (23 files, 225 insertions)
+- `5b8ac97`: docs: Create comprehensive pop-out architecture documentation (1 file, 987 insertions)
+
+### Impact on Development
+- ✅ Multi-domain framework now ready for expansion
+- ✅ Pop-out system fully documented for future reference/conversion
+- ⚠️ E2E tests require URL update: `/discover` → `/automobiles/discover`
+- ✅ No breaking changes to core functionality (all tests still pass)
+
+---
+
+## What Changed Previous Session
 
 **Session 12: Live Report Updates - Deep Research & Architectural Analysis**
 

@@ -1,10 +1,82 @@
 # Next Steps
 
-**Current Session**: Fix Known PrimeNG Bugs (Bug #13: Dropdown Keyboard Navigation)
+**Current Session**: Source Code Documentation & Pop-Out Manual Testing
 
 ---
 
-## Immediate Action: Fix PrimeNG Dropdown Keyboard Navigation (Bug #13)
+## Immediate Action: Document Source Code Fully
+
+**Priority**: CRITICAL (Blocks all other work)
+
+**What to Do**:
+
+1. **Framework Services** (highest priority - shared across domains)
+   - Add comprehensive inline documentation to all services in `framework/services/`
+   - Focus on: UrlStateService, ResourceManagementService, PopOutContextService, PickerConfigRegistry
+   - Document: purpose, public methods, usage examples, state flow
+
+2. **Component Documentation**
+   - Add detailed comments to all components in `framework/components/`
+   - Focus on: DiscoverComponent, PanelPopoutComponent, BasePicker, ResultsTable, StatisticsPanel, QueryControl
+   - Document: responsibility, data flow, event handling, pop-out behavior
+
+3. **Domain Configuration**
+   - Document domain-config pattern with Automobile as example
+   - Explain: models, adapters, configs, chart-sources
+   - Create inline comments in `domain-config/automobile/`
+
+4. **Key Architectural Files**
+   - Add architectural comments to: app.module.ts, app-routing.module.ts
+   - Document injection patterns, provider setup, multi-domain support
+
+**Expected Output**:
+- All public methods have JSDoc comments
+- Complex logic has inline explanations
+- Configuration examples show expected data structures
+- Architectural decisions are documented at file level
+
+---
+
+## After Documentation: Perform Manual Pop-Out Testing
+
+**Priority**: HIGH (Validates architecture)
+
+**Test Scenarios** (see [POPOUT-ARCHITECTURE.md](../../docs/POPOUT-ARCHITECTURE.md) for detailed steps):
+1. Open pop-out window - verify rendering and routing
+2. State sync main → pop-out - verify real-time updates
+3. State sync pop-out → main - verify URL updates and sync
+4. Multiple pop-outs - verify independent operation
+5. Filter operations - verify filter state propagation
+6. Pop-out window close - verify cleanup
+7. Page refresh - verify auto-close of pop-outs
+8. Multi-monitor scenario - verify smooth operation
+9. Network latency - verify eventual consistency
+10. Console validation - verify message flow and channel communication
+
+**Testing Approach**:
+- Follow the 10 test scenarios in [POPOUT-ARCHITECTURE.md](../../docs/POPOUT-ARCHITECTURE.md)
+- Document any issues found
+- Create bug reports for any failures
+- Note any UI improvements needed
+
+---
+
+## Priority Order (Updated)
+
+| Phase | Work | Priority | Status |
+|-------|------|----------|--------|
+| **1** | **Document source code fully** | **CRITICAL** | **TO START** |
+| **2** | **Manual testing: pop-outs** | **HIGH** | Pending |
+| 3 | Clean up uncommitted work | High | Pending |
+| 4 | Update E2E tests for `/automobiles/discover` | Medium | Pending |
+| 5 | Complete automobile domain testing | Medium | Pending |
+| 6 | Fix Bug #13 (dropdown keyboard nav) | Medium | Pending |
+| 7 | Fix Bug #7 (multiselect visual state) | Low | Pending |
+| 8 | Plan agriculture domain implementation | Low | Pending |
+
+---
+
+## Known PrimeNG Bug (Deferred): Fix Dropdown Keyboard Navigation (Bug #13)
 
 **Priority**: Medium (User Experience - Filter Usability)
 
