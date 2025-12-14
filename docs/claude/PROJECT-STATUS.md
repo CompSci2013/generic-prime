@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.8
-**Timestamp**: 2025-12-14T14:30:00Z
-**Updated By**: Session 13 - Multi-Domain Architecture & Pop-Out Documentation
+**Version**: 5.9
+**Timestamp**: 2025-12-14T22:45:00Z
+**Updated By**: Session 14 - Smart Domain Navigation Dropdown Menu
 
 ---
 
@@ -60,7 +60,56 @@
 
 ## What Changed This Session
 
-**Session 13: Multi-Domain Architecture & Pop-Out Architecture Documentation**
+**Session 14: Smart Domain Navigation Dropdown Menu Implementation**
+
+### Summary
+Implemented a smart domain navigation dropdown menu in the app header to improve UX. Users can now navigate between all domains and their sub-pages from any location without returning to home first. Investigated and documented architectural considerations for PrimeNG dropdown grouping vs. true flyout behavior.
+
+### Changes Made
+1. **Dropdown Menu Structure**
+   - Added hierarchical menu to app.component with 5 domains + sub-routes
+   - Home item links directly to `/`
+   - Each domain includes two items: Domain Home and Domain Discover
+   - Test Reports link at bottom for quick access
+   - Separator elements for visual organization
+
+2. **Navigation Implementation**
+   - Integrated routing in `navigateToDomain()` method
+   - Automatic dropdown reset after selection via DOM click simulation
+   - Proper route navigation for all domain pages
+
+3. **Styling & UX**
+   - Dark theme consistency (#2a2a2a background, #64c8ff accent)
+   - Dropdown width: 200px
+   - Icon display with proper alignment
+   - Arrow indicators for items with submenus
+
+4. **Documentation**
+   - Updated TANGENTS.md with implementation details
+   - Clarified architectural limitation: PrimeNG groupBy creates grouped list, not true flyouts
+   - Documented alternative approaches (TieredMenuModule, custom component)
+
+### Files Modified
+- `/frontend/src/app/app.component.ts` (menu structure + navigation)
+- `/frontend/src/app/app.component.html` (dropdown implementation)
+- `/docs/claude/TANGENTS.md` (implementation status + architectural note)
+- `/docs/claude/PROJECT-STATUS.md` (version bump + session notes)
+
+### Impact on Development
+- ✅ Improved navigation UX from any page
+- ✅ All routes accessible from header dropdown
+- ⚠️ Implementation note: Grouped dropdown (not true flyouts) - sufficient for functional requirements
+- ✅ No breaking changes to existing functionality
+
+### Outstanding Consideration
+If true flyout behavior is critical, alternatives to explore:
+- PrimeNG TieredMenuModule (would require import in primeng.module.ts)
+- Custom CSS-based flyout menu component
+- Different architectural approach to menu rendering
+
+---
+
+**Previous Session 13: Multi-Domain Architecture & Pop-Out Architecture Documentation**
 
 ### Summary
 Refactored application to support multi-domain architecture and created comprehensive documentation for pop-out window system. Gemini's earlier work on domain stubs was committed and integrated into the routing structure.

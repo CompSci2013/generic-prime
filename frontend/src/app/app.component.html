@@ -5,7 +5,7 @@
 <header class="app-header">
   <a routerLink="/" class="home-link">🏠 Home</a>
 
-  <!-- Domain Navigation Dropdown -->
+  <!-- Domain Navigation Dropdown with Organized Menu -->
   <p-dropdown
     [options]="domainMenuItems"
     optionLabel="label"
@@ -13,14 +13,13 @@
     (onChange)="navigateToDomain($event)"
     [showClear]="false"
     styleClass="domain-dropdown"
-    [group]="false"
     appendTo="body">
     <ng-template pTemplate="item" let-option>
-      <div *ngIf="!option.separator" class="dropdown-item-wrapper">
+      <div *ngIf="!option.separator" class="dropdown-item-wrapper" [class.indent-item]="option.indent" [class.group-label]="option.groupLabel">
         <span class="dropdown-item-icon">{{option.icon}}</span>
         <span class="dropdown-item-label">{{option.label}}</span>
-        <span *ngIf="option.submenu" class="dropdown-item-arrow">→</span>
       </div>
+      <hr *ngIf="option.separator" class="dropdown-separator">
     </ng-template>
   </p-dropdown>
 </header>

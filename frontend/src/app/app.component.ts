@@ -11,54 +11,27 @@ import { DOMAIN_PROVIDERS } from '../domain-config/domain-providers';
 export class AppComponent {
   title = 'generic-prime';
 
-  // Domain navigation menu items
+  // Domain navigation menu items - flat structure with grouping labels
   domainMenuItems = [
-    {
-      label: 'Automobiles',
-      icon: '🚗',
-      submenu: [
-        { label: 'Domain Overview', icon: '🏠', route: '/automobiles' },
-        { label: 'Discovery Interface', icon: '🔍', route: '/automobiles/discover' }
-      ]
-    },
-    {
-      label: 'Agriculture',
-      icon: '🌾',
-      submenu: [
-        { label: 'Domain Overview', icon: '🏠', route: '/agriculture' },
-        { label: 'Discovery Interface', icon: '🔍', route: '/agriculture/discover' }
-      ]
-    },
-    {
-      label: 'Physics',
-      icon: '⚛️',
-      submenu: [
-        { label: 'Domain Overview', icon: '🏠', route: '/physics' },
-        { label: 'Discovery Interface', icon: '🔍', route: '/physics/discover' }
-      ]
-    },
-    {
-      label: 'Chemistry',
-      icon: '🧪',
-      submenu: [
-        { label: 'Domain Overview', icon: '🏠', route: '/chemistry' },
-        { label: 'Discovery Interface', icon: '🔍', route: '/chemistry/discover' }
-      ]
-    },
-    {
-      label: 'Mathematics',
-      icon: '📐',
-      submenu: [
-        { label: 'Domain Overview', icon: '🏠', route: '/math' },
-        { label: 'Discovery Interface', icon: '🔍', route: '/math/discover' }
-      ]
-    },
+    { label: 'Home', icon: '🏠', route: '/' },
     { separator: true },
-    {
-      label: 'Test Reports',
-      icon: '📋',
-      route: '/report'
-    }
+    { label: 'Automobiles', icon: '🚗', groupLabel: 'Automobiles' },
+    { label: 'Autos Home', icon: '🏠', route: '/automobiles', indent: true },
+    { label: 'Autos Discover', icon: '🔍', route: '/automobiles/discover', indent: true },
+    { label: 'Agriculture', icon: '🌾', groupLabel: 'Agriculture' },
+    { label: 'Agriculture Home', icon: '🏠', route: '/agriculture', indent: true },
+    { label: 'Agriculture Discover', icon: '🔍', route: '/agriculture/discover', indent: true },
+    { label: 'Physics', icon: '⚛️', groupLabel: 'Physics' },
+    { label: 'Physics Home', icon: '🏠', route: '/physics', indent: true },
+    { label: 'Physics Discover', icon: '🔍', route: '/physics/discover', indent: true },
+    { label: 'Chemistry', icon: '🧪', groupLabel: 'Chemistry' },
+    { label: 'Chemistry Home', icon: '🏠', route: '/chemistry', indent: true },
+    { label: 'Chemistry Discover', icon: '🔍', route: '/chemistry/discover', indent: true },
+    { label: 'Mathematics', icon: '📐', groupLabel: 'Mathematics' },
+    { label: 'Math Home', icon: '🏠', route: '/math', indent: true },
+    { label: 'Math Discover', icon: '🔍', route: '/math/discover', indent: true },
+    { separator: true },
+    { label: 'Test Reports', icon: '📋', route: '/report' }
   ];
 
   constructor(
@@ -70,32 +43,24 @@ export class AppComponent {
   }
 
   /**
-   * Navigate to selected domain or submenu item
-   * Handles both direct routes and submenu items
+   * Navigate to selected menu item
+   * Handles direct routes and navigates away from menu items with submenus
    */
   navigateToDomain(event: any) {
     const selectedItem = event.value;
 
-    // Handle direct routes
-    if (selectedItem.route) {
+    // Only navigate if the item has a direct route
+    if (selectedItem && selectedItem.route) {
       this.router.navigate([selectedItem.route]);
-    }
-    // Handle submenu items (clicking on parent opens submenu)
-    else if (selectedItem.submenu) {
-      // For parent items, navigate to the first submenu item (domain overview)
-      const firstSubmenuItem = selectedItem.submenu[0];
-      if (firstSubmenuItem && firstSubmenuItem.route) {
-        this.router.navigate([firstSubmenuItem.route]);
-      }
-    }
 
-    // Reset dropdown after navigation
-    setTimeout(() => {
-      const dropdown = document.querySelector('.domain-dropdown .p-dropdown-trigger');
-      if (dropdown instanceof HTMLElement) {
-        dropdown.click();
-      }
-    }, 100);
+      // Reset dropdown after navigation
+      setTimeout(() => {
+        const dropdown = document.querySelector('.domain-dropdown .p-dropdown-trigger');
+        if (dropdown instanceof HTMLElement) {
+          dropdown.click();
+        }
+      }, 100);
+    }
   }
 }
 

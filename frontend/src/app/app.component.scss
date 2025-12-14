@@ -81,11 +81,32 @@
     flex: 1;
   }
 
-  .dropdown-item-arrow {
+  &.group-label {
+    font-weight: 600;
     color: #64c8ff;
-    font-weight: bold;
-    margin-left: auto;
+    padding-top: 0.5rem;
+
+    .dropdown-item-icon {
+      font-size: 1.4rem;
+    }
   }
+
+  &.indent-item {
+    padding-left: 1.5rem;
+    font-size: 0.9rem;
+
+    .dropdown-item-icon {
+      min-width: 1rem;
+      font-size: 1rem;
+    }
+  }
+}
+
+.dropdown-separator {
+  margin: 0.25rem 0;
+  border: none;
+  border-top: 1px solid #444;
+  width: 100%;
 }
 
 .app-content {
