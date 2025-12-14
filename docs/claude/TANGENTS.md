@@ -34,69 +34,75 @@ This document tracks discussion topics and questions that come up during session
 
 ### 2. Smart Domain Navigation Dropdown Menu in Banner
 **Date Raised**: 2025-12-14
-**Status**: Implementation Complete (and Verified)
+**Status**: Implementation Complete - Proper TieredMenu with Flyout Submenus
 **Summary**:
 - User requested a smart dropdown menu in the app header/banner
 - Should allow quick navigation between domains from any page
 - No need to click "Home" then select another domain
-- Should include organized menus for sub-pages within domains (e.g., /automobiles, /automobiles/discover)
+- Should include flyout menus for sub-pages within domains (e.g., /automobiles, /automobiles/discover)
 
 **Investigation Completed**: ✅
 - Current app structure explored
 - All routes documented: 5 domains with landing pages + discover routes + report page
-- PrimeNG DropdownModule already imported and available
+- Researched PrimeNG menu components: found TieredMenu is designed for flyout submenus
 - Banner location identified: `<header class="app-header">` in app.component.html
-- Current header only has simple "Home" link - room for enhancement
 
-**Implementation Completed**: ✅
-- Dropdown menu fully implemented with flat structure + visual grouping
-- Menu structure: Home → Separator → Domain groups → Separator → Test Reports
-- Each domain has bold cyan header followed by indented sub-items
-- Uses custom styling for group labels and indented items
-- Navigation routing integrated with automatic dropdown reset
+**Implementation Completed**: ✅ (Version 2 - Proper Implementation)
+- Replaced initial dropdown implementation with **PrimeNG TieredMenu component**
+- TieredMenu natively supports nested items with flyout overlay behavior
+- Menu uses proper hierarchical structure with `items` array for submenus
+- Navigation via `routerLink` property on MenuItem objects
+- Dark theme styling with cyan accents on submenus
+- Automatic flyout positioning and hover behavior
 
 **Implementation Details**:
-- **Structure**: Flat array with `groupLabel` markers for category headers
-- **Visual Organization**:
-  - Group labels displayed in bold cyan (#64c8ff)
-  - Sub-items indented by 1.5rem with smaller font
-  - Separators between Home/Domains and Reports sections
-- **Navigation**: Only items with `route` property trigger navigation
-- **UX**: Dropdown automatically closes after selection via DOM click
+- **Component**: `p-tieredMenu` with `[model]="domainMenuItems"`
+- **Structure**: Nested MenuItem array from `primeng/api`
+  ```typescript
+  {
+    label: 'Automobiles',
+    icon: '🚗',
+    items: [
+      { label: 'Autos Home', icon: '🏠', routerLink: '/automobiles' },
+      { label: 'Autos Discover', icon: '🔍', routerLink: '/automobiles/discover' }
+    ]
+  }
+  ```
+- **Styling**:
+  - Root menu items display horizontally in header
+  - Submenu flyouts positioned as overlays with cyan border
+  - Dark background (#3c3c3c) with hover highlights
+  - Box shadow for depth: `0 4px 12px rgba(0, 0, 0, 0.5)`
+- **Navigation**: routerLink directly on MenuItem - no custom handlers needed
 
-**Menu Display**:
+**Flyout Menu Display**:
 ```
-🏠 Home
-───────────────
-🚗 Automobiles (bold cyan, groupLabel)
-  🏠 Autos Home (indented)
-  🔍 Autos Discover (indented)
-🌾 Agriculture (bold cyan, groupLabel)
-  🏠 Agriculture Home (indented)
-  🔍 Agriculture Discover (indented)
-⚛️  Physics (bold cyan, groupLabel)
-  🏠 Physics Home (indented)
-  🔍 Physics Discover (indented)
-🧪 Chemistry (bold cyan, groupLabel)
-  🏠 Chemistry Home (indented)
-  🔍 Chemistry Discover (indented)
-📐 Mathematics (bold cyan, groupLabel)
-  🏠 Math Home (indented)
-  🔍 Math Discover (indented)
-───────────────
-📋 Test Reports
+Header: [🏠 Home] [🚗 Automobiles] [🌾 Agriculture] [⚛️ Physics] [🧪 Chemistry] [📐 Mathematics] [📋 Test Reports]
+
+Hovering on "Automobiles" shows flyout:
+┌─────────────────────┐
+│ 🏠 Autos Home       │
+│ 🔍 Autos Discover   │
+└─────────────────────┘
 ```
+
+**Research Sources**:
+- [PrimeNG Menu Component](https://primeng.org/menu)
+- [PrimeNG TieredMenu Component](https://primeng.org/tieredmenu)
+- [PrimeNG TieredMenu Methods](https://www.geeksforgeeks.org/angular-primeng-tieredmenu-methods/)
+- [Angular UI Development with PrimeNG - TieredMenu Book Reference](https://www.oreilly.com/library/view/angular-ui-development/9781788299572/c8e8caeb-b956-4a44-a399-64bb6b0e1dcb.xhtml)
 
 **Related Files**:
-- `/frontend/src/app/app.component.ts` (menu data structure + navigation logic)
-- `/frontend/src/app/app.component.html` (dropdown implementation with custom templates)
-- `/frontend/src/app/app.component.scss` (styling with group labels + indentation)
-- `/frontend/src/app/primeng.module.ts` (DropdownModule already imported)
+- `/frontend/src/app/app.component.ts` (MenuItem[] structure with nested items)
+- `/frontend/src/app/app.component.html` (p-tieredMenu component)
+- `/frontend/src/app/app.component.scss` (TieredMenu styling for root list and submenus)
+- `/frontend/src/app/primeng.module.ts` (TieredMenuModule imported)
 
 **Next Steps**:
-- Build and test the dropdown in running app
-- Verify navigation from all pages works correctly
-- Verify visual styling (indentation, group label colors, separators)
+- Build and test the TieredMenu in running app
+- Verify flyout behavior on hover from all pages
+- Verify navigation to all routes works correctly
+- Confirm visual styling and dark theme consistency
 
 ---
 
