@@ -63,17 +63,18 @@
 
             .p-menuitem-text {
               color: #ffffff;
-              font-size: 1rem;
+              font-size: 1.2rem;
+              font-weight: bold;
             }
 
             &:hover {
-              background-color: rgba(100, 200, 255, 0.1);
+              background-color: transparent;
               color: #64c8ff;
             }
           }
 
           &.p-menuitem-active > .p-menuitem-content {
-            background-color: rgba(100, 200, 255, 0.15);
+            background-color: transparent;
             color: #64c8ff;
           }
         }

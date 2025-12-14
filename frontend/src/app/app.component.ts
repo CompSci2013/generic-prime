@@ -13,8 +13,6 @@ export class AppComponent {
 
   // Domain navigation menu items with TieredMenu structure (nested items with flyout submenus)
   domainMenuItems: MenuItem[] = [
-    { label: 'Home', icon: '🏠', routerLink: '/' },
-    { separator: true },
     {
       label: 'Automobiles',
       icon: '🚗',
@@ -55,8 +53,13 @@ export class AppComponent {
         { label: 'Math Discover', icon: '🔍', routerLink: '/math/discover' }
       ]
     },
-    { separator: true },
-    { label: 'Test Reports', icon: '📋', routerLink: '/report' }
+    {
+      label: 'Test Reports',
+      icon: '📋',
+      items: [
+        { label: 'View Test Reports', icon: '📊', routerLink: '/report' }
+      ]
+    }
   ];
 
   constructor(
