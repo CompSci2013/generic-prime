@@ -74,7 +74,7 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
         fit: true,
         padding: 40
       },
-      wheelSensitivity: 0.1,
+      wheelSensitivity: 0.5,
       panningEnabled: true,
       userPanningEnabled: true,
       zoomingEnabled: true,
