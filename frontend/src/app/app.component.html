@@ -3,7 +3,26 @@
 
 <!-- Navigation Banner -->
 <header class="app-header">
-  <a routerLink="/" class="home-link">Home</a>
+  <a routerLink="/" class="home-link">🏠 Home</a>
+
+  <!-- Domain Navigation Dropdown -->
+  <p-dropdown
+    [options]="domainMenuItems"
+    optionLabel="label"
+    placeholder="📚 Domains"
+    (onChange)="navigateToDomain($event)"
+    [showClear]="false"
+    styleClass="domain-dropdown"
+    [group]="false"
+    appendTo="body">
+    <ng-template pTemplate="item" let-option>
+      <div *ngIf="!option.separator" class="dropdown-item-wrapper">
+        <span class="dropdown-item-icon">{{option.icon}}</span>
+        <span class="dropdown-item-label">{{option.label}}</span>
+        <span *ngIf="option.submenu" class="dropdown-item-arrow">→</span>
+      </div>
+    </ng-template>
+  </p-dropdown>
 </header>
 
 <!-- Application Content -->

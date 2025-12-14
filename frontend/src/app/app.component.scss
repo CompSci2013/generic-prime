@@ -1,9 +1,10 @@
 .app-header {
   background-color: #2a2a2a;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  gap: 2rem;
   border-bottom: 1px solid #444;
   height: 60px;
 
@@ -12,10 +13,78 @@
     text-decoration: none;
     font-size: 1.2rem;
     font-weight: bold;
+    white-space: nowrap;
 
     &:hover {
-      color: #cccccc;
+      color: #64c8ff;
     }
+  }
+
+  ::ng-deep .domain-dropdown {
+    width: 200px;
+
+    .p-dropdown-trigger {
+      background-color: #3c3c3c;
+      border: 1px solid #444;
+      color: #ffffff;
+
+      &:hover {
+        background-color: #4a4a4a;
+      }
+    }
+
+    .p-dropdown-label {
+      color: #ffffff;
+      font-weight: 500;
+    }
+
+    .p-dropdown-items {
+      background-color: #3c3c3c;
+      border: 1px solid #64c8ff;
+
+      .p-dropdown-item {
+        color: #ffffff;
+        border-bottom: 1px solid #444;
+        padding: 0.75rem 1rem;
+
+        &.p-highlight {
+          background-color: #4a4a4a;
+          color: #64c8ff;
+        }
+
+        &:hover {
+          background-color: #4a4a4a;
+          color: #64c8ff;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
+
+.dropdown-item-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+
+  .dropdown-item-icon {
+    font-size: 1.2rem;
+    min-width: 1.5rem;
+    text-align: center;
+  }
+
+  .dropdown-item-label {
+    flex: 1;
+  }
+
+  .dropdown-item-arrow {
+    color: #64c8ff;
+    font-weight: bold;
+    margin-left: auto;
   }
 }
 
