@@ -205,7 +205,7 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
           'width': '2px',
           'label': '',
           'curve-style': 'bezier',
-          'arrow-scale': 1.5
+          'arrow-scale': 2.625
         }
       },
       {
