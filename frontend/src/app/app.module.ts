@@ -16,13 +16,25 @@ import { createAutomobileDomainConfig } from '../domain-config/automobile';
 import { DiscoverComponent } from './features/discover/discover.component';
 import { PanelPopoutComponent } from './features/panel-popout/panel-popout.component';
 import { ReportComponent } from './features/report/report.component';
+import { HomeComponent } from './features/home/home.component';
+import { AutomobileComponent } from './features/automobile/automobile.component';
+import { AgricultureComponent } from './features/agriculture/agriculture.component';
+import { PhysicsComponent } from './features/physics/physics.component';
+import { ChemistryComponent } from './features/chemistry/chemistry.component';
+import { MathComponent } from './features/math/math.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DiscoverComponent,
     PanelPopoutComponent,
-    ReportComponent
+    ReportComponent,
+    HomeComponent,
+    AutomobileComponent,
+    AgricultureComponent,
+    PhysicsComponent,
+    ChemistryComponent,
+    MathComponent
   ],
   imports: [
     BrowserModule,
