@@ -1,0 +1,62 @@
+<div class="knowledge-graph-container">
+  <!-- Header Section -->
+  <div class="header">
+    <button class="back-button" (click)="goBack()">← Back</button>
+    <div class="header-content">
+      <h1>{{ title }}</h1>
+      <p class="subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+      <p class="description">Interactive visualization of topics and their relationships</p>
+    </div>
+  </div>
+
+  <!-- Cytoscape Container -->
+  <div class="canvas-wrapper-outer">
+    <button class="fit-button" (click)="fitGraph()" title="Fit graph to view">
+      ⊡ Fit to View
+    </button>
+    <div class="canvas-wrapper" #cytoscapeContainer></div>
+
+    <!-- Edge Label Tooltip -->
+    <div class="edge-tooltip" *ngIf="hoveredEdgeLabel" [style.top]="tooltipPos?.top" [style.left]="tooltipPos?.left">
+      {{ hoveredEdgeLabel }}
+    </div>
+  </div>
+
+  <!-- Legend Section -->
+  <div class="legend-section">
+    <div class="legend-title">Topic Levels</div>
+    <div class="legend-items">
+      <div class="legend-item">
+        <span class="legend-color" style="background-color: #64c8ff;"></span>
+        <span>Foundational</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background-color: #ffa500;"></span>
+        <span>Core Topics</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background-color: #ff6b9d;"></span>
+        <span>Advanced</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Panel -->
+  <div class="info-panel" *ngIf="selectedNode">
+    <div class="info-header">
+      <h3>{{ selectedNode.label }}</h3>
+      <button class="close-btn" (click)="selectedNode = null">✕</button>
+    </div>
+    <div class="info-content">
+      <p class="info-level">
+        <strong>Level:</strong> <span class="level-badge" [attr.data-level]="selectedNode.level">{{ selectedNode.level }}</span>
+      </p>
+      <p class="info-description">{{ selectedNode.description }}</p>
+    </div>
+  </div>
+
+  <!-- Instructions -->
+  <div class="instructions">
+    <p><strong>How to Use:</strong> Click on any node to view details. Pan with mouse, zoom with scroll wheel. Arrows show prerequisite and conceptual relationships.</p>
+  </div>
+</div>

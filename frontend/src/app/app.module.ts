@@ -22,6 +22,8 @@ import { AgricultureComponent } from './features/agriculture/agriculture.compone
 import { PhysicsComponent } from './features/physics/physics.component';
 import { PhysicsSyllabusComponent } from './features/physics/physics-syllabus.component';
 import { PhysicsConceptGraphComponent } from './features/physics/physics-concept-graph.component';
+import { KnowledgeGraphComponent } from './features/physics/knowledge-graph.component';
+import { ClassicalMechanicsGraphComponent } from './features/physics/classical-mechanics-graph.component';
 import { ChemistryComponent } from './features/chemistry/chemistry.component';
 import { MathComponent } from './features/math/math.component';
 
@@ -37,6 +39,8 @@ import { MathComponent } from './features/math/math.component';
     PhysicsComponent,
     PhysicsSyllabusComponent,
     PhysicsConceptGraphComponent,
+    KnowledgeGraphComponent,
+    ClassicalMechanicsGraphComponent,
     ChemistryComponent,
     MathComponent
   ],
