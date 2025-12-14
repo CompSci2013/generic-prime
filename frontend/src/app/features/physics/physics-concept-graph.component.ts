@@ -1,13 +1,13 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { PHYSICS_CONCEPT_GRAPH, ConceptNode, ConceptEdge } from './physics-concept-graph';
+import { PHYSICS_CONCEPT_GRAPH, ConceptNode } from './physics-concept-graph';
 
 @Component({
   selector: 'app-physics-concept-graph',
   templateUrl: './physics-concept-graph.component.html',
   styleUrls: ['./physics-concept-graph.component.scss']
 })
-export class PhysicsConceptGraphComponent implements OnInit {
+export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   conceptGraph = PHYSICS_CONCEPT_GRAPH;
@@ -18,10 +18,22 @@ export class PhysicsConceptGraphComponent implements OnInit {
   private ctx!: CanvasRenderingContext2D;
   private nodePositions: Map<string, { x: number; y: number }> = new Map();
   private animationFrameId: number | null = null;
+  private resizeListener!: () => void;
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
+    console.log('[PhysicsConceptGraph] ngOnInit()');
+  }
+
+  ngAfterViewInit(): void {
+    console.log('[PhysicsConceptGraph] ngAfterViewInit()');
+
+    if (!this.canvasRef) {
+      console.error('Canvas ref not available');
+      return;
+    }
+
     this.canvas = this.canvasRef.nativeElement;
     const ctx = this.canvas.getContext('2d');
     if (!ctx) {
@@ -32,13 +44,18 @@ export class PhysicsConceptGraphComponent implements OnInit {
 
     // Set canvas size to window size
     this.resizeCanvas();
-    window.addEventListener('resize', () => this.resizeCanvas());
 
-    // Initialize node positions using force-directed layout
+    // Use arrow function to preserve 'this'
+    this.resizeListener = () => this.resizeCanvas();
+    window.addEventListener('resize', this.resizeListener);
+
+    // Initialize node positions
     this.initializeNodePositions();
+    console.log('[PhysicsConceptGraph] Node positions initialized');
 
     // Start animation loop
     this.animate();
+    console.log('[PhysicsConceptGraph] Animation started');
 
     // Add click listener for node selection
     this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
@@ -49,8 +66,13 @@ export class PhysicsConceptGraphComponent implements OnInit {
     const container = this.canvas.parentElement;
     if (!container) return;
 
-    this.canvas.width = container.clientWidth;
-    this.canvas.height = container.clientHeight;
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    console.log(`[PhysicsConceptGraph] Resizing canvas to ${width}x${height}`);
+
+    this.canvas.width = width;
+    this.canvas.height = height;
   }
 
   private initializeNodePositions(): void {
@@ -58,8 +80,8 @@ export class PhysicsConceptGraphComponent implements OnInit {
     const levels = ['foundational', 'intermediate', 'advanced', 'specialization'];
     const nodesByLevel = new Map<string, ConceptNode[]>();
 
-    levels.forEach(level => {
-      nodesByLevel.set(level, this.conceptGraph.nodes.filter(n => n.level === level));
+    levels.forEach((level) => {
+      nodesByLevel.set(level, this.conceptGraph.nodes.filter(n => n.level as string === level));
     });
 
     // Position nodes in columns by level
@@ -96,30 +118,46 @@ export class PhysicsConceptGraphComponent implements OnInit {
   }
 
   private drawEdges(): void {
-    this.conceptGraph.edges.forEach(edge => {
+    const nodeRadius = 20;
+
+    this.conceptGraph.edges.forEach((edge, index) => {
       const source = this.nodePositions.get(edge.source);
       const target = this.nodePositions.get(edge.target);
 
       if (!source || !target) return;
 
+      // Calculate the actual line points accounting for node radius
+      const dx = target.x - source.x;
+      const dy = target.y - source.y;
+      const angle = Math.atan2(dy, dx);
+
+      const startX = source.x + nodeRadius * Math.cos(angle);
+      const startY = source.y + nodeRadius * Math.sin(angle);
+      const endX = target.x - nodeRadius * Math.cos(angle);
+      const endY = target.y - nodeRadius * Math.sin(angle);
+
       // Draw line
       this.ctx.strokeStyle = 'rgba(100, 200, 255, 0.3)';
       this.ctx.lineWidth = 2;
       this.ctx.beginPath();
-      this.ctx.moveTo(source.x, source.y);
-      this.ctx.lineTo(target.x, target.y);
+      this.ctx.moveTo(startX, startY);
+      this.ctx.lineTo(endX, endY);
       this.ctx.stroke();
 
-      // Draw arrow
-      this.drawArrow(source.x, source.y, target.x, target.y);
+      // Draw arrow at endpoint
+      this.drawArrow(startX, startY, endX, endY);
 
-      // Draw label
-      const midX = (source.x + target.x) / 2;
-      const midY = (source.y + target.y) / 2;
-      this.ctx.fillStyle = '#b0b0b0';
-      this.ctx.font = '0.75rem Arial';
-      this.ctx.textAlign = 'center';
-      this.ctx.fillText(edge.label, midX, midY - 5);
+      // Draw label with background
+      const midX = (startX + endX) / 2;
+      const midY = (startY + endY) / 2;
+
+      // Offset label perpendicular to the line (alternate above/below)
+      const offsetDistance = 15;
+      const perpAngle = angle + (index % 2 === 0 ? Math.PI / 2 : -Math.PI / 2);
+      const labelX = midX + offsetDistance * Math.cos(perpAngle);
+      const labelY = midY + offsetDistance * Math.sin(perpAngle);
+
+      this.drawLabelWithBackground(edge.label, labelX, labelY, 0.75);
     });
   }
 
@@ -127,14 +165,48 @@ export class PhysicsConceptGraphComponent implements OnInit {
     const headlen = 15;
     const angle = Math.atan2(toY - fromY, toX - fromX);
 
-    // Draw arrowhead
-    this.ctx.fillStyle = 'rgba(100, 200, 255, 0.5)';
+    // Draw arrowhead at the endpoint
+    this.ctx.fillStyle = 'rgba(100, 200, 255, 0.6)';
     this.ctx.beginPath();
     this.ctx.moveTo(toX, toY);
     this.ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
     this.ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
     this.ctx.closePath();
     this.ctx.fill();
+  }
+
+  private drawLabelWithBackground(text: string, x: number, y: number, fontSize: number): void {
+    // Measure text
+    this.ctx.font = `${fontSize}rem Arial`;
+    const metrics = this.ctx.measureText(text);
+    const textWidth = metrics.width;
+    const textHeight = fontSize * 16 * 1.2; // Approximate line height
+
+    // Draw semi-transparent background
+    const padding = 4;
+    this.ctx.fillStyle = 'rgba(26, 26, 26, 0.8)';
+    this.ctx.fillRect(
+      x - textWidth / 2 - padding,
+      y - textHeight / 2 - padding,
+      textWidth + padding * 2,
+      textHeight + padding * 2
+    );
+
+    // Draw border
+    this.ctx.strokeStyle = 'rgba(100, 200, 255, 0.4)';
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeRect(
+      x - textWidth / 2 - padding,
+      y - textHeight / 2 - padding,
+      textWidth + padding * 2,
+      textHeight + padding * 2
+    );
+
+    // Draw text
+    this.ctx.fillStyle = '#b0b0b0';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText(text, x, y);
   }
 
   private drawNodes(): void {
@@ -160,16 +232,17 @@ export class PhysicsConceptGraphComponent implements OnInit {
 
       this.ctx.globalAlpha = 1;
 
-      // Draw label
-      this.ctx.fillStyle = '#ffffff';
-      this.ctx.font = 'bold 0.8rem Arial';
-      this.ctx.textAlign = 'center';
-      this.ctx.textBaseline = 'middle';
-
+      // Draw label with better readability
       // Wrap text if needed
       const lines = this.wrapText(node.label, 18);
-      const lineHeight = 12;
+      const lineHeight = 13;
       const totalHeight = (lines.length - 1) * lineHeight;
+
+      // Draw text directly on nodes (they're large enough)
+      this.ctx.fillStyle = '#ffffff';
+      this.ctx.font = 'bold 0.85rem Arial';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
 
       lines.forEach((line, index) => {
         this.ctx.fillText(line, pos.x, pos.y - totalHeight / 2 + index * lineHeight);
