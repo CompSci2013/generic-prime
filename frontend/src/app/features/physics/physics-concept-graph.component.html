@@ -10,7 +10,17 @@
   </div>
 
   <!-- Cytoscape Container -->
-  <div class="canvas-wrapper" #cytoscapeContainer></div>
+  <div class="canvas-wrapper-outer">
+    <button class="fit-button" (click)="fitGraph()" title="Fit graph to view">
+      ⊡ Fit to View
+    </button>
+    <div class="canvas-wrapper" #cytoscapeContainer></div>
+
+    <!-- Edge Label Tooltip -->
+    <div class="edge-tooltip" *ngIf="hoveredEdgeLabel">
+      {{ hoveredEdgeLabel }}
+    </div>
+  </div>
 
   <!-- Legend Section -->
   <div class="legend-section">

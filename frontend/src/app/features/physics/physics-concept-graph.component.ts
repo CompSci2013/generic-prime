@@ -37,6 +37,8 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
 
   conceptGraph = PHYSICS_CONCEPT_GRAPH;
   selectedNode: ConceptNode | null = null;
+  hoveredEdgeLabel: string | null = null;
+  hoveredEdgeLabelPos: { x: number; y: number } | null = null;
 
   private cy: any;
   private resizeListener!: () => void;
@@ -74,7 +76,7 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
         fit: true,
         padding: 40
       },
-      wheelSensitivity: 0.5,
+      wheelSensitivity: 0.75,
       panningEnabled: true,
       userPanningEnabled: true,
       zoomingEnabled: true,
@@ -84,13 +86,26 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     // Fit graph to container
     this.cy.fit();
 
-    // Add event listeners
+    // Add event listeners for nodes
     this.cy.on('tap', 'node', (evt: any) => {
       const node = evt.target;
       const nodeId = node.id();
       this.selectedNode =
         this.conceptGraph.nodes.find((n) => n.id === nodeId) || null;
       console.log('[PhysicsConceptGraph] Selected node:', nodeId);
+    });
+
+    // Add event listeners for edges - hover to show tooltip
+    this.cy.on('mouseover', 'edge', (evt: any) => {
+      const edge = evt.target;
+      this.hoveredEdgeLabel = edge.data('label');
+      const pos = evt.position || { x: 0, y: 0 };
+      this.hoveredEdgeLabelPos = pos;
+    });
+
+    this.cy.on('mouseout', 'edge', () => {
+      this.hoveredEdgeLabel = null;
+      this.hoveredEdgeLabelPos = null;
     });
 
     // Add click outside graph to deselect
@@ -148,7 +163,7 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
           'text-halign': 'center',
           'width': '60px',
           'height': '60px',
-          'font-size': '12px',
+          'font-size': '18px',
           'color': '#ffffff',
           'font-weight': 'bold',
           'text-wrap': 'wrap',
@@ -188,14 +203,7 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
           'target-arrow-color': 'rgba(100, 200, 255, 0.6)',
           'target-arrow-shape': 'triangle',
           'width': '2px',
-          'label': 'data(label)',
-          'font-size': '11px',
-          'color': '#b0b0b0',
-          'text-background-color': 'rgba(26, 26, 26, 0.9)',
-          'text-background-opacity': 1,
-          'text-background-padding': '4px',
-          'edge-text-rotation': 'autorotate',
-          'text-margin-y': '-10px',
+          'label': '',
           'curve-style': 'bezier',
           'arrow-scale': 1.5
         }
@@ -214,6 +222,12 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     if (this.cy) {
       this.cy.resize();
       this.cy.fit();
+    }
+  }
+
+  fitGraph(): void {
+    if (this.cy) {
+      this.cy.fit(null, 40);
     }
   }
 
