@@ -55,11 +55,20 @@ export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngAfterViewInit(): void {
     console.log('[KnowledgeGraph] ngAfterViewInit()');
+    console.log('[KnowledgeGraph] Graph data:', this.graphData);
+    console.log('[KnowledgeGraph] Container ref:', this.containerRef);
 
-    if (!this.containerRef || !this.graphData) {
-      console.error('Container ref or graph data not available');
+    if (!this.containerRef) {
+      console.error('Container ref not available');
       return;
     }
+
+    if (!this.graphData) {
+      console.error('Graph data not available');
+      return;
+    }
+
+    console.log('[KnowledgeGraph] Building elements with', this.graphData.nodes.length, 'nodes and', this.graphData.edges.length, 'edges');
 
     // Convert data to Cytoscape format
     const elements = this.buildCytoscapeElements();
