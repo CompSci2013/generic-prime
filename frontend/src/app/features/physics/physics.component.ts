@@ -20,17 +20,11 @@ export class PhysicsComponent {
   }
 
   /**
-   * Navigate to knowledge graph or syllabus detail page for a selected node
-   * Special handling for topics with knowledge graphs (e.g., Classical Mechanics)
+   * Navigate to syllabus detail page for a selected node
    */
   navigateToNode(node: PhysicsNode): void {
-    // Check if this node has a knowledge graph
-    if (node.id === 'classical-mechanics') {
-      this.router.navigate(['/physics/classical-mechanics-graph']);
-    } else {
-      // Store node in session for the detail page to access
-      sessionStorage.setItem('selectedPhysicsNode', JSON.stringify(node));
-      this.router.navigate(['/physics/syllabus', node.id]);
-    }
+    // Store node in session for the detail page to access
+    sessionStorage.setItem('selectedPhysicsNode', JSON.stringify(node));
+    this.router.navigate(['/physics/syllabus', node.id]);
   }
 }
