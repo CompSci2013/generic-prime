@@ -20,6 +20,28 @@
     }
   }
 
+  .menu-trigger {
+    background-color: #3c3c3c;
+    border: 1px solid #444;
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #4a4a4a;
+      border-color: #64c8ff;
+      color: #64c8ff;
+    }
+
+    &:active {
+      background-color: rgba(100, 200, 255, 0.15);
+    }
+  }
+
   ::ng-deep .domain-menu {
     .p-tieredmenu {
       background-color: transparent;

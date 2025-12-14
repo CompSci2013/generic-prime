@@ -6,9 +6,17 @@
   <a routerLink="/" class="home-link">🏠 Home</a>
 
   <!-- Domain Navigation TieredMenu with Flyout Submenus -->
+  <button
+    #menuButton
+    class="menu-trigger"
+    (click)="menu.toggle($event)">
+    📚 Domains
+  </button>
   <p-tieredMenu
+    #menu
     [model]="domainMenuItems"
     styleClass="domain-menu"
+    [popup]="true"
     [appendTo]="'body'">
   </p-tieredMenu>
 </header>
