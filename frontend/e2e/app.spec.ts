@@ -36,7 +36,7 @@ test.describe('PHASE 1: Initial State & Basic Navigation', () => {
 
   test.skip('1.1: Initial page load - 4,887 records displayed', async ({ page }) => {
     // Navigate to discover page
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     // Verify all 4 panels are visible
     await expect(page.locator('[data-testid="query-control-panel"]')).toBeVisible();
@@ -56,7 +56,7 @@ test.describe('PHASE 1: Initial State & Basic Navigation', () => {
   });
 
   test.skip('1.2: Panel collapse/expand - state independent of URL', async ({ page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     // Collapse Query Control panel
     // The button is in the sibling panel-header, find all panel-actions buttons and click the first one
@@ -80,7 +80,7 @@ test.describe('PHASE 1: Initial State & Basic Navigation', () => {
   });
 
   test.skip('1.3: Panel drag-drop reordering - does not affect URL', async ({ page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     // Get initial order
     const initialOrder = await page.locator('[data-testid*="-panel"]').count();
@@ -119,7 +119,7 @@ test.describe('PHASE 1: Initial State & Basic Navigation', () => {
 test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
 
   test.skip('2.1.1-2.1.8: Single Selection Workflow - SELECT', async ({ page }: { page: Page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     // Click field selector dropdown
     const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
@@ -181,7 +181,7 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
   });
 
   test.skip('2.1.27-2.1.29: Edit Applied Filter', async ({ page }: { page: Page }) => {
-    await page.goto('/discover?manufacturer=Brammo');
+    await page.goto('/automobiles/discover?manufacturer=Brammo');
 
     // Verify chip exists
     const chip = page.locator('text=Manufacturer').first();
@@ -252,7 +252,7 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
   });
 
   test.skip('2.1.30-2.1.32: Remove Filter', async ({ page }: { page: Page }) => {
-    await page.goto('/discover?manufacturer=Brammo');
+    await page.goto('/automobiles/discover?manufacturer=Brammo');
 
     // Find and click the remove button on the manufacturer chip
     // The p-chip has a remove icon - try to find it with various selectors
@@ -283,7 +283,7 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
   });
 
   test.skip('2.1.19-2.1.22: Search in Dialog', async ({ page }: { page: Page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     // Open manufacturer filter
     const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
@@ -318,7 +318,7 @@ test.describe('PHASE 2.1: Manufacturer Filter (Multiselect Dialog)', () => {
   });
 
   test.skip('2.1.23-2.1.26: Keyboard Navigation', async ({ page }: { page: Page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     // Open manufacturer filter
     const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
@@ -362,7 +362,7 @@ test.describe('PHASE 2.2: Model Filter (Multiselect Dialog)', () => {
 
   test.skip('2.2.1-2.2.8: Single Selection Workflow', async ({ page }: { page: Page }) => {
     // Start with manufacturer already set
-    await page.goto('/discover?manufacturer=Brammo');
+    await page.goto('/automobiles/discover?manufacturer=Brammo');
 
     // Wait for initial load
     await waitForTableUpdate(page);
@@ -408,7 +408,7 @@ test.describe('PHASE 2.2: Model Filter (Multiselect Dialog)', () => {
   });
 
   test.skip('2.2.9: Edit Model Filter', async ({ page }: { page: Page }) => {
-    await page.goto('/discover?manufacturer=Brammo&model=Scooter');
+    await page.goto('/automobiles/discover?manufacturer=Brammo&model=Scooter');
 
     // Verify chip exists
     const modelChip = page.locator('text=Model').first();
@@ -458,7 +458,7 @@ test.describe('PHASE 2.2: Model Filter (Multiselect Dialog)', () => {
   });
 
   test.skip('2.2.10: Remove Model Filter', async ({ page }: { page: Page }) => {
-    await page.goto('/discover?manufacturer=Brammo&model=Scooter');
+    await page.goto('/automobiles/discover?manufacturer=Brammo&model=Scooter');
 
     const modelChip = page.locator('.filter-chip').filter({ hasText: 'Model' }).first();
     await expect(modelChip).toBeVisible();
@@ -480,7 +480,7 @@ test.describe('PHASE 2.2: Model Filter (Multiselect Dialog)', () => {
 test.describe('PHASE 2.3: Body Class Filter (Multiselect Dialog)', () => {
 
   test.skip('2.3.1-2.3.8: Single Selection Workflow', async ({ page }: { page: Page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
     await dropdown.click();
@@ -520,7 +520,7 @@ test.describe('PHASE 2.3: Body Class Filter (Multiselect Dialog)', () => {
   });
 
   test.skip('2.3.9: Multiple Body Classes', async ({ page }: { page: Page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
     await dropdown.click();
@@ -561,7 +561,7 @@ test.describe('PHASE 2.3: Body Class Filter (Multiselect Dialog)', () => {
 
   test.skip('2.3.10: Remove Body Class Filter', async ({ page }: { page: Page }) => {
     // First set the filter
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
     const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
     await dropdown.click();
     await page.locator('text=Body Class').first().click();
@@ -607,7 +607,7 @@ test.describe('PHASE 2.4: Year Range Filter (Range Dialog)', () => {
 
   test.skip('2.4.1-2.4.5: Minimum Year Only', async ({ page }: { page: Page }) => {
     // Use URL-first pattern: set yearMin directly via URL
-    await page.goto('/discover?yearMin=2020');
+    await page.goto('/automobiles/discover?yearMin=2020');
 
     await waitForTableUpdate(page);
 
@@ -627,7 +627,7 @@ test.describe('PHASE 2.4: Year Range Filter (Range Dialog)', () => {
 
   test.skip('2.4.6-2.4.10: Year Range (Min and Max)', async ({ page }: { page: Page }) => {
     // Use URL-first pattern: set both yearMin and yearMax directly via URL
-    await page.goto('/discover?yearMin=2020&yearMax=2024');
+    await page.goto('/automobiles/discover?yearMin=2020&yearMax=2024');
 
     await waitForTableUpdate(page);
 
@@ -648,7 +648,7 @@ test.describe('PHASE 2.4: Year Range Filter (Range Dialog)', () => {
 
   test.skip('2.4.11: Edit Year Filter', async ({ page }: { page: Page }) => {
     // Start with initial filter values
-    await page.goto('/discover?yearMin=2020&yearMax=2024');
+    await page.goto('/automobiles/discover?yearMin=2020&yearMax=2024');
 
     await waitForTableUpdate(page);
 
@@ -658,7 +658,7 @@ test.describe('PHASE 2.4: Year Range Filter (Range Dialog)', () => {
     expect(params['yearMax']).toBe('2024');
 
     // Navigate to edited filter values (simulating edit workflow)
-    await page.goto('/discover?yearMin=2022&yearMax=2023');
+    await page.goto('/automobiles/discover?yearMin=2022&yearMax=2023');
 
     await waitForTableUpdate(page);
 
@@ -669,7 +669,7 @@ test.describe('PHASE 2.4: Year Range Filter (Range Dialog)', () => {
   });
 
   test.skip('2.4.12: Remove Year Filter', async ({ page }: { page: Page }) => {
-    await page.goto('/discover?yearMin=2020&yearMax=2024');
+    await page.goto('/automobiles/discover?yearMin=2020&yearMax=2024');
 
     const yearChip = page.locator('.filter-chip').filter({ hasText: 'Year' }).first();
     await expect(yearChip).toBeVisible();
@@ -692,7 +692,7 @@ test.describe('PHASE 2.5: Search/Text Filter', () => {
 
   test.skip('2.5.1-2.5.5: Basic Search Workflow', async ({ page }: { page: Page }) => {
     // Use URL-first pattern: set search parameter directly
-    await page.goto('/discover?search=Brammo');
+    await page.goto('/automobiles/discover?search=Brammo');
 
     await waitForTableUpdate(page);
 
@@ -708,7 +708,7 @@ test.describe('PHASE 2.5: Search/Text Filter', () => {
 
   test.skip('2.5.6-2.5.8: Search Combined with Other Filters', async ({ page }: { page: Page }) => {
     // Use URL-first pattern: set both manufacturer and search parameters
-    await page.goto('/discover?manufacturer=Brammo&search=Hybrid');
+    await page.goto('/automobiles/discover?manufacturer=Brammo&search=Hybrid');
 
     await waitForTableUpdate(page);
 
@@ -725,7 +725,7 @@ test.describe('PHASE 2.5: Search/Text Filter', () => {
 
   test.skip('2.5.9: Clear Search', async ({ page }: { page: Page }) => {
     // Start with search filter
-    await page.goto('/discover?search=Brammo');
+    await page.goto('/automobiles/discover?search=Brammo');
 
     await waitForTableUpdate(page);
 
@@ -734,7 +734,7 @@ test.describe('PHASE 2.5: Search/Text Filter', () => {
     expect(params['search']).toBe('Brammo');
 
     // Navigate to clear search (no search parameter)
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     await waitForTableUpdate(page);
 
@@ -752,7 +752,7 @@ test.describe('PHASE 2.5: Search/Text Filter', () => {
 test.describe('PHASE 2.6: Page Size Filter', () => {
 
   test.skip('2.6.1-2.6.5: Change Page Size', async ({ page }: { page: Page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     await waitForTableUpdate(page);
 
@@ -780,7 +780,7 @@ test.describe('PHASE 2.6: Page Size Filter', () => {
   });
 
   test.skip('2.6.6: Page Size with Query Filters', async ({ page }: { page: Page }) => {
-    await page.goto('/discover?manufacturer=Brammo');
+    await page.goto('/automobiles/discover?manufacturer=Brammo');
 
     await waitForTableUpdate(page);
 
@@ -813,7 +813,7 @@ test.describe('PHASE 2.6: Page Size Filter', () => {
 test.describe('PHASE 2.7: Clear All Filters', () => {
 
   test.skip('2.7.1-2.7.15: Clear All Filters', async ({ page }: { page: Page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     // Apply multiple filters
     const dropdown = page.locator('[data-testid="filter-field-dropdown"]');
@@ -870,7 +870,7 @@ test.describe('PHASE 3: Results Table Panel', () => {
 
   test.skip('3.1.1-3.1.3: Table Pagination Forward', async ({ page }: { page: Page }) => {
     // Test pagination by navigating to a specific page via URL
-    await page.goto('/discover?first=10');
+    await page.goto('/automobiles/discover?first=10');
 
     await waitForTableUpdate(page);
 
@@ -889,7 +889,7 @@ test.describe('PHASE 3: Results Table Panel', () => {
   });
 
   test.skip('3.1.4: Row Expansion', async ({ page }: { page: Page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     const resultsTable = page.locator('[data-testid="results-table"]');
 
@@ -910,7 +910,7 @@ test.describe('PHASE 3: Results Table Panel', () => {
   });
 
   test.skip('3.2.1-3.2.3: Table with Filters and Pagination', async ({ page }: { page: Page }) => {
-    await page.goto('/discover?manufacturer=Brammo');
+    await page.goto('/automobiles/discover?manufacturer=Brammo');
 
     await waitForTableUpdate(page);
 
@@ -950,7 +950,7 @@ test.describe('PHASE 4: Manufacturer-Model Picker', () => {
   test.skip('4.1.1-4.1.3: Single Selection', async ({ page }: { page: Page }) => {
     // Test picker selection by setting the parameter directly via URL
     // This simulates selecting the first manufacturer (usually Brammo)
-    await page.goto('/discover?pickedManufacturer=Brammo');
+    await page.goto('/automobiles/discover?pickedManufacturer=Brammo');
 
     await waitForTableUpdate(page);
 
@@ -971,7 +971,7 @@ test.describe('PHASE 4: Manufacturer-Model Picker', () => {
 
   test.skip('4.1.4: Deselection', async ({ page }: { page: Page }) => {
     // Start with a selection
-    await page.goto('/discover?pickedManufacturer=Brammo');
+    await page.goto('/automobiles/discover?pickedManufacturer=Brammo');
 
     await waitForTableUpdate(page);
 
@@ -980,7 +980,7 @@ test.describe('PHASE 4: Manufacturer-Model Picker', () => {
     expect(params['pickedManufacturer']).toBe('Brammo');
 
     // Navigate to deselected state (no pickedManufacturer parameter)
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     await waitForTableUpdate(page);
 
@@ -991,7 +991,7 @@ test.describe('PHASE 4: Manufacturer-Model Picker', () => {
 
   test.skip('4.2.1: Picker with Results Table Filters', async ({ page }: { page: Page }) => {
     // Test picker selection combined with filters via URL
-    await page.goto('/discover?yearMin=2020&yearMax=2024&pickedManufacturer=Brammo');
+    await page.goto('/automobiles/discover?yearMin=2020&yearMax=2024&pickedManufacturer=Brammo');
 
     await waitForTableUpdate(page);
 
@@ -1021,7 +1021,7 @@ test.describe('PHASE 4: Manufacturer-Model Picker', () => {
 test.describe('PHASE 5: Statistics Panel', () => {
 
   test.skip('5.1.1-5.1.4: Statistics Display', async ({ page }: { page: Page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     const statsPanel = page.locator('[data-testid="statistics-panel"]');
     await expect(statsPanel).toBeVisible();
@@ -1033,12 +1033,12 @@ test.describe('PHASE 5: Statistics Panel', () => {
   });
 
   test.skip('5.2.1-5.2.5: Statistics Responsiveness to Filters', async ({ page }: { page: Page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     const statsPanel = page.locator('[data-testid="statistics-panel"]');
 
     // Apply filter
-    await page.goto('/discover?manufacturer=Brammo');
+    await page.goto('/automobiles/discover?manufacturer=Brammo');
 
     // Verify charts still visible (should have updated)
     const chartsFiltered = await statsPanel.locator('canvas, svg').count();
@@ -1046,7 +1046,7 @@ test.describe('PHASE 5: Statistics Panel', () => {
   });
 
   test.skip('5.3.1-5.3.2: Statistics Panel Collapse/Expand', async ({ page }: { page: Page }) => {
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     const statsPanel = page.locator('[data-testid="statistics-panel"]');
     const panelActions = statsPanel.locator('.panel-actions button').first();
@@ -1101,7 +1101,7 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
 
   test('6.1: Chart selection in pop-out Statistics panel updates all other popped-out controls', async ({ page, context }: any) => {
     // Navigate to discover
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     // Wait for initial load
     await expect(page.locator('#panel-results-table')).toBeVisible();
@@ -1243,7 +1243,7 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
 
   test('6.2: Multiple pop-outs stay in sync when any pop-out makes a selection', async ({ page, context }: any) => {
     // Similar to 6.1 but verifies multiple selections don't cause desynchronization
-    await page.goto('/discover');
+    await page.goto('/automobiles/discover');
 
     await expect(page.locator('#panel-results-table')).toBeVisible();
 
