@@ -1,63 +1,67 @@
 # Next Steps
 
-**Current Session**: Source Code Documentation & Pop-Out Manual Testing
+**Current Session**: Pop-Out Manual Testing & Bug Fixes
 
 ---
 
-## Immediate Action: Document Source Code Fully
+## Immediate Action: Perform Pop-Out Manual Testing
 
-**Priority**: CRITICAL (Blocks all other work)
+**Priority**: HIGH (Validates architecture stability)
 
 **What to Do**:
 
-1. **Framework Services** (highest priority - shared across domains)
-   - Add comprehensive inline documentation to all services in `framework/services/`
-   - Focus on: UrlStateService, ResourceManagementService, PopOutContextService, PickerConfigRegistry
-   - Document: purpose, public methods, usage examples, state flow
+Follow the 10 test scenarios in [POPOUT-ARCHITECTURE.md](../../docs/POPOUT-ARCHITECTURE.md):
+1. **Test 1**: Open pop-out window on Model Picker
+2. **Test 2**: Verify state sync from main window to pop-out
+3. **Test 3**: Verify state sync from pop-out to main window
+4. **Test 4**: Verify multiple pop-outs work independently
+5. **Test 5**: Verify filter operations propagate correctly
+6. **Test 6**: Verify pop-out window closes cleanly
+7. **Test 7**: Verify page refresh closes all pop-outs
+8. **Test 8**: Multi-monitor scenario (if available)
+9. **Test 9**: Network latency simulation with DevTools throttling
+10. **Test 10**: Console validation - verify message flow
 
-2. **Component Documentation**
-   - Add detailed comments to all components in `framework/components/`
-   - Focus on: DiscoverComponent, PanelPopoutComponent, BasePicker, ResultsTable, StatisticsPanel, QueryControl
-   - Document: responsibility, data flow, event handling, pop-out behavior
-
-3. **Domain Configuration**
-   - Document domain-config pattern with Automobile as example
-   - Explain: models, adapters, configs, chart-sources
-   - Create inline comments in `domain-config/automobile/`
-
-4. **Key Architectural Files**
-   - Add architectural comments to: app.module.ts, app-routing.module.ts
-   - Document injection patterns, provider setup, multi-domain support
+**Testing Environment**:
+- URL: `http://192.168.0.244:4205/automobiles/discover` (or localhost:4205)
+- Backend API: `generic-prime.minilab` (or configured endpoint)
+- Browser: Chrome/Chromium with DevTools
+- Need at least 2 windows for testing
 
 **Expected Output**:
-- All public methods have JSDoc comments
-- Complex logic has inline explanations
-- Configuration examples show expected data structures
-- Architectural decisions are documented at file level
+- ✅ Pop-outs open, display correctly, close without errors
+- ✅ State synchronization works in both directions
+- ✅ Multiple pop-outs can operate simultaneously
+- ✅ Console shows proper message flow with no errors
+- ✅ No memory leaks or event listener cleanup issues
+- Document any issues found for follow-up debugging
 
 ---
 
-## After Documentation: Perform Manual Pop-Out Testing
+## After Pop-Out Testing: Fix Known Bugs
 
-**Priority**: HIGH (Validates architecture)
+**Priority**: MEDIUM (User Experience)
 
-**Test Scenarios** (see [POPOUT-ARCHITECTURE.md](../../docs/POPOUT-ARCHITECTURE.md) for detailed steps):
-1. Open pop-out window - verify rendering and routing
-2. State sync main → pop-out - verify real-time updates
-3. State sync pop-out → main - verify URL updates and sync
-4. Multiple pop-outs - verify independent operation
-5. Filter operations - verify filter state propagation
-6. Pop-out window close - verify cleanup
-7. Page refresh - verify auto-close of pop-outs
-8. Multi-monitor scenario - verify smooth operation
-9. Network latency - verify eventual consistency
-10. Console validation - verify message flow and channel communication
+### Bug #13: PrimeNG Dropdown Keyboard Navigation
+**Component**: p-dropdown with `[filter]="true"` in Query Control (Manufacturer filter)
+**Issue**: Keyboard navigation broken - arrow keys don't highlight, Enter/Space don't select
+**Workaround**: Mouse click works fine
+**Fix Steps**:
+1. Inspect component in browser DevTools for missing tabindex/accessibility attributes
+2. Test if issue is PrimeNG bug or configuration conflict
+3. Check if `[editable]="true"` + `[filter]="true"` combination causes issue
+4. Implement onKeyDown event handler as workaround if needed
+5. Verify with other filters (Body Class, etc.)
 
-**Testing Approach**:
-- Follow the 10 test scenarios in [POPOUT-ARCHITECTURE.md](../../docs/POPOUT-ARCHITECTURE.md)
-- Document any issues found
-- Create bug reports for any failures
-- Note any UI improvements needed
+### Bug #7: Multiselect Visual State
+**Component**: p-multiSelect (Body Class filter)
+**Issue**: Checkboxes remain checked visually after clearing filters (filtering works correctly)
+**Impact**: Visual inconsistency - misleads users about active filters
+**Fix Steps**:
+1. Inspect p-multiSelect state after filter clear
+2. Manually update visual state after API response
+3. Force change detection or component refresh
+4. Test with various filter combinations
 
 ---
 
@@ -65,14 +69,13 @@
 
 | Phase | Work | Priority | Status |
 |-------|------|----------|--------|
-| **1** | **Document source code fully** | **CRITICAL** | **TO START** |
-| **2** | **Manual testing: pop-outs** | **HIGH** | Pending |
-| 3 | Clean up uncommitted work | High | Pending |
-| 4 | Update E2E tests for `/automobiles/discover` | Medium | Pending |
-| 5 | Complete automobile domain testing | Medium | Pending |
-| 6 | Fix Bug #13 (dropdown keyboard nav) | Medium | Pending |
-| 7 | Fix Bug #7 (multiselect visual state) | Low | Pending |
-| 8 | Plan agriculture domain implementation | Low | Pending |
+| **1** | **Perform pop-out manual testing (10 tests)** | **HIGH** | **IN PROGRESS** |
+| **2** | **Fix Bug #13 (dropdown keyboard nav)** | **MEDIUM** | Pending |
+| 3 | Fix Bug #7 (multiselect visual state) | Medium | Pending |
+| 4 | Document source code fully (framework services, components) | High | Pending |
+| 5 | Plan agriculture domain implementation | Low | Pending |
+| 6 | Plan chemistry domain implementation | Low | Pending |
+| 7 | Plan mathematics domain implementation | Low | Pending |
 
 ---
 
