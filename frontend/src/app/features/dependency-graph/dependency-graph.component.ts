@@ -114,7 +114,7 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
           minLen: 2,
         } as any,
         elements: this.buildCytoscapeElements(),
-        wheelSensitivity: 1.5, // Doubled from 0.75 for faster zoom
+        wheelSensitivity: 2.25, // 50% faster than 1.5 for rapid zoom
         pixelRatio: window.devicePixelRatio,
       });
 
