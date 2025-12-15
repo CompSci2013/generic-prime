@@ -190,9 +190,13 @@
   </div>
 
   <!-- Node Details Modal/Popover -->
-  <div class="node-modal" *ngIf="selectedNode" [@fadeInOut]>
+  <div class="node-modal" *ngIf="selectedNode" [@fadeInOut]
+       (mousemove)="onModalMouseMove($event)"
+       (mouseleave)="onModalMouseUp()"
+       (mouseup)="onModalMouseUp()">
     <div class="modal-backdrop" (click)="selectedNode = null"></div>
-    <div class="modal-content">
+    <div class="modal-content" [style]="getModalStyle()"
+         (mousedown)="onModalMouseDown($event)">
       <button class="modal-close" (click)="selectedNode = null">&times;</button>
       <div class="modal-header">
         <h2>{{ selectedNode.label }}</h2>

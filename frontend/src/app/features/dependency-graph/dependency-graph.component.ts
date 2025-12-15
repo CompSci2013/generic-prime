@@ -59,6 +59,11 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
   searchText = '';
   currentDate = new Date();
 
+  // Modal positioning and dragging
+  modalPosition = { x: 0, y: 0 };
+  isDraggingModal = false;
+  dragOffset = { x: 0, y: 0 };
+
   // Category filters for toggling visibility
   categoryFilters = [
     { category: LAYER_GROUPS.NPM_PEER, label: 'Angular Framework', color: '#DD0031', visible: true },
@@ -534,5 +539,35 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
 
   getNodeColor(category: string): string {
     return this.categoryFilters.find(f => f.category === category)?.color || '#888';
+  }
+
+  onModalMouseDown(event: MouseEvent): void {
+    // Only allow dragging from the header
+    if ((event.target as HTMLElement).closest('.modal-header')) {
+      this.isDraggingModal = true;
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      this.dragOffset = {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+      event.preventDefault();
+    }
+  }
+
+  onModalMouseMove(event: MouseEvent): void {
+    if (this.isDraggingModal) {
+      this.modalPosition = {
+        x: event.clientX - this.dragOffset.x,
+        y: event.clientY - this.dragOffset.y
+      };
+    }
+  }
+
+  onModalMouseUp(): void {
+    this.isDraggingModal = false;
+  }
+
+  getModalStyle(): string {
+    return `transform: translate(${this.modalPosition.x}px, ${this.modalPosition.y}px);`;
   }
 }

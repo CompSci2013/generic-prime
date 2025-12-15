@@ -600,7 +600,7 @@ $border-color: #444;
   }
 
   .modal-content {
-    position: relative;
+    position: fixed;
     background: $bg-secondary;
     border: 2px solid $accent-cyan;
     border-radius: 8px;
@@ -610,6 +610,10 @@ $border-color: #444;
     overflow-y: auto;
     color: #ffffff;
     animation: slideIn 0.3s ease-out;
+
+    &:active {
+      cursor: grabbing;
+    }
 
     .modal-close {
       position: absolute;
