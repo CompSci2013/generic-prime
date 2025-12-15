@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { trigger, style, transition, animate } from '@angular/animations';
 
 // @ts-ignore - cytoscape has default export
 import cytoscape from 'cytoscape';
@@ -32,7 +33,18 @@ import {
   selector: 'app-dependency-graph',
   templateUrl: './dependency-graph.component.html',
   styleUrls: ['./dependency-graph.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-10px)' }),
+        animate('300ms ease-in', style({ opacity: 1, transform: 'translateX(0)' }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-out', style({ opacity: 0, transform: 'translateX(-10px)' }))
+      ])
+    ])
+  ]
 })
 export class DependencyGraphComponent implements OnInit, AfterViewInit {
   @ViewChild('cyContainer', { static: false }) cyContainer!: ElementRef<HTMLDivElement>;
@@ -45,6 +57,7 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
   legendExpanded = true;
   selectedCategory = '';
   searchText = '';
+  currentDate = new Date();
 
   // Category filters for toggling visibility
   categoryFilters = [
