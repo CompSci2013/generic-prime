@@ -13,6 +13,9 @@ export interface DependencyNode {
             'internal-service' | 'internal-model' | 'build-tool' | 'test-tool' | 'external-lib';
   version?: string;
   description?: string;
+  detailedDescription?: string;
+  methods?: string[];
+  observables?: string[];
   color?: string;
   shape?: string;
 }
@@ -117,7 +120,11 @@ const FRAMEWORK_SERVICES: DependencyNode[] = [
   { id: 'svc-url-state', label: 'UrlStateService', category: 'framework-service',
     description: 'URL ↔ App state synchronization', color: '#C7CEEA' },
   { id: 'svc-resource-mgmt', label: 'ResourceManagementService<T>', category: 'framework-service',
-    description: 'Data fetching, filtering, and state orchestration', color: '#C7CEEA' },
+    description: 'Data fetching, filtering, and state orchestration',
+    detailedDescription: 'Core state orchestrator for URL-first architecture. Manages application state with URL as the single source of truth. Coordinates filter changes, API calls, state updates, and cross-window synchronization. Uses Observable streams for reactive updates and supports pop-out window state synchronization.',
+    observables: ['state$', 'filters$', 'results$', 'totalResults$', 'loading$', 'error$', 'statistics$', 'highlights$'],
+    methods: ['updateFilters()', 'clearFilters()', 'refresh()', 'getCurrentState()', 'getCurrentFilters()', 'syncStateFromExternal()'],
+    color: '#C7CEEA' },
   { id: 'svc-request-coord', label: 'RequestCoordinator', category: 'framework-service',
     description: 'Request deduplication and queuing', color: '#C7CEEA' },
 

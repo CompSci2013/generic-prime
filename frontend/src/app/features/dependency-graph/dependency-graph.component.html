@@ -198,11 +198,14 @@
     <div class="modal-content" [style]="getModalStyle()"
          (mousedown)="onModalMouseDown($event)">
       <button class="modal-close" (click)="selectedNode = null">&times;</button>
-      <div class="modal-header">
-        <h2>{{ selectedNode.label }}</h2>
-        <span class="modal-category" [style.background-color]="getNodeColor(selectedNode.category)">
-          {{ selectedNode.category }}
-        </span>
+      <div class="modal-header" (mousedown)="onModalMouseDown($event)">
+        <div class="drag-handle" title="Drag to move window">⋮⋮</div>
+        <div class="header-content">
+          <h2>{{ selectedNode.label }}</h2>
+          <span class="modal-category" [style.background-color]="getNodeColor(selectedNode.category)">
+            {{ selectedNode.category }}
+          </span>
+        </div>
       </div>
       <div class="modal-body">
         <div class="modal-section">
@@ -211,6 +214,25 @@
           <ng-template #noDescription>
             <p class="no-info">No description available</p>
           </ng-template>
+        </div>
+
+        <div class="modal-section" *ngIf="selectedNode.detailedDescription">
+          <h4>Details</h4>
+          <p class="detailed-text">{{ selectedNode.detailedDescription }}</p>
+        </div>
+
+        <div class="modal-section" *ngIf="selectedNode.methods && selectedNode.methods.length > 0">
+          <h4>Public Methods</h4>
+          <ul class="methods-list">
+            <li *ngFor="let method of selectedNode.methods">{{ method }}</li>
+          </ul>
+        </div>
+
+        <div class="modal-section" *ngIf="selectedNode.observables && selectedNode.observables.length > 0">
+          <h4>Observable Streams</h4>
+          <ul class="observables-list">
+            <li *ngFor="let obs of selectedNode.observables"><code>{{ obs }}</code></li>
+          </ul>
         </div>
 
         <div class="modal-section" *ngIf="selectedNode.version">
