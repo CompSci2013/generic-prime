@@ -1,6 +1,6 @@
 # Next Steps
 
-**Current Session**: Physics Knowledge Graphs Complete - Expanding Knowledge Graph System
+**Current Session**: Dependency Graph Complete - Ready for Next Feature or Bug Fixes
 
 ---
 
@@ -124,13 +124,15 @@ Follow the 10 test scenarios in [POPOUT-ARCHITECTURE.md](../../docs/POPOUT-ARCHI
 
 | Phase | Work | Priority | Status |
 |-------|------|----------|--------|
-| **1** | **Perform pop-out manual testing (10 tests)** | **HIGH** | **IN PROGRESS** |
-| **2** | **Fix Bug #13 (dropdown keyboard nav)** | **MEDIUM** | Pending |
-| 3 | Fix Bug #7 (multiselect visual state) | Medium | Pending |
-| 4 | Document source code fully (framework services, components) | High | Pending |
-| 5 | Plan agriculture domain implementation | Low | Pending |
-| 6 | Plan chemistry domain implementation | Low | Pending |
-| 7 | Plan mathematics domain implementation | Low | Pending |
+| **0** | **Session 17 Complete**: Dependency graph visualization (145+ nodes, 300+ edges) | **DONE** | **✅ COMPLETE** |
+| **1** | **Create Knowledge Graphs for Physics Topics** (Electromagnetism, Thermodynamics, Quantum Mechanics) | **HIGH** | Pending |
+| **2** | **Perform pop-out manual testing (10 tests)** | **HIGH** | Pending |
+| **3** | **Fix Bug #13 (dropdown keyboard nav)** | **MEDIUM** | Pending |
+| 4 | Fix Bug #7 (multiselect visual state) | Medium | Pending |
+| 5 | Document source code fully (framework services, components) | High | Pending |
+| 6 | Plan agriculture domain implementation | Low | Pending |
+| 7 | Plan chemistry domain implementation | Low | Pending |
+| 8 | Plan mathematics domain implementation | Low | Pending |
 
 ---
 
