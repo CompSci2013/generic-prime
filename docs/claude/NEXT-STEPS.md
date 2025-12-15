@@ -1,10 +1,65 @@
 # Next Steps
 
-**Current Session**: Pop-Out Manual Testing & Bug Fixes
+**Current Session**: Physics Knowledge Graphs Complete - Expanding Knowledge Graph System
 
 ---
 
-## Immediate Action: Perform Pop-Out Manual Testing
+## Immediate Action: Create Knowledge Graphs for Other Physics Topics
+
+**Priority**: HIGH (Extends Physics domain educational value)
+
+**What to Do**:
+
+Implement knowledge graphs for the remaining Physics course tiles following the Classical Mechanics pattern:
+
+1. **Electromagnetism Knowledge Graph**
+   - Create: `electromagnetism-graph.ts` (15-20 topics)
+   - Create: `ElectromagnetismGraphComponent` wrapper
+   - Add route: `/physics/electromagnetism-graph`
+   - Topics to include:
+     - Foundational: Electric Fields, Magnetic Fields, Vector Calculus
+     - Intermediate: Maxwell's Equations, Wave Propagation, Electromagnetic Potentials
+     - Advanced: Radiation, Relativity & EM, Quantum Effects in EM
+   - Map concept-graph node click (e.g., 'electromagnetism' node) to new route
+
+2. **Thermodynamics Knowledge Graph**
+   - Create: `thermodynamics-graph.ts` (15-20 topics)
+   - Create: `ThermodynamicsGraphComponent` wrapper
+   - Add route: `/physics/thermodynamics-graph`
+   - Topics to include:
+     - Foundational: Temperature, Energy, Entropy Basics
+     - Intermediate: First & Second Laws, Phase Transitions, Statistical Basis
+     - Advanced: Non-equilibrium, Fluctuations, Applications
+
+3. **Quantum Mechanics Knowledge Graph**
+   - Create: `quantum-mechanics-graph.ts` (15-20 topics)
+   - Create: `QuantumMechanicsGraphComponent` wrapper
+   - Add route: `/physics/quantum-mechanics-graph`
+   - Topics to include:
+     - Foundational: Wave Functions, Schrödinger Equation, Uncertainty
+     - Intermediate: Perturbation Theory, Spin, Angular Momentum
+     - Advanced: Quantum Field Theory, Dirac Equation, Applications
+
+**Implementation Steps** (for each subject):
+1. Define 15-20 topic nodes with appropriate levels and colors
+2. Map 20-30 edges showing prerequisites and relationships
+3. Create wrapper component using generic KnowledgeGraphComponent
+4. Add route to app-routing.module.ts
+5. Add component declaration to app.module.ts
+6. Update physics-concept-graph.component.ts navigateToNodeGraph() to map node clicks
+7. Build and test visualization
+
+**Testing Checklist**:
+- [ ] Navigate from concept-graph node → knowledge graph displays
+- [ ] Zoom/pan controls work smoothly
+- [ ] Click nodes → info panel shows correctly
+- [ ] Hover edges → tooltips appear
+- [ ] Fit-to-View button resets visualization
+- [ ] Back button returns to physics page
+
+---
+
+## After Knowledge Graphs: Continue Pop-Out Manual Testing
 
 **Priority**: HIGH (Validates architecture stability)
 
@@ -251,4 +306,4 @@ See `docs/claude/PROJECT-STATUS.md` for complete technical analysis and architec
 
 ---
 
-**Last Updated**: 2025-12-07T09:30:00Z
+**Last Updated**: 2025-12-14T19:35:00Z
