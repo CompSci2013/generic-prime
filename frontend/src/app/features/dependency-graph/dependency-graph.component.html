@@ -189,6 +189,56 @@
     </div>
   </div>
 
+  <!-- Node Details Modal/Popover -->
+  <div class="node-modal" *ngIf="selectedNode" [@fadeInOut]>
+    <div class="modal-backdrop" (click)="selectedNode = null"></div>
+    <div class="modal-content">
+      <button class="modal-close" (click)="selectedNode = null">&times;</button>
+      <div class="modal-header">
+        <h2>{{ selectedNode.label }}</h2>
+        <span class="modal-category" [style.background-color]="getNodeColor(selectedNode.category)">
+          {{ selectedNode.category }}
+        </span>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <h4>Overview</h4>
+          <p *ngIf="selectedNode.description; else noDescription">{{ selectedNode.description }}</p>
+          <ng-template #noDescription>
+            <p class="no-info">No description available</p>
+          </ng-template>
+        </div>
+
+        <div class="modal-section" *ngIf="selectedNode.version">
+          <h4>Version</h4>
+          <code>{{ selectedNode.version }}</code>
+        </div>
+
+        <div class="modal-section">
+          <h4>Technical ID</h4>
+          <code>{{ selectedNode.id }}</code>
+        </div>
+
+        <div class="modal-section">
+          <h4>Category Details</h4>
+          <p class="category-info">
+            <span *ngIf="selectedNode.category.includes('npm')">📦 NPM Package</span>
+            <span *ngIf="selectedNode.category.includes('Service')">⚙️ Framework Service</span>
+            <span *ngIf="selectedNode.category.includes('Component')">🎨 UI Component</span>
+            <span *ngIf="selectedNode.category.includes('Feature')">✨ Feature Component</span>
+            <span *ngIf="selectedNode.category.includes('Model')">📋 Model/Interface</span>
+            <span *ngIf="selectedNode.category.includes('Domain')">🔧 Domain Configuration</span>
+            <span *ngIf="selectedNode.category.includes('Adapter')">🔌 Domain Adapter</span>
+            <span *ngIf="selectedNode.category.includes('Chart')">📊 Chart Data Source</span>
+            <span *ngIf="selectedNode.category.includes('Build')">🏗️ Build Tool</span>
+            <span *ngIf="selectedNode.category.includes('Test')">🧪 Testing/Linting Tool</span>
+            <span *ngIf="selectedNode.category.includes('External')">🌐 External Library</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <div class="footer">
     <p>
