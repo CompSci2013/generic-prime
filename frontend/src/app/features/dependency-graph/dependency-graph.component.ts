@@ -42,6 +42,7 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
   stats = DEPENDENCY_STATS;
   showLegend = true;
   showFilters = true;
+  legendExpanded = true;
   selectedCategory = '';
   searchText = '';
 
@@ -441,6 +442,10 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
 
   toggleLegend(): void {
     this.showLegend = !this.showLegend;
+  }
+
+  toggleLegendExpanded(): void {
+    this.legendExpanded = !this.legendExpanded;
   }
 
   toggleFilters(): void {

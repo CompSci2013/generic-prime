@@ -143,99 +143,49 @@
   </div>
 
   <!-- Legend -->
-  <div class="legend" *ngIf="showLegend" [@fadeInOut]>
-    <div class="legend-header">
-      <h4>Legend</h4>
+  <div class="legend-compact" *ngIf="showLegend" [@fadeInOut]>
+    <div class="legend-header" (click)="toggleLegendExpanded()">
+      <h4>📋 Legend <span class="toggle-icon">{{ legendExpanded ? '▼' : '▶' }}</span></h4>
     </div>
 
-    <div class="legend-section">
-      <h5>Node Types</h5>
-      <div class="legend-grid">
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #DD0031"></div>
-          <span>Angular Framework</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #3776AB"></div>
-          <span>Production Dependencies</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #C7CEEA"></div>
-          <span>Framework Services</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #F8B195"></div>
-          <span>Framework Components</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #B4A7D6"></div>
-          <span>Feature Components</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #95E1D3"></div>
-          <span>Models & Interfaces</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #FFD93D"></div>
-          <span>Domain Configurations</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #6BCB77"></div>
-          <span>Domain Adapters</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #A8E6CF"></div>
-          <span>Chart Data Sources</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #E8DAEF"></div>
-          <span>Build Tools</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #D7BDE2"></div>
-          <span>Testing & Linting</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #F5B7B1"></div>
-          <span>External Libraries</span>
+    <div class="legend-content" *ngIf="legendExpanded">
+      <div class="legend-section compact">
+        <h5>Node Types (12)</h5>
+        <div class="legend-grid compact">
+          <div class="legend-item"><div class="legend-color" style="background-color: #DD0031"></div><span>Angular</span></div>
+          <div class="legend-item"><div class="legend-color" style="background-color: #3776AB"></div><span>Prod Deps</span></div>
+          <div class="legend-item"><div class="legend-color" style="background-color: #C7CEEA"></div><span>Services</span></div>
+          <div class="legend-item"><div class="legend-color" style="background-color: #F8B195"></div><span>Components</span></div>
+          <div class="legend-item"><div class="legend-color" style="background-color: #B4A7D6"></div><span>Features</span></div>
+          <div class="legend-item"><div class="legend-color" style="background-color: #95E1D3"></div><span>Models</span></div>
+          <div class="legend-item"><div class="legend-color" style="background-color: #FFD93D"></div><span>Config</span></div>
+          <div class="legend-item"><div class="legend-color" style="background-color: #6BCB77"></div><span>Adapters</span></div>
+          <div class="legend-item"><div class="legend-color" style="background-color: #A8E6CF"></div><span>Charts</span></div>
+          <div class="legend-item"><div class="legend-color" style="background-color: #E8DAEF"></div><span>Build</span></div>
+          <div class="legend-item"><div class="legend-color" style="background-color: #D7BDE2"></div><span>Testing</span></div>
+          <div class="legend-item"><div class="legend-color" style="background-color: #F5B7B1"></div><span>External</span></div>
         </div>
       </div>
-    </div>
 
-    <div class="legend-section">
-      <h5>Edge Types</h5>
-      <div class="legend-items">
-        <div class="legend-item-row">
-          <span class="edge-sample uses"></span>
-          <span>Uses/Imports</span>
-        </div>
-        <div class="legend-item-row">
-          <span class="edge-sample implements"></span>
-          <span>Implements Interface</span>
-        </div>
-        <div class="legend-item-row">
-          <span class="edge-sample extends"></span>
-          <span>Extends Class</span>
-        </div>
-        <div class="legend-item-row">
-          <span class="edge-sample provides"></span>
-          <span>Provides Service</span>
-        </div>
-        <div class="legend-item-row">
-          <span class="edge-sample injects"></span>
-          <span>Injects Dependency</span>
+      <div class="legend-section compact">
+        <h5>Edges (5)</h5>
+        <div class="legend-items compact">
+          <div><span class="edge-sample uses"></span><span>Uses</span></div>
+          <div><span class="edge-sample implements"></span><span>Impl</span></div>
+          <div><span class="edge-sample extends"></span><span>Ext</span></div>
+          <div><span class="edge-sample provides"></span><span>Prov</span></div>
+          <div><span class="edge-sample injects"></span><span>Inj</span></div>
         </div>
       </div>
-    </div>
 
-    <div class="legend-section">
-      <h5>Interaction</h5>
-      <ul class="legend-help">
-        <li><strong>Click node:</strong> View details & highlight connections</li>
-        <li><strong>Drag to pan:</strong> Move around the graph</li>
-        <li><strong>Scroll to zoom:</strong> Use mouse wheel to zoom in/out</li>
-        <li><strong>Search:</strong> Find dependencies by name or description</li>
-      </ul>
+      <div class="legend-section compact">
+        <h5>Keyboard</h5>
+        <ul class="legend-help compact">
+          <li><strong>Click:</strong> Select node</li>
+          <li><strong>Drag:</strong> Pan graph</li>
+          <li><strong>Scroll:</strong> Zoom</li>
+        </ul>
+      </div>
     </div>
   </div>
 
