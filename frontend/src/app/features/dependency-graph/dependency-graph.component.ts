@@ -67,55 +67,81 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.initializeCytoscape();
+    try {
+      this.initializeCytoscape();
+    } catch (error) {
+      console.error('Failed to initialize dependency graph:', error);
+    }
   }
 
   private initializeCytoscape(): void {
-    // Register Dagre layout
-    cytoscape.use(dagre);
-
-    // Initialize Cytoscape
-    this.cy = cytoscape({
-      container: this.cyContainer.nativeElement,
-      style: this.getCytoscapeStyle(),
-      layout: {
-        name: 'dagre',
-        nodeSep: 80,
-        rankSep: 150,
-        edgeSep: 20,
-        rankDir: 'LR', // Left to Right
-        animate: true,
-        animationDuration: 500,
-        avoidOverlap: true,
-        spacingFactor: 1.5,
-        minLen: 2,
-      } as any,
-      elements: this.buildCytoscapeElements(),
-      wheelSensitivity: 0.75,
-      pixelRatio: window.devicePixelRatio,
-    });
-
-    // Add event listeners
-    this.cy.on('tap', (evt: any) => {
-      if (evt.target.isNode()) {
-        const nodeId = evt.target.id();
-        this.selectedNode = ALL_DEPENDENCY_NODES.find(n => n.id === nodeId) || null;
-
-        // Visual feedback - highlight selected node and its neighbors
-        this.cy.elements().removeClass('selected-node adjacent-node');
-        const node = evt.target;
-        node.addClass('selected-node');
-        node.connectedEdges().connectedNodes().addClass('adjacent-node');
-      } else {
-        this.selectedNode = null;
-        this.cy.elements().removeClass('selected-node adjacent-node');
+    try {
+      // Validate container exists
+      if (!this.cyContainer || !this.cyContainer.nativeElement) {
+        throw new Error('Cytoscape container not found');
       }
-    });
 
-    // Fit to view on initialization
-    setTimeout(() => {
-      this.fitToView();
-    }, 500);
+      // Register Dagre layout
+      cytoscape.use(dagre);
+
+      // Initialize Cytoscape
+      this.cy = cytoscape({
+        container: this.cyContainer.nativeElement,
+        style: this.getCytoscapeStyle(),
+        layout: {
+          name: 'dagre',
+          nodeSep: 80,
+          rankSep: 150,
+          edgeSep: 20,
+          rankDir: 'LR', // Left to Right
+          animate: true,
+          animationDuration: 500,
+          avoidOverlap: true,
+          spacingFactor: 1.5,
+          minLen: 2,
+        } as any,
+        elements: this.buildCytoscapeElements(),
+        wheelSensitivity: 1.5, // Doubled from 0.75 for faster zoom
+        pixelRatio: window.devicePixelRatio,
+      });
+
+      // Add event listeners with error handling
+      this.cy.on('tap', (evt: any) => {
+        try {
+          if (evt.target.isNode()) {
+            const nodeId = evt.target.id();
+            this.selectedNode = ALL_DEPENDENCY_NODES.find(n => n.id === nodeId) || null;
+
+            // Visual feedback - highlight selected node and its neighbors
+            this.cy.elements().removeClass('selected-node adjacent-node');
+            const node = evt.target;
+            if (node && node.addClass) {
+              node.addClass('selected-node');
+              if (node.connectedEdges && node.connectedNodes) {
+                node.connectedEdges().connectedNodes().addClass('adjacent-node');
+              }
+            }
+          } else {
+            this.selectedNode = null;
+            this.cy.elements().removeClass('selected-node adjacent-node');
+          }
+        } catch (err) {
+          console.error('Error in tap event handler:', err);
+        }
+      });
+
+      // Fit to view on initialization
+      setTimeout(() => {
+        try {
+          this.fitToView();
+        } catch (err) {
+          console.error('Error fitting to view:', err);
+        }
+      }, 500);
+    } catch (error) {
+      console.error('Error initializing Cytoscape:', error);
+      throw error;
+    }
   }
 
   private buildCytoscapeElements(): any[] {
@@ -419,25 +445,47 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
   }
 
   fitToView(): void {
-    if (this.cy && this.cy.elements(':visible').length > 0) {
-      this.cy.fit(':visible', 50);
+    try {
+      if (this.cy && this.cy.elements(':visible').length > 0) {
+        this.cy.fit(':visible', 50);
+      }
+    } catch (error) {
+      console.error('Error fitting to view:', error);
     }
   }
 
   resetView(): void {
-    this.selectedNode = null;
-    this.cy.elements().removeClass('selected-node adjacent-node');
-    this.searchText = '';
-    this.categoryFilters.forEach(f => f.visible = true);
-    this.updateNodeVisibility();
+    try {
+      this.selectedNode = null;
+      if (this.cy) {
+        this.cy.elements().removeClass('selected-node adjacent-node');
+      }
+      this.searchText = '';
+      this.categoryFilters.forEach(f => f.visible = true);
+      this.updateNodeVisibility();
+    } catch (error) {
+      console.error('Error resetting view:', error);
+    }
   }
 
   zoomIn(): void {
-    this.cy.zoom(this.cy.zoom() * 1.2);
+    try {
+      if (this.cy) {
+        this.cy.zoom(this.cy.zoom() * 1.2);
+      }
+    } catch (error) {
+      console.error('Error zooming in:', error);
+    }
   }
 
   zoomOut(): void {
-    this.cy.zoom(this.cy.zoom() / 1.2);
+    try {
+      if (this.cy) {
+        this.cy.zoom(this.cy.zoom() / 1.2);
+      }
+    } catch (error) {
+      console.error('Error zooming out:', error);
+    }
   }
 
   toggleLegend(): void {
