@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { trigger, style, transition, animate } from '@angular/animations';
 
 // @ts-ignore - cytoscape has default export
@@ -80,6 +80,8 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     { category: LAYER_GROUPS.EXTERNAL, label: 'External Libraries', color: '#F5B7B1', visible: true },
   ];
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   ngOnInit(): void {
     // Initialization complete
   }
@@ -129,6 +131,7 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
           if (evt.target.isNode()) {
             const nodeId = evt.target.id();
             this.selectedNode = ALL_DEPENDENCY_NODES.find(n => n.id === nodeId) || null;
+            this.cdr.detectChanges(); // Trigger change detection for modal to appear
 
             // Visual feedback - highlight selected node and its neighbors
             this.cy.elements().removeClass('selected-node adjacent-node');
@@ -141,6 +144,7 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
             }
           } else {
             this.selectedNode = null;
+            this.cdr.detectChanges(); // Trigger change detection to close modal
             this.cy.elements().removeClass('selected-node adjacent-node');
           }
         } catch (err) {
@@ -560,6 +564,7 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
         x: event.clientX - this.dragOffset.x,
         y: event.clientY - this.dragOffset.y
       };
+      this.cdr.detectChanges(); // Trigger change detection for smooth drag movement
     }
   }
 
