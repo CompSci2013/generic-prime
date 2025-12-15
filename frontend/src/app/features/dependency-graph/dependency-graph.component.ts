@@ -206,7 +206,7 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
           'height': '60px',
           'font-size': '11px',
           'font-weight': 'bold',
-          'color': '#fff',
+          'color': '#ffffff',
           'text-wrap': 'wrap',
           'text-max-width': '85px',
           'overlay-padding': '5px',
@@ -256,70 +256,70 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
         selector: `node.${LAYER_GROUPS.SERVICES}`,
         style: {
           'background-color': '#C7CEEA',
-          'color': '#000',
+          'color': '#ffffff',
         }
       },
       {
         selector: `node.${LAYER_GROUPS.COMPONENTS}`,
         style: {
           'background-color': '#F8B195',
-          'color': '#000',
+          'color': '#ffffff',
         }
       },
       {
         selector: `node.${LAYER_GROUPS.FEATURES}`,
         style: {
           'background-color': '#B4A7D6',
-          'color': '#fff',
+          'color': '#ffffff',
         }
       },
       {
         selector: `node.${LAYER_GROUPS.MODELS}`,
         style: {
           'background-color': '#95E1D3',
-          'color': '#000',
+          'color': '#ffffff',
         }
       },
       {
         selector: `node.${LAYER_GROUPS.DOMAIN}`,
         style: {
           'background-color': '#FFD93D',
-          'color': '#000',
+          'color': '#ffffff',
         }
       },
       {
         selector: `node.${LAYER_GROUPS.ADAPTERS}`,
         style: {
           'background-color': '#6BCB77',
-          'color': '#fff',
+          'color': '#ffffff',
         }
       },
       {
         selector: `node.${LAYER_GROUPS.CHARTS}`,
         style: {
           'background-color': '#A8E6CF',
-          'color': '#000',
+          'color': '#ffffff',
         }
       },
       {
         selector: `node.${LAYER_GROUPS.BUILD}`,
         style: {
           'background-color': '#E8DAEF',
-          'color': '#000',
+          'color': '#ffffff',
         }
       },
       {
         selector: `node.${LAYER_GROUPS.TEST}`,
         style: {
           'background-color': '#D7BDE2',
-          'color': '#000',
+          'color': '#ffffff',
         }
       },
       {
         selector: `node.${LAYER_GROUPS.EXTERNAL}`,
         style: {
           'background-color': '#F5B7B1',
-          'color': '#000',
+          'color': '#ffffff',
         }
       },
       {
@@ -332,10 +332,12 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
           'curve-style': 'bezier',
           'width': '1.5px',
           'opacity': 0.6,
-          'text-background-color': '#fff',
-          'text-background-opacity': 0.8,
+          'color': '#ffffff',
+          'text-background-color': '#2a2a2a',
+          'text-background-opacity': 0.9,
           'text-background-padding': '2px',
           'font-size': '9px',
+          'font-weight': 'bold',
           'text-valign': 'center',
           'text-halign': 'center',
           'edge-text-rotation': 'autorotate',
