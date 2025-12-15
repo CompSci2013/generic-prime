@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.14
-**Timestamp**: 2025-12-14T23:59:00Z
-**Updated By**: Session 17 - Comprehensive Dependency Graph Visualization
+**Version**: 5.15
+**Timestamp**: 2025-12-15T01:45:00Z
+**Updated By**: Session 18 - Dependency Graph Enhancements & Modal Improvements
 
 ---
 
@@ -66,6 +66,100 @@
 ---
 
 ## What Changed This Session
+
+**Session 18: Dependency Graph Enhancements - Modal & Documentation**
+
+### Summary
+Enhanced the dependency graph visualization with interactive modal improvements and source code documentation extraction. Fixed modal visibility bug caused by OnPush change detection strategy. Added prominent drag handle for improved UX. Implemented detailed documentation display including method signatures, observable streams, and architectural descriptions pulled from JSDoc comments.
+
+### Changes Made
+
+1. **Modal Visibility Fix** ✅
+   - Fixed critical bug where modal wasn't appearing when clicking nodes
+   - Root cause: OnPush change detection strategy not detecting property changes in Cytoscape event handlers (outside Angular zone)
+   - Solution: Injected ChangeDetectorRef and call detectChanges() after setting selectedNode
+   - Modal now appears instantly when clicking any dependency node
+
+2. **Drag Handle & UX Improvements** ✅
+   - Added prominent drag handle (⋮⋮) in modal header for obvious visual cue
+   - Implemented cursor feedback (grab/grabbing) for better affordance
+   - Reorganized header layout: drag handle + title + category badge
+   - Header now fully draggable with improved hit target
+   - Fixed SCSS indentation error causing unmatched brace compilation error
+
+3. **Source Code Documentation Extraction** ✅
+   - Extended DependencyNode interface with new fields:
+     - `detailedDescription`: Full JSDoc documentation from source
+     - `methods`: Array of public method signatures
+     - `observables`: Array of Observable stream properties
+   - Added documentation sections to modal:
+     - Overview: Brief one-liner description
+     - Details: Full architectural documentation with state flow diagrams
+     - Public Methods: Clickable method signatures with parameter info
+     - Observable Streams: RxJS pattern documentation
+   - Example: ResourceManagementService displays:
+     - 50+ line detailed description of URL-first architecture
+     - 6 public methods: updateFilters(), clearFilters(), refresh(), etc.
+     - 8 observable streams: state$, filters$, results$, loading$, error$, etc.
+
+4. **Styling Enhancements** ✅
+   - Detailed description box with yellow (#FFD93D) left border
+   - Methods list with cyan arrow markers (→)
+   - Observable streams with code formatting and light blue text
+   - Improved typography: better line heights, spacing, font sizes
+   - Proper flexbox layout for responsive header
+   - Smooth transitions and hover states
+
+### Technical Details
+
+**Change Detection Fix**:
+- Import ChangeDetectorRef from @angular/core
+- Inject in constructor: `private cdr: ChangeDetectorRef`
+- Call in tap event handler: `this.cdr.detectChanges()`
+- Also call during drag movement for smooth repositioning
+
+**Modal Enhancements**:
+- Modal z-index: 100 (above legend at z: 5)
+- Fixed positioning with transform: translate() for dragging
+- Animation: slideIn 0.3s ease-out
+- Max-width: 500px, max-height: 80vh
+- Scrollable body with overflow-y: auto
+- Semi-transparent backdrop: rgba(0,0,0,0.6)
+
+**Data Model Updates**:
+- DependencyNode now supports rich metadata
+- Methods array format: `['updateFilters()', 'clearFilters()', 'refresh()']`
+- Observables array format: `['state$', 'filters$', 'results$']`
+- Detailed descriptions support multi-line text with formatting
+
+### Files Modified
+- `dependency-graph.component.ts` - Added ChangeDetectorRef injection and detectChanges() calls
+- `dependency-graph.component.html` - Added drag handle, details sections, methods list, observables list
+- `dependency-graph.component.scss` - Added drag handle styling, detailed-text, methods-list, observables-list
+- `dependency-graph.ts` - Extended DependencyNode interface with new fields
+
+### Commits This Session
+- `5cbba07`: fix: Fix modal not appearing when clicking nodes on dependency graph
+- `83d57ec`: feat: Enhance modal with drag handle and detailed source code documentation
+
+### Testing Completed
+- ✅ Build succeeds with no compilation errors
+- ✅ Modal appears when clicking any node
+- ✅ Modal is draggable with smooth movement
+- ✅ Drag handle provides clear visual affordance
+- ✅ Documentation sections display correctly
+- ✅ Methods and observables lists render properly
+- ✅ All styling applies correctly
+
+### Impact
+- **Developer Experience**: Developers can now understand service architecture without leaving the app
+- **Documentation**: JSDoc comments automatically surfaced in UI
+- **Discoverability**: Drag handle makes modal dragging obvious to users
+- **Accessibility**: Fixed bug that prevented interaction with dependency information
+
+---
+
+**Previous Session Summary**:
 
 **Session 17: Comprehensive Dependency Graph Visualization**
 

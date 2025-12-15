@@ -1,6 +1,6 @@
 # Next Steps
 
-**Current Session**: Dependency Graph Complete - Ready for Next Feature or Bug Fixes
+**Current Session**: Session 18 Complete - Dependency Graph Modal Enhancements Done
 
 ---
 
@@ -125,6 +125,7 @@ Follow the 10 test scenarios in [POPOUT-ARCHITECTURE.md](../../docs/POPOUT-ARCHI
 | Phase | Work | Priority | Status |
 |-------|------|----------|--------|
 | **0** | **Session 17 Complete**: Dependency graph visualization (145+ nodes, 300+ edges) | **DONE** | **✅ COMPLETE** |
+| **0.5** | **Session 18 Complete**: Modal visibility fix + drag handle + source documentation | **DONE** | **✅ COMPLETE** |
 | **1** | **Create Knowledge Graphs for Physics Topics** (Electromagnetism, Thermodynamics, Quantum Mechanics) | **HIGH** | Pending |
 | **2** | **Perform pop-out manual testing (10 tests)** | **HIGH** | Pending |
 | **3** | **Fix Bug #13 (dropdown keyboard nav)** | **MEDIUM** | Pending |
@@ -308,4 +309,4 @@ See `docs/claude/PROJECT-STATUS.md` for complete technical analysis and architec
 
 ---
 
-**Last Updated**: 2025-12-14T19:35:00Z
+**Last Updated**: 2025-12-15T01:45:00Z
