@@ -12,6 +12,7 @@ import { PhysicsConceptGraphComponent } from './features/physics/physics-concept
 import { ClassicalMechanicsGraphComponent } from './features/physics/classical-mechanics-graph.component';
 import { ChemistryComponent } from './features/chemistry/chemistry.component';
 import { MathComponent } from './features/math/math.component';
+import { DependencyGraphComponent } from './features/dependency-graph/dependency-graph.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -25,6 +26,7 @@ const routes: Routes = [
   { path: 'physics/classical-mechanics-graph', component: ClassicalMechanicsGraphComponent },
   { path: 'chemistry', component: ChemistryComponent },
   { path: 'math', component: MathComponent },
+  { path: 'dependencies', component: DependencyGraphComponent },
   { path: 'report', component: ReportComponent },
   { path: 'panel/:gridId/:panelId/:type', component: PanelPopoutComponent }
 ];

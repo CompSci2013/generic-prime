@@ -1,0 +1,250 @@
+<div class="dependency-graph-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>🔗 Generic-Prime Dependency Graph</h1>
+    <p class="subtitle">Comprehensive DAG visualization of all application dependencies</p>
+  </div>
+
+  <!-- Statistics Bar -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <strong>{{ stats.totalNodes }}</strong> Nodes
+    </div>
+    <div class="stat-item">
+      <strong>{{ stats.totalEdges }}</strong> Dependency Edges
+    </div>
+    <div class="stat-item">
+      <strong>{{ stats.npmDependencies }}</strong> NPM Packages
+    </div>
+    <div class="stat-item">
+      <strong>{{ stats.frameworkServices }}</strong> Services
+    </div>
+    <div class="stat-item">
+      <strong>{{ stats.frameworkComponents }}</strong> Components
+    </div>
+    <div class="stat-item">
+      <strong>{{ stats.buildTools }}</strong> Build Tools
+    </div>
+    <div class="stat-item">
+      <strong>{{ stats.testingTools }}</strong> Test Tools
+    </div>
+  </div>
+
+  <!-- Controls Panel -->
+  <div class="controls-panel">
+    <!-- Search Controls -->
+    <div class="control-group search-group">
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (ngModelChange)="filterBySearch()"
+        placeholder="Search dependencies..."
+        class="search-input"
+      />
+      <button (click)="clearSearch()" class="btn btn-clear">Clear</button>
+    </div>
+
+    <!-- Zoom Controls -->
+    <div class="control-group zoom-group">
+      <button (click)="zoomOut()" class="btn btn-zoom" title="Zoom Out">−</button>
+      <button (click)="fitToView()" class="btn btn-zoom" title="Fit to View">⊡</button>
+      <button (click)="zoomIn()" class="btn btn-zoom" title="Zoom In">+</button>
+    </div>
+
+    <!-- Toggle Controls -->
+    <div class="control-group toggle-group">
+      <button
+        (click)="toggleLegend()"
+        [class.active]="showLegend"
+        class="btn btn-toggle"
+        title="Toggle Legend"
+      >
+        ◆ Legend
+      </button>
+      <button
+        (click)="toggleFilters()"
+        [class.active]="showFilters"
+        class="btn btn-toggle"
+        title="Toggle Filters"
+      >
+        ⊞ Filters
+      </button>
+    </div>
+
+    <!-- Action Controls -->
+    <div class="control-group action-group">
+      <button (click)="resetView()" class="btn btn-action" title="Reset View">🔄 Reset</button>
+      <button (click)="exportAsJson()" class="btn btn-action" title="Export as JSON">⬇ Export</button>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="content-wrapper">
+    <!-- Left Sidebar - Filters -->
+    <div class="sidebar" *ngIf="showFilters" [@fadeInOut]>
+      <div class="sidebar-header">
+        <h3>Category Filters</h3>
+      </div>
+      <div class="filter-list">
+        <div
+          *ngFor="let filter of categoryFilters"
+          class="filter-item"
+          (click)="toggleCategory(filter.category)"
+        >
+          <div class="filter-checkbox">
+            <input
+              type="checkbox"
+              [checked]="filter.visible"
+              (change)="toggleCategory(filter.category)"
+              [id]="'filter-' + filter.category"
+            />
+            <label [for]="'filter-' + filter.category"></label>
+          </div>
+          <span class="filter-color" [style.background-color]="filter.color"></span>
+          <span class="filter-label">{{ filter.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graph Canvas -->
+    <div class="graph-wrapper">
+      <div #cyContainer class="cy-container"></div>
+    </div>
+
+    <!-- Right Sidebar - Node Details -->
+    <div class="sidebar info-panel" [class.has-content]="selectedNode" [@fadeInOut]>
+      <div *ngIf="selectedNode; else noSelection" class="node-details">
+        <h3>{{ selectedNode.label }}</h3>
+        <div class="detail-row">
+          <strong>ID:</strong>
+          <span class="code">{{ selectedNode.id }}</span>
+        </div>
+        <div class="detail-row">
+          <strong>Category:</strong>
+          <span class="category-badge" [style.background-color]="getNodeColor(selectedNode.category)">
+            {{ selectedNode.category }}
+          </span>
+        </div>
+        <div *ngIf="selectedNode.version" class="detail-row">
+          <strong>Version:</strong>
+          <span class="code">{{ selectedNode.version }}</span>
+        </div>
+        <div *ngIf="selectedNode.description" class="detail-row description">
+          <strong>Description:</strong>
+          <p>{{ selectedNode.description }}</p>
+        </div>
+      </div>
+      <ng-template #noSelection>
+        <div class="no-selection">
+          <p>👆 Click on a node to view details</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend" *ngIf="showLegend" [@fadeInOut]>
+    <div class="legend-header">
+      <h4>Legend</h4>
+    </div>
+
+    <div class="legend-section">
+      <h5>Node Types</h5>
+      <div class="legend-grid">
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #DD0031"></div>
+          <span>Angular Framework</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #3776AB"></div>
+          <span>Production Dependencies</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #C7CEEA"></div>
+          <span>Framework Services</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #F8B195"></div>
+          <span>Framework Components</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #B4A7D6"></div>
+          <span>Feature Components</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #95E1D3"></div>
+          <span>Models & Interfaces</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #FFD93D"></div>
+          <span>Domain Configurations</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #6BCB77"></div>
+          <span>Domain Adapters</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #A8E6CF"></div>
+          <span>Chart Data Sources</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #E8DAEF"></div>
+          <span>Build Tools</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #D7BDE2"></div>
+          <span>Testing & Linting</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #F5B7B1"></div>
+          <span>External Libraries</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend-section">
+      <h5>Edge Types</h5>
+      <div class="legend-items">
+        <div class="legend-item-row">
+          <span class="edge-sample uses"></span>
+          <span>Uses/Imports</span>
+        </div>
+        <div class="legend-item-row">
+          <span class="edge-sample implements"></span>
+          <span>Implements Interface</span>
+        </div>
+        <div class="legend-item-row">
+          <span class="edge-sample extends"></span>
+          <span>Extends Class</span>
+        </div>
+        <div class="legend-item-row">
+          <span class="edge-sample provides"></span>
+          <span>Provides Service</span>
+        </div>
+        <div class="legend-item-row">
+          <span class="edge-sample injects"></span>
+          <span>Injects Dependency</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend-section">
+      <h5>Interaction</h5>
+      <ul class="legend-help">
+        <li><strong>Click node:</strong> View details & highlight connections</li>
+        <li><strong>Drag to pan:</strong> Move around the graph</li>
+        <li><strong>Scroll to zoom:</strong> Use mouse wheel to zoom in/out</li>
+        <li><strong>Search:</strong> Find dependencies by name or description</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>
+      Generic-Prime Dependency Graph • Generated: {{ 'now' | date: 'short' }} •
+      {{ stats.npmDependencies }} NPM packages, {{ stats.frameworkServices }} services,
+      {{ stats.frameworkComponents }} framework components
+    </p>
+  </div>
+</div>

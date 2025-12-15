@@ -57,6 +57,14 @@ export class AppComponent {
         { label: 'Math Discover', icon: '🔍', routerLink: '/math/discover' },
         { label: 'View Test Reports', icon: '📋', command: () => this.openTestReports() }
       ]
+    },
+    {
+      label: 'Developer',
+      icon: '⚙️',
+      items: [
+        { label: 'Dependency Graph', icon: '🔗', routerLink: '/dependencies' },
+        { label: 'View Test Reports', icon: '📋', command: () => this.openTestReports() }
+      ]
     }
   ];
 

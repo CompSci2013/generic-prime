@@ -26,6 +26,7 @@ import { KnowledgeGraphComponent } from './features/physics/knowledge-graph.comp
 import { ClassicalMechanicsGraphComponent } from './features/physics/classical-mechanics-graph.component';
 import { ChemistryComponent } from './features/chemistry/chemistry.component';
 import { MathComponent } from './features/math/math.component';
+import { DependencyGraphComponent } from './features/dependency-graph/dependency-graph.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { MathComponent } from './features/math/math.component';
     KnowledgeGraphComponent,
     ClassicalMechanicsGraphComponent,
     ChemistryComponent,
-    MathComponent
+    MathComponent,
+    DependencyGraphComponent
   ],
   imports: [
     BrowserModule,
