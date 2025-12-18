@@ -10,7 +10,10 @@
     "test:e2e": "npx playwright test",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
-    "lint:framework": "eslint \"src/framework/**/*.ts\""
+    "lint:framework": "eslint \"src/framework/**/*.ts\"",
+    "build:doc": "compodoc -p ./tsconfig.app.json -d documents",
+    "compodoc": "http-server documents -p 4242 -c-1",
+    "dev": "concurrently \"ng serve --host 0.0.0.0 --port 4205\" \"npm run compodoc\""
   },
   "private": true,
   "dependencies": {
@@ -41,6 +44,8 @@
     "@types/plotly.js": "^3.0.8",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
+    "compodoc": "^0.0.41",
+    "concurrently": "^9.2.1",
     "eslint": "^8.57.0",
     "http-server": "^14.1.1",
     "jasmine-core": "~4.3.0",
