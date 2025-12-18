@@ -1,10 +1,53 @@
 # Next Steps
 
-**Current Session**: Session 18 Complete - Dependency Graph Modal Enhancements Done
+**Current Session**: Session 19 Complete - Architecture Audit & Module Analysis Done
 
 ---
 
-## Immediate Action: Create Knowledge Graphs for Other Physics Topics
+## PRIORITY UPDATE: Fix Module Re-export Anti-pattern BEFORE Physics Knowledge Graphs
+
+**Blocking Issue Identified**: FrameworkModule re-exports CommonModule, FormsModule, PrimengModule
+- Creates hidden dependencies for downstream modules
+- Must be fixed to establish proper architectural foundation
+- Fixes: 3 lines in 1 file + setup automated validation
+
+**Why This Takes Priority**:
+1. Architectural correctness required before adding new features
+2. Session 19 comprehensive audit identified and documented this
+3. Only 20 minutes to fix (includes setup validation)
+4. Enables automated checking for all future modules
+5. Prevents similar issues in Physics knowledge graphs
+
+**Immediate Actions (Session 20)**:
+
+1. **Remove re-exports from FrameworkModule** (5 min)
+   - File: `frontend/src/framework/framework.module.ts`
+   - Action: Delete lines 50-52 (CommonModule, FormsModule, PrimengModule exports)
+   - Impact: Modules must now explicitly import what they need
+
+2. **Create automated validation script** (10 min)
+   - File: Create `scripts/check-module-reexports.js`
+   - Source: Copy from `docs/claude/MODULE-ARCHITECTURE-AUDIT.md` Section "Method 4"
+   - Benefit: Prevents regression in future modules
+
+3. **Add npm scripts** (5 min)
+   - File: `frontend/package.json`
+   - Add: `check:modules` and `check:modules:strict` scripts
+
+4. **Verify fix** (10 min)
+   - Run: `npm run check:modules` (expect ✅ 0 violations)
+   - Build: `ng build --configuration development`
+   - Test: `npm run test:e2e` (expect 33/33 passing)
+
+**Documentation**:
+- Quick guide: `QUICK-START-MODULE-FIX.md` (30 minutes, step-by-step)
+- Detailed: `SUGGESTED-ITEMS-CHECKLIST.md` (14 items with effort estimates)
+- Full audit: `docs/claude/MODULE-ARCHITECTURE-AUDIT.md` (800+ lines)
+- Reference: `MODULE-AUDIT-BULLET-SUMMARY.txt` (quick bullets)
+
+---
+
+## After Module Fix: Create Knowledge Graphs for Other Physics Topics
 
 **Priority**: HIGH (Extends Physics domain educational value)
 
