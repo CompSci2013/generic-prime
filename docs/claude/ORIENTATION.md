@@ -489,9 +489,48 @@ timeout 300 podman run --rm --network=host generic-prime-e2e 2>&1 | tail -50
 
 ## Development Environment
 
-**All Angular/npm commands run INSIDE the container:**
+### Option 1: Direct on Thor Host (Recommended for Development)
 
-### Start Dev Server
+**Thor has Node.js installed via NVM - no containers needed!**
+
+```bash
+cd ~/projects/generic-prime/frontend
+
+# Start dev server (Angular CLI runs via npx)
+npm run dev:server
+
+# In another terminal, run tests (Playwright runs via npx)
+npm run test:e2e
+
+# In a third terminal, view test results
+npm run test:report
+```
+
+**How it works**:
+- Node.js v20.19.6 is installed via NVM at `~/.nvm/`
+- Angular CLI is in `node_modules/.bin/ng` (symlinked from `@angular/cli`)
+- Playwright is in `node_modules/.bin/playwright`
+- Both are available via `npx` (Node Package eXecute)
+- `npm run` scripts automatically use local `node_modules/.bin/` binaries
+
+**Why this works**:
+- Your `~/.bashrc` sources NVM on login: `. $HOME/.nvm/nvm.sh`
+- NVM adds `/home/odin/.nvm/versions/node/v20.19.6/bin` to `$PATH`
+- When you `npm install`, Angular CLI and Playwright are installed locally
+- `npx` finds these tools and runs them automatically
+
+**Advantages**:
+- ✅ No containers needed for development
+- ✅ Direct access to source code in VS Code
+- ✅ Fastest feedback loop (local file watching)
+- ✅ Easy to debug with browser DevTools
+- ✅ No container overhead or port conflicts
+- ✅ **This is your primary development workflow**
+
+### Option 2: Inside Dev Container (Optional)
+
+If you prefer an isolated build environment:
+
 ```bash
 cd ~/projects/generic-prime/frontend
 
@@ -500,16 +539,56 @@ podman start generic-prime-frontend-dev 2>/dev/null || \
   podman run -d --name generic-prime-frontend-dev --network host \
     -v $(pwd):/app:z -w /app localhost/generic-prime-frontend:dev
 
-# Run dev server
-podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205
+# Run dev server in container
+podman exec -it generic-prime-frontend-dev npm run dev:server
+
+# In another terminal, run tests in container
+podman exec -it generic-prime-frontend-dev npm run test:e2e
+
+# In a third terminal, view results from container
+podman exec -it generic-prime-frontend-dev npm run test:report
 ```
 
-### Run Commands in Container
+**When to use this**:
+- Testing multiple Node versions simultaneously
+- Ensuring identical CI/CD environment
+- Isolated builds without affecting host system
+- Production validation before deployment
+
+**Note**: The dev container also has Node.js and npm installed, so this works the same way as Option 1 but inside a container
+
+### Option 3: E2E Container (For CI/CD Testing)
+
 ```bash
+# Dev server must be running on host port 4205 first:
+npm run dev:server
+
+# In another terminal, run tests in E2E container:
+podman exec generic-prime-e2e bash -c "cd /app/frontend && npm run test:e2e"
+
+# View results from host:
+npm run test:report
+```
+
+**Advantages**:
+- Matches production Playwright environment
+- Tests browser sandboxing
+- Good for final validation
+
+### Run Any npm Command
+
+```bash
+# On host
+npm install
+npm run test:e2e
+npm run lint
+npm run build
+
+# In container
 podman exec -it generic-prime-frontend-dev npm install
-podman exec -it generic-prime-frontend-dev ng build
 podman exec -it generic-prime-frontend-dev npm run test:e2e
-podman exec -it generic-prime-frontend-dev sh  # Interactive shell
+podman exec -it generic-prime-frontend-dev npm run lint
+podman exec -it generic-prime-frontend-dev npm run build
 ```
 
 ---
@@ -544,15 +623,180 @@ podman exec -it generic-prime-frontend-dev sh  # Interactive shell
 
 ---
 
+## E2E Testing with Playwright
+
+### Quick Start: Live Development Workflow
+
+This is the **recommended setup for active development** - watch your code changes in real-time while monitoring test results:
+
+```bash
+# Terminal 1: Start dev server (watch for Angular compilation)
+cd ~/projects/generic-prime/frontend
+npm run dev:server
+# Server running at http://192.168.0.244:4205
+
+# Terminal 2: View test results (static report viewer)
+npm run test:report
+# Report available at http://192.168.0.244:9323
+
+# Terminal 3: Run tests when needed
+npm run test:e2e
+# After completion, refresh Terminal 2 browser to see results
+
+# Repeat as needed:
+# 1. Edit code in VS Code
+# 2. Watch changes in Terminal 1 browser (4205)
+# 3. Run tests in Terminal 3 when ready
+# 4. View results in Terminal 2 browser (9323)
+```
+
+**Workflow Benefits**:
+- ✅ Dev server auto-recompiles on file changes
+- ✅ Test results visible immediately after running
+- ✅ Catch regressions: app looks good but tests fail = bug found!
+- ✅ All three browsers accessible from Windows PC
+
+### Alternative: Interactive Test Mode
+
+For debugging specific tests or step-through execution:
+
+```bash
+# Terminal 1: Start dev server
+npm run dev:server
+
+# Terminal 2: Start Playwright UI mode (auto-reruns on code change)
+npm run test:watch
+# Playwright UI opens at http://localhost:3000
+```
+
+**Test Watch Mode Benefits**:
+- Auto-reruns tests when code changes
+- Step through test execution
+- Inspect DOM during test
+- Retry individual tests
+- View detailed logs per test
+
+### npm Scripts Reference
+
+All commands run from `frontend/` directory:
+
+| Command | Purpose | Access | Notes |
+|---------|---------|--------|-------|
+| `npm run dev:server` | Angular dev server | http://192.168.0.244:4205 | Terminal stays active, shows compilation |
+| `npm run test:e2e` | Run all tests once | (generates report) | Tests connect to port 4205, exits when done |
+| `npm run test:watch` | Interactive test mode | http://localhost:3000 | Auto-reruns on changes, stays running |
+| `npm run test:report` | View HTML test report | http://192.168.0.244:9323 | Stays running, refresh to see new results |
+
+### Test Results Location
+
+Test reports are generated in `frontend/playwright-report/`:
+
+```bash
+# View raw HTML
+open frontend/playwright-report/index.html
+
+# Or serve via npm script (recommended for Windows access)
+npm run test:report
+```
+
+### Configuration
+
+**Playwright Config** (`frontend/playwright.config.ts`):
+- **PORT**: 4205 (must match dev server)
+- **Timeout**: 10000ms (increased for pop-out tests)
+- **Browser**: Chromium only
+- **Reporter**: HTML (auto-opens after tests complete)
+- **Base URL**: http://localhost:4205
+
+**Test Files** (`frontend/e2e/`):
+- `app.spec.ts` - Main test suite (33 tests in 6 phases)
+- Tests organized by feature (initial state, navigation, filtering, pop-outs, etc.)
+
+### Container-Based Testing
+
+If you prefer isolated environments:
+
+**Dev Container**:
+```bash
+podman start generic-prime-frontend-dev 2>/dev/null || \
+  podman run -d --name generic-prime-frontend-dev --network host \
+    -v $(pwd):/app:z -w /app localhost/generic-prime-frontend:dev
+
+podman exec -it generic-prime-frontend-dev npm run dev:server
+podman exec -it generic-prime-frontend-dev npm run test:e2e
+podman exec -it generic-prime-frontend-dev npm run test:report
+```
+
+**E2E Container**:
+```bash
+# Dev server must be running on host (port 4205)
+npm run dev:server
+
+# Run tests in E2E container
+podman exec generic-prime-e2e bash -c "cd /app/frontend && npm run test:e2e"
+
+# View results from host
+npm run test:report
+```
+
+### Troubleshooting Tests
+
+**Port 4205 already in use**:
+```bash
+lsof -i :4205
+kill -9 <PID>
+npm run dev:server
+```
+
+**Port 9323 already in use**:
+```bash
+lsof -i :9323
+kill -9 <PID>
+npm run test:report
+```
+
+**"Cannot find module" errors**:
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Dev server won't start**:
+```bash
+# Check if Angular CLI is working
+ng version
+
+# If not found, reinstall
+npm install -g @angular/cli@14
+```
+
+**Tests fail with "Cannot reach http://localhost:4205"**:
+```bash
+# Verify dev server is running
+curl http://localhost:4205
+
+# If it fails, restart dev server in Terminal 1
+# Make sure it says "Compiled successfully"
+```
+
+---
+
 ## Testing Policy
 
 - **Unit Tests**: Deferred to dedicated project (NOT in scope)
-- **E2E Tests**: Playwright, located in `frontend/e2e/`
-- **Manual Testing**: Expected during development
+- **E2E Tests**: Playwright, located in `frontend/e2e/` (33 tests, see [NEXT-STEPS.md](./NEXT-STEPS.md))
+- **Manual Testing**: Expected during development (recommended before pushing)
 
 ---
 
 **Last Updated**: 2025-12-20
+
+**Session 34 Update**: Added comprehensive E2E testing documentation
+- Documented three execution methods: host, dev container, E2E container
+- Added practical npm scripts for dev workflow
+- Clarified port usage and browser access from Windows PC
+- Added troubleshooting guide for common issues
 
 **Session 22 Update**: Corrected infrastructure documentation to reflect actual Kubernetes architecture:
 - Loki is the control plane (not Thor)
