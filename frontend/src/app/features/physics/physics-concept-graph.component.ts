@@ -12,7 +12,49 @@ cytoscape.use(dagre);
 /**
  * Cytoscape Node Data Structure
  *
- * Defines the data format for nodes in the Cytoscape graph
+ * Defines the data format for nodes in the Cytoscape graph visualization.
+ * This interface structures node data for use with Cytoscape.js library,
+ * providing all necessary properties for rendering and styling graph nodes.
+ *
+ * @interface CytoscapeNode
+ * @property {Object} data - Data object containing node properties
+ * @property {string} data.id - Unique identifier for the node (kebab-case)
+ * @property {string} data.label - Display text shown on the node in the graph
+ * @property {string} data.level - Academic level for categorization (foundational/intermediate/advanced)
+ * @property {string} data.description - Detailed description shown on node selection
+ * @property {string} [data.color] - Optional hex color code for node background
+ *
+ * @remarks
+ * This is Cytoscape.js's standard node format. The data object is passed directly to
+ * the Cytoscape instance during graph initialization.
+ *
+ * **Color Values**:
+ * - Foundational: #64c8ff (cyan)
+ * - Intermediate: #ffa500 (orange)
+ * - Advanced: #ff6b9d (pink)
+ *
+ * **Node Rendering**:
+ * Cytoscape renders nodes as 60x60px circles with:
+ * - Background color from data.color
+ * - Label text from data.label
+ * - Cyan border (#64c8ff)
+ * - White text (12px, bold)
+ *
+ * @example
+ * ```typescript
+ * const node: CytoscapeNode = {
+ *   data: {
+ *     id: 'mechanics-foundations',
+ *     label: 'Classical Mechanics',
+ *     level: 'foundational',
+ *     description: 'Lagrangian mechanics and oscillations',
+ *     color: '#64c8ff'
+ *   }
+ * };
+ * ```
+ *
+ * @see CytoscapeEdge - Companion edge data structure
+ * @see PhysicsConceptGraphComponent - Component using this interface
  */
 interface CytoscapeNode {
   data: {
@@ -151,10 +193,53 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
 
   constructor(private router: Router) {}
 
+  /**
+   * Angular lifecycle hook - Component initialization
+   *
+   * Called once when the component is initialized but before the view is rendered.
+   * Used for early logging and non-DOM-dependent initialization.
+   *
+   * @lifecycle
+   * Executes: After constructor, before ngAfterViewInit
+   * Timing: Safe for property binding, not yet for DOM access
+   *
+   * @remarks
+   * At this point:
+   * - Component properties are bound
+   * - Input properties are populated
+   * - DOM/ViewChild references are NOT yet available
+   * - Change detection can still be triggered
+   */
   ngOnInit(): void {
     console.log('[PhysicsConceptGraph] ngOnInit()');
   }
 
+  /**
+   * Angular lifecycle hook - View initialization completion
+   *
+   * Called once after the component's view and child views are initialized.
+   * This is where Cytoscape.js graph is created and event listeners are attached.
+   *
+   * @lifecycle
+   * Executes: After ngOnInit, after DOM is fully rendered
+   * Timing: Safe for DOM access, ViewChild references available
+   *
+   * @remarks
+   * **Why Cytoscape is initialized here**:
+   * - ViewChild containerRef is now available
+   * - DOM element is rendered and in the document
+   * - Height/width CSS is applied
+   * - Cytoscape needs actual DOM element to render
+   *
+   * **What happens**:
+   * 1. Validates containerRef is available
+   * 2. Builds Cytoscape elements from data
+   * 3. Initializes Cytoscape instance with configuration
+   * 4. Sets up event listeners (click, hover, pan, zoom)
+   * 5. Logs successful initialization
+   *
+   * @throws Error logged to console if containerRef not available
+   */
   ngAfterViewInit(): void {
     console.log('[PhysicsConceptGraph] ngAfterViewInit()');
 
@@ -239,6 +324,40 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     console.log('[PhysicsConceptGraph] Cytoscape initialized');
   }
 
+  /**
+   * Build Cytoscape-compatible elements from physics concept graph data
+   *
+   * Transforms the PHYSICS_CONCEPT_GRAPH data structure into format required by Cytoscape.js.
+   * Cytoscape expects elements in a specific structure with `data` properties containing node/edge info.
+   *
+   * @private
+   * @returns {any[]} Array of Cytoscape elements (nodes + edges)
+   *
+   * @remarks
+   * **Data Transformation**:
+   * - Converts ConceptNode array to Cytoscape node elements with data.id, data.label, etc.
+   * - Converts ConceptEdge array to Cytoscape edge elements with data.source, data.target, data.label
+   *
+   * **Cytoscape Format**:
+   * Nodes: `{ data: { id, label, level, description, color } }`
+   * Edges: `{ data: { source, target, label } }`
+   *
+   * @example
+   * ```typescript
+   * // Input from PHYSICS_CONCEPT_GRAPH
+   * // nodes: [{ id: 'mech', label: 'Mechanics', ... }]
+   * // edges: [{ source: 'mech', target: 'waves', label: 'prerequisite' }]
+   *
+   * // Output:
+   * // [
+   * //   { data: { id: 'mech', label: 'Mechanics', level: 'foundational', ... } },
+   * //   { data: { source: 'mech', target: 'waves', label: 'prerequisite' } }
+   * // ]
+   * ```
+   *
+   * @see PHYSICS_CONCEPT_GRAPH - Data source
+   * @see ngAfterViewInit - Where this is called
+   */
   private buildCytoscapeElements(): any[] {
     const elements: any[] = [];
 
@@ -269,6 +388,34 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     return elements;
   }
 
+  /**
+   * Generate Cytoscape stylesheet for graph visualization
+   *
+   * Creates styling rules for nodes and edges in Cytoscape.js graph.
+   * Defines colors, sizes, labels, transitions, and hover effects.
+   *
+   * @private
+   * @returns {any[]} Array of Cytoscape style objects
+   *
+   * @remarks
+   * **Style Selectors**:
+   * - `node`: Base styling for all nodes (60x60px, colored circles, white text)
+   * - `node:selected`: Larger (80x80px), white border, glow effect
+   * - `node:hover`: Opacity change, pointer cursor
+   * - `edge`: Base styling for connections (2px line, triangle arrow)
+   * - `edge:hover`: Brighter color, thicker line (3px)
+   *
+   * **Colors**:
+   * - Node border: #64c8ff (cyan)
+   * - Edge color: rgba(100, 200, 255, 0.5) (semi-transparent cyan)
+   * - Arrow: rgba(100, 200, 255, 0.6)
+   *
+   * **Animations**:
+   * - Transitions: 0.3s for smooth state changes
+   * - Curve style: bezier for smooth edges
+   *
+   * @see ngAfterViewInit - Where this is used for Cytoscape initialization
+   */
   private getCytoscapeStyle(): any[] {
     return [
       {
@@ -335,6 +482,27 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     ];
   }
 
+  /**
+   * Handle window resize events and adjust graph layout
+   *
+   * Called by window resize event listener to ensure Cytoscape graph remains
+   * properly sized when the browser window or container changes dimensions.
+   *
+   * @private
+   * @remarks
+   * **What happens**:
+   * 1. Checks if Cytoscape instance exists
+   * 2. Calls cy.resize() to update internal Cytoscape canvas
+   * 3. Calls cy.fit() to recenter and fit graph to new container size
+   *
+   * **Performance**:
+   * - Debouncing not implemented (can optimize if needed)
+   * - Called on every resize event
+   * - Fast operations (minimal DOM impact)
+   *
+   * @see ngAfterViewInit - Where resize listener is registered
+   * @see ngOnDestroy - Where listener is cleaned up
+   */
   private handleResize(): void {
     if (this.cy) {
       this.cy.resize();
@@ -342,12 +510,58 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     }
   }
 
+  /**
+   * Fit the entire graph to the current view
+   *
+   * Public method called from template (fit-to-view button) to center and zoom
+   * the graph to show all nodes and edges within the visible container.
+   *
+   * @public
+   * @remarks
+   * **Parameters**:
+   * - null: Animate all nodes (default behavior)
+   * - 40: Padding in pixels around the graph edges
+   *
+   * **Use case**:
+   * Called when user clicks the "Fit to View" button in the UI to reset zoom/pan
+   * after manual exploration.
+   *
+   * @see ngAfterViewInit - Initial fit is done here after graph creation
+   */
   fitGraph(): void {
     if (this.cy) {
       this.cy.fit(null, 40);
     }
   }
 
+  /**
+   * Navigate to knowledge graph for a selected concept node
+   *
+   * Handles routing to detailed knowledge graphs for specific physics topics.
+   * Currently supports classical mechanics; expandable for other topics.
+   *
+   * @public
+   * @param {string} nodeId - The unique identifier of the selected node
+   *
+   * @remarks
+   * **Current Mappings**:
+   * - 'mechanics-foundations' → /physics/classical-mechanics-graph
+   *
+   * **Future Expansion**:
+   * Add more mappings as knowledge graphs are created for other topics:
+   * ```typescript
+   * if (nodeId === 'mechanics-foundations') {
+   *   this.router.navigate(['/physics/classical-mechanics-graph']);
+   * } else if (nodeId === 'electromagnetism') {
+   *   this.router.navigate(['/physics/electromagnetism-graph']);
+   * }
+   * ```
+   *
+   * **Called by**:
+   * - Node tap/click event handler in ngAfterViewInit
+   *
+   * @see ngAfterViewInit - Where this is called on node click
+   */
   navigateToNodeGraph(nodeId: string): void {
     // Navigate to knowledge graph for nodes that have them
     if (nodeId === 'mechanics-foundations') {
@@ -356,10 +570,48 @@ export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDe
     // Add more node-to-graph mappings as knowledge graphs are created for other topics
   }
 
+  /**
+   * Navigate back to parent physics component
+   *
+   * Called by back button in template to return to /physics main view.
+   *
+   * @public
+   * @remarks
+   * **Navigation**:
+   * - From: /physics/concept-graph
+   * - To: /physics
+   *
+   * **Alternative**:
+   * Users can also use browser back button, but this provides explicit UI control.
+   */
   goBack(): void {
     this.router.navigate(['/physics']);
   }
 
+  /**
+   * Angular lifecycle hook - Component destruction cleanup
+   *
+   * Called once when the component is destroyed. Cleans up Cytoscape instance
+   * and removes all registered event listeners to prevent memory leaks.
+   *
+   * @lifecycle
+   * Executes: When component is removed from DOM
+   * Timing: Final cleanup before garbage collection
+   *
+   * @remarks
+   * **Cleanup Tasks**:
+   * 1. Destroy Cytoscape instance (frees canvas and memory)
+   * 2. Remove window resize listener
+   * 3. Remove document mousemove listener
+   *
+   * **Memory Leak Prevention**:
+   * Without proper cleanup:
+   * - Cytoscape canvas would remain in memory
+   * - Event listeners would continue firing
+   * - Memory usage would grow on component re-creation
+   *
+   * @see ngAfterViewInit - Where listeners and instances are created
+   */
   ngOnDestroy(): void {
     if (this.cy) {
       this.cy.destroy();

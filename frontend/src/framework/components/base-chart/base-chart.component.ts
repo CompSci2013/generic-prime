@@ -182,6 +182,26 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private cdr: ChangeDetectorRef) {}
 
+  /**
+   * Angular lifecycle hook - Component initialization
+   *
+   * Called once when the component is created. Validates that required inputs
+   * are provided and initializes chart title from data source.
+   *
+   * @lifecycle
+   * Executes: After constructor, before ngAfterViewInit
+   * Change Detection: Safe to trigger
+   * DOM Access: Not yet available
+   *
+   * @remarks
+   * **Validation**:
+   * - Logs error to console if dataSource is not provided
+   * - BaseChartComponent requires a ChartDataSource instance
+   *
+   * **Initialization**:
+   * - Sets chartTitle from dataSource.getTitle()
+   * - Falls back to 'Chart' if dataSource is not available
+   */
   ngOnInit(): void {
     if (!this.dataSource) {
       console.error('BaseChartComponent: dataSource is required');
@@ -189,11 +209,52 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chartTitle = this.dataSource?.getTitle() || 'Chart';
   }
 
+  /**
+   * Angular lifecycle hook - View initialization completion
+   *
+   * Called once after the component's view and child views are initialized.
+   * This is where the Plotly chart is first rendered into the DOM.
+   *
+   * @lifecycle
+   * Executes: After ngOnInit, after DOM is fully rendered
+   * Change Detection: Can be triggered
+   * DOM Access: ViewChild references now available
+   *
+   * @remarks
+   * **Why Plotly is initialized here**:
+   * - ViewChild chartContainer is now available
+   * - DOM element is rendered and in the document
+   * - Container dimensions (clientWidth) are determined
+   * - Plotly needs actual DOM element and dimensions
+   */
   ngAfterViewInit(): void {
     // Render chart after view is initialized
     this.renderChart();
   }
 
+  /**
+   * Angular lifecycle hook - Component destruction cleanup
+   *
+   * Called once when the component is destroyed. Cleans up Plotly chart
+   * and completes RxJS subjects to prevent memory leaks.
+   *
+   * @lifecycle
+   * Executes: When component is removed from DOM
+   * Change Detection: No longer triggered
+   *
+   * @remarks
+   * **Cleanup Tasks**:
+   * 1. Signal destroy$ subject to all subscribers
+   * 2. Complete destroy$ subject (no more emissions)
+   * 3. Purge Plotly chart from DOM (if it exists)
+   *
+   * **Memory Leak Prevention**:
+   * - Destroy$ subject stops RxJS subscriptions
+   * - Plotly.purge() removes canvas and frees memory
+   * - Without cleanup, multiple chart instances would accumulate
+   *
+   * @see destroy$ - RxJS subject used for cleanup
+   */
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -205,7 +266,29 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Detect changes (called when inputs change)
+   * Angular lifecycle hook - Input change detection
+   *
+   * Called when any @Input property changes. If a Plotly chart is already
+   * rendered, the chart is updated with the new data.
+   *
+   * @lifecycle
+   * Executes: When any @Input property changes (after ngOnInit)
+   * Timing: Before change detection runs
+   *
+   * @remarks
+   * **Triggered by changes to**:
+   * - @Input() statistics - New statistics data
+   * - @Input() highlights - Updated highlight filters
+   * - @Input() selectedValue - Different selection
+   *
+   * **Behavior**:
+   * - Only rerenders if Plotly chart is already initialized
+   * - Skips render during initial component setup
+   * - Called even if multiple inputs change at once
+   *
+   * @see statistics - Statistics data input
+   * @see highlights - Highlight filters input
+   * @see selectedValue - Selected value input
    */
   ngOnChanges(): void {
     if (this.plotlyElement) {
@@ -214,7 +297,24 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Handle window resize
+   * Handle window resize events
+   *
+   * HostListener for window:resize events that keeps Plotly chart
+   * responsive to container dimension changes.
+   *
+   * @private (HostListener)
+   * @remarks
+   * **Why resize is needed**:
+   * - When browser window resizes, Plotly must recalculate dimensions
+   * - Without resize, chart may appear stretched or clipped
+   *
+   * **Double resize for pop-out windows**:
+   * - First resize() call updates Plotly's internal state
+   * - setTimeout with 100ms delay for browser rendering
+   * - Second resize() call applies final dimensions
+   * - Needed for pop-out/docking window scenarios
+   *
+   * @see onWindowResize - The implementation
    */
   @HostListener('window:resize')
   onWindowResize(): void {

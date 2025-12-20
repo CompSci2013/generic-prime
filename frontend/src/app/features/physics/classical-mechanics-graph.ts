@@ -112,14 +112,91 @@ export interface TopicEdge {
  * Complete topic graph data structure
  *
  * @interface TopicGraph
- * @property {TopicNode[]} nodes - All topic nodes
- * @property {TopicEdge[]} edges - All topic relationships
+ * @property {TopicNode[]} nodes - All topic nodes in the curriculum graph
+ * @property {TopicEdge[]} edges - All topic relationships and dependencies
+ *
+ * @remarks
+ * TopicGraph represents a complete directed acyclic graph (DAG) of curriculum topics
+ * with prerequisite and dependency relationships. Used across curriculum planning,
+ * visualization, and knowledge mapping components.
+ *
+ * @see TopicNode - Individual topic nodes
+ * @see TopicEdge - Relationships between topics
  */
 export interface TopicGraph {
   nodes: TopicNode[];
   edges: TopicEdge[];
 }
 
+/**
+ * Classical Mechanics Topic Dependency Graph
+ *
+ * Complete topic dependency graph for the Classical Mechanics course showing prerequisites,
+ * conceptual foundations, and knowledge extensions between all course topics.
+ * This graph visualizes the curriculum structure and helps plan learning pathways.
+ *
+ * @constant
+ * @type {TopicGraph}
+ *
+ * @remarks
+ * **Graph Statistics**:
+ * - 18 total topic nodes
+ * - 27 directed edges (relationships)
+ * - 3 academic levels: foundational, core, advanced
+ *
+ * **Topic Distribution by Level**:
+ * - Foundational (3 topics): Vectors/Calculus, Newtonian Mechanics, 1D Kinematics
+ *   - Color: #64c8ff (cyan)
+ *   - Required entry-level concepts
+ *
+ * - Core (6 topics): 2D/3D Motion, Particle Systems, Rigid Bodies, Gravitation, Rotating Frames, Continuous Media
+ *   - Color: #ffa500 (orange)
+ *   - Central curriculum topics
+ *
+ * - Advanced (9 topics): Lagrange, Tensors, Rigid Rotation, Small Vibrations, Special Relativity, Relativistic Dynamics, Central Forces, Hamiltonian, Energy Methods
+ *   - Color: #ff6b9d (pink)
+ *   - Specialized and advanced topics
+ *
+ * **Relationship Types** (edge labels):
+ * - "prerequisite" - Target requires source knowledge (strict dependency)
+ * - "foundation" - Source provides conceptual basis for target
+ * - "extends" - Target extends/builds upon source
+ * - "related" - Topics share connections without strict dependency
+ *
+ * **Example Prerequisite Chains**:
+ * 1. Vectors/Calculus → Newtonian Mechanics → Kinematics (1D) → Kinematics (3D)
+ * 2. Kinematics (3D) → Particle Systems → Rigid Bodies
+ * 3. Newtonian Mechanics → Central Forces → Gravitation
+ * 4. Kinematics (3D) + Dynamics → Lagrange Equations → Hamiltonian Formalism
+ *
+ * **Visual Rendering**:
+ * - Rendered with Cytoscape.js in ClassicalMechanicsGraphComponent
+ * - Uses Dagre layout for hierarchical left-to-right arrangement
+ * - Color-coded by level for visual categorization
+ * - Interactive: pan, zoom, node selection, hover tooltips
+ * - Shows relationship type on edge hover
+ *
+ * **Usage**:
+ * ```typescript
+ * // Access topics by level
+ * const foundational = CLASSICAL_MECHANICS_GRAPH.nodes
+ *   .filter(n => n.level === 'foundational');
+ *
+ * // Find prerequisites for a topic
+ * const topic = 'rigid-bodies';
+ * const prerequisites = CLASSICAL_MECHANICS_GRAPH.edges
+ *   .filter(e => e.target === topic && e.label === 'prerequisite')
+ *   .map(e => e.source);
+ * ```
+ *
+ * @see ClassicalMechanicsGraphComponent - Component that visualizes this graph
+ * @see KnowledgeGraphComponent - Generic graph visualization component
+ * @see TopicNode - Individual topic data structure
+ * @see TopicEdge - Relationship data structure
+ *
+ * @version 1.0
+ * @since 2024
+ */
 export const CLASSICAL_MECHANICS_GRAPH: TopicGraph = {
   nodes: [
     // Foundational Topics

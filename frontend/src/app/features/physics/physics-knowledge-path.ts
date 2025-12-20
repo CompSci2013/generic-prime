@@ -83,6 +83,32 @@ export interface PhysicsNode {
  * @property {string[]} keyPoints - Bullet points of key concepts covered
  * @property {number} estimatedHours - Approximate study hours for mastery
  */
+/**
+ * Represents a single syllabus topic within a course
+ *
+ * @interface SyllabusItem
+ * @property {string} topic - Name of the syllabus topic
+ * @property {string} description - Brief explanation of topic content
+ * @property {string[]} keyPoints - Bullet points of key concepts covered
+ * @property {number} estimatedHours - Approximate study hours for mastery
+ *
+ * @remarks
+ * **Usage in PhysicsNode**:
+ * Each course node contains an optional syllabus array of SyllabusItem objects.
+ * These provide detailed breakdowns of what's covered in each course.
+ *
+ * **Example**:
+ * ```typescript
+ * {
+ *   topic: 'Classical Mechanics',
+ *   description: 'Lagrangian formalism, oscillations, dynamics',
+ *   keyPoints: ['Lagrangian & Hamiltonian', 'Oscillations & Waves', 'Central Forces'],
+ *   estimatedHours: 40
+ * }
+ * ```
+ *
+ * @see PhysicsNode - Parent node that contains syllabus items
+ */
 export interface SyllabusItem {
   topic: string;
   description: string;
@@ -90,6 +116,55 @@ export interface SyllabusItem {
   estimatedHours: number;
 }
 
+/**
+ * Complete Physics PhD Curriculum Knowledge Path
+ *
+ * Hierarchical array containing the complete 3-tier physics curriculum structure
+ * from undergraduate foundations through PhD specialization. This is the primary
+ * data source for rendering the physics curriculum tree and syllabus views.
+ *
+ * @constant
+ * @type {PhysicsNode[]}
+ *
+ * @remarks
+ * **Structure**:
+ * Root array contains 3 tier nodes:
+ * - Tier 1: Undergraduate Physics (4 courses)
+ * - Tier 2: Graduate Physics (4 courses)
+ * - Tier 3: PhD Specialization (7 courses)
+ *
+ * **Total Curriculum Stats**:
+ * - 15 major courses total
+ * - ~110 individual syllabus topics
+ * - ~2,500+ total estimated study hours
+ * - 6-8 year typical duration (undergrad + grad + PhD)
+ *
+ * **Specialization Track**:
+ * PhD specialization focuses on:
+ * - Thermodynamics & Statistical Mechanics
+ * - Solid State Matter & Materials Science
+ * - Computational Methods
+ * - Advanced topics in condensed matter physics
+ *
+ * **Usage**:
+ * ```typescript
+ * // Render tier 1 courses
+ * PHYSICS_KNOWLEDGE_PATH[0].children // → Array of 4 undergraduate courses
+ *
+ * // Access specific course
+ * PHYSICS_KNOWLEDGE_PATH[0].children[0] // → Classical Mechanics course
+ *
+ * // Get syllabus for a course
+ * PHYSICS_KNOWLEDGE_PATH[0].children[0].syllabus // → Array of SyllabusItem
+ * ```
+ *
+ * @see PhysicsComponent - Component that displays this curriculum
+ * @see PhysicsSyllabusComponent - Component that shows detailed syllabus
+ * @see PHYSICS_CONCEPT_GRAPH - Concept relationships for knowledge graph
+ *
+ * @version 1.0
+ * @since 2024
+ */
 export const PHYSICS_KNOWLEDGE_PATH: PhysicsNode[] = [
   {
     id: 'tier-1-undergraduate',
