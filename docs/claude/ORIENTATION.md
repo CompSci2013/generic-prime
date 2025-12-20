@@ -69,32 +69,43 @@
 ## Infrastructure Overview
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  Host Machine: Thor (192.168.0.244)                         │
-│  Working Directory: ~/projects/generic-prime (frontend)     │
-│  Backend Source: ~/projects/data-broker/generic-prime       │
-└─────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────┐
+│  Development Host: Thor (192.168.0.244)                           │
+│  Working Directory: ~/projects/generic-prime (frontend)           │
+│  Backend Source: ~/projects/data-broker/generic-prime             │
+└───────────────────────────────────────────────────────────────────┘
          │
          ├── Kubernetes Cluster (K3s)
-         │   ├── Namespace: generic-prime
-         │   │   ├── generic-prime-backend-api (2 replicas, v1.5.0)
-         │   │   └── generic-prime-frontend (prod deployment)
+         │   ├── Control Plane: Loki (192.168.0.110)
+         │   │   ├── K3s API Server (port 6443)
+         │   │   ├── Traefik Ingress Controller (port 80)
+         │   │   ├── Persistent Storage (/srv/k3s)
+         │   │   └── Other cluster services
          │   │
-         │   └── Namespace: data
-         │       └── elasticsearch (autos-unified, autos-vins indices)
+         │   ├── Worker Node: Thor (192.168.0.244)
+         │   │   ├── Namespace: generic-prime
+         │   │   │   ├── generic-prime-backend-api (2 replicas, v1.5.0)
+         │   │   │   └── generic-prime-frontend (prod deployment)
+         │   │   │
+         │   │   └── Namespace: data
+         │   │       └── elasticsearch (autos-unified, autos-vins indices)
+         │   │
+         │   └── Pod distribution: May run on either node
          │
-         └── Development Container (Podman)
+         └── Development Container (Podman on Thor)
              └── generic-prime-frontend-dev (port 4205)
 ```
 
-**Frontend Ports**:
+**Frontend Access**:
+- **4205**: generic-prime development server (Thor: 192.168.0.244:4205)
+- **80**: K8s ingress via Traefik (Loki: generic-prime.minilab)
 - **4201**: autos-prime-ng (reference implementation in K8s)
-- **4205**: generic-prime (development container)
-- **80**: K8s ingress (generic-prime.minilab)
 
 **Backend**:
 - **K8s Service**: `generic-prime-backend-api` (namespace: generic-prime)
 - **API Endpoint**: `http://generic-prime.minilab/api/specs/v1/...`
+  - Resolves to **Loki (192.168.0.110)** - Traefik Ingress on control plane
+  - Routed to backend pods (may run on Thor or Loki)
 - **Source**: JavaScript/Express (`~/projects/data-broker/generic-prime/src/`)
 - **Image**: `localhost/generic-prime-backend-api:v1.5.0`
 
@@ -179,9 +190,9 @@ docker run --rm \
 
 **Why /etc/hosts entry?**: The E2E container runs in isolated network mode. The `Dockerfile.e2e` adds:
 ```
-192.168.0.244 generic-prime-dockview generic-prime-dockview.minilab
+192.168.0.110 generic-prime-dockview generic-prime-dockview.minilab
 ```
-This maps `generic-prime-dockview.minilab` to Thor's IP, allowing curl/API calls to reach the backend.
+This maps `generic-prime-dockview.minilab` to Loki's IP (192.168.0.110), allowing curl/API calls to reach the Traefik ingress and backend API.
 
 ### Backend Build & Deployment
 
@@ -213,42 +224,51 @@ kubectl rollout restart deployment/generic-prime-backend-api -n generic-prime
 ### Frontend Access: Development vs Production
 
 **DEVELOPMENT** (Current active environment):
-- **URL**: `http://192.168.0.244:4205` (IP address + port)
+- **URL**: `http://192.168.0.244:4205` (Thor IP + port)
 - **Why**: Running `ng serve` in development container on Thor
-- **Access from**: Windows: Add to hosts → `192.168.0.244 thor` (or just use IP directly)
-- **Backend API**: Currently hardcoded to `http://generic-prime.minilab/api/specs/v1/` (falls through to production ingress)
+- **Access from**: Windows: Can use IP directly or add to hosts → `192.168.0.244 thor`
+- **Backend API**: Hardcoded to `http://generic-prime.minilab/api/specs/v1/`
+  - Must resolve to **Loki (192.168.0.110)** for Traefik ingress routing
 
-**PRODUCTION** (Future - when frontend deployed to Kubernetes):
+**PRODUCTION** (When frontend deployed to Kubernetes):
 - **URL**: `http://generic-prime.minilab/` (fully qualified domain name)
-- **Why**: Frontend served via Kubernetes Ingress + Traefik
-- **Access from**: Windows: Add to hosts → `192.168.0.244 generic-prime.minilab` (or `192.168.0.110`)
-- **Backend API**: Same `http://generic-prime.minilab/api/specs/v1/` (via Traefik ingress)
+- **Why**: Frontend served via Kubernetes Ingress + Traefik on Loki control plane
+- **Access from**: Windows: Must add to hosts → `192.168.0.110 generic-prime.minilab` (Loki)
+- **Backend API**: Same `http://generic-prime.minilab/api/specs/v1/` (via Traefik ingress on Loki)
 
 ### /etc/hosts Entries (Windows Client)
 
-For development access, add this line to `C:\Windows\System32\drivers\etc\hosts`:
+Add these lines to `C:\Windows\System32\drivers\etc\hosts`:
 
 ```
-192.168.0.244 thor generic-prime.minilab
+192.168.0.244   thor thor.minilab
+192.168.0.110   loki loki.minilab generic-prime.minilab generic-prime-dockview.minilab
 ```
 
-This maps both:
-- Thor hostname (for direct IP access reference)
-- `generic-prime.minilab` (for production access when deployed to K8s)
+**Explanation**:
+- `192.168.0.244 thor` - Direct access to Thor for development server (port 4205)
+- `192.168.0.110 generic-prime.minilab` - **CRITICAL**: Points to Loki control plane where Traefik ingress runs
+  - Routes both development and production API requests through Traefik
+  - Traefik on Loki forwards `/api` requests to backend pods (wherever they run)
+  - This is required for both dev and production environments to access the backend API
 
-### /etc/hosts Entries (Thor Host)
+### /etc/hosts Entries (Thor Host - Already Configured)
 
-The following hostnames are configured on Thor for K8s/Traefik routing:
+Thor should have these entries in `/etc/hosts`:
 
 ```
-192.168.0.244 thor thor.minilab                          # Host machine
-192.168.0.244 generic-prime-dockview.minilab             # Backend via dockview (for E2E)
-192.168.0.110 autos.minilab autos2.minilab (other apps)
+192.168.0.110   loki loki.minilab
+192.168.0.244   thor thor.minilab
+192.168.0.110   generic-prime.minilab generic-prime-dockview.minilab
 ```
+
+**Note**: This matches Windows hosts file for consistency.
 
 **Key Hostnames for generic-prime**:
-- `generic-prime.minilab` - Traefik ingress (production) - routes to both frontend (/) and backend (/api)
-- `generic-prime-dockview.minilab` - Direct backend access (used by E2E container)
+- `generic-prime.minilab` → `192.168.0.110` (Loki) - Traefik ingress (on control plane)
+  - Routes both development and production requests through Traefik
+  - Traefik forwards `/api` requests to backend pods
+- `generic-prime-dockview.minilab` → `192.168.0.110` (Loki) - Alternative backend access (E2E fallback)
 
 ### Network Access Paths
 
@@ -259,33 +279,41 @@ Windows Browser (http://192.168.0.244:4205)
   Direct to Thor:4205 (ng serve dev container)
   ↓
   Frontend makes API calls to: http://generic-prime.minilab/api/specs/v1/
+  ↓ (resolves to 192.168.0.110 via /etc/hosts)
+  Traefik Ingress on Loki:80 (control plane)
   ↓
-  Traefik Ingress routes /api → generic-prime-backend-api:3000
+  Traefik routes /api → generic-prime-backend-api:3000 (service)
   ↓
-  Backend Pod (Node.js Express)
+  Backend Pod (Node.js Express) - may run on Thor or Loki
   ↓
   Elasticsearch: elasticsearch.data.svc.cluster.local:9200
 ```
 
-**PRODUCTION** (Future - when frontend deployed to K8s):
+**PRODUCTION** (When frontend deployed to K8s):
 ```
 Windows Browser (http://generic-prime.minilab/)
+  ↓ (resolves to 192.168.0.110 via /etc/hosts)
+  Traefik Ingress on Loki:80 (control plane)
   ↓
-  Traefik Ingress (K8s port 80)
+  Traefik routes:
+    / → generic-prime-frontend:80 (Frontend Pod)
+    /api → generic-prime-backend-api:3000 (Backend Pod)
   ↓
-  Routes / → generic-prime-frontend:80 (Frontend Pod)
-  Routes /api → generic-prime-backend-api:3000 (Backend Pod)
-  ↓
-  Backend Pod (Node.js Express)
+  Backend Pod (Node.js Express) - may run on Thor or Loki
   ↓
   Elasticsearch: elasticsearch.data.svc.cluster.local:9200
 ```
+
+**Key Architecture Point**: Both development and production access the backend through **Loki's Traefik ingress** (192.168.0.110). Pod workload distribution (Thor vs Loki) is handled by Kubernetes service routing and doesn't affect external access.
 
 ### Backend API Testing Across Three Environments
 
-**VERIFIED WORKING APPROACH**: All three environments access the backend via `generic-prime.minilab/api/specs/v1/` (Traefik ingress).
+**VERIFIED WORKING APPROACH**: All three environments access the backend via `generic-prime.minilab/api/specs/v1/` (Traefik ingress on Loki).
 
-During development, the frontend is configured to use `http://generic-prime.minilab/api/specs/v1/` even though the frontend itself runs on `192.168.0.244:4205`. This works because the hostname is mapped in `/etc/hosts` to `192.168.0.244` (Thor), which has Traefik routing the request to the backend.
+During development, the frontend is configured to use `http://generic-prime.minilab/api/specs/v1/` even though the frontend itself runs on `192.168.0.244:4205`. This works because:
+1. The hostname `generic-prime.minilab` is mapped in `/etc/hosts` to `192.168.0.110` (Loki control plane)
+2. Loki runs Traefik ingress controller on port 80
+3. Traefik routes `/api` requests to backend pods wherever they run (Thor or Loki)
 
 #### **1. Thor Host SSH**
 
@@ -398,13 +426,13 @@ timeout 300 podman run --rm --network=host generic-prime-e2e 2>&1 | tail -50
 
 ### Troubleshooting: Cannot Access Backend API
 
-**Access path**: All three environments → `generic-prime.minilab` (via /etc/hosts) → Traefik ingress (port 80) → Backend service (port 3000).
+**Access path**: All three environments → `generic-prime.minilab` (via /etc/hosts to Loki) → Traefik ingress on Loki:80 → Backend service (port 3000).
 
 **Quick Checklist**:
 1. ✅ Verify `/etc/hosts` has the correct entry:
    ```bash
    grep generic-prime /etc/hosts
-   # Expected: 192.168.0.244 generic-prime generic-prime.minilab
+   # Expected: 192.168.0.110 generic-prime.minilab
    ```
 
 2. ✅ Verify backend pods are running:
@@ -515,4 +543,11 @@ podman exec -it generic-prime-frontend-dev sh  # Interactive shell
 
 ---
 
-**Last Updated**: 2025-12-06
+**Last Updated**: 2025-12-20
+
+**Session 22 Update**: Corrected infrastructure documentation to reflect actual Kubernetes architecture:
+- Loki is the control plane (not Thor)
+- Thor is a worker node only
+- Windows hosts file should point to Loki (192.168.0.110) for generic-prime.minilab
+- Traefik ingress runs on Loki control plane, not Thor
+- Updated all network access paths and troubleshooting procedures
