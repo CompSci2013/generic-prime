@@ -32,7 +32,9 @@
 export class VehicleStatistics {
   /**
    * Total number of unique vehicle configurations
-   * Count of distinct manufacturer+model+year+bodyclass combinations
+   *
+   * Count of distinct manufacturer+model+year+bodyclass combinations.
+   * Used for displaying total vehicle count in statistics panel.
    *
    * @example 1247
    */
@@ -40,7 +42,9 @@ export class VehicleStatistics {
 
   /**
    * Total number of VIN instances across all vehicles
-   * Sum of all instance_count values
+   *
+   * Sum of all instance_count values. Represents the total number of
+   * unique VINs in the filtered dataset.
    *
    * @example 45623
    */
@@ -49,12 +53,16 @@ export class VehicleStatistics {
   /**
    * Number of unique manufacturers
    *
+   * Count of distinct manufacturer names in the filtered dataset.
+   *
    * @example 23
    */
   manufacturerCount!: number;
 
   /**
    * Number of unique models
+   *
+   * Count of distinct model names (across all manufacturers) in the filtered dataset.
    *
    * @example 412
    */
@@ -63,23 +71,28 @@ export class VehicleStatistics {
   /**
    * Number of unique body classes
    *
+   * Count of distinct body class categories (Sedan, SUV, Truck, etc.)
+   * in the filtered dataset.
+   *
    * @example 8
    */
   bodyClassCount?: number;
 
   /**
-   * Year range
-   * Minimum and maximum years in the dataset
+   * Year range (minimum and maximum years in dataset)
+   *
+   * Object containing min and max year values for the filtered vehicle dataset.
+   * Used for year range sliders and charts.
    */
   yearRange!: {
     /**
-     * Oldest vehicle year
+     * Oldest vehicle year in dataset
      * @example 2010
      */
     min: number;
 
     /**
-     * Newest vehicle year
+     * Newest vehicle year in dataset
      * @example 2024
      */
     max: number;
@@ -87,7 +100,9 @@ export class VehicleStatistics {
 
   /**
    * Average number of VIN instances per vehicle configuration
-   * totalInstances / totalVehicles
+   *
+   * Calculated as totalInstances / totalVehicles. Represents the average
+   * number of unique VINs per vehicle spec (manufacturer+model+year+bodyclass).
    *
    * @example 36.6
    */
@@ -96,50 +111,97 @@ export class VehicleStatistics {
   /**
    * Median number of VIN instances per vehicle configuration
    *
+   * The middle value when all instance counts are sorted. Useful for
+   * understanding distribution when outliers exist.
+   *
    * @example 28
    */
   medianInstancesPerVehicle?: number;
 
   /**
-   * Top manufacturers by vehicle count
-   * Sorted by count descending
+   * Top manufacturers by vehicle count (top 20)
+   *
+   * Array of ManufacturerStat objects sorted by vehicle count in descending order.
+   * Typically limited to top 20 manufacturers for chart display.
+   * Populated from API response statistics.
    */
   topManufacturers?: ManufacturerStat[];
 
   /**
-   * Top models by instance count
-   * Sorted by instance count descending
+   * Top models by instance count (top 20)
+   *
+   * Array of ModelStat objects sorted by VIN instance count in descending order.
+   * Includes both manufacturer name and model name. Limited to top 20 for display.
    */
   topModels?: ModelStat[];
 
   /**
    * Distribution by body class
+   *
+   * Array of BodyClassStat objects showing vehicle count and percentage
+   * for each body class (Sedan, SUV, Truck, etc.).
    */
   bodyClassDistribution?: BodyClassStat[];
 
   /**
    * Distribution by year
-   * Vehicle counts per year
+   *
+   * Array of YearStat objects showing vehicle count and percentage for each year.
+   * Sorted chronologically from min to max year.
    */
   yearDistribution?: YearStat[];
 
   /**
    * Distribution by manufacturer
-   * Complete list of all manufacturers with counts
+   *
+   * Complete list of all manufacturers with vehicle counts and percentages.
+   * Similar to topManufacturers but includes all manufacturers, not just top 20.
    */
   manufacturerDistribution?: ManufacturerStat[];
 
   /**
-   * Raw segmented statistics from API
-   * Preserves {total, highlighted} structure for chart highlighting
+   * Raw segmented statistics by manufacturer
+   *
+   * Preserves API's {total, highlighted} structure for each manufacturer.
+   * Used for chart highlighting when secondary filters are applied.
+   * Format: { "Toyota": { total: 234, highlighted: 45 }, ... }
    */
   byManufacturer?: Record<string, {total: number, highlighted: number}>;
+
+  /**
+   * Raw segmented statistics by body class
+   *
+   * Preserves API's {total, highlighted} structure for each body class.
+   * Used for chart highlighting when secondary filters are applied.
+   * Format: { "Sedan": { total: 456, highlighted: 78 }, ... }
+   */
   byBodyClass?: Record<string, {total: number, highlighted: number}>;
+
+  /**
+   * Raw segmented statistics by year range
+   *
+   * Preserves API's {total, highlighted} structure for each year.
+   * Used for chart highlighting when secondary filters are applied.
+   * Format: { "2024": { total: 156, highlighted: 32 }, ... }
+   */
   byYearRange?: Record<string, {total: number, highlighted: number}>;
+
+  /**
+   * Raw segmented statistics by model within each manufacturer
+   *
+   * Preserves API's nested {total, highlighted} structure for models per manufacturer.
+   * Used for detailed model-level chart highlighting.
+   * Format: { "Toyota": { "Camry": { total: 45, highlighted: 12 }, ... }, ... }
+   */
   modelsByManufacturer?: Record<string, Record<string, {total: number, highlighted: number}>>;
 
   /**
    * Constructor with partial data
+   *
+   * Initializes VehicleStatistics instance from partial data using Object.assign.
+   * Allows flexible initialization with only properties that need to be set.
+   *
+   * @param partial - Partial VehicleStatistics object with any subset of properties
    */
   constructor(partial?: Partial<VehicleStatistics>) {
     if (partial) {
@@ -419,45 +481,83 @@ export class VehicleStatistics {
 /**
  * Manufacturer statistic
  *
- * Aggregated data for a single manufacturer
+ * Aggregated data for a single manufacturer, including vehicle count,
+ * VIN instances, percentage distribution, and model count.
  */
 export class ManufacturerStat {
   /**
    * Manufacturer name
+   *
+   * The name of the automobile manufacturer (e.g., Toyota, Honda, Ford).
+   * Used for display in charts and tables.
+   *
    * @example 'Toyota'
    */
   name!: string;
 
   /**
-   * Number of vehicle configurations
+   * Number of vehicle configurations for this manufacturer
+   *
+   * Count of distinct vehicle specs (model+year+bodyclass combinations)
+   * from this manufacturer in the filtered dataset.
+   *
    * @example 234
    */
   count!: number;
 
   /**
    * Total VIN instances for this manufacturer
+   *
+   * Sum of all unique VINs across all vehicle configurations from this manufacturer.
+   * Provides a measure of prevalence in the dataset.
+   *
    * @example 8456
    */
   instanceCount?: number;
 
   /**
    * Percentage of total vehicles
+   *
+   * The percentage that this manufacturer's vehicle count represents
+   * of the total vehicle count in the filtered dataset. Used for pie/bar charts.
+   *
    * @example 18.8
    */
   percentage!: number;
 
   /**
    * Number of unique models for this manufacturer
+   *
+   * Count of distinct model names produced by this manufacturer
+   * in the filtered dataset.
+   *
    * @example 42
    */
   modelCount?: number;
 
+  /**
+   * Constructor with partial data
+   *
+   * Initializes ManufacturerStat instance from partial data using Object.assign.
+   * Allows flexible initialization with only properties that need to be set.
+   *
+   * @param partial - Partial ManufacturerStat object with any subset of properties
+   */
   constructor(partial?: Partial<ManufacturerStat>) {
     if (partial) {
       Object.assign(this, partial);
     }
   }
 
+  /**
+   * Create ManufacturerStat from API response
+   *
+   * Transforms raw API data to ManufacturerStat instance.
+   * Handles both snake_case and camelCase field names from different API versions.
+   *
+   * @param data - Raw API response data for a single manufacturer
+   * @returns ManufacturerStat instance with normalized properties
+   */
   static fromApiResponse(data: any): ManufacturerStat {
     return new ManufacturerStat({
       name: data.name || data.manufacturer,
@@ -472,45 +572,82 @@ export class ManufacturerStat {
 /**
  * Model statistic
  *
- * Aggregated data for a single model (across all manufacturers/years)
+ * Aggregated data for a single model across all manufacturers and years.
+ * Includes vehicle count, VIN instances, and percentage distribution.
  */
 export class ModelStat {
   /**
    * Model name
+   *
+   * The name of the vehicle model (e.g., Camry, Accord, F-150).
+   * Note: Same model names can appear from different manufacturers.
+   *
    * @example 'Camry'
    */
   name!: string;
 
   /**
    * Manufacturer name
+   *
+   * The manufacturer of this model. Combined with name provides unique model identification.
+   *
    * @example 'Toyota'
    */
   manufacturer!: string;
 
   /**
    * Number of vehicle configurations for this model
+   *
+   * Count of distinct vehicle specs (year+bodyclass combinations) for this
+   * manufacturer+model combination in the filtered dataset.
+   *
    * @example 15
    */
   count!: number;
 
   /**
    * Total VIN instances for this model
+   *
+   * Sum of all unique VINs across all configurations of this manufacturer+model.
+   * Higher counts indicate more prevalent models in the dataset.
+   *
    * @example 3456
    */
   instanceCount!: number;
 
   /**
    * Percentage of total instances
+   *
+   * The percentage that this model's VIN count represents of the total VINs
+   * in the filtered dataset. Used for sorting and chart display.
+   *
    * @example 7.6
    */
   percentage!: number;
 
+  /**
+   * Constructor with partial data
+   *
+   * Initializes ModelStat instance from partial data using Object.assign.
+   * Allows flexible initialization with only properties that need to be set.
+   *
+   * @param partial - Partial ModelStat object with any subset of properties
+   */
   constructor(partial?: Partial<ModelStat>) {
     if (partial) {
       Object.assign(this, partial);
     }
   }
 
+  /**
+   * Create ModelStat from API response
+   *
+   * Transforms raw API data to ModelStat instance.
+   * Handles both snake_case and camelCase field names from different API versions.
+   *
+   * @param data - Raw API response data for a single model
+   * @returns ModelStat instance with normalized properties
+   */
   static fromApiResponse(data: any): ModelStat {
     return new ModelStat({
       name: data.name || data.model,
@@ -522,8 +659,12 @@ export class ModelStat {
   }
 
   /**
-   * Get full model name
-   * @returns Manufacturer + Model
+   * Get full model name including manufacturer
+   *
+   * Concatenates manufacturer and model name with space separator
+   * for display in charts and UI elements.
+   *
+   * @returns Full model name (e.g., "Toyota Camry")
    */
   getFullName(): string {
     return `${this.manufacturer} ${this.name}`;
@@ -533,39 +674,73 @@ export class ModelStat {
 /**
  * Body class statistic
  *
- * Aggregated data for a single body class
+ * Aggregated data for a single body class (Sedan, SUV, Truck, etc.).
+ * Includes vehicle count, VIN instances, and percentage distribution.
  */
 export class BodyClassStat {
   /**
    * Body class name
-   * @example 'Sedan', 'SUV', 'Truck'
+   *
+   * The vehicle body class category (e.g., Sedan, SUV, Truck, Convertible, Wagon).
+   * Used for categorizing and filtering vehicles in the dataset.
+   *
+   * @example 'Sedan'
    */
   name!: string;
 
   /**
-   * Number of vehicle configurations
+   * Number of vehicle configurations for this body class
+   *
+   * Count of distinct vehicle specs (manufacturer+model+year combinations)
+   * that match this body class in the filtered dataset.
+   *
    * @example 456
    */
   count!: number;
 
   /**
    * Total VIN instances for this body class
+   *
+   * Sum of all unique VINs across all configurations in this body class.
+   * Indicates the prevalence of this body class in the dataset.
+   *
    * @example 16789
    */
   instanceCount?: number;
 
   /**
    * Percentage of total vehicles
+   *
+   * The percentage that this body class's vehicle count represents of the total
+   * vehicle count in the filtered dataset. Used for pie/bar chart display.
+   *
    * @example 36.6
    */
   percentage!: number;
 
+  /**
+   * Constructor with partial data
+   *
+   * Initializes BodyClassStat instance from partial data using Object.assign.
+   * Allows flexible initialization with only properties that need to be set.
+   *
+   * @param partial - Partial BodyClassStat object with any subset of properties
+   */
   constructor(partial?: Partial<BodyClassStat>) {
     if (partial) {
       Object.assign(this, partial);
     }
   }
 
+  /**
+   * Create BodyClassStat from API response
+   *
+   * Transforms raw API data to BodyClassStat instance.
+   * Handles multiple field naming conventions from different API versions.
+   *
+   * @param data - Raw API response data for a single body class
+   * @returns BodyClassStat instance with normalized properties
+   */
   static fromApiResponse(data: any): BodyClassStat {
     return new BodyClassStat({
       name: data.name || data.body_class || data.bodyClass,
@@ -579,39 +754,73 @@ export class BodyClassStat {
 /**
  * Year statistic
  *
- * Aggregated data for a single year
+ * Aggregated data for a single vehicle year. Includes vehicle count,
+ * VIN instances, percentage distribution, and utility methods for age calculation.
  */
 export class YearStat {
   /**
-   * Year
+   * Vehicle year
+   *
+   * The model year of vehicles in this statistic (e.g., 2024, 2010).
+   * Used for chronological filtering and analysis.
+   *
    * @example 2024
    */
   year!: number;
 
   /**
    * Number of vehicle configurations for this year
+   *
+   * Count of distinct vehicle specs (manufacturer+model+bodyclass combinations)
+   * from this year in the filtered dataset.
+   *
    * @example 89
    */
   count!: number;
 
   /**
    * Total VIN instances for this year
+   *
+   * Sum of all unique VINs across all vehicle configurations from this year.
+   * Indicates how many vehicles from this year are in the dataset.
+   *
    * @example 3245
    */
   instanceCount?: number;
 
   /**
    * Percentage of total vehicles
+   *
+   * The percentage that this year's vehicle count represents of the total
+   * vehicle count in the filtered dataset. Used for chart display.
+   *
    * @example 7.1
    */
   percentage!: number;
 
+  /**
+   * Constructor with partial data
+   *
+   * Initializes YearStat instance from partial data using Object.assign.
+   * Allows flexible initialization with only properties that need to be set.
+   *
+   * @param partial - Partial YearStat object with any subset of properties
+   */
   constructor(partial?: Partial<YearStat>) {
     if (partial) {
       Object.assign(this, partial);
     }
   }
 
+  /**
+   * Create YearStat from API response
+   *
+   * Transforms raw API data to YearStat instance.
+   * Handles both snake_case and camelCase field names from different API versions.
+   *
+   * @param data - Raw API response data for a single year
+   * @returns YearStat instance with normalized properties
+   */
   static fromApiResponse(data: any): YearStat {
     return new YearStat({
       year: Number(data.year),
@@ -622,14 +831,24 @@ export class YearStat {
   }
 
   /**
-   * Check if year is current year
+   * Check if this year is the current year
+   *
+   * Compares the year value against the current calendar year.
+   * Useful for highlighting recent vehicles or marking newest models.
+   *
+   * @returns True if year equals current year, false otherwise
    */
   isCurrentYear(): boolean {
     return this.year === new Date().getFullYear();
   }
 
   /**
-   * Get age (years from now)
+   * Get age of vehicles from this year
+   *
+   * Calculates the number of years from this year to the current year.
+   * Represents how old vehicles from this model year are.
+   *
+   * @returns Number of years from this year to current year (can be 0 for current year)
    */
   getAge(): number {
     return new Date().getFullYear() - this.year;
