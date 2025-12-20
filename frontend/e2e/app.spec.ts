@@ -34,7 +34,7 @@ async function waitForTableUpdate(page: Page, timeoutMs: number = 10000) {
 
 test.describe('PHASE 1: Initial State & Basic Navigation', () => {
 
-  test.skip('1.1: Initial page load - 4,887 records displayed', async ({ page }) => {
+  test('1.1: Initial page load - 4,887 records displayed', async ({ page }) => {
     // Navigate to discover page
     await page.goto('/automobiles/discover');
 
@@ -55,7 +55,7 @@ test.describe('PHASE 1: Initial State & Basic Navigation', () => {
     await expect(resultsTablePaginator).toContainText(/4887/, { timeout: 10000 });
   });
 
-  test.skip('1.2: Panel collapse/expand - state independent of URL', async ({ page }) => {
+  test('1.2: Panel collapse/expand - state independent of URL', async ({ page }) => {
     await page.goto('/automobiles/discover');
 
     // Collapse Query Control panel
@@ -79,7 +79,7 @@ test.describe('PHASE 1: Initial State & Basic Navigation', () => {
     // Test other panels - skip for now since first one is the main concern
   });
 
-  test.skip('1.3: Panel drag-drop reordering - does not affect URL', async ({ page }) => {
+  test('1.3: Panel drag-drop reordering - does not affect URL', async ({ page }) => {
     await page.goto('/automobiles/discover');
 
     // Get initial order
@@ -1155,24 +1155,22 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     // Main window panels may still be in DOM but are not active
     console.log('[Test] All panels popped out, proceeding with chart selection test');
 
-    // Step 5: In Statistics pop-out, simulate a year filter selection
-    // Instead of clicking on chart canvas (which doesn't properly trigger Plotly events in E2E),
-    // we'll directly navigate the URL to add a year filter, which is equivalent to the user clicking
-    // the year chart in the Statistics panel
+    // Step 5: In Results Table pop-out, apply a year range filter
+    // This triggers sync to main window which then broadcasts to all pop-outs
+    console.log('[Test] Applying year filter via Results Table pop-out...');
+    const yearMinInput = resultsPanelPopout.locator('#yearRangeMin input');
+    const yearMaxInput = resultsPanelPopout.locator('#yearRangeMax input');
 
-    // First, get reference values BEFORE the filter selection
-    const resultsTableBefore = resultsPanelPopout.locator('app-results-table');
-    const paginatorBefore = resultsTableBefore.locator('.p-paginator-current').first();
-    const textBefore = await paginatorBefore.textContent();
-    console.log(`[Test] Results before chart selection: ${textBefore}`);
+    // Fill min year
+    await yearMinInput.fill('2023');
+    await yearMinInput.press('Enter');
+    
+    // Fill max year
+    await yearMaxInput.fill('2024');
+    await yearMaxInput.press('Enter');
 
-    // Apply a year range filter by navigating to URL with filter parameters
-    // This simulates the user clicking on a year bar in the chart
-    console.log('[Test] Applying year filter via URL parameter...');
-    await page.goto('/automobiles/discover?yearMin=2023&yearMax=2024');
-
-    // Wait for all windows to receive the state update via BroadcastChannel
-    await page.waitForTimeout(500);
+    // Wait for state update to propagate (via BroadcastChannel)
+    await page.waitForTimeout(1000);
 
     // Step 6: Verify that Query Control pop-out updated with new filters
     // The query control should show the selected filter from the URL
@@ -1236,6 +1234,12 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
 
     await expect(page.locator('#panel-results-table')).toBeVisible();
 
+    // Get initial result count from Results Table in main window BEFORE popping out
+    const mainResults = page.locator('app-results-table');
+    const mainPaginator = mainResults.locator('.p-paginator-current').first();
+    const initialCount = await mainPaginator.textContent();
+    console.log(`[Test 6.2] Initial result count: ${initialCount}`);
+
     // Pop out all 4 panels
     const [statsPanelPopout] = await Promise.all([
       context.waitForEvent('page'),
@@ -1255,19 +1259,20 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     ]);
     await pickerPanelPopout.waitForLoadState('load');
 
-    // Get initial result count from Results Table in main window
-    const mainResults = page.locator('app-results-table');
-    const mainPaginator = mainResults.locator('.p-paginator-current').first();
-    const initialCount = await mainPaginator.textContent();
-    console.log(`[Test 6.2] Initial result count: ${initialCount}`);
+    const [resultsPanelPopout] = await Promise.all([
+      context.waitForEvent('page'),
+      page.locator('#popout-results-table').click()
+    ]);
+    await resultsPanelPopout.waitForLoadState('load');
 
-    // Make first selection by applying a manufacturer filter via URL
-    // This simulates the user clicking on a chart element in the Statistics panel
-    console.log('[Test 6.2] Applying manufacturer filter via URL parameter...');
-    await page.goto('/automobiles/discover?manufacturer=Brammo');
+    // Make first selection by applying a manufacturer filter via UI in Results Table pop-out
+    console.log('[Test 6.2] Applying manufacturer filter via Results Table pop-out...');
+    const manufacturerInput = resultsPanelPopout.locator('#manufacturer');
+    await manufacturerInput.fill('Brammo');
+    await manufacturerInput.press('Enter');
 
     // Wait for all windows to receive the state update via BroadcastChannel
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
 
     // Verify all pop-outs updated
     const statsFilters = statsPanelPopout.locator('app-statistics-panel').locator('[class*="selected"]');
@@ -1290,12 +1295,17 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     expect(mainFilterCount).toBeGreaterThan(0);
 
     // Make second selection - add a body class filter
-    // This tests that multiple selections propagate correctly without desynchronization
-    console.log('[Test 6.2] Applying second filter (body class) via URL parameter...');
-    await page.goto('/automobiles/discover?manufacturer=Brammo&bodyClass=Sedan');
+    // We'll use the UI again to be safe
+    console.log('[Test 6.2] Applying second filter (body class) via Results Table pop-out...');
+    const bodyClassDropdown = resultsPanelPopout.locator('#bodyClass');
+    await bodyClassDropdown.click();
+    // Select 'Sedan' from the multi-select
+    await resultsPanelPopout.locator('p-multiselectitem').filter({ hasText: 'Sedan' }).click();
+    // Click outside to close or just wait
+    await resultsPanelPopout.mouse.click(0, 0);
 
     // Wait for state propagation
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
 
     // Verify both filters are now visible in Query Control pop-out
     const queryFilters2 = queryPanelPopout.locator('app-query-control').locator('p-chip');
@@ -1309,6 +1319,7 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     await statsPanelPopout.close();
     await queryPanelPopout.close();
     await pickerPanelPopout.close();
+    await resultsPanelPopout.close();
   });
 
 });

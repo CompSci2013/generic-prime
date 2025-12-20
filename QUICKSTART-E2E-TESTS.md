@@ -54,8 +54,8 @@ See [E2E-TEST-IDS-REQUIRED.md](E2E-TEST-IDS-REQUIRED.md) for exact implementatio
 # Build the E2E image (one-time)
 podman build --no-cache -f frontend/Dockerfile.e2e -t generic-prime-e2e .
 
-# Run all tests
-podman run --rm --ipc=host generic-prime-e2e
+# Run all tests (uses helper script)
+./scripts/run-e2e-tests.sh
 ```
 
 ### Step 3: Check Results

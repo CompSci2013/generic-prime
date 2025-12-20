@@ -188,6 +188,15 @@ docker run --rm \
   npm run test:e2e
 ```
 
+**Viewing Test Reports (from Windows)**:
+By default, Playwright reports bind to `localhost`, making them invisible outside the container. To view them from your Windows browser:
+
+1. Run inside container:
+   ```bash
+   npx playwright show-report --host 0.0.0.0
+   ```
+2. Access from Windows: `http://192.168.0.244:9323/`
+
 **Why /etc/hosts entry?**: The E2E container runs in isolated network mode. The `Dockerfile.e2e` adds:
 ```
 192.168.0.110 generic-prime-dockview generic-prime-dockview.minilab
