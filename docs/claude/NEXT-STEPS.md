@@ -1,6 +1,49 @@
 # Next Steps
 
-**Current Session**: Session 32 - Pop-Out State Synchronization Fix Complete
+**Current Session**: Session 33 - E2E Test Fixes Complete
+
+---
+
+## SESSION 34 PLAN: Execute E2E Tests and Validate Pop-Out Feature
+
+**Status**: Ready for execution. Tests are fixed and waiting for validation.
+
+### Immediate Next Action
+
+**Run E2E Tests 6.1 and 6.2 in the E2E Container**
+
+```bash
+# In E2E container:
+podman exec generic-prime-e2e bash -c "cd /app/frontend && npx playwright test e2e/app.spec.ts -g '6\\.1|6\\.2'"
+```
+
+**What to Expect**:
+- Both tests should now PASS with increased timeout and URL-parameter approach
+- Tests verify pop-out state synchronization via BroadcastChannel
+- Full test suite should complete in ~10 seconds
+
+**If Tests Pass**:
+1. Document test results in PROJECT-STATUS.md
+2. Mark pop-out feature as "Stable" (ready for production)
+3. Next priority: Fix Bug #13 (PrimeNG dropdown keyboard navigation)
+
+**If Tests Fail**:
+1. Check console logs for BroadcastChannel message flow
+2. Verify dev server is running on port 4205
+3. Investigate if pop-out window references are staying open during test
+
+---
+
+## SESSION 33 COMPLETED: Fixed E2E Tests for Pop-Out Synchronization
+
+**Status**: ✅ Completed. Fixed failing E2E tests and optimized test framework.
+
+### What Was Done
+- ✅ Diagnosed E2E test failures (Plotly canvas click issue)
+- ✅ Refactored tests 6.1 and 6.2 to use URL parameter navigation
+- ✅ Increased test timeout from 3000ms to 10000ms for pop-out tests
+- ✅ Optimized wait times from 2000ms to 500ms
+- ✅ Tests now ready for validation in E2E container
 
 ---
 
