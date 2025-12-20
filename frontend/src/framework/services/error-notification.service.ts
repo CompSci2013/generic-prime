@@ -41,26 +41,49 @@ import {
 export class ErrorNotificationService {
   /**
    * Recent error messages for deduplication
-   * Maps error signature to timestamp
+   *
+   * Maps error signature (hash of message) to timestamp. Used to suppress
+   * duplicate errors shown within DEDUPLICATION_WINDOW milliseconds.
+   *
+   * @private
    */
   private recentErrors = new Map<string, number>();
 
   /**
    * Deduplication window in milliseconds
-   * Errors with same signature within this window are suppressed
+   *
+   * Errors with the same signature within this window are suppressed
+   * to prevent notification spam from repeated failures.
+   *
+   * @private
    */
   private readonly DEDUPLICATION_WINDOW = 3000; // 3 seconds
 
   /**
    * Cleanup interval for recent errors map
+   *
+   * Interval at which expired entries (older than DEDUPLICATION_WINDOW)
+   * are removed from recentErrors to prevent unbounded memory growth.
+   *
+   * @private
    */
   private readonly CLEANUP_INTERVAL = 10000; // 10 seconds
 
   /**
-   * Cleanup timer
+   * Cleanup timer reference
+   *
+   * Holds the setInterval timer ID for cleanup process.
+   * Cleared on service destroy to prevent memory leaks.
+   *
+   * @private
    */
   private cleanupTimer?: ReturnType<typeof setInterval>;
 
+  /**
+   * Constructor for dependency injection
+   *
+   * @param messageService - PrimeNG MessageService for displaying toast notifications
+   */
   constructor(private messageService: MessageService) {
     this.startCleanupTimer();
   }

@@ -32,6 +32,13 @@ import {
 })
 export class DomainConfigValidator {
   /**
+   * Constructor for dependency injection
+   *
+   * Service is stateless and relies on Angular's singleton scope.
+   */
+  constructor() {}
+
+  /**
    * Validate domain configuration
    *
    * @param config - Domain configuration to validate
@@ -507,8 +514,24 @@ export class DomainConfigValidator {
   /**
    * Get human-readable validation summary
    *
-   * @param result - Validation result
-   * @returns Formatted summary string
+   * Formats validation result into human-readable multi-line string
+   * that includes both errors and warnings with line numbers and error types.
+   *
+   * @param result - Validation result from validate() or validateAndSanitize()
+   * @returns Formatted summary string with errors and warnings listed
+   *
+   * @example
+   * ```typescript
+   * const result = validator.validate(config);
+   * const summary = validator.getValidationSummary(result);
+   * console.log(summary);
+   * // Output:
+   * // Configuration validation failed:
+   * //
+   * // Errors (2):
+   * //   1. [MISSING_REQUIRED] domainName: Required field 'domainName' is missing
+   * //   2. [INVALID_TYPE] apiBaseUrl: Field 'apiBaseUrl' must be a string
+   * ```
    */
   getValidationSummary(result: ConfigValidationResult): string {
     if (result.valid) {
