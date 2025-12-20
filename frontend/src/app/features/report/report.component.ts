@@ -43,6 +43,15 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   `]
 })
 export class ReportComponent implements OnInit {
+  /**
+   * Sanitized URL for the Playwright test report iframe
+   *
+   * Contains a cache-busting query parameter (timestamp) to ensure
+   * the browser always fetches fresh test results instead of serving cached content.
+   * The URL points to `/report/index.html` with a timestamp query parameter.
+   *
+   * @type {SafeResourceUrl}
+   */
   reportUrl: SafeResourceUrl;
 
   constructor(private sanitizer: DomSanitizer) {
@@ -50,13 +59,41 @@ export class ReportComponent implements OnInit {
     this.reportUrl = this.getReportUrl();
   }
 
+  /**
+   * Angular lifecycle hook - Component initialization
+   *
+   * Called once when the component is created. Logs a message indicating
+   * that the Playwright test report page has loaded with live updates.
+   *
+   * @lifecycle
+   * Executes: After constructor, before component view is rendered
+   */
   ngOnInit() {
     console.log('Playwright test report page loaded with live updates.');
   }
 
   /**
    * Generate report URL with cache-busting query parameter
-   * The timestamp forces the browser to always fetch fresh content
+   *
+   * Creates a sanitized URL for the Playwright test report by appending
+   * a timestamp query parameter. This forces the browser to always fetch
+   * fresh content instead of showing cached results from previous test runs.
+   *
+   * @private
+   * @returns {SafeResourceUrl} Sanitized URL safe for use in iframe src binding
+   *
+   * @remarks
+   * **Cache Busting**:
+   * The timestamp query parameter (`?t=<timestamp>`) ensures that every time
+   * the component loads, the browser will fetch a fresh copy of the report HTML.
+   * Without this, cached versions might be displayed.
+   *
+   * **Security**:
+   * The URL is sanitized using Angular's DomSanitizer.bypassSecurityTrustResourceUrl()
+   * because we're using it in an iframe src binding and need to bypass XSS protection.
+   *
+   * **Usage**:
+   * Called in constructor to initialize the reportUrl property.
    */
   private getReportUrl(): SafeResourceUrl {
     const timestamp = Date.now();
