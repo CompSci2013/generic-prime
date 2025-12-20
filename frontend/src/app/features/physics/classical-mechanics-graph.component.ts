@@ -64,8 +64,16 @@ import { KnowledgeGraphData } from './knowledge-graph.component';
   `
 })
 export class ClassicalMechanicsGraphComponent implements OnInit {
+  /**
+   * Graph data containing transformed topic nodes and edges for visualization
+   */
   graphData: KnowledgeGraphData | null = null;
 
+  /**
+   * Angular lifecycle hook - Component initialization
+   *
+   * Transforms and loads the classical mechanics topic graph data.
+   */
   ngOnInit(): void {
     console.log('[ClassicalMechanicsGraph] ngOnInit()');
     this.graphData = {

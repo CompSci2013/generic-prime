@@ -18,8 +18,19 @@ import { environment } from '../../../environments/environment';
  * Represents a manufacturer-model combination with count
  */
 export interface ManufacturerModelRow {
+  /**
+   * Manufacturer name (e.g., "Toyota", "Honda", "BMW")
+   */
   manufacturer: string;
+
+  /**
+   * Vehicle model name (e.g., "Camry", "Civic", "X5")
+   */
   model: string;
+
+  /**
+   * Number of vehicles matching this manufacturer-model combination
+   */
   count: number;
 }
 

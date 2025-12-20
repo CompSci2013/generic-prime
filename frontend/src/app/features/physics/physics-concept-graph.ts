@@ -85,10 +85,29 @@
  * @see PHYSICS_CONCEPT_GRAPH - The exported instance containing all nodes
  */
 export interface ConceptNode {
+  /**
+   * Unique identifier in kebab-case (e.g., "classical-mechanics", "quantum-mechanics")
+   */
   id: string;
+
+  /**
+   * Display name of the physics concept (human-readable)
+   */
   label: string;
+
+  /**
+   * Academic level classification (foundational/intermediate/advanced/specialization)
+   */
   level: 'foundational' | 'intermediate' | 'advanced' | 'specialization';
+
+  /**
+   * Brief explanation of the concept's content and scope
+   */
   description: string;
+
+  /**
+   * Optional hex color for graph visualization (overrides level default)
+   */
   color?: string;
 }
 
@@ -152,8 +171,19 @@ export interface ConceptNode {
  * @see PHYSICS_CONCEPT_GRAPH - The exported instance
  */
 export interface ConceptEdge {
+  /**
+   * ID of the source (origin) concept node. The edge originates from this node and represents a dependency relationship direction (source → target).
+   */
   source: string;
+
+  /**
+   * ID of the target (destination) concept node. The edge points to this node and represents where the relationship leads.
+   */
   target: string;
+
+  /**
+   * Type of relationship describing the edge semantics (e.g., "leads to", "foundation for", "extends", "required for")
+   */
   label: string;
 }
 
@@ -172,7 +202,14 @@ export interface ConceptEdge {
  *           Each edge defines a source node, target node, and relationship label.
  */
 export interface PhysicsConceptGraph {
+  /**
+   * Array of all concept nodes in the graph. Each node represents a major physics concept with its id, label, level, description, and optional custom color.
+   */
   nodes: ConceptNode[];
+
+  /**
+   * Array of all directed edges showing relationships between concepts. Each edge defines a source node, target node, and relationship label.
+   */
   edges: ConceptEdge[];
 }
 

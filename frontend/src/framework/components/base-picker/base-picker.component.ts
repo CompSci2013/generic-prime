@@ -54,33 +54,39 @@ import { UrlStateService } from '../../services/url-state.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BasePickerComponent<T> implements OnInit, OnDestroy {
-  /** Environment configuration for conditional test-id rendering */
+  /**
+   * Environment configuration for conditional test-id rendering
+   */
   readonly environment = environment;
 
   /**
-   * Picker configuration ID (loads from registry)
-   * Either configId or config must be provided
+   * Picker configuration ID (loads from PickerConfigRegistry). Either configId or config must be provided.
    */
   @Input() configId?: string;
 
   /**
-   * Direct picker configuration
-   * Either configId or config must be provided
+   * Direct picker configuration object. Either configId or config must be provided.
    */
   @Input() config?: PickerConfig<T>;
 
   /**
-   * Emits when selection changes
+   * Emits when the user selection changes in the picker table
    */
   @Output() selectionChange = new EventEmitter<PickerSelectionEvent<T>>();
 
-  /** Picker state */
+  /**
+   * Current picker state including loaded data, pagination, and selection
+   */
   state: PickerState<T> = getDefaultPickerState();
 
-  /** Active picker config */
+  /**
+   * Active picker configuration resolved from either configId or config input
+   */
   activeConfig?: PickerConfig<T>;
 
-  /** Destroy subject for cleanup */
+  /**
+   * RxJS Subject to signal component destruction and unsubscribe from observables
+   */
   private destroy$ = new Subject<void>();
 
   constructor(

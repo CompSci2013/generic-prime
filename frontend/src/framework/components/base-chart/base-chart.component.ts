@@ -88,8 +88,19 @@ const Plotly = require('plotly.js-dist-min');
  * @see BaseChartComponent.attachEventHandlers - Example usage
  */
 interface PlotlyHTMLElement extends HTMLElement {
+  /**
+   * Attach event listener to Plotly chart (supports 'plotly_click', 'plotly_selected', 'plotly_hover', etc.)
+   */
   on(event: string, callback: (data: any) => void): void;
+
+  /**
+   * Array of Plotly data traces (read-only after render)
+   */
   data?: any[];
+
+  /**
+   * Plotly layout configuration object (read-only after render)
+   */
   layout?: any;
 }
 
@@ -98,17 +109,17 @@ interface PlotlyHTMLElement extends HTMLElement {
  */
 export interface ChartData {
   /**
-   * Plotly data traces
+   * Array of Plotly data traces (each trace represents a data series or element)
    */
   traces: any[];
 
   /**
-   * Plotly layout configuration
+   * Plotly layout configuration object controlling chart appearance, axes, titles, etc.
    */
   layout: Partial<any>;
 
   /**
-   * Optional click event data
+   * Optional click event data from the last chart interaction
    */
   clickData?: any;
 }
@@ -177,33 +188,33 @@ export abstract class ChartDataSource<TStatistics = any> {
 })
 export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
-   * Chart container element
+   * Reference to the chart container HTML div element where Plotly chart is rendered
    */
   @ViewChild('chartContainer', { static: false })
   chartContainer!: ElementRef<HTMLDivElement>;
 
   /**
-   * Chart data source (required)
+   * Chart data source implementation (required input) that transforms statistics into Plotly-ready data
    */
   @Input() dataSource!: ChartDataSource;
 
   /**
-   * Statistics data
+   * Statistics data to be visualized by the chart via the dataSource
    */
   @Input() statistics: any | null = null;
 
   /**
-   * Highlight filters
+   * Highlight filters applied to the data for filtering or emphasis in the visualization
    */
   @Input() highlights: any = {};
 
   /**
-   * Selected value for highlighting
+   * Currently selected value to be highlighted or emphasized in the chart
    */
   @Input() selectedValue: string | null = null;
 
   /**
-   * Chart click event
+   * Emits when user clicks on a data point or completes a selection (box/lasso) in the chart
    */
   @Output() chartClick = new EventEmitter<{
     value: string;
@@ -211,32 +222,32 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }>();
 
   /**
-   * Highlight mode active flag
+   * Flag indicating whether highlight mode is currently active (toggled by 'h' key)
    */
   isHighlightModeActive = false;
 
   /**
-   * Chart title
+   * Chart title obtained from the data source, displayed at the top of the chart
    */
   chartTitle = '';
 
   /**
-   * Error state for error boundary
+   * Error boundary state flag indicating whether an error occurred during chart rendering
    */
   hasError = false;
 
   /**
-   * Error message for display
+   * User-friendly error message displayed when chart rendering fails
    */
   errorMessage = '';
 
   /**
-   * Destroy subject for cleanup
+   * RxJS Subject to signal component destruction and cleanup of subscriptions
    */
   private destroy$ = new Subject<void>();
 
   /**
-   * Plotly chart element
+   * Reference to the rendered Plotly chart element after Plotly.newPlot() completes
    */
   private plotlyElement: PlotlyHTMLElement | null = null;
 

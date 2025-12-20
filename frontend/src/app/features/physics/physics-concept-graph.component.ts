@@ -87,11 +87,33 @@ cytoscape.use(dagre);
  * @see PhysicsConceptGraphComponent - Component using this interface
  */
 interface CytoscapeNode {
+  /**
+   * Data object containing all node properties for Cytoscape rendering
+   */
   data: {
+    /**
+     * Unique identifier for the node in kebab-case (e.g., "classical-mechanics")
+     */
     id: string;
+
+    /**
+     * Display text shown on the node in the graph (e.g., "Classical Mechanics")
+     */
     label: string;
+
+    /**
+     * Academic level for categorization (foundational/intermediate/advanced/specialization)
+     */
     level: string;
+
+    /**
+     * Detailed description shown when the node is selected
+     */
     description: string;
+
+    /**
+     * Optional hex color code for node background (overrides level-based color)
+     */
     color?: string;
   };
 }
@@ -130,9 +152,23 @@ interface CytoscapeNode {
  * @see PhysicsConceptGraphComponent - Component using this interface
  */
 interface CytoscapeEdge {
+  /**
+   * Data object containing all edge properties for Cytoscape rendering
+   */
   data: {
+    /**
+     * Unique ID of the source (origin) node in the edge
+     */
     source: string;
+
+    /**
+     * Unique ID of the target (destination) node in the edge
+     */
     target: string;
+
+    /**
+     * Textual label describing the relationship type (e.g., "leads to", "foundation for")
+     */
     label: string;
   };
 }
@@ -210,17 +246,49 @@ interface CytoscapeEdge {
   styleUrls: ['./physics-concept-graph.component.scss']
 })
 export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDestroy {
+  /**
+   * Reference to the Cytoscape container HTML div element
+   */
   @ViewChild('cytoscapeContainer') containerRef!: ElementRef<HTMLDivElement>;
 
+  /**
+   * Physics concept graph data containing all nodes and edges
+   */
   conceptGraph = PHYSICS_CONCEPT_GRAPH;
+
+  /**
+   * Currently selected concept node in the graph, or null if no node is selected
+   */
   selectedNode: ConceptNode | null = null;
+
+  /**
+   * Label of the currently hovered edge, or null if no edge is hovered
+   */
   hoveredEdgeLabel: string | null = null;
+
+  /**
+   * Position for the edge tooltip (top and left CSS properties)
+   */
   tooltipPos: { top: string; left: string } | null = null;
 
+  /**
+   * Cytoscape.js instance for the rendered graph
+   */
   private cy: any;
+
+  /**
+   * Window resize event listener function
+   */
   private resizeListener!: () => void;
+
+  /**
+   * Document mousemove event listener function for tooltip tracking
+   */
   private mouseMoveListener!: (e: MouseEvent) => void;
 
+  /**
+   * Constructor for dependency injection
+   */
   constructor(private router: Router) {}
 
   /**

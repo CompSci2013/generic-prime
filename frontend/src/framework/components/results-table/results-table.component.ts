@@ -38,40 +38,91 @@ import { ResourceManagementService } from '../../services/resource-management.se
 })
 export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {
-  /** Environment configuration for conditional test-id rendering */
+  /**
+   * Environment configuration for conditional test-id rendering
+   */
   readonly environment = environment;
 
   /**
-   * Domain configuration (required)
-   * Contains all configuration for filters, table, API, etc.
+   * Domain configuration (required input) containing filters, table config, API endpoints, statistics, and more
    */
   @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
 
   // Observables from resource service
+  /**
+   * Observable stream of current filter state from the resource management service
+   */
   filters$!: Observable<TFilters>;
+
+  /**
+   * Observable stream of table data results matching current filters and pagination
+   */
   results$!: Observable<TData[]>;
+
+  /**
+   * Observable stream of total results count for pagination calculation
+   */
   totalResults$!: Observable<number>;
+
+  /**
+   * Observable stream of loading state indicating whether data is being fetched
+   */
   loading$!: Observable<boolean>;
+
+  /**
+   * Observable stream of error state containing any error that occurred during data fetch
+   */
   error$!: Observable<Error | null>;
+
+  /**
+   * Observable stream of statistics data aggregated from the results
+   */
   statistics$!: Observable<TStatistics | undefined>;
 
   // Component state - using Record for dynamic property access from template
+  /**
+   * Current filter values synchronized from the filters$ observable
+   */
   currentFilters: Record<string, any> = {};
+
+  /**
+   * Current table data results synchronized from the results$ observable
+   */
   results: TData[] = [];
+
+  /**
+   * Total count of all results matching the filters (for pagination)
+   */
   totalResults = 0;
+
+  /**
+   * Current loading state synchronized from the loading$ observable
+   */
   loading = false;
+
+  /**
+   * Map of expanded row IDs for collapsible row details in the table
+   */
   expandedRows: { [key: string]: boolean } = {};
 
-  /** Filter panel collapse state */
+  /**
+   * Whether the filter panel is currently collapsed/hidden
+   */
   filterPanelCollapsed = false;
 
-  /** Dynamically loaded options for select filters (keyed by filter id) */
+  /**
+   * Dynamically loaded filter options from API endpoints, keyed by filter field name
+   */
   dynamicOptions: Record<string, FilterOption[]> = {};
 
-  /** Subject for unsubscribing on destroy */
+  /**
+   * RxJS Subject to signal component destruction and unsubscribe from all observables
+   */
   private destroy$ = new Subject<void>();
 
-  // Expose Object for template use (for dynamic rendering)
+  /**
+   * Object reference exposed for template use in dynamic property iteration and access
+   */
   Object = Object;
 
   /**

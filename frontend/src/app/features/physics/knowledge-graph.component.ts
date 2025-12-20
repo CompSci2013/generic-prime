@@ -137,10 +137,29 @@ cytoscape.use(dagre);
  * @see KnowledgeGraphComponent - Component that visualizes this graph
  */
 export interface KnowledgeNode {
+  /**
+   * Unique identifier for the node in kebab-case format (e.g., "classical-mechanics")
+   */
   id: string;
+
+  /**
+   * Display text for the node shown in the graph visualization
+   */
   label: string;
+
+  /**
+   * Detailed description shown in tooltip/modal when node is selected
+   */
   description: string;
+
+  /**
+   * Categorization level for color coding (e.g., 'foundational', 'intermediate', 'advanced', 'specialization')
+   */
   level: string;
+
+  /**
+   * Optional custom hex color code for the node background (overrides level-based color)
+   */
   color?: string;
 }
 
@@ -207,8 +226,19 @@ export interface KnowledgeNode {
  * @see KnowledgeGraphData - Container holding all edges
  */
 export interface KnowledgeEdge {
+  /**
+   * ID of the source (origin) node. The edge originates from this node.
+   */
   source: string;
+
+  /**
+   * ID of the target (destination) node. The edge points to this node.
+   */
   target: string;
+
+  /**
+   * Descriptive label for the relationship type (e.g., 'prerequisite', 'foundation', 'extends', 'related')
+   */
   label: string;
 }
 
@@ -220,7 +250,14 @@ export interface KnowledgeEdge {
  * @property {KnowledgeEdge[]} edges - All edges connecting nodes
  */
 export interface KnowledgeGraphData {
+  /**
+   * All nodes in the graph
+   */
   nodes: KnowledgeNode[];
+
+  /**
+   * All edges connecting nodes in the graph
+   */
   edges: KnowledgeEdge[];
 }
 
@@ -236,26 +273,81 @@ export interface KnowledgeGraphData {
   styleUrls: ['./knowledge-graph.component.scss']
 })
 export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy {
+  /**
+   * Reference to the Cytoscape container HTML element
+   */
   @ViewChild('cytoscapeContainer') containerRef!: ElementRef<HTMLDivElement>;
+
+  /**
+   * Graph data containing nodes and edges to visualize
+   */
   @Input() graphData!: KnowledgeGraphData;
+
+  /**
+   * Title displayed at the top of the knowledge graph
+   */
   @Input() title = 'Knowledge Graph';
+
+  /**
+   * Subtitle displayed below the title
+   */
   @Input() subtitle = '';
+
+  /**
+   * Route to navigate back to when the back button is clicked
+   */
   @Input() backRoute = '/physics';
 
+  /**
+   * Currently selected node in the graph, or null if no node is selected
+   */
   selectedNode: KnowledgeNode | null = null;
+
+  /**
+   * Label of the currently hovered edge, or null if no edge is hovered
+   */
   hoveredEdgeLabel: string | null = null;
+
+  /**
+   * Position for the edge tooltip (top and left CSS properties)
+   */
   tooltipPos: { top: string; left: string } | null = null;
 
+  /**
+   * Cytoscape.js instance for the rendered graph
+   */
   private cy: any;
+
+  /**
+   * Window resize event listener function
+   */
   private resizeListener!: () => void;
+
+  /**
+   * Document mousemove event listener function for tooltip tracking
+   */
   private mouseMoveListener!: (e: MouseEvent) => void;
 
+  /**
+   * Constructor for dependency injection
+   */
   constructor(private router: Router) {}
 
+  /**
+   * Angular lifecycle hook - Component initialization
+   *
+   * Called once when the component is created.
+   */
   ngOnInit(): void {
     console.log('[KnowledgeGraph] ngOnInit()');
   }
 
+  /**
+   * Angular lifecycle hook - View initialization completion
+   *
+   * Called after the view and child views are initialized.
+   * Initializes Cytoscape.js chart and sets up event listeners.
+   */
   ngAfterViewInit(): void {
     console.log('[KnowledgeGraph] ngAfterViewInit()');
     console.log('[KnowledgeGraph] Graph data:', this.graphData);
@@ -503,6 +595,11 @@ export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy
     this.router.navigate([this.backRoute]);
   }
 
+  /**
+   * Angular lifecycle hook - Component destruction
+   *
+   * Called when the component is destroyed. Cleans up Cytoscape instance and event listeners.
+   */
   ngOnDestroy(): void {
     if (this.cy) {
       this.cy.destroy();

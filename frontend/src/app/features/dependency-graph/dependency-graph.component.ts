@@ -122,24 +122,74 @@ import {
   ]
 })
 export class DependencyGraphComponent implements OnInit, AfterViewInit {
+  /**
+   * Reference to the Cytoscape container HTML div element
+   */
   @ViewChild('cyContainer', { static: false }) cyContainer!: ElementRef<HTMLDivElement>;
 
+  /**
+   * Cytoscape.js Core instance managing the graph visualization
+   */
   cy!: Core;
+
+  /**
+   * Currently selected dependency node in the graph, or null if none selected
+   */
   selectedNode: DependencyNode | null = null;
+
+  /**
+   * Statistics about the dependency graph (node counts, edge counts, etc.)
+   */
   stats = DEPENDENCY_STATS;
+
+  /**
+   * Whether the legend showing node category colors is currently visible
+   */
   showLegend = true;
+
+  /**
+   * Whether the filter panel is currently visible
+   */
   showFilters = true;
+
+  /**
+   * Whether the legend section is expanded (showing details)
+   */
   legendExpanded = true;
+
+  /**
+   * Currently selected category filter (empty string = all categories visible)
+   */
   selectedCategory = '';
+
+  /**
+   * Current search text for filtering nodes by name
+   */
   searchText = '';
+
+  /**
+   * Current date used for display purposes
+   */
   currentDate = new Date();
 
-  // Modal positioning and dragging
+  /**
+   * Position of the modal window containing selected node details
+   */
   modalPosition = { x: 0, y: 0 };
+
+  /**
+   * Whether the user is currently dragging the modal window
+   */
   isDraggingModal = false;
+
+  /**
+   * Offset from cursor position to modal origin when dragging started
+   */
   dragOffset = { x: 0, y: 0 };
 
-  // Category filters for toggling visibility
+  /**
+   * Array of category filter toggles for showing/hiding node categories
+   */
   categoryFilters = [
     { category: LAYER_GROUPS.NPM_PEER, label: 'Angular Framework', color: '#DD0031', visible: true },
     { category: LAYER_GROUPS.NPM_PROD, label: 'Production Dependencies', color: '#3776AB', visible: true },
@@ -155,6 +205,9 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     { category: LAYER_GROUPS.EXTERNAL, label: 'External Libraries', color: '#F5B7B1', visible: true },
   ];
 
+  /**
+   * Constructor for dependency injection
+   */
   constructor(private cdr: ChangeDetectorRef) {}
 
   /**

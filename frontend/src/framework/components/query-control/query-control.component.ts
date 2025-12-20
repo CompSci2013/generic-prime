@@ -37,8 +37,19 @@ import { UrlStateService } from '../../services/url-state.service';
  *           Examples: "Toyota,Honda" (comma-separated) or "1990-2020" (range format)
  */
 interface ActiveFilter {
+  /**
+   * The filter definition containing metadata like field, label, and type
+   */
   definition: FilterDefinition;
+
+  /**
+   * Array of selected values for this filter (e.g., ["Toyota", "Honda"] or [1990, 2020])
+   */
   values: (string | number)[];
+
+  /**
+   * Serialized string representation for URL parameters (e.g., "Toyota,Honda" or "1990-2020")
+   */
   urlValue: string;
 }
 
@@ -74,84 +85,132 @@ interface ActiveFilter {
 export class QueryControlComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {
 
-  /** Environment configuration for conditional test-id rendering */
+  /**
+   * Environment configuration for conditional test-id rendering
+   */
   readonly environment = environment;
 
-  /** Domain configuration with filter definitions */
+  /**
+   * Domain configuration with filter definitions for this query control instance
+   */
   @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
 
-  /** Emits when URL parameters should be updated */
+  /**
+   * Emits when URL parameters should be updated with new filter values or other query parameters
+   */
   @Output() urlParamsChange = new EventEmitter<{ [key: string]: any }>();
 
-  /** Emits when all filters should be cleared (parent should call urlState.clearParams()) */
+  /**
+   * Emits when all filters should be cleared (parent should call urlState.clearParams())
+   */
   @Output() clearAllFilters = new EventEmitter<void>();
 
   // ==================== Dropdown State ====================
 
-  /** Filter field options for dropdown */
+  /**
+   * Filter field options for dropdown, built from domainConfig.queryControlFilters
+   */
   filterFieldOptions: { label: string; value: FilterDefinition }[] = [];
 
-  /** Currently selected field (temporary selection) */
+  /**
+   * Currently selected field in the dropdown (temporary selection before dialog opens)
+   */
   selectedField: FilterDefinition | null = null;
 
-  /** Whether we're currently editing a highlight filter (vs regular filter) */
+  /**
+   * Whether we're currently editing a highlight filter (vs regular filter)
+   */
   isHighlightFilter = false;
 
   // ==================== Active Filters ====================
 
-  /** List of currently active filters */
+  /**
+   * List of currently active filters applied by the user
+   */
   activeFilters: ActiveFilter[] = [];
 
-  /** List of currently active highlight filters */
+  /**
+   * List of currently active highlight filters applied by the user
+   */
   activeHighlights: ActiveFilter[] = [];
 
-  /** Currently active filter definition for dialogs */
+  /**
+   * Currently active filter definition used by dialogs (multiselect or range)
+   */
   currentFilterDef: FilterDefinition | null = null;
 
   // ==================== Multiselect Dialog State ====================
 
-  /** Whether multiselect dialog is visible */
+  /**
+   * Whether multiselect dialog is currently visible
+   */
   showMultiselectDialog = false;
 
-  /** Title for multiselect dialog */
+  /**
+   * Title displayed in the multiselect dialog header
+   */
   multiselectDialogTitle = '';
 
-  /** Subtitle for multiselect dialog */
+  /**
+   * Subtitle displayed in the multiselect dialog
+   */
   multiselectDialogSubtitle = '';
 
-  /** Whether options are currently loading */
+  /**
+   * Whether options are currently loading from the API
+   */
   loadingOptions = false;
 
-  /** Error message if options fail to load */
+  /**
+   * Error message shown if options fail to load from the API
+   */
   optionsError: string | null = null;
 
-  /** All available options for a multiselect filter */
+  /**
+   * All available options fetched from the API for multiselect filters
+   */
   allOptions: FilterOption[] = [];
 
-  /** Filtered options based on search query */
+  /**
+   * Filtered options based on the user's search query in multiselect dialog
+   */
   filteredOptions: FilterOption[] = [];
 
-  /** Currently selected options in multiselect dialog */
+  /**
+   * Currently selected options in the multiselect dialog before applying
+   */
   selectedOptions: (string | number)[] = [];
 
-  /** Search query for multiselect options */
+  /**
+   * Current search query text for filtering multiselect options
+   */
   searchQuery = '';
 
   // ==================== Year Range Dialog State ====================
 
-  /** Whether year range dialog is visible */
+  /**
+   * Whether year range dialog is currently visible
+   */
   showYearRangeDialog = false;
 
-  /** Selected minimum year */
+  /**
+   * Selected minimum year value in the year range dialog
+   */
   yearMin: number | null = null;
 
-  /** Selected maximum year */
+  /**
+   * Selected maximum year value in the year range dialog
+   */
   yearMax: number | null = null;
 
-  /** Available year range from API */
+  /**
+   * Available year range from API showing min and max years for range filters
+   */
   availableYearRange: { min: number; max: number } = { min: 1900, max: new Date().getFullYear() };
 
-  /** Subject to signal component destruction */
+  /**
+   * RxJS Subject to signal component destruction and unsubscribe from observables
+   */
   private destroy$ = new Subject<void>();
 
   constructor(

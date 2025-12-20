@@ -48,16 +48,18 @@ import { ChartDataSource } from '../base-chart/base-chart.component';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StatisticsPanelComponent implements OnInit, OnDestroy {
-  /** Environment configuration for conditional test-id rendering */
+  /**
+   * Environment configuration for conditional test-id rendering
+   */
   readonly environment = environment;
 
   /**
-   * Domain configuration
+   * Domain configuration (required input) containing chart definitions and data sources
    */
   @Input() domainConfig!: DomainConfig<any, any, any>;
 
   /**
-   * Visible charts (filtered by visibility flag)
+   * Array of visible charts filtered by visibility flag, paired with their data sources
    */
   visibleCharts: Array<{
     config: ChartConfig;
@@ -65,25 +67,27 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
   }> = [];
 
   /**
-   * Panel collapsed state
+   * Whether the statistics panel is currently collapsed/hidden
    */
   panelCollapsed = false;
 
   /**
-   * Statistics data (from resource service)
+   * Current statistics data synchronized from the resource service's statistics$ observable
    */
   statistics: any | null = null;
 
   /**
-   * Highlight filters (from resource service)
+   * Current highlight filters extracted from URL parameters (h_* parameters)
    */
   highlights: any = {};
 
-  // Observable for statistics
+  /**
+   * Observable stream of statistics data from the resource management service
+   */
   statistics$!: Observable<any | undefined>;
 
   /**
-   * Destroy subject for cleanup
+   * RxJS Subject to signal component destruction and unsubscribe from observables
    */
   private destroy$ = new Subject<void>();
 
