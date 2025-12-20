@@ -28,6 +28,34 @@ import { ChemistryComponent } from './features/chemistry/chemistry.component';
 import { MathComponent } from './features/math/math.component';
 import { DependencyGraphComponent } from './features/dependency-graph/dependency-graph.component';
 
+/**
+ * Root Application Module (AppModule)
+ *
+ * Central configuration and bootstrapping module for the Generic-Prime Angular application.
+ * Aggregates all feature components, framework services, and third-party library modules.
+ *
+ * Responsibilities:
+ * - Declares all feature and root components (15 total)
+ * - Imports Angular core modules (BrowserModule, HttpClientModule, FormsModule)
+ * - Imports PrimeNG UI component library
+ * - Configures global error handling via GlobalErrorHandler
+ * - Registers domain configuration providers for multi-domain data management
+ * - Sets up application-wide services (MessageService)
+ * - Bootstraps AppComponent as the root component
+ *
+ * Feature Components Declared:
+ * - Navigation: HomeComponent, DependencyGraphComponent
+ * - Domain Hubs: AutomobileComponent, AgricultureComponent, PhysicsComponent, ChemistryComponent, MathComponent
+ * - Discovery: DiscoverComponent, PanelPopoutComponent
+ * - Visualization: PhysicsConceptGraphComponent, KnowledgeGraphComponent, ClassicalMechanicsGraphComponent, PhysicsSyllabusComponent
+ * - Reporting: ReportComponent
+ *
+ * @class AppModule
+ * @see AppComponent - Root component
+ * @see FrameworkModule - Core framework services and components
+ * @see PrimengModule - UI component library configuration
+ * @see GlobalErrorHandler - Global error handling service
+ */
 @NgModule({
   declarations: [
     AppComponent,

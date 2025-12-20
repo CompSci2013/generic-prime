@@ -16,18 +16,93 @@ import {
 } from './dependency-graph';
 
 /**
- * DependencyGraphComponent
+ * Dependency Graph Component - Application Architecture Visualization
  *
- * Comprehensive visualization of all dependencies in the generic-prime application.
- * Displays a directed acyclic graph (DAG) with:
- * - Every npm dependency from package.json
- * - Framework services and their relationships
- * - Framework components and their dependencies
- * - Feature components and their integration points
- * - Domain-specific configurations and adapters
- * - Build tools, testing frameworks, and external libraries
+ * Comprehensive interactive visualization of all dependencies in the generic-prime application.
+ * Displays a complete directed acyclic graph (DAG) with hierarchical layout showing how all
+ * parts of the application integrate and depend on each other.
  *
- * The graph uses Cytoscape.js with the Dagre layout algorithm for hierarchical visualization.
+ * Visualized Dependencies:
+ * - **NPM Packages** (18): Angular framework, RxJS, PrimeNG, Cytoscape, Plotly, build tools
+ * - **Framework Models** (12): TypeScript interfaces and data structures
+ * - **Framework Services** (8): API, state management, configuration, error handling
+ * - **Framework Components** (5): Reusable UI widgets (picker, table, chart, etc.)
+ * - **Domain Adapters** (9): Domain-specific API integrations and configurations
+ * - **Feature Components** (13): Pages and route components
+ * - **Data Structures** (3): Physics curriculum graphs
+ * - **Build & Test Tools** (13): Webpack, Karma, Jasmine, Playwright, ESLint
+ * - **External Libraries** (2): Type definitions, utilities
+ *
+ * **Total**: 118 nodes (dependencies), 350+ edges (relationships)
+ *
+ * Architecture & Features:
+ * - **Cytoscape.js**: Canvas-based graph rendering with mouse interaction
+ * - **Dagre Layout**: Hierarchical left-to-right directed graph layout
+ * - **Interactive**: Node selection, filtering by category, search functionality
+ * - **Visual Encoding**: Color-coded by node category for quick identification
+ * - **Statistics Panel**: Shows dependency metrics and category breakdowns
+ * - **Legend**: Color key for all node categories
+ * - **Performance**: Uses ChangeDetectionStrategy.OnPush for efficient rendering
+ *
+ * **Node Categories & Colors**:
+ * - npm-peer (Blue #DD0031): Angular framework and core dependencies
+ * - npm-prod (Teal #3776AB): Production libraries (PrimeNG, Cytoscape, RxJS)
+ * - framework-service (Purple #C7CEEA): Core application services
+ * - framework-component (Orange #F8B195): Reusable UI components
+ * - framework-model (Mint #95E1D3): TypeScript interfaces and types
+ * - domain-adapter (Green #6BCB77): Domain-specific API adapters
+ * - domain-config (Yellow #FFD93D): Configuration objects
+ * - domain-chart (Emerald #A8E6CF): Chart data sources
+ * - feature-component (Lavender #B4A7D6): Page and route components
+ * - build-tool (Pink #E8DAEF): Build and compilation tools
+ * - test-tool (Plum #D7BDE2): Testing frameworks and runners
+ * - external-lib (Light Red #F5B7B1): Third-party utilities
+ *
+ * **Relationship Types**:
+ * - 'imports': A imports/uses B
+ * - 'provides': A provides B (dependency injection)
+ * - 'injects': A injects B
+ * - 'extends': A extends B (inheritance)
+ * - 'implements': A implements B (interface)
+ * - 'uses': General consumption/usage
+ *
+ * **Navigation & Interaction**:
+ * - **Click nodes**: Select and view detailed information
+ * - **Filter by category**: Show only specific dependency types
+ * - **Search**: Filter nodes by name/id (text search)
+ * - **Fit to view**: Reset zoom and pan to show entire graph
+ * - **Drag nodes**: Reposition (Cytoscape default)
+ * - **Zoom**: Mouse wheel or trackpad pinch gesture
+ * - **Pan**: Click and drag background or middle mouse button
+ *
+ * **Use Cases**:
+ * - Understand application architecture and dependency layers
+ * - Identify tightly coupled components
+ * - Plan refactoring and modularization
+ * - Document system architecture for team knowledge
+ * - Verify dependency constraints and patterns
+ *
+ * @remarks
+ * This component is a developer tool. It's not part of the user-facing application
+ * but rather a visualization aid for understanding the codebase structure.
+ *
+ * Data Sources:
+ * - ALL_DEPENDENCY_NODES: 118 nodes exported from dependency-graph.ts
+ * - ALL_DEPENDENCY_EDGES: 350+ relationship edges from dependency-graph.ts
+ * - DEPENDENCY_STATS: Aggregated statistics about the dependency graph
+ * - LAYER_GROUPS: Category groupings for layout organization
+ *
+ * @class DependencyGraphComponent
+ * @implements OnInit, AfterViewInit
+ * @selector app-dependency-graph
+ *
+ * @lifecycle
+ * - ngOnInit: Initialize graph data and UI state
+ * - ngAfterViewInit: Initialize Cytoscape instance after DOM is ready
+ * - ngOnDestroy: (inherited) Cleanup Cytoscape instance
+ *
+ * @see dependency-graph.ts - Data structures for nodes and edges
+ * @see https://js.cytoscape.org - Cytoscape.js documentation
  */
 @Component({
   selector: 'app-dependency-graph',

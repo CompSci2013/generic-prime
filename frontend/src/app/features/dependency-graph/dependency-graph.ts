@@ -5,6 +5,40 @@
  * organized as nodes and edges suitable for DAG visualization using Cytoscape.js
  */
 
+/**
+ * Represents a node (entity) in the application's dependency graph.
+ *
+ * Nodes represent discrete components, services, models, or external libraries in the system.
+ * They are used to construct a directed acyclic graph (DAG) for dependency visualization
+ * and architecture analysis using Cytoscape.js.
+ *
+ * @interface DependencyNode
+ * @property {string} id - Unique identifier (kebab-case, e.g., "svc-api", "npm-angular-core")
+ * @property {string} label - Display label for the node (human-readable name)
+ * @property {string} category - Node classification for grouping and layout:
+ *           - 'npm-peer': Angular peer dependencies (@angular/*)
+ *           - 'npm-prod': Production npm dependencies
+ *           - 'npm-dev': Development-only dependencies
+ *           - 'framework-service': Core application services
+ *           - 'framework-component': Reusable UI components
+ *           - 'framework-model': TypeScript interfaces and types
+ *           - 'domain-adapter': Domain-specific API adapters
+ *           - 'domain-config': Configuration objects and constants
+ *           - 'domain-chart': Chart data source classes
+ *           - 'feature-component': Page and route components
+ *           - 'internal-service': Internal service dependencies
+ *           - 'internal-model': Internal model interfaces
+ *           - 'build-tool': Build and compilation tools
+ *           - 'test-tool': Testing frameworks and runners
+ *           - 'external-lib': Third-party utility libraries
+ * @property {string} [version] - Optional semantic version string
+ * @property {string} [description] - Brief one-line description of purpose
+ * @property {string} [detailedDescription] - Extended description with architecture context
+ * @property {string[]} [methods] - Optional list of exported/public methods
+ * @property {string[]} [observables] - Optional list of observable streams (for services)
+ * @property {string} [color] - Optional hex color for graph visualization
+ * @property {string} [shape] - Optional shape identifier (rectangle, circle, etc.)
+ */
 export interface DependencyNode {
   id: string;
   label: string;
@@ -20,6 +54,26 @@ export interface DependencyNode {
   shape?: string;
 }
 
+/**
+ * Represents a directed edge (relationship) between two nodes in the dependency graph.
+ *
+ * Edges define how components, services, and modules interact with each other.
+ * They are used to construct the visual representation of the application's architecture
+ * and dependency structure in Cytoscape.js.
+ *
+ * @interface DependencyEdge
+ * @property {string} source - The unique ID of the source node (originating component/service)
+ * @property {string} target - The unique ID of the target node (destination component/service)
+ * @property {string} [label] - Optional descriptive label for the edge (e.g., "imports", "depends on")
+ * @property {'imports' | 'provides' | 'injects' | 'extends' | 'implements' | 'uses'} [type]
+ *           The type of relationship between nodes:
+ *           - 'imports': A-imports-B relationship
+ *           - 'provides': A-provides-B (dependency injection)
+ *           - 'injects': A-injects-B (dependency injection)
+ *           - 'extends': A-extends-B (class inheritance)
+ *           - 'implements': A-implements-B (interface implementation)
+ *           - 'uses': A-uses-B (general consumption/usage)
+ */
 export interface DependencyEdge {
   source: string;
   target: string;

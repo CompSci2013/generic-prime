@@ -21,6 +21,43 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
 import { TieredMenuModule } from 'primeng/tieredmenu';
 
+/**
+ * Centralized PrimeNG UI Component Library Module
+ *
+ * Aggregates all PrimeNG component modules used throughout the Generic-Prime application.
+ * This module pattern provides a single import point for all UI components, making
+ * dependency management cleaner and allowing for easier module addition/removal.
+ *
+ * PrimeNG Components Included:
+ * - Data Display: TableModule, SkeletonModule
+ * - Input: MultiSelectModule, InputTextModule, InputNumberModule, DropdownModule, CheckboxModule
+ * - Navigation: TieredMenuModule, ToolbarModule
+ * - Containers: PanelModule, DialogModule
+ * - Feedback: ToastModule, TooltipModule, MessageModule, ProgressSpinnerModule
+ * - Controls: ButtonModule, RippleModule, ChipModule
+ *
+ * Usage:
+ * Import PrimengModule in feature modules to access all PrimeNG components:
+ * ```
+ * @NgModule({
+ *   imports: [CommonModule, PrimengModule]
+ * })
+ * export class MyFeatureModule { }
+ * ```
+ *
+ * Component Details:
+ * - TableModule: Advanced data grid with sorting, filtering, pagination
+ * - MultiSelectModule: Multi-select dropdown for filter selection
+ * - DialogModule: Modal dialogs for user interactions
+ * - ToastModule: Toast notifications for user feedback
+ * - ToolbarModule: Toolbar container for action buttons
+ * - TieredMenuModule: Hierarchical menu with flyout submenus (used in navigation)
+ * - ProgressSpinnerModule: Loading spinners for async operations
+ * - TooltipModule: Hover tooltips for UI hints
+ *
+ * @class PrimengModule
+ * @see https://www.primeng.org - PrimeNG official documentation
+ */
 const PRIMENG_MODULES = [
   TableModule,
   ButtonModule,
@@ -42,6 +79,13 @@ const PRIMENG_MODULES = [
   TieredMenuModule
 ];
 
+/**
+ * PrimeNG Module
+ *
+ * Provides centralized export of all PrimeNG component modules.
+ *
+ * @module PrimengModule
+ */
 @NgModule({
   imports: [
     CommonModule,

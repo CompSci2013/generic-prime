@@ -86,12 +86,37 @@ export interface KnowledgeNode {
 }
 
 /**
- * Represents a directed edge between two nodes
+ * Represents a directed edge (relationship) between two nodes in a knowledge graph.
+ *
+ * Edges define the nature and direction of relationships between knowledge concepts,
+ * topics, or entities. They are visualized as arrows in the Cytoscape.js graph with
+ * optional labels describing the relationship type.
  *
  * @interface KnowledgeEdge
- * @property {string} source - ID of the source node
- * @property {string} target - ID of the target node
- * @property {string} label - Relationship type or description
+ * @property {string} source - ID of the source (origin) node. The edge originates from this node.
+ * @property {string} target - ID of the target (destination) node. The edge points to this node.
+ * @property {string} label - Descriptive label for the relationship type or connection name
+ *           Common values:
+ *           - 'prerequisite': Target requires source as prior knowledge
+ *           - 'foundation': Source provides conceptual basis for target
+ *           - 'extends': Target builds upon and extends knowledge from source
+ *           - 'related': Conceptual or contextual connection between nodes
+ *           - 'implements': Source implements or provides target interface/service
+ *           - 'depends-on': Source depends on target for functionality
+ *
+ * @remarks
+ * The edge is directional: source → target. Visual representation shows an arrow
+ * pointing from source to target node. The label is displayed on hover in the UI.
+ *
+ * @example
+ * {
+ *   source: 'vectors-calculus',
+ *   target: 'newtonian-mechanics',
+ *   label: 'prerequisite'
+ * }
+ *
+ * @see KnowledgeNode - Node interface paired with this edge
+ * @see KnowledgeGraphComponent - Component that visualizes edges
  */
 export interface KnowledgeEdge {
   source: string;

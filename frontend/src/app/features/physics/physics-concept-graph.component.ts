@@ -27,7 +27,35 @@ interface CytoscapeNode {
 /**
  * Cytoscape Edge Data Structure
  *
- * Defines the data format for edges (connections) in the Cytoscape graph
+ * Defines the data format for edges (connections) in the Cytoscape graph visualization.
+ * This interface structures edge data for use with Cytoscape.js library, providing the
+ * connection information between nodes in physics concept graphs.
+ *
+ * @interface CytoscapeEdge
+ * @property {Object} data - Data object containing edge properties
+ * @property {string} data.source - Unique ID of the source (origin) node in the edge
+ * @property {string} data.target - Unique ID of the target (destination) node in the edge
+ * @property {string} data.label - Textual label describing the relationship type or nature
+ *           displayed in tooltips or on hover in the visualization
+ *
+ * @remarks
+ * This is Cytoscape.js's standard edge format. The data object is passed directly to
+ * the Cytoscape instance during graph initialization. Edges are always directional,
+ * with arrows pointing from source to target node in the visualization.
+ *
+ * @example
+ * ```typescript
+ * const edge: CytoscapeEdge = {
+ *   data: {
+ *     source: 'node-1',
+ *     target: 'node-2',
+ *     label: 'depends-on'
+ *   }
+ * };
+ * ```
+ *
+ * @see CytoscapeNode - Companion node data structure
+ * @see PhysicsConceptGraphComponent - Component using this interface
  */
 interface CytoscapeEdge {
   data: {

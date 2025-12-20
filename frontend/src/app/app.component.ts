@@ -3,15 +3,63 @@ import { MenuItem } from 'primeng/api';
 import { DomainConfigRegistry } from '../framework/services';
 import { DOMAIN_PROVIDERS } from '../domain-config/domain-providers';
 
+/**
+ * Root Application Component (AppComponent)
+ *
+ * Main container component for the Generic-Prime application. Provides the global
+ * application shell including the primary navigation menu and router outlet for
+ * feature components.
+ *
+ * Responsibilities:
+ * - Renders the application shell with PrimeNG TieredMenu navigation
+ * - Registers all domain configuration providers during initialization
+ * - Manages domain-specific navigation across 5 domains
+ * - Provides access to developer tools (dependency graph, test reports)
+ *
+ * Navigation Structure:
+ * - Automobiles: Home and Discovery interface for vehicle data
+ * - Agriculture: Domain entry point for agricultural data (stub)
+ * - Physics: Concept graphs, syllabus, classical mechanics visualization
+ * - Chemistry: Domain entry point for chemistry data (stub)
+ * - Mathematics: Domain entry point for math data (stub)
+ * - Developer: Tools for architecture analysis (dependency graph, reports)
+ *
+ * Domain Integration:
+ * Initializes DomainConfigRegistry with all available domain providers, enabling
+ * dynamic domain selection and configuration loading. The registry is populated
+ * once at app startup via the injected providers.
+ *
+ * @class AppComponent
+ * @selector app-root
+ * @remarks
+ * This component uses PrimeNG's TieredMenu for nested navigation with flyout submenus.
+ * Each domain has Home, Discover, and Reports options where applicable.
+ *
+ * @see DomainConfigRegistry - Service managing domain configurations
+ * @see MenuItem - PrimeNG menu item structure
+ */
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  /**
+   * Application title identifier
+   * @type {string}
+   */
   title = 'generic-prime';
 
-  // Domain navigation menu items with TieredMenu structure (nested items with flyout submenus)
+  /**
+   * Domain navigation menu items with TieredMenu structure (nested items with flyout submenus)
+   *
+   * Organized hierarchically:
+   * - Top level: Domain category (Automobiles, Physics, etc.)
+   * - Sub-level: Domain-specific actions (Home, Discover, View Reports)
+   * - Actions: Navigation (routerLink) or command execution (command function)
+   *
+   * @type {MenuItem[]}
+   */
   domainMenuItems: MenuItem[] = [
     {
       label: 'Automobiles',
@@ -68,6 +116,12 @@ export class AppComponent {
     }
   ];
 
+  /**
+   * Initialize AppComponent with domain configuration registry
+   *
+   * @param {DomainConfigRegistry} domainConfigRegistry - Service for managing domain configurations
+   * @param {Injector} injector - Angular injector for dependency resolution
+   */
   constructor(
     private domainConfigRegistry: DomainConfigRegistry,
     private injector: Injector
@@ -76,7 +130,13 @@ export class AppComponent {
   }
 
   /**
-   * Open Playwright test reports in a new tab
+   * Opens Playwright test reports in a new browser tab
+   *
+   * Navigates to the '/report' route and displays it in a new window.
+   * Called from the "View Test Reports" menu items across all domains.
+   *
+   * @public
+   * @returns {void}
    */
   openTestReports(): void {
     window.open('/report', '_blank');

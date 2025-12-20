@@ -41,14 +41,31 @@
  */
 
 /**
- * Represents a single topic node in the classical mechanics curriculum
+ * Represents a single topic node in the classical mechanics curriculum.
+ *
+ * Topic nodes are individual concepts or subject areas within the Classical Mechanics course.
+ * Each node has a specific academic level and relationships to other topics that form a
+ * prerequisite and extension graph for curriculum planning and concept mapping.
  *
  * @interface TopicNode
- * @property {string} id - Unique identifier (kebab-case)
- * @property {string} label - Display name of the topic
- * @property {string} description - Brief explanation of topic content
- * @property {string} level - Academic level (foundational/core/advanced)
- * @property {string} [color] - Optional hex color for visualization
+ * @property {string} id - Unique identifier in kebab-case (e.g., "newtonian-mechanics", "rigid-bodies")
+ * @property {string} label - Display name of the topic (human-readable)
+ * @property {string} description - Brief explanation of the topic's content and scope
+ * @property {'foundational' | 'core' | 'advanced'} level
+ *           Academic level classification:
+ *           - 'foundational': Basic concepts required for all other topics (color: #64c8ff)
+ *           - 'core': Central topics forming the bulk of the curriculum (color: #ffa500)
+ *           - 'advanced': Specialized extensions and cutting-edge topics (color: #ff6b9d)
+ * @property {string} [color] - Optional hex color for graph visualization (overrides level default)
+ *
+ * @example
+ * {
+ *   id: 'newtonian-mechanics',
+ *   label: 'Elements of Newtonian Mechanics',
+ *   description: 'Newton\'s laws, forces, and basic dynamics',
+ *   level: 'foundational',
+ *   color: '#64c8ff'
+ * }
  */
 export interface TopicNode {
   id: string;
@@ -59,17 +76,36 @@ export interface TopicNode {
 }
 
 /**
- * Represents a directed edge between two topics
+ * Represents a directed edge (relationship) between two topics in the Classical Mechanics curriculum.
+ *
+ * Edges define prerequisite dependencies, conceptual foundations, and knowledge extensions
+ * between topics. They form the structure of the curriculum's topic dependency graph.
  *
  * @interface TopicEdge
- * @property {string} source - ID of the source topic node
- * @property {string} target - ID of the target topic node
- * @property {string} label - Relationship type (prerequisite/foundation/extends/related)
+ * @property {string} source - ID of the source (origin) topic node
+ * @property {string} target - ID of the target (destination) topic node
+ * @property {string} label - Relationship type describing the edge:
+ *           - 'prerequisite': Target requires mastery of source before being studied
+ *           - 'foundation': Source provides conceptual basis for target
+ *           - 'extends': Target builds upon and extends the knowledge in source
+ *           - 'related': Topics share connections but no strict dependency exists
+ *
+ * @remarks
+ * The directed nature of edges means source → target. For example:
+ * - Edge(source: 'vectors-calculus', target: 'newtonian-mechanics', label: 'prerequisite')
+ *   means students should learn vectors & calculus before Newtonian mechanics.
+ *
+ * @example
+ * {
+ *   source: 'kinematics-1d',
+ *   target: 'kinematics-3d',
+ *   label: 'extends'
+ * }
  */
 export interface TopicEdge {
   source: string;
   target: string;
-  label: string; // e.g., "prerequisite", "extends", "related"
+  label: string;
 }
 
 /**

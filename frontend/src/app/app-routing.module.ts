@@ -14,6 +14,38 @@ import { ChemistryComponent } from './features/chemistry/chemistry.component';
 import { MathComponent } from './features/math/math.component';
 import { DependencyGraphComponent } from './features/dependency-graph/dependency-graph.component';
 
+/**
+ * Application Routing Configuration
+ *
+ * Defines all routes and navigation paths for the Generic-Prime application.
+ * Implements a multi-domain architecture where each domain (automobile, agriculture,
+ * physics, chemistry, math) has its own entry point and discovery interface.
+ *
+ * Route Structure:
+ * - Root & Home: '', 'home' → HomeComponent (domain selector landing page)
+ * - Automobile: 'automobiles' → AutomobileComponent, 'automobiles/discover' → DiscoverComponent
+ * - Agriculture: 'agriculture' → AgricultureComponent
+ * - Physics: 'physics' → PhysicsComponent
+ *   - Sub-routes: 'physics/syllabus/:nodeId' → PhysicsSyllabusComponent
+ *   - Visualization: 'physics/concept-graph', 'physics/classical-mechanics-graph'
+ * - Chemistry: 'chemistry' → ChemistryComponent
+ * - Math: 'math' → MathComponent
+ * - Developer: 'dependencies' → DependencyGraphComponent (architecture visualization)
+ * - Pop-out: 'panel/:gridId/:panelId/:type' → PanelPopoutComponent (window synchronization)
+ * - Reporting: 'report' → ReportComponent (test results)
+ *
+ * @remarks
+ * Route parameters:
+ * - :nodeId - Physics syllabus node identifier (e.g., topic ID)
+ * - :gridId - Grid identifier for discovery panels
+ * - :panelId - Individual panel identifier within grid
+ * - :type - Panel content type (results-table, charts, statistics)
+ *
+ * Navigation Strategy:
+ * - Lazy loading not implemented; all routes load eagerly
+ * - URL state synchronized via UrlStateService for filter persistence
+ * - Pop-out windows maintain state via BroadcastChannel communication
+ */
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'home', component: HomeComponent },
@@ -31,6 +63,11 @@ const routes: Routes = [
   { path: 'panel/:gridId/:panelId/:type', component: PanelPopoutComponent }
 ];
 
+/**
+ * Application Routing Module
+ *
+ * @class AppRoutingModule
+ */
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
