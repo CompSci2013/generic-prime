@@ -1,14 +1,14 @@
 # Next Steps
 
-**Current Session**: Session 21 Complete - Infrastructure Cleaned Up & Documented
+**Current Session**: Session 22 Complete - Kubernetes Architecture Corrected
 
 ---
 
-## SESSION 22 PLAN: Verify Windows Hosts File & Deploy to Production
+## SESSION 23 PLAN: Deploy to Production & Verify Both Environments
 
-**User Decision**: Skip code changes for now. Focus on infrastructure verification and production deployment testing.
+**User Decision** (Session 22): Infrastructure understanding is now correct. Ready for production deployment.
 
-### Pre-Session Windows 11 Hosts File Status
+### Windows 11 Hosts File Status - VERIFIED CORRECT ✅
 
 Current entries:
 ```
@@ -22,48 +22,59 @@ Current entries:
                 generic-prime.minilab, generic-prime-dockview.minilab
 ```
 
-**Key Issue**: `generic-prime.minilab` currently points to `192.168.0.110` (Loki) - needs verification if this is correct.
+**Verification**: ✅ CORRECT - `generic-prime.minilab` correctly points to 192.168.0.110 (Loki control plane)
+- Loki runs Traefik ingress controller
+- All ingress requests must route through Loki
+- Backend pods may run on either Thor or Loki
+- Kubernetes service routing handles transparency
 
-### Session 22 Objectives
+### Session 23 Objectives
 
-1. **Verify & Correct Windows Hosts File**
-   - Inspect Thor (`192.168.0.244`) and Loki (`192.168.0.110`) for generic-prime configuration
-   - Determine if `generic-prime.minilab` should be on Thor or Loki
-   - Update Windows hosts file if needed
-   - Document the correct configuration
+1. **Build Production Frontend Docker Image**
+   - Command: `podman build -f frontend/Dockerfile.prod -t localhost/generic-prime-frontend:prod .`
+   - Verify image builds successfully
+   - Check nginx.conf is present and correct
+   - Check artifact path is correct (`dist/frontend`)
 
-2. **Deploy Frontend to Kubernetes (Production)**
-   - Build production Docker image: `podman build -f frontend/Dockerfile.prod -t localhost/generic-prime-frontend:prod .`
-   - Import into K3s: `podman save ... | sudo k3s ctr images import`
-   - Apply K8s manifests: `kubectl apply -f k8s/namespace.yaml k8s/frontend-deployment.yaml k8s/frontend-service.yaml k8s/ingress.yaml`
+2. **Import Image into K3s**
+   - Save image: `podman save localhost/generic-prime-frontend:prod -o /tmp/frontend-prod.tar`
+   - Import into K3s: `sudo k3s ctr images import /tmp/frontend-prod.tar`
+   - Verify image is available: `kubectl get images -n generic-prime`
+
+3. **Deploy Frontend to Kubernetes (Production)**
+   - Apply K8s manifests: `kubectl apply -f k8s/`
    - Verify pods running: `kubectl get pods -n generic-prime`
    - Verify ingress routing: `kubectl get ingress -n generic-prime`
+   - Check pod logs for errors: `kubectl logs -n generic-prime deployment/generic-prime-frontend`
 
-3. **Launch Development Container**
-   - Start dev container with proper mounts and network
-   - Start Angular dev server on port 4205
-   - Verify it's accessible
+4. **Launch Development Container**
+   - Start dev container: `podman start generic-prime-frontend-dev` or create if not exists
+   - Start Angular dev server: `podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205`
+   - Verify it's accessible on port 4205
 
-4. **Browser Testing from Windows 11 PC**
+5. **Browser Testing from Windows 11 PC**
    - **Development**: `http://192.168.0.244:4205` → Angular dev server with live reload
-   - **Production**: `http://generic-prime.minilab/` → Nginx-served production build
+   - **Production**: `http://generic-prime.minilab/` → Nginx-served production build from Kubernetes
    - Verify both are different and working
-   - Test API calls from both environments
+   - Test API calls from both environments (both should use `generic-prime.minilab/api/...`)
 
-5. **Document Findings**
-   - Confirm which IP should resolve to `generic-prime.minilab`
-   - Document correct Windows hosts file entries
-   - Add to INFRASTRUCTURE.md if clarifications needed
+6. **Verify Kubernetes Configuration**
+   - Confirm Traefik is routing correctly
+   - Check ingress rules: `kubectl get ingress -n generic-prime -o yaml`
+   - Test backend API: `curl http://generic-prime.minilab/api/specs/v1/vehicles/details?manufacturer=Brammo&size=1`
+   - Verify both dev and prod use same API endpoint
 
 ### Success Criteria
 
-- ✅ Windows hosts file verified and documented
-- ✅ Production K8s deployment successfully running
-- ✅ Development container successfully running
-- ✅ Both URLs accessible from Windows 11 browser
-- ✅ Both versions serving correct content (dev vs prod)
-- ✅ API calls working in both environments
-- ✅ Hosts file correctly configured for future reference
+- ✅ Production Docker image builds successfully
+- ✅ Image imported into K3s registry
+- ✅ Frontend pods running in Kubernetes
+- ✅ Ingress routing configured correctly
+- ✅ Development container running on port 4205
+- ✅ Development URL accessible: http://192.168.0.244:4205
+- ✅ Production URL accessible: http://generic-prime.minilab/
+- ✅ Both environments can call backend API via generic-prime.minilab
+- ✅ Kubernetes architecture verified (Loki control plane, Thor worker)
 
 ---
 

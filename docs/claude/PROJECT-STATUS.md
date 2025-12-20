@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.19
-**Timestamp**: 2025-12-20T17:30:00Z
-**Updated By**: Session 21 - Infrastructure Cleanup & Consolidation
+**Version**: 5.20
+**Timestamp**: 2025-12-20T18:00:00Z
+**Updated By**: Session 22 - Kubernetes Architecture Correction
 
 ---
 
@@ -66,6 +66,102 @@
 ---
 
 ## What Changed This Session
+
+**Session 22: Kubernetes Architecture Correction & Documentation**
+
+### Summary
+Investigated and corrected fundamental misunderstanding about Kubernetes cluster topology. Direct examination of actual cluster revealed that Loki (not Thor) is the control plane, which has significant implications for infrastructure access and network configuration. Updated all documentation to reflect actual architecture and clarified how Thor gains kubectl access through delegated kubeconfig.
+
+### Key Accomplishments
+
+1. **Investigated Actual Kubernetes Topology** ✅
+   - Ran `kubectl get nodes` to verify node roles
+   - Checked K3s processes on both nodes
+   - Inspected kubeconfig API server endpoint
+   - Result: **Loki is control plane (192.168.0.110), Thor is worker (192.168.0.244)**
+
+2. **Clarified Thor's kubectl Access** ✅
+   - Thor has kubeconfig pointing to Loki's API: https://192.168.0.110:6443
+   - This is delegated access pattern—standard Kubernetes architecture
+   - Thor runs K3s agent (worker), not K3s server (control plane)
+   - RBAC permissions allow Thor user to execute kubectl commands against Loki API
+
+3. **Determined Correct Windows Hosts Configuration** ✅
+   - Windows hosts file should point to **Loki (192.168.0.110)** for generic-prime.minilab
+   - Reason: Traefik ingress controller runs on control plane (Loki)
+   - All external requests route through Loki:80 first, then Traefik forwards to pods
+   - Pod location (Thor vs Loki) doesn't affect entry point—Kubernetes handles routing
+
+4. **Updated ORIENTATION.md** ✅
+   - Corrected infrastructure overview diagram
+   - Fixed node roles and descriptions
+   - Updated Windows hosts file recommendations
+   - Clarified network access paths for dev and production
+   - Updated troubleshooting procedures
+   - Fixed E2E container hosts entry
+
+5. **Created KUBERNETES-ARCHITECTURE.md** ✅
+   - Comprehensive documentation of actual K3s topology
+   - Included verified evidence from cluster inspection
+   - Explained delegation access pattern for Thor
+   - Provided network flow diagrams for development and production
+   - Added verification commands for future reference
+   - 247 lines of detailed architecture explanation
+
+### Files Created
+- `docs/claude/KUBERNETES-ARCHITECTURE.md` - Comprehensive architecture documentation
+
+### Files Modified
+- `docs/claude/ORIENTATION.md` - Updated all infrastructure and network sections
+- `docs/claude/PROJECT-STATUS.md` - This file (version bump + session notes)
+
+### Key Findings Documented
+
+**Kubernetes Cluster Reality**:
+```
+Loki (192.168.0.110)   = K3s server (control plane)
+Thor (192.168.0.244)   = K3s agent (worker)
+Traefik               = Runs on Loki (control plane)
+```
+
+**Correct Windows hosts file**:
+```
+192.168.0.110   loki loki.minilab generic-prime.minilab
+192.168.0.244   thor thor.minilab
+```
+
+### What This Enables
+
+1. **Proper Infrastructure Understanding**
+   - Clear separation between control plane (Loki) and worker (Thor)
+   - Correct understanding of ingress routing through Loki
+   - Pod distribution doesn't affect external access patterns
+
+2. **Production Deployment Ready**
+   - Windows clients must target Loki for generic-prime.minilab
+   - Frontend dev server remains on Thor:4205
+   - Backend API accessed through Loki Traefik (same URL for both dev and prod)
+
+3. **Correct Network Configuration**
+   - Both development and production use same hostname resolution
+   - Traefik on Loki provides single entry point for all external traffic
+   - Kubernetes service routing handles pod location transparency
+
+### Testing Status
+- ✅ No code changes required—only infrastructure documentation
+- ✅ Architecture discovery verified through direct kubectl inspection
+- ✅ All findings cross-referenced with infrastructure project documentation
+- ✅ Verification commands provided for future validation
+
+### Architecture Verified
+**Infrastructure Documentation Status**:
+- ✅ ~/projects/infrastructure/docs/LAB-CONFIGURATION.md - Correct (Loki = control plane)
+- ✅ ~/projects/infrastructure/docs/halo-labs.md - Correct (describes separation accurately)
+- ✅ generic-prime ORIENTATION.md - Now updated to match actual architecture
+
+---
+
+## What Changed Previous Session
 
 **Session 21: Infrastructure Cleanup, Config Consolidation & Documentation**
 
