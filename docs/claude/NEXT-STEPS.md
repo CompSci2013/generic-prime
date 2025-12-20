@@ -4,30 +4,70 @@
 
 ---
 
-## IMMEDIATE PRIORITY: Fix Module Re-export Anti-pattern (Session 19 Carryover)
+## SESSION 22 PLAN: Verify Windows Hosts File & Deploy to Production
 
-**Status**: Still pending - infrastructure work took priority
-**Issue**: FrameworkModule re-exports CommonModule, FormsModule, PrimengModule
-- Creates hidden dependencies for downstream modules
-- Must be fixed to establish proper architectural foundation
-- Fix: Remove 3 lines in 1 file
+**User Decision**: Skip code changes for now. Focus on infrastructure verification and production deployment testing.
 
-**Why This Takes Priority**:
-1. Architectural correctness required before adding new features
-2. Identified in Session 19, documented in MODULE-ARCHITECTURE-AUDIT.md
-3. Only 20 minutes to fix completely
-4. Enables automated checking for all future modules
-5. Infrastructure now cleaned up (Session 21) - no blockers remain
+### Pre-Session Windows 11 Hosts File Status
 
-**Session 21 Accomplished**: Infrastructure audit & cleanup
-- Fixed Dockerfile.prod (created nginx.conf, fixed dist path)
-- Removed cruft (duplicate Dockerfiles, proxy configs, test scripts)
-- Unified API hostname across dev/prod
-- Added K8s health checks
-- Created comprehensive INFRASTRUCTURE.md
-- Clarified dev vs production network access in documentation
+Current entries:
+```
+192.168.0.244   minilab, minipc, registry.minilab, angular.minilab, traefik.minilab,
+                ockview-wrapper.minilab, dockview-wrapper.minilab.local, satellites.minilab,
+                kibana.minilab, thor
+192.168.0.110   loki, whoami.minilab, gitLab.minilab, ollama.minilab, chat.minilab,
+                dockview.minilab, rag.minilab, qdrant.minilab, rag-ui.minilab,
+                api.satellites.minilab, api.transportation.minilab, transportation.minilab,
+                autos.minilab, autos2.minilab, auto-discovery.minilab,
+                generic-prime.minilab, generic-prime-dockview.minilab
+```
 
-**Immediate Actions (Session 22)**:
+**Key Issue**: `generic-prime.minilab` currently points to `192.168.0.110` (Loki) - needs verification if this is correct.
+
+### Session 22 Objectives
+
+1. **Verify & Correct Windows Hosts File**
+   - Inspect Thor (`192.168.0.244`) and Loki (`192.168.0.110`) for generic-prime configuration
+   - Determine if `generic-prime.minilab` should be on Thor or Loki
+   - Update Windows hosts file if needed
+   - Document the correct configuration
+
+2. **Deploy Frontend to Kubernetes (Production)**
+   - Build production Docker image: `podman build -f frontend/Dockerfile.prod -t localhost/generic-prime-frontend:prod .`
+   - Import into K3s: `podman save ... | sudo k3s ctr images import`
+   - Apply K8s manifests: `kubectl apply -f k8s/namespace.yaml k8s/frontend-deployment.yaml k8s/frontend-service.yaml k8s/ingress.yaml`
+   - Verify pods running: `kubectl get pods -n generic-prime`
+   - Verify ingress routing: `kubectl get ingress -n generic-prime`
+
+3. **Launch Development Container**
+   - Start dev container with proper mounts and network
+   - Start Angular dev server on port 4205
+   - Verify it's accessible
+
+4. **Browser Testing from Windows 11 PC**
+   - **Development**: `http://192.168.0.244:4205` → Angular dev server with live reload
+   - **Production**: `http://generic-prime.minilab/` → Nginx-served production build
+   - Verify both are different and working
+   - Test API calls from both environments
+
+5. **Document Findings**
+   - Confirm which IP should resolve to `generic-prime.minilab`
+   - Document correct Windows hosts file entries
+   - Add to INFRASTRUCTURE.md if clarifications needed
+
+### Success Criteria
+
+- ✅ Windows hosts file verified and documented
+- ✅ Production K8s deployment successfully running
+- ✅ Development container successfully running
+- ✅ Both URLs accessible from Windows 11 browser
+- ✅ Both versions serving correct content (dev vs prod)
+- ✅ API calls working in both environments
+- ✅ Hosts file correctly configured for future reference
+
+---
+
+## DEFERRED: Fix Module Re-export Anti-pattern (Session 19 Carryover)
 
 1. **Remove re-exports from FrameworkModule** (5 min)
    - File: `frontend/src/framework/framework.module.ts`
