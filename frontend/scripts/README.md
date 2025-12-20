@@ -4,7 +4,7 @@ This directory contains helper scripts for managing development and testing work
 
 ## ⭐ Ultra-Quick Start: Single Terminal
 
-Want everything in one terminal? **This is the easiest way:**
+Want everything in one terminal? **Use npm scripts (easiest):**
 
 ```bash
 npm run dev:all
@@ -21,6 +21,8 @@ Then open three browser windows:
 - Results: http://192.168.0.244:9323
 
 Edit code → Tests auto-run → See results immediately! ✨
+
+**Note**: The shell scripts in this directory are for reference/documentation only. Use `npm run` commands for all workflows (they're the npm standard).
 
 ---
 
