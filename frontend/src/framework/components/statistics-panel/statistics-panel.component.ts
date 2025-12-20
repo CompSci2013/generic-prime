@@ -210,6 +210,7 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
       // If we're in a pop-out window, broadcast the URL change to main window
       if (this.popOutContext.isInPopOut()) {
         console.log('[StatisticsPanel] 🟡 In Pop-Out - Broadcasting highlight params to main window:', newParams);
+        console.log('[StatisticsPanel] Sending URL_PARAMS_CHANGED with payload:', { params: newParams });
         this.popOutContext.sendMessage({
           type: PopOutMessageType.URL_PARAMS_CHANGED,
           payload: { params: newParams },
@@ -247,6 +248,7 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
       // If we're in a pop-out window, broadcast the URL change to main window
       if (this.popOutContext.isInPopOut()) {
         console.log('[StatisticsPanel] 🟡 In Pop-Out - Broadcasting filter params to main window:', newParams);
+        console.log('[StatisticsPanel] Sending URL_PARAMS_CHANGED with payload:', { params: newParams });
         this.popOutContext.sendMessage({
           type: PopOutMessageType.URL_PARAMS_CHANGED,
           payload: { params: newParams },

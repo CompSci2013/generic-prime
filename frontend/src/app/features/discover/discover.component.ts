@@ -469,7 +469,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       case PopOutMessageType.URL_PARAMS_CHANGED:
         // Pop-out sent URL params change - update main window URL
         console.log(
-          '[Discover] URL params change from pop-out:',
+          '[Discover] URL params change from pop-out - RECEIVED PARAMS:',
           message.payload?.params
         );
         if (message.payload?.params) {
@@ -483,6 +483,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
           // where pop-outs receive state with empty results before API completes
           console.log('[Discover] URL update will trigger state$ subscription and broadcast');
           await this.urlStateService.setParams(message.payload.params);
+          console.log('[Discover] urlStateService.setParams() called in main window.');
         }
         break;
 

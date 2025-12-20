@@ -11,7 +11,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 1
+      "actualWorkers": 5
     },
     "preserveOutput": "always",
     "reporter": [
@@ -37,7 +37,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 5
         },
         "id": "chromium",
         "name": "chromium",
@@ -46,7 +46,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 3000
+        "timeout": 10000
       }
     ],
     "shard": null,
@@ -58,6 +58,419 @@
     "webServer": null
   },
   "suites": [
+    {
+      "title": "agriculture.spec.ts",
+      "file": "agriculture.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "PHASE 1 (Agriculture): Initial State & Basic Navigation",
+          "file": "agriculture.spec.ts",
+          "line": 30,
+          "column": 6,
+          "specs": [
+            {
+              "title": "1.1: Initial page load - agriculture records displayed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "line": 32,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.090Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "line": 32,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c4237e38112dc8d05413-2dd5fd15b1e28b6857c7",
+              "file": "agriculture.spec.ts",
+              "line": 32,
+              "column": 8
+            },
+            {
+              "title": "1.2: Panel collapse/expand - state independent of URL",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "line": 52,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.090Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "line": 52,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c4237e38112dc8d05413-27873ec2fee82a28d03c",
+              "file": "agriculture.spec.ts",
+              "line": 52,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 2.1 (Agriculture): Filter Workflows",
+          "file": "agriculture.spec.ts",
+          "line": 78,
+          "column": 6,
+          "specs": [
+            {
+              "title": "2.1.1: Apply filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "line": 80,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.090Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "line": 80,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c4237e38112dc8d05413-ad53e2884c71f748b9de",
+              "file": "agriculture.spec.ts",
+              "line": 80,
+              "column": 8
+            },
+            {
+              "title": "2.1.2: Remove filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "line": 98,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.090Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "line": 98,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c4237e38112dc8d05413-72d1d54e73eecf03dadc",
+              "file": "agriculture.spec.ts",
+              "line": 98,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 3 (Agriculture): Results Table Panel",
+          "file": "agriculture.spec.ts",
+          "line": 119,
+          "column": 6,
+          "specs": [
+            {
+              "title": "3.1.1: Table pagination",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "line": 121,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "line": 121,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c4237e38112dc8d05413-44fb4109fb6e302ce57a",
+              "file": "agriculture.spec.ts",
+              "line": 121,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 4 (Agriculture): Picker Panel",
+          "file": "agriculture.spec.ts",
+          "line": 143,
+          "column": 6,
+          "specs": [
+            {
+              "title": "4.1.1: Single picker selection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "line": 145,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "line": 145,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c4237e38112dc8d05413-194f3845dd9dba0f86a3",
+              "file": "agriculture.spec.ts",
+              "line": 145,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 5 (Agriculture): Statistics Panel",
+          "file": "agriculture.spec.ts",
+          "line": 167,
+          "column": 6,
+          "specs": [
+            {
+              "title": "5.1.1: Statistics display",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "line": 169,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "line": 169,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c4237e38112dc8d05413-c02179531cf697a1a6e0",
+              "file": "agriculture.spec.ts",
+              "line": 169,
+              "column": 8
+            }
+          ]
+        }
+      ]
+    },
     {
       "title": "app.spec.ts",
       "file": "app.spec.ts",
@@ -77,7 +490,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -94,14 +507,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.445Z",
+                      "startTime": "2025-12-20T20:01:32.329Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -129,7 +542,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -146,14 +559,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.445Z",
+                      "startTime": "2025-12-20T20:01:32.329Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -181,7 +594,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -198,14 +611,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.445Z",
+                      "startTime": "2025-12-20T20:01:32.329Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -241,7 +654,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -258,14 +671,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.445Z",
+                      "startTime": "2025-12-20T20:01:32.329Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -293,7 +706,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -310,14 +723,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.445Z",
+                      "startTime": "2025-12-20T20:01:32.329Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -345,7 +758,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -362,14 +775,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.445Z",
+                      "startTime": "2025-12-20T20:01:32.329Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -397,7 +810,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -414,14 +827,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.445Z",
+                      "startTime": "2025-12-20T20:01:32.329Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -449,7 +862,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -466,14 +879,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.445Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -509,7 +922,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -526,14 +939,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.445Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -561,7 +974,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -578,14 +991,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -613,7 +1026,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -630,14 +1043,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -673,7 +1086,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -690,14 +1103,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -725,7 +1138,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -742,14 +1155,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -777,7 +1190,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -794,14 +1207,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -837,7 +1250,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -854,14 +1267,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -889,7 +1302,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -906,14 +1319,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -941,7 +1354,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -958,14 +1371,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -993,7 +1406,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1010,14 +1423,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1053,7 +1466,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1070,14 +1483,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1105,7 +1518,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1122,14 +1535,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1157,7 +1570,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1174,14 +1587,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1217,7 +1630,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1234,14 +1647,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1269,7 +1682,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1286,14 +1699,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1329,7 +1742,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1346,14 +1759,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1389,7 +1802,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1406,14 +1819,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1441,7 +1854,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1458,14 +1871,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1493,7 +1906,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1510,14 +1923,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1553,7 +1966,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1570,14 +1983,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1605,7 +2018,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1622,14 +2035,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1657,7 +2070,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1674,14 +2087,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1717,7 +2130,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1734,14 +2147,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1769,7 +2182,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1786,14 +2199,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1821,7 +2234,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [
                     {
                       "type": "skip",
@@ -1838,14 +2251,14 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "skipped",
                       "duration": 0,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -1881,7 +2294,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -1889,27 +2302,27 @@
                   "results": [
                     {
                       "workerIndex": 0,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 1598,
+                      "duration": 2599,
                       "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at /app/frontend/e2e/app.spec.ts:1199:23",
+                        "message": "Error: locator.count: Target page, context or browser has been closed",
+                        "stack": "Error: locator.count: Target page, context or browser has been closed\n    at /app/frontend/e2e/app.spec.ts:1183:41",
                         "location": {
                           "file": "/app/frontend/e2e/app.spec.ts",
-                          "column": 23,
-                          "line": 1199
+                          "column": 41,
+                          "line": 1183
                         },
-                        "snippet": "  1197 |     // BUG CHECK: With the bug, chipCount will be 0\n  1198 |     // Without bug, chipCount should be > 0\n> 1199 |     expect(chipCount).toBeGreaterThan(0);\n       |                       ^\n  1200 |\n  1201 |     // Step 7: Verify Picker pop-out shows highlight for selected filter\n  1202 |     const pickerComponent = pickerPanelPopout.locator('app-base-picker');"
+                        "snippet": "  1181 |\n  1182 |     // After filter applied, at least one filter chip should be visible (the year range)\n> 1183 |     const chipCount = await filterChips.count();\n       |                                         ^\n  1184 |     console.log(`[Test] Filter chips in Query Control pop-out: ${chipCount}`);\n  1185 |\n  1186 |     // BUG CHECK: With the bug, chipCount will be 0"
                       },
                       "errors": [
                         {
                           "location": {
                             "file": "/app/frontend/e2e/app.spec.ts",
-                            "column": 23,
-                            "line": 1199
+                            "column": 41,
+                            "line": 1183
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n  1197 |     // BUG CHECK: With the bug, chipCount will be 0\n  1198 |     // Without bug, chipCount should be > 0\n> 1199 |     expect(chipCount).toBeGreaterThan(0);\n       |                       ^\n  1200 |\n  1201 |     // Step 7: Verify Picker pop-out shows highlight for selected filter\n  1202 |     const pickerComponent = pickerPanelPopout.locator('app-base-picker');\n    at /app/frontend/e2e/app.spec.ts:1199:23"
+                          "message": "Error: locator.count: Target page, context or browser has been closed\n\n  1181 |\n  1182 |     // After filter applied, at least one filter chip should be visible (the year range)\n> 1183 |     const chipCount = await filterChips.count();\n       |                                         ^\n  1184 |     console.log(`[Test] Filter chips in Query Control pop-out: ${chipCount}`);\n  1185 |\n  1186 |     // BUG CHECK: With the bug, chipCount will be 0\n    at /app/frontend/e2e/app.spec.ts:1183:41"
                         }
                       ],
                       "stdout": [
@@ -1932,12 +2345,12 @@
                           "text": "[Test] Results before chart selection: Showing 1 to 20 of 4887 results\n"
                         },
                         {
-                          "text": "[Test] Filter chips in Query Control pop-out: 0\n"
+                          "text": "[Test] Applying year filter via URL parameter...\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:18.446Z",
+                      "startTime": "2025-12-20T20:01:32.330Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1948,8 +2361,8 @@
                       ],
                       "errorLocation": {
                         "file": "/app/frontend/e2e/app.spec.ts",
-                        "column": 23,
-                        "line": 1199
+                        "column": 41,
+                        "line": 1183
                       }
                     }
                   ],
@@ -1967,7 +2380,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 3000,
+                  "timeout": 10000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -1977,25 +2390,25 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 1390,
+                      "duration": 2304,
                       "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at /app/frontend/e2e/app.spec.ts:1301:72",
+                        "message": "Error: locator.count: Target page, context or browser has been closed",
+                        "stack": "Error: locator.count: Target page, context or browser has been closed\n    at /app/frontend/e2e/app.spec.ts:1274:49",
                         "location": {
                           "file": "/app/frontend/e2e/app.spec.ts",
-                          "column": 72,
-                          "line": 1301
+                          "column": 49,
+                          "line": 1274
                         },
-                        "snippet": "  1299 |\n  1300 |     // BUG CHECK: All should have at least 1 indication of the filter\n> 1301 |     expect(statsFilterCount + queryFilterCount + pickerHighlightCount).toBeGreaterThan(0);\n       |                                                                        ^\n  1302 |\n  1303 |     // Verify main window also shows the filter\n  1304 |     const mainFilterChips = page.locator('#panel-query-control').locator('p-chip');"
+                        "snippet": "  1272 |     // Verify all pop-outs updated\n  1273 |     const statsFilters = statsPanelPopout.locator('app-statistics-panel').locator('[class*=\"selected\"]');\n> 1274 |     const statsFilterCount = await statsFilters.count();\n       |                                                 ^\n  1275 |\n  1276 |     const queryFilters = queryPanelPopout.locator('app-query-control').locator('p-chip');\n  1277 |     const queryFilterCount = await queryFilters.count();"
                       },
                       "errors": [
                         {
                           "location": {
                             "file": "/app/frontend/e2e/app.spec.ts",
-                            "column": 72,
-                            "line": 1301
+                            "column": 49,
+                            "line": 1274
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n  1299 |\n  1300 |     // BUG CHECK: All should have at least 1 indication of the filter\n> 1301 |     expect(statsFilterCount + queryFilterCount + pickerHighlightCount).toBeGreaterThan(0);\n       |                                                                        ^\n  1302 |\n  1303 |     // Verify main window also shows the filter\n  1304 |     const mainFilterChips = page.locator('#panel-query-control').locator('p-chip');\n    at /app/frontend/e2e/app.spec.ts:1301:72"
+                          "message": "Error: locator.count: Target page, context or browser has been closed\n\n  1272 |     // Verify all pop-outs updated\n  1273 |     const statsFilters = statsPanelPopout.locator('app-statistics-panel').locator('[class*=\"selected\"]');\n> 1274 |     const statsFilterCount = await statsFilters.count();\n       |                                                 ^\n  1275 |\n  1276 |     const queryFilters = queryPanelPopout.locator('app-query-control').locator('p-chip');\n  1277 |     const queryFilterCount = await queryFilters.count();\n    at /app/frontend/e2e/app.spec.ts:1274:49"
                         }
                       ],
                       "stdout": [
@@ -2003,12 +2416,12 @@
                           "text": "[Test 6.2] Initial result count: Showing 1 to 20 of 4887 results\n"
                         },
                         {
-                          "text": "[Test 6.2] After selection 1: Stats=0, Query=0, Picker=0\n"
+                          "text": "[Test 6.2] Applying manufacturer filter via URL parameter...\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-12T10:10:20.328Z",
+                      "startTime": "2025-12-20T20:01:35.224Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2019,8 +2432,8 @@
                       ],
                       "errorLocation": {
                         "file": "/app/frontend/e2e/app.spec.ts",
-                        "column": 72,
-                        "line": 1301
+                        "column": 49,
+                        "line": 1274
                       }
                     }
                   ],
@@ -2029,8 +2442,1247 @@
               ],
               "id": "c31ff144dc4fee3acd0a-c758d8076ff4cfdc3528",
               "file": "app.spec.ts",
-              "line": 1244,
+              "line": 1233,
               "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "chemistry.spec.ts",
+      "file": "chemistry.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "PHASE 1 (Chemistry): Initial State & Basic Navigation",
+          "file": "chemistry.spec.ts",
+          "line": 30,
+          "column": 6,
+          "specs": [
+            {
+              "title": "1.1: Initial page load - chemistry records displayed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "line": 32,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "line": 32,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4acd24e14e7fe1282527-3f797cd3744a91b5c5a5",
+              "file": "chemistry.spec.ts",
+              "line": 32,
+              "column": 8
+            },
+            {
+              "title": "1.2: Panel collapse/expand - state independent of URL",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "line": 52,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "line": 52,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4acd24e14e7fe1282527-64bf236faed9833dab07",
+              "file": "chemistry.spec.ts",
+              "line": 52,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 2.1 (Chemistry): Filter Workflows",
+          "file": "chemistry.spec.ts",
+          "line": 78,
+          "column": 6,
+          "specs": [
+            {
+              "title": "2.1.1: Apply filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "line": 80,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "line": 80,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4acd24e14e7fe1282527-6bc7d8149efa7f8ef33a",
+              "file": "chemistry.spec.ts",
+              "line": 80,
+              "column": 8
+            },
+            {
+              "title": "2.1.2: Remove filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "line": 98,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "line": 98,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4acd24e14e7fe1282527-221bca037d5328e795fa",
+              "file": "chemistry.spec.ts",
+              "line": 98,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 3 (Chemistry): Results Table Panel",
+          "file": "chemistry.spec.ts",
+          "line": 119,
+          "column": 6,
+          "specs": [
+            {
+              "title": "3.1.1: Table pagination",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "line": 121,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "line": 121,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4acd24e14e7fe1282527-e00b90cee2c74bf539c4",
+              "file": "chemistry.spec.ts",
+              "line": 121,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 4 (Chemistry): Picker Panel",
+          "file": "chemistry.spec.ts",
+          "line": 143,
+          "column": 6,
+          "specs": [
+            {
+              "title": "4.1.1: Single picker selection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "line": 145,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "line": 145,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4acd24e14e7fe1282527-df839e6e84cd820e35bb",
+              "file": "chemistry.spec.ts",
+              "line": 145,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 5 (Chemistry): Statistics Panel",
+          "file": "chemistry.spec.ts",
+          "line": 167,
+          "column": 6,
+          "specs": [
+            {
+              "title": "5.1.1: Statistics display",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "line": 169,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "line": 169,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4acd24e14e7fe1282527-f03c8e6fe24493209397",
+              "file": "chemistry.spec.ts",
+              "line": 169,
+              "column": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "math.spec.ts",
+      "file": "math.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "PHASE 1 (Mathematics): Initial State & Basic Navigation",
+          "file": "math.spec.ts",
+          "line": 30,
+          "column": 6,
+          "specs": [
+            {
+              "title": "1.1: Initial page load - mathematics records displayed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "line": 32,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "line": 32,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "1ea80860c8eab5452f69-4ac6af4951d474844873",
+              "file": "math.spec.ts",
+              "line": 32,
+              "column": 8
+            },
+            {
+              "title": "1.2: Panel collapse/expand - state independent of URL",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "line": 52,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "line": 52,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "1ea80860c8eab5452f69-e708c8f8ffebb6e6e472",
+              "file": "math.spec.ts",
+              "line": 52,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 2.1 (Mathematics): Filter Workflows",
+          "file": "math.spec.ts",
+          "line": 78,
+          "column": 6,
+          "specs": [
+            {
+              "title": "2.1.1: Apply filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "line": 80,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "line": 80,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "1ea80860c8eab5452f69-fac8fcd1b8c8c558d2c7",
+              "file": "math.spec.ts",
+              "line": 80,
+              "column": 8
+            },
+            {
+              "title": "2.1.2: Remove filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "line": 98,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "line": 98,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "1ea80860c8eab5452f69-595c46c2f45bf9421f1c",
+              "file": "math.spec.ts",
+              "line": 98,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 3 (Mathematics): Results Table Panel",
+          "file": "math.spec.ts",
+          "line": 119,
+          "column": 6,
+          "specs": [
+            {
+              "title": "3.1.1: Table pagination",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "line": 121,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "line": 121,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "1ea80860c8eab5452f69-e63c69aa899ff477021d",
+              "file": "math.spec.ts",
+              "line": 121,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 4 (Mathematics): Picker Panel",
+          "file": "math.spec.ts",
+          "line": 143,
+          "column": 6,
+          "specs": [
+            {
+              "title": "4.1.1: Single picker selection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "line": 145,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "line": 145,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "1ea80860c8eab5452f69-a15d067c2c238801b26a",
+              "file": "math.spec.ts",
+              "line": 145,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 5 (Mathematics): Statistics Panel",
+          "file": "math.spec.ts",
+          "line": 167,
+          "column": 6,
+          "specs": [
+            {
+              "title": "5.1.1: Statistics display",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "line": 169,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "line": 169,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "1ea80860c8eab5452f69-85245b4c8f0416f2d450",
+              "file": "math.spec.ts",
+              "line": 169,
+              "column": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "physics.spec.ts",
+      "file": "physics.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "PHASE 1 (Physics): Initial State & Basic Navigation",
+          "file": "physics.spec.ts",
+          "line": 30,
+          "column": 6,
+          "specs": [
+            {
+              "title": "1.1: Initial page load - physics records displayed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "line": 32,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "line": 32,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "2b3027ae5b09f8d6926b-6740da297876079ddcdf",
+              "file": "physics.spec.ts",
+              "line": 32,
+              "column": 8
+            },
+            {
+              "title": "1.2: Panel collapse/expand - state independent of URL",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "line": 52,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "line": 52,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "2b3027ae5b09f8d6926b-e96978b76b74cfe52260",
+              "file": "physics.spec.ts",
+              "line": 52,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 2.1 (Physics): Filter Workflows",
+          "file": "physics.spec.ts",
+          "line": 78,
+          "column": 6,
+          "specs": [
+            {
+              "title": "2.1.1: Apply filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "line": 80,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "line": 80,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "2b3027ae5b09f8d6926b-25f10ef2bb719fef866f",
+              "file": "physics.spec.ts",
+              "line": 80,
+              "column": 8
+            },
+            {
+              "title": "2.1.2: Remove filter",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "line": 98,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "line": 98,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "2b3027ae5b09f8d6926b-e9c1c43588543fede8b3",
+              "file": "physics.spec.ts",
+              "line": 98,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 3 (Physics): Results Table Panel",
+          "file": "physics.spec.ts",
+          "line": 119,
+          "column": 6,
+          "specs": [
+            {
+              "title": "3.1.1: Table pagination",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "line": 121,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "line": 121,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "2b3027ae5b09f8d6926b-3e94786895ae58ce7df7",
+              "file": "physics.spec.ts",
+              "line": 121,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 4 (Physics): Picker Panel",
+          "file": "physics.spec.ts",
+          "line": 143,
+          "column": 6,
+          "specs": [
+            {
+              "title": "4.1.1: Single picker selection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "line": 145,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "line": 145,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "2b3027ae5b09f8d6926b-d0e2ac5eb5b0cee540b9",
+              "file": "physics.spec.ts",
+              "line": 145,
+              "column": 8
+            }
+          ]
+        },
+        {
+          "title": "PHASE 5 (Physics): Statistics Panel",
+          "file": "physics.spec.ts",
+          "line": 167,
+          "column": 6,
+          "specs": [
+            {
+              "title": "5.1.1: Statistics display",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 10000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "line": 169,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "line": 169,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "2b3027ae5b09f8d6926b-99e1eae27344f73166f6",
+              "file": "physics.spec.ts",
+              "line": 169,
+              "column": 8
             }
           ]
         }
@@ -2039,10 +3691,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-12-12T10:10:18.116Z",
-    "duration": 3659.065,
+    "startTime": "2025-12-20T20:01:32.024Z",
+    "duration": 5557.125,
     "expected": 0,
-    "skipped": 33,
+    "skipped": 61,
     "unexpected": 2,
     "flaky": 0
   }

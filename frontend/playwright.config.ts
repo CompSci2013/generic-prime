@@ -17,8 +17,10 @@ export default defineConfig({
   // Opt out of parallel tests on CI.
   workers: process.env.CI ? 1 : undefined,
 
-  // Timeout per test (tests are fast, 3 seconds is sufficient)
-  timeout: 3000,
+  // Timeout per test
+  // Most tests are fast (3 seconds), but pop-out tests (6.1, 6.2) need more time
+  // to open multiple windows and wait for BroadcastChannel synchronization
+  timeout: 10000,
 
   // Reporter to use. See https://playwright.dev/docs/test-reporters
   reporter: [

@@ -1172,7 +1172,7 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     await page.goto('/automobiles/discover?yearMin=2023&yearMax=2024');
 
     // Wait for all windows to receive the state update via BroadcastChannel
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(500);
 
     // Step 6: Verify that Query Control pop-out updated with new filters
     // The query control should show the selected filter from the URL
@@ -1267,7 +1267,7 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     await page.goto('/automobiles/discover?manufacturer=Brammo');
 
     // Wait for all windows to receive the state update via BroadcastChannel
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(500);
 
     // Verify all pop-outs updated
     const statsFilters = statsPanelPopout.locator('app-statistics-panel').locator('[class*="selected"]');
@@ -1295,7 +1295,7 @@ test.describe('PHASE 6: Pop-Out Windows & Cross-Window Communication', () => {
     await page.goto('/automobiles/discover?manufacturer=Brammo&bodyClass=Sedan');
 
     // Wait for state propagation
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(500);
 
     // Verify both filters are now visible in Query Control pop-out
     const queryFilters2 = queryPanelPopout.locator('app-query-control').locator('p-chip');
