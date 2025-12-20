@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.34
-**Timestamp**: 2025-12-20T23:45:00Z
-**Updated By**: Session 34 - E2E Testing Workflow Documentation Complete
+**Version**: 5.35
+**Timestamp**: 2025-12-20T16:30:00Z
+**Updated By**: Session 35 - E2E Tests Enabled and Test Artifacts Cleaned
 
 ---
 
@@ -420,6 +420,49 @@ Why: Simpler setup, less terminal clutter, good for quick validation
 
 **Commits**:
 - (Awaiting final commit - to be created below)
+
+---
+
+## Session 35 Progress: E2E Tests Enabled and Test Artifacts Cleaned
+
+### Primary Objective: Enable all E2E tests and clean up test artifacts from git
+
+**Status**: ✅ COMPLETE - All E2E tests enabled and test artifacts properly ignored
+
+**Work Completed** (2 commits):
+
+1. ✅ **Enabled All 33 E2E Tests** ([frontend/e2e/app.spec.ts](frontend/e2e/app.spec.ts))
+   - Removed `test.skip` markers from all 33 skipped tests across 6 phases
+   - Tests now enabled:
+     * Phase 2.1: Manufacturer Filter (5 tests)
+     * Phase 2.2: Model Filter (3 tests)
+     * Phase 2.3: Body Class Filter (3 tests)
+     * Phase 2.4: Year Range Filter (4 tests)
+     * Phase 2.5: Search/Text Filter (3 tests)
+     * Phase 2.6: Page Size Filter (2 tests)
+     * Phase 2.7: Clear All Filters (1 test)
+     * Phase 3: Results Table Panel (3 tests)
+     * Phase 4: Manufacturer-Model Picker (3 tests)
+     * Phase 5: Statistics Panel (3 tests)
+     * Phase 6: Pop-Out Windows (2 tests)
+   - Total E2E test count: 33 tests across 7 phases
+
+2. ✅ **Cleaned Up Test Artifacts from Git** ([.gitignore](.gitignore))
+   - Added to .gitignore:
+     * `frontend/playwright-report/` - HTML test reports
+     * `frontend/test-results/` - Test result metadata and errors
+     * `frontend/test-results.json` - Test summary file
+   - Removed from git cache: 6 tracked test artifact files (~3,932 lines deleted)
+   - Configuration files (playwright.config.ts) remain tracked
+
+**Key Achievement**:
+- Full test suite is now ready to run with all 33 tests enabled
+- Generated test artifacts will no longer clutter git history
+- Clean separation between source code and generated test data
+
+**Commits**:
+- 05afb5a: test: Enable all E2E tests - remove test.skip markers from 33 tests
+- 06f4a9b: chore: Add Playwright test artifacts to .gitignore and remove from git cache
 
 ---
 

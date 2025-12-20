@@ -1,36 +1,56 @@
 # Next Steps
 
-**Current Session**: Session 33 - E2E Test Fixes Complete
+**Current Session**: Session 35 - E2E Tests Enabled and Artifacts Cleaned
 
 ---
 
-## SESSION 34 PLAN: Execute E2E Tests and Validate Pop-Out Feature
+## SESSION 36 PLAN: Execute Full E2E Test Suite
 
-**Status**: Ready for execution. Tests are fixed and waiting for validation.
+**Status**: All 33 E2E tests are now enabled and ready for execution. Test artifacts are properly ignored by git.
 
 ### Immediate Next Action
 
-**Run E2E Tests 6.1 and 6.2 in the E2E Container**
+**Run the Full E2E Test Suite**
 
 ```bash
-# In E2E container:
-podman exec generic-prime-e2e bash -c "cd /app/frontend && npx playwright test e2e/app.spec.ts -g '6\\.1|6\\.2'"
+# On host (Thor):
+cd ~/projects/generic-prime/frontend
+npm run test:e2e
+
+# Or in E2E container:
+podman exec generic-prime-e2e bash -c "cd /app/frontend && npm run test:e2e"
 ```
 
 **What to Expect**:
-- Both tests should now PASS with increased timeout and URL-parameter approach
-- Tests verify pop-out state synchronization via BroadcastChannel
-- Full test suite should complete in ~10 seconds
+- All 33 tests across 7 phases should execute
+- Total runtime: ~60-90 seconds (10-15 seconds per phase)
+- Tests cover:
+  * Initial state and navigation
+  * Filter operations (Manufacturer, Model, Body Class, Year, Search)
+  * Page size changes
+  * Results table pagination and expansion
+  * Picker selections
+  * Statistics display and responsiveness
+  * Pop-out window state synchronization
 
-**If Tests Pass**:
-1. Document test results in PROJECT-STATUS.md
-2. Mark pop-out feature as "Stable" (ready for production)
-3. Next priority: Fix Bug #13 (PrimeNG dropdown keyboard navigation)
+**Success Criteria**:
+- All Phase 1 tests PASS (initial state)
+- All Phase 2 tests PASS (filters work correctly)
+- All Phase 3 tests PASS (results table works correctly)
+- All Phase 4 tests PASS (picker works correctly)
+- All Phase 5 tests PASS (statistics display correctly)
+- All Phase 6 tests PASS (pop-out synchronization works)
 
 **If Tests Fail**:
-1. Check console logs for BroadcastChannel message flow
-2. Verify dev server is running on port 4205
-3. Investigate if pop-out window references are staying open during test
+1. Review the HTML report: `npm run test:report`
+2. Check which phase failed and investigate specific test failure
+3. Look for timing issues or state synchronization problems
+4. Update test expectations if application behavior has changed
+
+**After Tests Pass**:
+1. Document test results in PROJECT-STATUS.md (mark tests as "All Passing")
+2. Next priority: Fix Bug #13 (PrimeNG dropdown keyboard navigation)
+3. Consider adding more comprehensive test coverage for edge cases
 
 ---
 
