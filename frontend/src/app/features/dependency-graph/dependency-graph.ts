@@ -92,16 +92,26 @@
  * - `external-lib`: Third-party utility libraries
  *
  * @interface DependencyNode
- * @property {string} id Unique identifier in kebab-case format (e.g., "svc-api", "npm-angular-core")
- * @property {string} label Display label for the node shown in visualization (human-readable name)
- * @property {('npm-peer'|'npm-prod'|'npm-dev'|'framework-service'|'framework-component'|'framework-model'|'domain-adapter'|'domain-config'|'domain-chart'|'feature-component'|'internal-service'|'internal-model'|'build-tool'|'test-tool'|'external-lib')} category Node classification for graph grouping, layout, and filtering
- * @property {string} [version] Optional semantic version string (e.g., "14.2.0" for Angular packages)
- * @property {string} [description] Brief one-line description of the node's primary purpose and responsibility
- * @property {string} [detailedDescription] Extended description with architectural context, relationships, and usage patterns
- * @property {string[]} [methods] Optional list of exported public methods and functions available from this node
- * @property {string[]} [observables] Optional list of observable streams (primary for services and reactive components)
- * @property {string} [color] Optional hex color code for graph visualization and legend representation
- * @property {string} [shape] Optional shape identifier for Cytoscape rendering (rectangle, circle, etc.)
+ *
+ * @property {string} id - Unique identifier in kebab-case format (e.g., "svc-api", "npm-angular-core")
+ *
+ * @property {string} label - Display label for the node shown in visualization (human-readable name)
+ *
+ * @property {('npm-peer'|'npm-prod'|'npm-dev'|'framework-service'|'framework-component'|'framework-model'|'domain-adapter'|'domain-config'|'domain-chart'|'feature-component'|'internal-service'|'internal-model'|'build-tool'|'test-tool'|'external-lib')} category - Node classification for graph grouping, layout, and filtering
+ *
+ * @property {string} [version] - Optional semantic version string (e.g., "14.2.0" for Angular packages)
+ *
+ * @property {string} [description] - Brief one-line description of the node's primary purpose and responsibility
+ *
+ * @property {string} [detailedDescription] - Extended description with architectural context, relationships, and usage patterns
+ *
+ * @property {string[]} [methods] - Optional list of exported public methods and functions available from this node
+ *
+ * @property {string[]} [observables] - Optional list of observable streams (primary for services and reactive components)
+ *
+ * @property {string} [color] - Optional hex color code for graph visualization and legend representation
+ *
+ * @property {string} [shape] - Optional shape identifier for Cytoscape rendering (rectangle, circle, etc.)
  *
  * @remarks
  * **Property Details**:
@@ -117,17 +127,56 @@
  * - **shape**: Cytoscape shape identifier. Defaults to 'ellipse' if omitted. Options: 'rectangle', 'circle', 'diamond'
  */
 export interface DependencyNode {
+  /**
+   * Unique identifier in kebab-case format (e.g., "svc-api", "npm-angular-core")
+   */
   id: string;
+
+  /**
+   * Display label for the node shown in visualization (human-readable name)
+   */
   label: string;
+
+  /**
+   * Node classification for graph grouping, layout, and filtering
+   */
   category: 'npm-peer' | 'npm-prod' | 'npm-dev' | 'framework-service' | 'framework-component' |
             'framework-model' | 'domain-adapter' | 'domain-config' | 'domain-chart' | 'feature-component' |
             'internal-service' | 'internal-model' | 'build-tool' | 'test-tool' | 'external-lib';
+
+  /**
+   * Optional semantic version string (e.g., "14.2.0" for Angular packages)
+   */
   version?: string;
+
+  /**
+   * Brief one-line description of the node's primary purpose and responsibility
+   */
   description?: string;
+
+  /**
+   * Extended description with architectural context, relationships, and usage patterns
+   */
   detailedDescription?: string;
+
+  /**
+   * Optional list of exported public methods and functions available from this node
+   */
   methods?: string[];
+
+  /**
+   * Optional list of observable streams (primary for services and reactive components)
+   */
   observables?: string[];
+
+  /**
+   * Optional hex color code for graph visualization and legend representation
+   */
   color?: string;
+
+  /**
+   * Optional shape identifier for Cytoscape rendering (rectangle, circle, etc.)
+   */
   shape?: string;
 }
 
@@ -147,10 +196,14 @@ export interface DependencyNode {
  * - `uses`: General consumption or usage relationship (A uses B)
  *
  * @interface DependencyEdge
- * @property {string} source The unique ID of the source node (originating component/service/library)
- * @property {string} target The unique ID of the target node (destination component/service/library)
- * @property {string} [label] Optional descriptive label for the edge (e.g., "imports", "depends on")
- * @property {('imports'|'provides'|'injects'|'extends'|'implements'|'uses')} [type] The semantic type of relationship between source and target nodes
+ *
+ * @property {string} source - The unique ID of the source node (originating component/service/library)
+ *
+ * @property {string} target - The unique ID of the target node (destination component/service/library)
+ *
+ * @property {string} [label] - Optional descriptive label for the edge (e.g., "imports", "depends on")
+ *
+ * @property {('imports'|'provides'|'injects'|'extends'|'implements'|'uses')} [type] - The semantic type of relationship between source and target nodes
  *
  * @remarks
  * **Directionality**:
@@ -186,9 +239,24 @@ export interface DependencyNode {
  * ```
  */
 export interface DependencyEdge {
+  /**
+   * The unique ID of the source node (originating component/service/library)
+   */
   source: string;
+
+  /**
+   * The unique ID of the target node (destination component/service/library)
+   */
   target: string;
+
+  /**
+   * Optional descriptive label for the edge (e.g., "imports", "depends on")
+   */
   label?: string;
+
+  /**
+   * The semantic type of relationship between source and target nodes
+   */
   type?: 'imports' | 'provides' | 'injects' | 'extends' | 'implements' | 'uses';
 }
 

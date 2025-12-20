@@ -12,34 +12,20 @@
  * @template T - The filter model type that contains these fields
  *
  * @property {keyof T} field - Unique field identifier matching a property in the filter model (T).
- *           Used internally to map filter changes to state updates. Example: "manufacturer"
  *
  * @property {string} label - Display label for the filter field shown in the Query Control component.
- *           Example: "Manufacturer", "Model", "Year Range"
  *
- * @property {('multiselect'|'range'|'text'|'date')} type - Filter type determines the UI component rendered:
- *           - `'multiselect'`: Multi-select dropdown with search (uses FilterOption[])
- *           - `'range'`: Min/max numeric or date range picker
- *           - `'text'`: Text input with optional pattern validation
- *           - `'date'`: Date picker component
+ * @property {('multiselect'|'range'|'text'|'date')} type - Filter type determines the UI component rendered.
  *
  * @property {string} [optionsEndpoint] - Optional API endpoint URL for fetching multiselect filter options.
- *           Server returns array of FilterOption with value, label, and optional count.
- *           Example: "/agg/manufacturers" endpoint returns { values: [...FilterOption[]] }
  *
  * @property {Function} [optionsTransformer] - Optional transformer function to convert API response to FilterOption[].
- *           Signature: `(response: any) => FilterOption[]`
- *           Applied after fetching from optionsEndpoint to normalize the response format.
  *
  * @property {(string|{min:string, max:string})} urlParams - URL parameter name(s) for state synchronization.
- *           - String for single parameter: "manufacturer" (URL: ?manufacturer=value)
- *           - Object for range filters: { min: "yearMin", max: "yearMax" } (URL: ?yearMin=1990&yearMax=2020)
  *
  * @property {string} [searchPlaceholder] - Optional placeholder text displayed in the search box.
- *           Example: "Search manufacturer..." or "Type to filter..."
  *
  * @property {string} [dialogSubtitle] - Optional subtitle text shown in the filter dialog/modal.
- *           Provides additional context or instructions for the user.
  *
  * @remarks
  * **Usage in Domain Config**:
@@ -59,13 +45,44 @@
  * ```
  */
 export interface FilterDefinition<T = any> {
+  /**
+   * Unique field identifier matching a property in the filter model
+   */
   field: keyof T;
+
+  /**
+   * Display label for the filter field shown in the Query Control component
+   */
   label: string;
+
+  /**
+   * Filter type determines the UI component rendered
+   */
   type: 'multiselect' | 'range' | 'text' | 'date';
+
+  /**
+   * Optional API endpoint URL for fetching multiselect filter options
+   */
   optionsEndpoint?: string;
+
+  /**
+   * Optional transformer function to convert API response to FilterOption[]
+   */
   optionsTransformer?: (response: any) => FilterOption[];
+
+  /**
+   * URL parameter name(s) for state synchronization
+   */
   urlParams: string | { min: string; max: string };
+
+  /**
+   * Optional placeholder text displayed in the search box
+   */
   searchPlaceholder?: string;
+
+  /**
+   * Optional subtitle text shown in the filter dialog/modal
+   */
   dialogSubtitle?: string;
 }
 
@@ -75,13 +92,10 @@ export interface FilterDefinition<T = any> {
  * @interface FilterOption
  *
  * @property {(string|number)} value - The actual value for this option. Used as the data value when selected.
- *           Examples: "Toyota", "2020", "5000"
  *
  * @property {string} label - Display text shown to the user in the multiselect dropdown.
- *           Examples: "Toyota (45)", "Year 2020", "Price $5000-$10000"
  *
  * @property {number} [count] - Optional count of items matching this option value.
- *           Used for display purposes (e.g., "Toyota (45 vehicles)"). Useful for aggregation results.
  *
  * @remarks
  * **Usage**:
@@ -102,7 +116,18 @@ export interface FilterDefinition<T = any> {
  * ```
  */
 export interface FilterOption {
+  /**
+   * The actual value for this option. Used as the data value when selected
+   */
   value: string | number;
+
+  /**
+   * Display text shown to the user in the multiselect dropdown
+   */
   label: string;
+
+  /**
+   * Optional count of items matching this option value
+   */
   count?: number;
 }
