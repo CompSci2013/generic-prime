@@ -1,12 +1,42 @@
 # Next Steps
 
-**Current Session**: Session 22 Complete - Kubernetes Architecture Corrected
+**Current Session**: Session 23 Complete - Production Deployed
 
 ---
 
-## SESSION 23 PLAN: Deploy to Production & Verify Both Environments
+## SESSION 24 PLAN: Manual Testing & Development
 
-**User Decision** (Session 22): Infrastructure understanding is now correct. Ready for production deployment.
+**Status**: Production deployment successful. Frontend running in Kubernetes (2/2 pods), backend stable (13+ days). Ready for manual testing and development work.
+
+### Immediate Next Action: Start Development Container
+
+**Test Live Reload Development Environment**
+
+1. **Start Angular Dev Server**
+   ```bash
+   podman exec -it generic-prime-frontend-dev npm start -- --host 0.0.0.0 --port 4205
+   ```
+   Expected: Angular CLI dev server starts on port 4205 with live reload enabled
+
+2. **Access Development Frontend**
+   - Open: http://192.168.0.244:4205 from Windows 11 browser
+   - Expected: Angular application loads (same as production, but with dev server)
+   - Backend: Same API at http://generic-prime.minilab/api/specs/v1/
+
+3. **Test Live Reload Workflow**
+   - Edit: `src/app/app.component.ts` (any change)
+   - Save: File (Ctrl+S)
+   - Watch: Browser auto-reloads with your changes
+   - Test: API calls still work through Loki
+
+4. **Compare Both Environments**
+   - **Production**: http://generic-prime.minilab/ (Kubernetes, Nginx)
+   - **Development**: http://192.168.0.244:4205 (Dev container, CLI)
+   - **Both**: Share same backend API
+
+### Session 23: Production Deployment (✅ COMPLETE)
+
+**Deployment Status**: All objectives completed successfully
 
 ### Windows 11 Hosts File Status - VERIFIED CORRECT ✅
 
