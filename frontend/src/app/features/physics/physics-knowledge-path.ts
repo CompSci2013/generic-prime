@@ -1,11 +1,68 @@
 /**
- * Physics Knowledge Path
+ * Physics Knowledge Path Data Structure
  *
- * Hierarchical structure of physics topics for PhD curriculum
- * Three tiers: Undergraduate → Graduate → PhD Specialization
- * Specialization: Thermodynamics & Solid State Matter
+ * @fileoverview
+ * Defines the complete hierarchical curriculum structure for physics PhD program with
+ * specialization in Thermodynamics and Solid State Matter. Organizes 1300+ hours of
+ * coursework across three academic tiers with detailed syllabi for each topic.
+ *
+ * @remarks
+ * Curriculum Organization:
+ * - Tier 1: Undergraduate Physics (Years 1-2)
+ *   - Classical Mechanics, Electromagnetism, Quantum Mechanics I & II
+ *   - 4 courses, ~130 hours total per course
+ *
+ * - Tier 2: Graduate Physics (Years 2-3)
+ *   - Thermodynamics & Statistical Mechanics, Solid State Fundamentals
+ *   - Modern Physics Topics, Condensed Matter I
+ *   - 4 courses, ~210-230 hours total per course
+ *
+ * - Tier 3: PhD Specialization (Years 3-4+)
+ *   - Advanced Thermodynamics, Condensed Matter II
+ *   - Phase Transitions, Solid State Thermodynamics
+ *   - Defects & Disorder, Advanced Materials, Computational Methods
+ *   - 7 specialized courses, ~210-245 hours total per course
+ *
+ * Data Structure:
+ * - Hierarchical tree with PhysicsNode at each level
+ * - Each node contains: id, title, icon, description, level, year
+ * - Children array for nested topics
+ * - Syllabus array with detailed topic breakdowns
+ * - SyllabusItem includes: topic, description, keyPoints, estimatedHours
+ *
+ * Usage:
+ * - Used by PhysicsComponent for rendering curriculum tree
+ * - PhysicsSyllabusComponent displays detailed syllabus
+ * - Icons provide visual categorization
+ * - Estimated hours support planning and progress tracking
+ *
+ * Total Content:
+ * - 15 major courses across 3 tiers
+ * - ~110 syllabus topics with detailed key points
+ * - Estimated 2,500+ total study hours
+ * - Progressive depth: foundational → core → specialized
+ *
+ * @see PhysicsComponent
+ * @see PhysicsSyllabusComponent
+ * @see PHYSICS_CONCEPT_GRAPH (concept relationships)
+ *
+ * @version 1.0
+ * @since 2024
  */
 
+/**
+ * Represents a single node in the physics curriculum hierarchy
+ *
+ * @interface PhysicsNode
+ * @property {string} id - Unique identifier for the node (kebab-case)
+ * @property {string} title - Display name of the topic/course
+ * @property {string} icon - Emoji icon for visual categorization
+ * @property {string} description - Brief summary of content
+ * @property {string} level - Academic tier (undergraduate/graduate/phd-specialization)
+ * @property {number} year - Typical year in curriculum (1-4)
+ * @property {PhysicsNode[]} [children] - Nested child topics
+ * @property {SyllabusItem[]} [syllabus] - Detailed topic breakdowns
+ */
 export interface PhysicsNode {
   id: string;
   title: string;
@@ -17,6 +74,15 @@ export interface PhysicsNode {
   syllabus?: SyllabusItem[];
 }
 
+/**
+ * Represents a single syllabus topic within a course
+ *
+ * @interface SyllabusItem
+ * @property {string} topic - Name of the syllabus topic
+ * @property {string} description - Brief explanation of topic content
+ * @property {string[]} keyPoints - Bullet points of key concepts covered
+ * @property {number} estimatedHours - Approximate study hours for mastery
+ */
 export interface SyllabusItem {
   topic: string;
   description: string;

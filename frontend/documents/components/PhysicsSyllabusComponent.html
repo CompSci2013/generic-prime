@@ -1046,10 +1046,30 @@
     </p>
     <p class="comment">
         <p>Physics Syllabus Detail Component</p>
-<p>Displays detailed syllabus for a selected physics course node<br>Retrieves node data from sessionStorage (set by parent component)</p>
+<p>Displays comprehensive syllabus information for a selected physics course, including topics,<br>descriptions, and key learning points. Data is retrieved from sessionStorage and displayed<br>in an organized card-based layout.The component uses a syllabus detail layout:</p>
+<ol>
+<li><strong>Header Section</strong>: Back button, course icon, title, description, and metadata</li>
+<li><strong>Syllabus Topics Section</strong>: Numbered topic cards with descriptions and key points</li>
+<li><strong>Empty State</strong>: Message when no syllabus data is available</li>
+<li><strong>Error State</strong>: Fallback UI when course data is not found</li>
+</ol>
 
     </p>
 
+    <p class="comment">
+        <h3>Example</h3>
+    </p>
+    <div class="io-description">
+                <div>
+                    <pre><code class="hljs html">```typescript
+// Navigation from parent component
+navigateToNode(subtopic: PhysicsNode): void {
+sessionStorage.setItem('selectedPhysicsNode', JSON.stringify(subtopic));
+this.router.navigate(['/physics/syllabus', subtopic.id]);
+}
+```</code></pre>
+                </div>
+    </div>
 
 <section>
     <h3>Metadata</h3>
@@ -1101,6 +1121,43 @@
                         </td>
                     </tr>
     
+                    <tr>
+                        <td class="col-md-4">
+                                <div class="io-description"><p>Constructor</p>
+    </div>
+                                <div class="io-description">
+                                        <b>Parameters :</b>
+                                        <ul class="jsdoc-params">
+                                                <li>
+                                                    <div>
+                                                        <b>route</b>
+                                                            :     <code><a href="https://angular.io/docs/ts/latest/api/router/index/ActivatedRoute-interface.html" target="_blank" >ActivatedRoute</a></code>
+    
+                                                    </div>
+                                                    <div>
+                                                        <ul>
+    <li>Angular router for accessing route parameters</li>
+    </ul>
+    
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div>
+                                                        <b>router</b>
+                                                            :     <code><a href="https://angular.io/docs/ts/latest/api/router/index/Router-class.html" target="_blank" >Router</a></code>
+    
+                                                    </div>
+                                                    <div>
+                                                        <ul>
+    <li>Angular router for programmatic navigation</li>
+    </ul>
+    
+                                                    </div>
+                                                </li>
+                                        </ul>
+                                </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
     </section>
@@ -1126,12 +1183,18 @@
     
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-description"><p>Load node data from sessionStorage</p>
+                                <div class="io-description"><p>Loads physics course node data from sessionStorage</p>
+    <p>Attempts to retrieve previously stored node data. If no data is found<br>and a nodeId exists, redirects back to the physics main page.</p>
     </div>
+                                <div class="io-description">
+                                </div>
                                 <div class="io-description">
                                     <b>Returns: </b>    <code>void</code>
     
                                 </div>
+                                    <div class="io-description">
+                                        
+                                    </div>
                         </td>
                     </tr>
                 </tbody>
@@ -1152,12 +1215,17 @@
     
                     <tr>
                         <td class="col-md-4">
-                                <div class="io-description"><p>Navigate back to physics main page</p>
+                                <div class="io-description"><p>Navigates back to the physics main page</p>
     </div>
+                                <div class="io-description">
+                                </div>
                                 <div class="io-description">
                                     <b>Returns: </b>    <code>void</code>
     
                                 </div>
+                                    <div class="io-description">
+                                        
+                                    </div>
                         </td>
                     </tr>
                 </tbody>
@@ -1206,8 +1274,66 @@ import { PhysicsNode } from &#x27;./physics-knowledge-path&#x27;;
 /**
  * Physics Syllabus Detail Component
  *
- * Displays detailed syllabus for a selected physics course node
- * Retrieves node data from sessionStorage (set by parent component)
+ * Displays comprehensive syllabus information for a selected physics course, including topics,
+ * descriptions, and key learning points. Data is retrieved from sessionStorage and displayed
+ * in an organized card-based layout.
+ *
+ * @remarks
+ * - Loads physics course node data from sessionStorage (set by parent PhysicsComponent)
+ * - Displays course metadata: icon, title, description, and topic count
+ * - Shows syllabus items as numbered cards with key points
+ * - Provides navigation back to physics main page
+ * - Handles error states when no node data is available
+ *
+ * @architecture
+ * **Purpose**: Detailed syllabus view for individual physics courses
+ * **Pattern**: Detail view with sessionStorage-based state management
+ * **Navigation Flow**:
+ *   - User clicks course card in PhysicsComponent → navigates to /physics/syllabus/:nodeId
+ *   - Parent component stores node data in sessionStorage
+ *   - This component reads from sessionStorage and displays syllabus
+ *   - User can navigate back to /physics
+ *
+ * **State Management**:
+ *   - Uses sessionStorage for data transfer between components
+ *   - Key: &#x27;selectedPhysicsNode&#x27;
+ *   - Fallback: Redirects to /physics if no data found
+ *
+ * @template
+ * The component uses a syllabus detail layout:
+ * 1. **Header Section**: Back button, course icon, title, description, and metadata
+ * 2. **Syllabus Topics Section**: Numbered topic cards with descriptions and key points
+ * 3. **Empty State**: Message when no syllabus data is available
+ * 4. **Error State**: Fallback UI when course data is not found
+ *
+ * @styling
+ * - Dark theme with cyan accents (#64c8ff, #4ba3d9)
+ * - Gradient backgrounds with transparent overlays
+ * - Animations: fadeInDown (header), fadeInUp (topics with delay)
+ * - Topic cards with numbered badges and hover effects
+ * - Responsive breakpoint: 768px for mobile layout
+ *
+ * @example
+ * &#x60;&#x60;&#x60;typescript
+ * // Navigation from parent component
+ * navigateToNode(subtopic: PhysicsNode): void {
+ *   sessionStorage.setItem(&#x27;selectedPhysicsNode&#x27;, JSON.stringify(subtopic));
+ *   this.router.navigate([&#x27;/physics/syllabus&#x27;, subtopic.id]);
+ * }
+ * &#x60;&#x60;&#x60;
+ *
+ * @seeAlso
+ * - {@link PhysicsComponent} - Parent component that sets sessionStorage
+ * - {@link PhysicsNode} - Interface for course node data structure
+ * - {@link SyllabusItem} - Interface for syllabus topic items
+ * - {@link PHYSICS_KNOWLEDGE_PATH} - Complete physics curriculum data
+ *
+ * @lifecycle
+ * - **ngOnInit**: Subscribes to route params and loads node data from sessionStorage
+ * - **OnDestroy**: No cleanup needed (no subscriptions to unsubscribe)
+ *
+ * @version 1.0
+ * @since 1.0.0 (Added as part of physics domain implementation)
  */
 @Component({
   selector: &#x27;app-physics-syllabus&#x27;,
@@ -1215,16 +1341,37 @@ import { PhysicsNode } from &#x27;./physics-knowledge-path&#x27;;
   styleUrls: [&#x27;./physics-syllabus.component.scss&#x27;]
 })
 export class PhysicsSyllabusComponent implements OnInit {
+  /**
+   * @property {PhysicsNode | null} selectedNode - Currently selected physics course node with syllabus data
+   */
   selectedNode: PhysicsNode | null &#x3D; null;
+
+  /**
+   * @property {string | null} nodeId - Course node ID from route parameters
+   */
   nodeId: string | null &#x3D; null;
 
+  /**
+   * Constructor
+   *
+   * @param {ActivatedRoute} route - Angular router for accessing route parameters
+   * @param {Router} router - Angular router for programmatic navigation
+   */
   constructor(
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
+  /**
+   * Component initialization lifecycle hook
+   *
+   * Subscribes to route params to get node ID, then loads corresponding
+   * node data from sessionStorage.
+   *
+   * @lifecycle Called once after component is constructed
+   */
   ngOnInit(): void {
-    // Get node ID from route params
+    // Get node ID from route params and load corresponding data
     this.route.params.subscribe(params &#x3D;&gt; {
       this.nodeId &#x3D; params[&#x27;nodeId&#x27;];
       this.loadNodeData();
@@ -1232,20 +1379,32 @@ export class PhysicsSyllabusComponent implements OnInit {
   }
 
   /**
-   * Load node data from sessionStorage
+   * Loads physics course node data from sessionStorage
+   *
+   * Attempts to retrieve previously stored node data. If no data is found
+   * and a nodeId exists, redirects back to the physics main page.
+   *
+   * @private
+   * @remarks
+   * Data is stored in sessionStorage by the parent PhysicsComponent before navigation
+   *
+   * @seeAlso {@link PhysicsComponent.navigateToNode}
    */
   private loadNodeData(): void {
     const storedNode &#x3D; sessionStorage.getItem(&#x27;selectedPhysicsNode&#x27;);
     if (storedNode) {
       this.selectedNode &#x3D; JSON.parse(storedNode);
     } else if (this.nodeId) {
-      // Fallback: navigate back if no data
+      // Fallback: navigate back if no data available
       this.router.navigate([&#x27;/physics&#x27;]);
     }
   }
 
   /**
-   * Navigate back to physics main page
+   * Navigates back to the physics main page
+   *
+   * @public
+   * @returns {void}
    */
   goBack(): void {
     this.router.navigate([&#x27;/physics&#x27;]);

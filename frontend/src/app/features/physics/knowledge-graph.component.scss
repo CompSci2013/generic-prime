@@ -1,3 +1,43 @@
+/**
+ * Knowledge Graph Component Styles
+ * Generic reusable styles for Cytoscape.js interactive knowledge graph visualization
+ *
+ * Color Palette:
+ * - Primary Blue: #64c8ff (foundational level, accents, borders)
+ * - Orange: #ffa500 (core/intermediate level)
+ * - Pink: #ff6b9d (advanced level)
+ * - Dark Background: #1a1a1a to #2d2d2d gradient
+ * - Text: #ffffff (primary), #b0b0b0 (secondary), #888 (tertiary)
+ *
+ * Animations:
+ * - fadeIn: Simple opacity transition (0 to 1)
+ * - fadeInDown: Header slides down from top with fade
+ * - fadeInUp: Legend/instructions slide up from bottom with fade
+ * - slideIn: Info panel slides in from left
+ *
+ * Layout Structure:
+ * - .knowledge-graph-container: Full-viewport flexbox container with dark gradient
+ * - .header: Top navigation and title section with back button
+ * - .canvas-wrapper-outer: Graph visualization area with controls
+ * - .legend-section: Color-coded level indicators with responsive grid
+ * - .info-panel: Node detail display (conditional, shown on selection)
+ * - .instructions: User interaction guide
+ *
+ * Special Features:
+ * - Cytoscape container fills .canvas-wrapper (500px min-height, 400px mobile)
+ * - .edge-tooltip: Fixed position tooltip following cursor on edge hover
+ * - .fit-button: Absolute positioned control over canvas for recentering graph
+ * - Level badges with data-level attribute for conditional coloring
+ * - Staggered animation delays: 0.2s (canvas), 0.4s (legend), 0.6s (instructions)
+ *
+ * Responsive Design:
+ * - Mobile breakpoint at 768px
+ * - Reduced padding (2rem → 1rem)
+ * - Font size reductions for headers and body text
+ * - Legend grid switches to single column
+ * - Canvas min-height reduced to 400px
+ */
+
 .knowledge-graph-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);

@@ -1,3 +1,62 @@
+/**
+ * Knowledge Graph Component
+ *
+ * @fileoverview
+ * Generic reusable component for displaying interactive knowledge graphs using Cytoscape.js.
+ * This component serves as a foundation for visualizing concept relationships, topic hierarchies,
+ * and dependency networks in any subject domain.
+ *
+ * @remarks
+ * Architecture:
+ * - Accepts graph data via @Input properties (nodes and edges)
+ * - Initializes Cytoscape.js instance with Dagre hierarchical layout
+ * - Provides interactive features: pan, zoom, node selection, edge tooltips
+ * - Handles window resize and cleanup on destroy
+ * - Configurable title, subtitle, and back route
+ *
+ * Cytoscape Features:
+ * - Dagre layout algorithm (left-to-right hierarchical)
+ * - Node styling with color-coded levels
+ * - Edge hover tooltips showing relationship types
+ * - Click to select nodes and view details
+ * - Fit-to-view button for centering graph
+ * - Mouse wheel zoom and pan controls
+ *
+ * Template Features:
+ * - Header with configurable title and subtitle
+ * - Canvas wrapper for Cytoscape container
+ * - Legend showing level color coding
+ * - Info panel for selected node details
+ * - Instructions for user interaction
+ *
+ * Styling:
+ * - Dark theme with gradient background
+ * - Level-based node coloring (foundational: blue, core: orange, advanced: pink)
+ * - Animated entrance effects (fadeIn, slideIn)
+ * - Responsive design with mobile breakpoints
+ *
+ * @example
+ * ```html
+ * <app-knowledge-graph
+ *   [graphData]="myGraphData"
+ *   [title]="'My Knowledge Graph'"
+ *   [subtitle]="'Topic relationships'"
+ *   [backRoute]="'/home'">
+ * </app-knowledge-graph>
+ * ```
+ *
+ * @see PhysicsConceptGraphComponent - Example usage
+ * @see ClassicalMechanicsGraphComponent - Example usage
+ *
+ * @lifecycle
+ * - ngOnInit: Initial logging
+ * - ngAfterViewInit: Cytoscape initialization, event listeners setup
+ * - ngOnDestroy: Cleanup listeners and Cytoscape instance
+ *
+ * @version 1.0
+ * @since 2024
+ */
+
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -8,6 +67,16 @@ const dagre = require('cytoscape-dagre');
 // Register the dagre layout
 cytoscape.use(dagre);
 
+/**
+ * Represents a single node in the knowledge graph
+ *
+ * @interface KnowledgeNode
+ * @property {string} id - Unique identifier for the node
+ * @property {string} label - Display text for the node
+ * @property {string} description - Detailed description shown on selection
+ * @property {string} level - Categorization level for color coding
+ * @property {string} [color] - Optional custom hex color
+ */
 export interface KnowledgeNode {
   id: string;
   label: string;
@@ -16,17 +85,38 @@ export interface KnowledgeNode {
   color?: string;
 }
 
+/**
+ * Represents a directed edge between two nodes
+ *
+ * @interface KnowledgeEdge
+ * @property {string} source - ID of the source node
+ * @property {string} target - ID of the target node
+ * @property {string} label - Relationship type or description
+ */
 export interface KnowledgeEdge {
   source: string;
   target: string;
   label: string;
 }
 
+/**
+ * Complete graph data structure containing all nodes and edges
+ *
+ * @interface KnowledgeGraphData
+ * @property {KnowledgeNode[]} nodes - All nodes in the graph
+ * @property {KnowledgeEdge[]} edges - All edges connecting nodes
+ */
 export interface KnowledgeGraphData {
   nodes: KnowledgeNode[];
   edges: KnowledgeEdge[];
 }
 
+/**
+ * Generic Knowledge Graph Component
+ *
+ * Renders an interactive Cytoscape.js visualization from provided graph data.
+ * Supports pan, zoom, node selection, and edge relationship display.
+ */
 @Component({
   selector: 'app-knowledge-graph',
   templateUrl: './knowledge-graph.component.html',
@@ -163,6 +253,12 @@ export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
+  /**
+   * Converts graph data to Cytoscape.js element format
+   *
+   * @private
+   * @returns {any[]} Array of Cytoscape elements (nodes and edges)
+   */
   private buildCytoscapeElements(): any[] {
     const elements: any[] = [];
 
@@ -193,6 +289,12 @@ export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy
     return elements;
   }
 
+  /**
+   * Defines Cytoscape.js visual styling for nodes and edges
+   *
+   * @private
+   * @returns {any[]} Cytoscape style array with selectors and style properties
+   */
   private getCytoscapeStyle(): any[] {
     return [
       {
@@ -259,6 +361,11 @@ export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy
     ];
   }
 
+  /**
+   * Handles window resize events by resizing and refitting the graph
+   *
+   * @private
+   */
   private handleResize(): void {
     if (this.cy) {
       this.cy.resize();
@@ -266,12 +373,19 @@ export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
+  /**
+   * Fits the graph to the viewport with padding
+   * Called by the "Fit to View" button
+   */
   fitGraph(): void {
     if (this.cy) {
       this.cy.fit(null, 40);
     }
   }
 
+  /**
+   * Navigates back to the configured back route
+   */
   goBack(): void {
     this.router.navigate([this.backRoute]);
   }

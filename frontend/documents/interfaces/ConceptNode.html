@@ -1050,7 +1050,7 @@
                 <h3>Description</h3>
             </p>
             <p class="comment">
-                <p>Physics Concept Graph<br>Represents the relationships and dependencies between physics concepts<br>Organized from foundational concepts to advanced specializations</p>
+                <p>Physics Concept Graph Data Structure<br>Represents a single concept node in the physics curriculum graph</p>
 
             </p>
 
@@ -1200,12 +1200,27 @@
   color?: string;
 }
 
+/**
+ * Represents a directed edge between two concepts showing their relationship
+ *
+ * @interface ConceptEdge
+ * @property {string} source - ID of the source concept node
+ * @property {string} target - ID of the target concept node
+ * @property {string} label - Type of relationship (e.g., &quot;leads to&quot;, &quot;required for&quot;, &quot;extends&quot;, &quot;foundation for&quot;)
+ */
 export interface ConceptEdge {
   source: string;
   target: string;
   label: string; // e.g., &quot;leads to&quot;, &quot;required for&quot;, &quot;extends&quot;
 }
 
+/**
+ * Complete physics concept graph data structure
+ *
+ * @interface PhysicsConceptGraph
+ * @property {ConceptNode[]} nodes - Array of all concept nodes in the graph
+ * @property {ConceptEdge[]} edges - Array of all directed edges showing relationships
+ */
 export interface PhysicsConceptGraph {
   nodes: ConceptNode[];
   edges: ConceptEdge[];

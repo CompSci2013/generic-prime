@@ -1046,6 +1046,13 @@
             <code>src/app/features/physics/classical-mechanics-graph.ts</code>
         </p>
 
+            <p class="comment">
+                <h3>Description</h3>
+            </p>
+            <p class="comment">
+                <p>Represents a directed edge between two topics</p>
+
+            </p>
 
 
 
@@ -1141,12 +1148,27 @@
   color?: string;
 }
 
+/**
+ * Represents a directed edge between two topics
+ *
+ * @interface TopicEdge
+ * @property {string} source - ID of the source topic node
+ * @property {string} target - ID of the target topic node
+ * @property {string} label - Relationship type (prerequisite/foundation/extends/related)
+ */
 export interface TopicEdge {
   source: string;
   target: string;
   label: string; // e.g., &quot;prerequisite&quot;, &quot;extends&quot;, &quot;related&quot;
 }
 
+/**
+ * Complete topic graph data structure
+ *
+ * @interface TopicGraph
+ * @property {TopicNode[]} nodes - All topic nodes
+ * @property {TopicEdge[]} edges - All topic relationships
+ */
 export interface TopicGraph {
   nodes: TopicNode[];
   edges: TopicEdge[];

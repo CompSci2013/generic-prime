@@ -1,3 +1,22 @@
+<!--
+  Physics Concept Graph Template
+
+  Purpose: Renders interactive Cytoscape.js visualization of physics concepts and dependencies
+
+  Template Structure:
+  1. Header Section: Back button, title, subtitle, and description
+  2. Cytoscape Container: Interactive graph canvas with fit-to-view button
+  3. Edge Tooltip: Hover tooltip showing relationship labels
+  4. Legend Section: Color-coded learning levels (Foundational/Intermediate/Advanced)
+  5. Info Panel: Selected node details with level badge and description
+  6. Instructions: Usage guide for graph interaction
+
+  Styling: Dark theme with cyan accents, level-based node colors (#64c8ff, #ffa500, #ff6b9d)
+  Animations: fadeInDown (header), fadeIn (canvas), fadeInUp (legend/instructions), slideIn (info panel)
+  Responsive: Mobile breakpoint at 768px, reduced canvas height on mobile
+
+  Component Reference: {@link PhysicsConceptGraphComponent}
+-->
 <div class="concept-graph-container">
   <!-- Header Section -->
   <div class="header">

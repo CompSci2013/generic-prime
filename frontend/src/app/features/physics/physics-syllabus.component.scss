@@ -1,3 +1,33 @@
+/**
+ * Physics Syllabus Component Styles
+ *
+ * Purpose: Provides dark theme styling for the physics syllabus detail page
+ * Theme: Dark mode with cyan accents (#64c8ff, #4ba3d9)
+ * Color Palette:
+ *   - Primary accent: #64c8ff (cyan)
+ *   - Secondary accent: #4ba3d9 (darker cyan)
+ *   - Error/warning: #ff6b9d (pink)
+ *   - Text primary: #ffffff (white)
+ *   - Text secondary: #b0b0b0 (light gray)
+ *   - Text tertiary: #999 (medium gray)
+ *   - Background dark: #1a1a1a, #2d2d2d (dark gradients)
+ *   - Card backgrounds: Transparent cyan overlays
+ *
+ * Responsive Design:
+ *   - Default: Desktop layout with two-column grid for topic cards
+ *   - Mobile (768px breakpoint): Single column, reduced padding, smaller fonts
+ *
+ * Animations:
+ *   - fadeInDown: Header entrance (0.8s)
+ *   - fadeInUp: Syllabus section entrance (0.8s with 0.2s delay)
+ *   - transform transitions: Card hover states (0.3s)
+ *
+ * Layout Features:
+ *   - Topic Cards Grid: Auto 1fr with numbered badges
+ *   - Header Content: Centered with gradient background
+ *   - Key Points: Bulleted list with custom cyan bullets
+ */
+
 .syllabus-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);

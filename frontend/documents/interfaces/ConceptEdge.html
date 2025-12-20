@@ -1046,6 +1046,13 @@
             <code>src/app/features/physics/physics-concept-graph.ts</code>
         </p>
 
+            <p class="comment">
+                <h3>Description</h3>
+            </p>
+            <p class="comment">
+                <p>Represents a directed edge between two concepts showing their relationship</p>
+
+            </p>
 
 
 
@@ -1141,12 +1148,27 @@
   color?: string;
 }
 
+/**
+ * Represents a directed edge between two concepts showing their relationship
+ *
+ * @interface ConceptEdge
+ * @property {string} source - ID of the source concept node
+ * @property {string} target - ID of the target concept node
+ * @property {string} label - Type of relationship (e.g., &quot;leads to&quot;, &quot;required for&quot;, &quot;extends&quot;, &quot;foundation for&quot;)
+ */
 export interface ConceptEdge {
   source: string;
   target: string;
   label: string; // e.g., &quot;leads to&quot;, &quot;required for&quot;, &quot;extends&quot;
 }
 
+/**
+ * Complete physics concept graph data structure
+ *
+ * @interface PhysicsConceptGraph
+ * @property {ConceptNode[]} nodes - Array of all concept nodes in the graph
+ * @property {ConceptEdge[]} edges - Array of all directed edges showing relationships
+ */
 export interface PhysicsConceptGraph {
   nodes: ConceptNode[];
   edges: ConceptEdge[];

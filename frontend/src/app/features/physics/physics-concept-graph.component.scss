@@ -1,3 +1,41 @@
+/**
+ * Physics Concept Graph Component Styles
+ * Styles for interactive Cytoscape.js visualization of physics concept relationships
+ *
+ * Color Palette:
+ * - Primary Blue: #64c8ff (foundational concepts, accents)
+ * - Orange: #ffa500 (intermediate level)
+ * - Pink: #ff6b9d (advanced/specialization level)
+ * - Dark Background: #1a1a1a to #2d2d2d gradient
+ * - Text: #ffffff (primary), #b0b0b0 (secondary), #888 (tertiary)
+ *
+ * Animations:
+ * - fadeIn: Simple opacity transition
+ * - fadeInDown: Header entrance from top
+ * - fadeInUp: Legend/instructions entrance from bottom
+ * - slideIn: Info panel slide from left
+ *
+ * Layout Structure:
+ * - .concept-graph-container: Full-page flexbox container with dark gradient
+ * - .header: Top section with back button and title
+ * - .canvas-wrapper-outer: Main visualization area with fit button
+ * - .legend-section: Color-coded level key
+ * - .info-panel: Node details panel (shown on selection)
+ * - .instructions: Usage guide
+ *
+ * Features:
+ * - Cytoscape.js graph fills 500px min-height canvas wrapper
+ * - Edge tooltip follows cursor on hover
+ * - Responsive grid layout for legend items
+ * - Level badges with color-coding (foundational/intermediate/advanced/specialization)
+ * - Smooth animations with staggered delays (0.2s, 0.4s, 0.6s)
+ *
+ * Responsive Design:
+ * - Mobile breakpoint at 768px reduces padding and font sizes
+ * - Canvas min-height reduced to 400px on mobile
+ * - Legend switches to single column layout
+ */
+
 .concept-graph-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);

@@ -1,7 +1,56 @@
+/**
+ * Classical Mechanics Graph Component
+ *
+ * @fileoverview
+ * Wrapper component that displays the Classical Mechanics topic graph using the generic
+ * KnowledgeGraphComponent. Loads data from CLASSICAL_MECHANICS_GRAPH constant and
+ * transforms it to the KnowledgeGraphData format.
+ *
+ * @remarks
+ * Architecture:
+ * - Thin wrapper around KnowledgeGraphComponent
+ * - Loads topic graph from classical-mechanics-graph.ts
+ * - Maps TopicNode/TopicEdge to KnowledgeNode/KnowledgeEdge format
+ * - Configures title, subtitle, and back route for classical mechanics context
+ *
+ * Template:
+ * - Inline template rendering app-knowledge-graph selector
+ * - Conditional rendering with *ngIf="graphData"
+ * - Passes transformed graph data via [graphData] input
+ * - Sets contextual title and subtitle
+ * - Back route navigates to /physics
+ *
+ * Data Flow:
+ * 1. ngOnInit loads CLASSICAL_MECHANICS_GRAPH
+ * 2. Maps nodes and edges to KnowledgeGraphData format
+ * 3. Template renders KnowledgeGraphComponent with data
+ *
+ * @example
+ * Route configuration:
+ * ```typescript
+ * { path: 'classical-mechanics/graph', component: ClassicalMechanicsGraphComponent }
+ * ```
+ *
+ * @see KnowledgeGraphComponent - Reusable graph visualization
+ * @see CLASSICAL_MECHANICS_GRAPH - Topic graph data
+ *
+ * @lifecycle
+ * - ngOnInit: Transforms and loads graph data
+ *
+ * @version 1.0
+ * @since 2024
+ */
+
 import { Component, OnInit } from '@angular/core';
 import { CLASSICAL_MECHANICS_GRAPH } from './classical-mechanics-graph';
 import { KnowledgeGraphData } from './knowledge-graph.component';
 
+/**
+ * Classical Mechanics Knowledge Graph Display Component
+ *
+ * Displays the hierarchical topic graph for Classical Mechanics curriculum
+ * using the generic KnowledgeGraphComponent.
+ */
 @Component({
   selector: 'app-classical-mechanics-graph',
   template: `

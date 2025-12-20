@@ -1,8 +1,55 @@
 /**
- * Classical Mechanics Topic Graph
- * Represents the hierarchical and relational structure of classical mechanics topics
+ * Classical Mechanics Topic Graph Data Structure
+ *
+ * @fileoverview
+ * Defines the complete topic dependency graph for the Classical Mechanics course.
+ * Represents hierarchical relationships between topics from foundational concepts
+ * (vectors, Newtonian mechanics) through core topics (rigid bodies, gravitation)
+ * to advanced topics (Lagrangian, Hamiltonian, relativity).
+ *
+ * @remarks
+ * Graph Structure:
+ * - 18 nodes representing classical mechanics topics
+ * - 27 edges showing prerequisite, foundation, extension relationships
+ * - 3 levels: foundational (blue), core (orange), advanced (pink)
+ * - Organized to support curriculum planning and concept mapping
+ *
+ * Relationship Types:
+ * - "prerequisite": Required knowledge before studying target topic
+ * - "foundation": Provides conceptual basis for target topic
+ * - "extends": Target topic builds upon and expands source topic
+ * - "related": Topics share connections but no strict dependency
+ *
+ * Usage:
+ * - Used by ClassicalMechanicsGraphComponent
+ * - Visualized via KnowledgeGraphComponent with Cytoscape.js
+ * - Exported as constant CLASSICAL_MECHANICS_GRAPH
+ * - Nodes: id, label, description, level, color
+ * - Edges: source, target, relationship label
+ *
+ * Course Coverage:
+ * - Foundational: Vectors/Calculus, Newtonian Mechanics, 1D Motion (3 topics)
+ * - Core: 2D/3D Motion, Particle Systems, Rigid Bodies, Gravitation, Rotating Frames, Continuous Media (6 topics)
+ * - Advanced: Lagrange Equations, Tensors, Rigid Body Rotation, Small Vibrations, Special Relativity, Relativistic Dynamics, Central Forces, Hamiltonian (9 topics)
+ *
+ * @see ClassicalMechanicsGraphComponent
+ * @see KnowledgeGraphComponent
+ * @see PhysicsKnowledgePath (syllabus details)
+ *
+ * @version 1.0
+ * @since 2024
  */
 
+/**
+ * Represents a single topic node in the classical mechanics curriculum
+ *
+ * @interface TopicNode
+ * @property {string} id - Unique identifier (kebab-case)
+ * @property {string} label - Display name of the topic
+ * @property {string} description - Brief explanation of topic content
+ * @property {string} level - Academic level (foundational/core/advanced)
+ * @property {string} [color] - Optional hex color for visualization
+ */
 export interface TopicNode {
   id: string;
   label: string;
@@ -11,12 +58,27 @@ export interface TopicNode {
   color?: string;
 }
 
+/**
+ * Represents a directed edge between two topics
+ *
+ * @interface TopicEdge
+ * @property {string} source - ID of the source topic node
+ * @property {string} target - ID of the target topic node
+ * @property {string} label - Relationship type (prerequisite/foundation/extends/related)
+ */
 export interface TopicEdge {
   source: string;
   target: string;
   label: string; // e.g., "prerequisite", "extends", "related"
 }
 
+/**
+ * Complete topic graph data structure
+ *
+ * @interface TopicGraph
+ * @property {TopicNode[]} nodes - All topic nodes
+ * @property {TopicEdge[]} edges - All topic relationships
+ */
 export interface TopicGraph {
   nodes: TopicNode[];
   edges: TopicEdge[];

@@ -1,9 +1,48 @@
 /**
- * Physics Concept Graph
- * Represents the relationships and dependencies between physics concepts
- * Organized from foundational concepts to advanced specializations
+ * Physics Concept Graph Data Structure
+ *
+ * @fileoverview
+ * Defines the complete concept dependency graph for physics curriculum with specialization
+ * in Thermodynamics and Solid State Matter. This graph represents the hierarchical progression
+ * from foundational physics concepts through intermediate core topics to advanced PhD-level
+ * specializations.
+ *
+ * @remarks
+ * The graph structure enables visualization of:
+ * - Prerequisite relationships between concepts
+ * - Conceptual dependencies and progression paths
+ * - Level-based organization (foundational → intermediate → advanced → specialization)
+ * - Cross-topic connections and relationships
+ *
+ * Structure:
+ * - 17 nodes representing major physics concepts
+ * - 26 edges representing relationships (prerequisites, foundations, extensions)
+ * - 4 concept levels: foundational, intermediate, advanced, specialization
+ * - Color-coded by level for visual clarity
+ *
+ * Usage:
+ * - Used by PhysicsConceptGraphComponent for Cytoscape.js visualization
+ * - Exported as constant PHYSICS_CONCEPT_GRAPH
+ * - Nodes include id, label, level, description, color
+ * - Edges include source, target, relationship label
+ *
+ * @see PhysicsConceptGraphComponent
+ * @see KnowledgeGraphComponent
+ *
+ * @version 1.0
+ * @since 2024
  */
 
+/**
+ * Represents a single concept node in the physics curriculum graph
+ *
+ * @interface ConceptNode
+ * @property {string} id - Unique identifier for the concept (kebab-case)
+ * @property {string} label - Display name of the concept
+ * @property {string} level - Academic level (foundational/intermediate/advanced/specialization)
+ * @property {string} description - Brief explanation of the concept
+ * @property {string} [color] - Optional hex color for visualization (defaults by level)
+ */
 export interface ConceptNode {
   id: string;
   label: string;
@@ -12,12 +51,27 @@ export interface ConceptNode {
   color?: string;
 }
 
+/**
+ * Represents a directed edge between two concepts showing their relationship
+ *
+ * @interface ConceptEdge
+ * @property {string} source - ID of the source concept node
+ * @property {string} target - ID of the target concept node
+ * @property {string} label - Type of relationship (e.g., "leads to", "required for", "extends", "foundation for")
+ */
 export interface ConceptEdge {
   source: string;
   target: string;
   label: string; // e.g., "leads to", "required for", "extends"
 }
 
+/**
+ * Complete physics concept graph data structure
+ *
+ * @interface PhysicsConceptGraph
+ * @property {ConceptNode[]} nodes - Array of all concept nodes in the graph
+ * @property {ConceptEdge[]} edges - Array of all directed edges showing relationships
+ */
 export interface PhysicsConceptGraph {
   nodes: ConceptNode[];
   edges: ConceptEdge[];

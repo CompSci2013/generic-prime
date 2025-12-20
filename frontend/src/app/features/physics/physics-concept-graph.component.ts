@@ -9,6 +9,11 @@ const dagre = require('cytoscape-dagre');
 // Register the dagre layout
 cytoscape.use(dagre);
 
+/**
+ * Cytoscape Node Data Structure
+ *
+ * Defines the data format for nodes in the Cytoscape graph
+ */
 interface CytoscapeNode {
   data: {
     id: string;
@@ -19,6 +24,11 @@ interface CytoscapeNode {
   };
 }
 
+/**
+ * Cytoscape Edge Data Structure
+ *
+ * Defines the data format for edges (connections) in the Cytoscape graph
+ */
 interface CytoscapeEdge {
   data: {
     source: string;
@@ -27,6 +37,73 @@ interface CytoscapeEdge {
   };
 }
 
+/**
+ * Physics Concept Graph Component
+ *
+ * Renders an interactive Cytoscape.js graph visualization showing the relationships and dependencies
+ * between physics concepts in the PhD curriculum. Uses the dagre layout algorithm for hierarchical
+ * positioning and supports pan, zoom, and node selection interactions.
+ *
+ * @remarks
+ * - Uses Cytoscape.js library for graph rendering and interaction
+ * - Applies dagre layout for left-to-right hierarchical arrangement
+ * - Color-codes nodes by learning level (foundational, intermediate, advanced)
+ * - Shows edge labels on hover via custom tooltip
+ * - Provides click navigation to detailed knowledge graphs for specific topics
+ * - Handles responsive canvas sizing and window resize events
+ *
+ * @architecture
+ * **Purpose**: Interactive visualization of physics concept dependencies
+ * **Pattern**: Canvas-based graph component with Cytoscape.js
+ * **Libraries**:
+ *   - Cytoscape.js: Core graph rendering and interaction
+ *   - Cytoscape-dagre: Hierarchical layout algorithm
+ * **Navigation Flow**:
+ *   - User arrives from /physics → Views concept graph at /physics/concept-graph
+ *   - Clicks node (e.g., Classical Mechanics) → Navigates to /physics/classical-mechanics-graph
+ *   - Can pan, zoom, and explore the full curriculum graph
+ *
+ * @template
+ * The component uses an interactive graph layout:
+ * 1. **Header Section**: Title, subtitle, and back button
+ * 2. **Canvas Wrapper**: Cytoscape container with fit-to-view button
+ * 3. **Edge Tooltip**: Position-tracked tooltip for edge hover labels
+ * 4. **Legend Section**: Color key for learning levels
+ * 5. **Info Panel**: Dynamic panel showing selected node details
+ * 6. **Instructions**: User guide for graph interaction
+ *
+ * @styling
+ * - Dark theme with level-specific node colors
+ * - Foundational: #64c8ff (cyan)
+ * - Intermediate: #ffa500 (orange)
+ * - Advanced/Specialization: #ff6b9d (pink)
+ * - Canvas: 500px height with responsive adjustments
+ * - Animations: fadeInDown, fadeInUp, slideIn
+ *
+ * @example
+ * ```typescript
+ * // Usage in routing module
+ * {
+ *   path: 'concept-graph',
+ *   component: PhysicsConceptGraphComponent
+ * }
+ * ```
+ *
+ * @seeAlso
+ * - {@link PHYSICS_CONCEPT_GRAPH} - Data source for graph nodes and edges
+ * - {@link KnowledgeGraphComponent} - Generic reusable graph component
+ * - {@link ClassicalMechanicsGraphComponent} - Detailed topic graph
+ * - {@link ConceptNode} - Node data interface
+ * - {@link ConceptEdge} - Edge data interface
+ *
+ * @lifecycle
+ * - **ngOnInit**: Logs initialization
+ * - **ngAfterViewInit**: Initializes Cytoscape graph, sets up event listeners
+ * - **ngOnDestroy**: Destroys Cytoscape instance, removes event listeners
+ *
+ * @version 1.0
+ * @since 1.0.0 (Added as part of physics domain implementation)
+ */
 @Component({
   selector: 'app-physics-concept-graph',
   templateUrl: './physics-concept-graph.component.html',

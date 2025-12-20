@@ -1,3 +1,20 @@
+<!--
+  Physics Syllabus Detail Page Template
+
+  Purpose: Displays detailed syllabus for a selected physics course with topics, descriptions, and key points
+
+  Template Structure:
+  1. Header Section: Back button, course icon, title, description, and topic count
+  2. Syllabus Topics Section: List of numbered topic cards with key points
+  3. Empty State: Message when syllabus data is unavailable
+  4. Error State: Fallback when no course node is selected
+
+  Styling: Dark theme with cyan accents (#64c8ff), numbered badges, topic cards
+  Animations: fadeInDown (header), fadeInUp (topics with 0.2s delay)
+  Responsive: Mobile breakpoint at 768px, grid layout changes to single column
+
+  Component Reference: {@link PhysicsSyllabusComponent}
+-->
 <div class="syllabus-container" *ngIf="selectedNode">
   <!-- Header Section -->
   <div class="header">
