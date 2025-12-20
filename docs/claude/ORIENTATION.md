@@ -625,73 +625,66 @@ podman exec -it generic-prime-frontend-dev npm run build
 
 ## E2E Testing with Playwright
 
-### ⭐ Recommended: All-in-One Single Terminal
+### ⭐ Recommended: Three Separate Terminals
 
-This is the **easiest setup** - everything in one terminal:
+This is the **best approach for development** - proven and tested:
 
 ```bash
+# Terminal 1: Dev server with live compilation
 cd ~/projects/generic-prime/frontend
-npm run dev:all
+npm run dev:server
+# → http://192.168.0.244:4205
+
+# Terminal 2: Test report viewer (always visible)
+npm run test:report
+# → http://192.168.0.244:9323
+
+# Terminal 3: Run tests on demand
+npm run test:e2e
+# (can run repeatedly without restarting other services)
 ```
 
-This starts **three services simultaneously**:
-1. **Angular Dev Server** on port 4205 (dev app)
-2. **Playwright UI Mode** on port 3000 (auto-reruns tests)
-3. **Test Report Server** on port 9323 (results viewer)
-
-**Then open three browser windows:**
+**Then open TWO browser windows:**
 ```
 Windows PC Browser 1: http://192.168.0.244:4205 (Dev App)
-Windows PC Browser 2: http://localhost:3000 (Playwright UI)
-Windows PC Browser 3: http://192.168.0.244:9323 (Test Results)
+Windows PC Browser 2: http://192.168.0.244:9323 (Test Results)
 ```
 
 **Your Development Workflow**:
 1. Edit code in VS Code
-2. See changes compile in Terminal → Dev app browser updates (4205)
-3. Playwright automatically reruns tests → Tests browser shows execution (3000)
-4. Test failures visible immediately → Results browser shows summary (9323)
-5. Fix code → Tests auto-rerun → See green checkmarks!
+2. See changes compile in Terminal 1 → Dev app browser updates (4205)
+3. Run `npm run test:e2e` in Terminal 3 whenever ready
+4. Test results appear in Terminal 2 browser (9323)
+5. Fix code → Run tests again → Repeat!
 
 **Advantages**:
-- ✅ Single terminal - no context switching
-- ✅ Auto-recompilation with hot reload
-- ✅ Tests auto-run when code changes
-- ✅ Colored output for easy reading
-- ✅ All browsers accessible from Windows PC
-- ✅ Exit with Ctrl+C stops all services
+- ✅ Full control - restart services independently
+- ✅ Report stays visible at all times
+- ✅ Run tests on your schedule
+- ✅ Easy to see which service is doing what
+- ✅ Can fix and test individual features
+- ✅ **This is the approach that works best**
 
 ---
 
-### Alternative: Traditional Multi-Terminal Setup
+### Alternative: Single Terminal (`npm run dev:all`)
 
-If you prefer separate terminals:
+If you prefer everything in one command:
 
 ```bash
-# Terminal 1: Start dev server (watch for Angular compilation)
 cd ~/projects/generic-prime/frontend
-npm run dev:server
-# Server running at http://192.168.0.244:4205
-
-# Terminal 2: View test results (static report viewer)
-npm run test:report
-# Report available at http://192.168.0.244:9323
-
-# Terminal 3: Run tests when needed
-npm run test:e2e
-# After completion, refresh Terminal 2 browser to see results
-
-# Repeat as needed:
-# 1. Edit code in VS Code
-# 2. Watch changes in Terminal 1 browser (4205)
-# 3. Run tests in Terminal 3 when ready
-# 4. View results in Terminal 2 browser (9323)
+npm run dev:all
+# Runs: dev server + tests (once) + report server
+# Tests exit after completion, but dev & report servers keep running
+# To re-run tests: open another terminal and run npm run test:e2e
 ```
 
-**Use this if**:
-- You prefer separate terminal windows
-- You want more control over each service
-- You need to restart individual services without affecting others
+**When to use this**:
+- You prefer a single command to get started
+- You want less terminal clutter
+- Good for quick validation runs
+
+**Note**: Thor is a headless environment, so interactive test mode (Playwright UI) isn't available. The single-terminal approach is less powerful than three separate terminals.
 
 ### Alternative: Interactive Test Mode
 

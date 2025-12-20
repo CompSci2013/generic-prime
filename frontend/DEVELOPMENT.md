@@ -7,12 +7,19 @@ cd ~/projects/generic-prime/frontend
 npm run dev:all
 ```
 
-Then open three browser windows:
-1. **Dev App**: http://192.168.0.244:4205
-2. **Tests**: http://localhost:3000
-3. **Results**: http://192.168.0.244:9323
+**What happens:**
+- Angular dev server starts on port **4205**
+- Playwright tests run once (~11 seconds)
+- Test report server starts on port **9323**
+- After tests complete, all services stay running
 
-Edit code → See changes → Tests auto-run → Done! 🚀
+Then open TWO browser windows:
+1. **Dev App**: http://192.168.0.244:4205 (dev server)
+2. **Results**: http://192.168.0.244:9323 (test results)
+
+**Edit code → See changes compile → Check test results** 🚀
+
+**Note**: Thor is a headless environment, so interactive test mode (--ui) isn't available. Tests run once; use `npm run test:e2e` in another terminal to re-run them manually.
 
 ---
 
@@ -22,27 +29,77 @@ Starts **three services in one terminal** with colored output:
 
 ```
 [DEV]    ✓ Compiled successfully (port 4205)
-[TEST]   ✓ Tests passed: 33/33
-[REPORT] ✓ Report server running (port 9323)
+[TEST]   Running 63 tests...
+[TEST]   ✓ Tests completed (3 passed, 2 failed, 58 skipped)
+[REPORT] ✓ Report server running at http://0.0.0.0:9323
 ```
 
-- **Dev App** (port 4205): Your application
-- **Playwright UI** (port 3000): Auto-runs tests, shows execution
-- **Report Server** (port 9323): HTML test results
+- **Dev App** (port 4205): Your application - hot reloads on code changes
+- **Playwright Tests**: Run all 63 tests once (~11 seconds)
+- **Report Server** (port 9323): HTML test results viewer
+
+The test service exits after tests complete, but Dev and Report services keep running.
+
+To re-run tests while dev:all is active: Open another terminal and run `npm run test:e2e`
 
 Stop everything: Press **Ctrl+C**
 
 ---
 
-## All npm Commands
+## Recommended: Three Separate Terminals (More Control)
 
-| Command | What it does | One terminal? |
-|---------|-------------|---|
-| `npm run dev:all` | All three services together | ✅ YES |
-| `npm run dev:server` | Just the dev server | Manual 1 |
-| `npm run test:e2e` | Run tests once | No |
-| `npm run test:watch` | Interactive test mode | Manual 1 |
-| `npm run test:report` | Just the report server | Manual 1 |
+This is the **BEST approach** for development - you've already discovered this works perfectly:
+
+```bash
+# Terminal 1: Dev server (watches for changes)
+npm run dev:server
+
+# Terminal 2: Report server (always running)
+npm run test:report
+
+# Terminal 3: Run tests on demand
+npm run test:e2e
+# (after tests complete, you can run this again whenever you want)
+```
+
+**Why this is better:**
+- ✅ Full control - restart any service independently
+- ✅ Report stays visible at http://192.168.0.244:9323 at all times
+- ✅ Run tests manually whenever you want
+- ✅ Easy to see which service is doing what
+- ✅ Can restart tests without restarting the dev server
+- ✅ This is what you had working before
+
+**Use this approach!**
+
+---
+
+## Alternative: Single Terminal with `npm run dev:all`
+
+If you want everything in one terminal:
+
+```bash
+npm run dev:all
+# Runs: dev server + tests (once) + report server
+# To re-run tests: open another terminal and run npm run test:e2e
+```
+
+**Why you might use this:**
+- Simpler setup (one command)
+- Less terminal clutter
+- Good for quick validation
+
+---
+
+## All npm Commands Reference
+
+| Command | Purpose |
+|---------|---------|
+| `npm run dev:server` | Just the Angular dev server (port 4205) |
+| `npm run test:e2e` | Run all tests once |
+| `npm run test:report` | View test results server (port 9323) |
+| `npm run dev:all` | All three together (one terminal) |
+| `npm run test:watch` | Interactive test mode (requires X Server, not available on Thor) |
 
 ---
 
