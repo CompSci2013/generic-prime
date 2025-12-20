@@ -90,10 +90,29 @@
  * @see CLASSICAL_MECHANICS_GRAPH - The exported instance
  */
 export interface TopicNode {
+  /**
+   * Unique identifier in kebab-case (e.g., "newtonian-mechanics", "rigid-bodies")
+   */
   id: string;
+
+  /**
+   * Display name of the topic (human-readable)
+   */
   label: string;
+
+  /**
+   * Brief explanation of the topic's content and scope
+   */
   description: string;
+
+  /**
+   * Academic level classification (foundational/core/advanced)
+   */
   level: 'foundational' | 'core' | 'advanced';
+
+  /**
+   * Optional hex color for graph visualization (overrides level default)
+   */
   color?: string;
 }
 
@@ -148,8 +167,19 @@ export interface TopicNode {
  * @see CLASSICAL_MECHANICS_GRAPH - The exported instance
  */
 export interface TopicEdge {
+  /**
+   * ID of the source (origin) topic node
+   */
   source: string;
+
+  /**
+   * ID of the target (destination) topic node
+   */
   target: string;
+
+  /**
+   * Relationship type describing the edge (prerequisite/foundation/extends/related)
+   */
   label: string;
 }
 
@@ -169,7 +199,14 @@ export interface TopicEdge {
  * @see TopicEdge - Relationships between topics
  */
 export interface TopicGraph {
+  /**
+   * All topic nodes in the curriculum graph
+   */
   nodes: TopicNode[];
+
+  /**
+   * All topic relationships and dependencies
+   */
   edges: TopicEdge[];
 }
 
