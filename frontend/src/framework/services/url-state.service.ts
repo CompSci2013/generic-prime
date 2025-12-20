@@ -33,13 +33,35 @@ import { map, distinctUntilChanged, filter } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class UrlStateService {
+  /**
+   * Subject that holds the current URL query parameters
+   *
+   * BehaviorSubject that tracks current query parameters from the URL.
+   * Emits whenever route query parameters change via router navigation.
+   * Initialized in constructor from current route params.
+   *
+   * @private
+   */
   private paramsSubject = new BehaviorSubject<Params>({});
 
   /**
    * Observable stream of URL query parameters
+   *
+   * Public observable that emits current and future URL query parameters.
+   * Subscribers receive updates whenever the URL query parameters change.
+   * Used by watchParams() to provide type-safe filtered streams.
    */
   public params$: Observable<Params> = this.paramsSubject.asObservable();
 
+  /**
+   * Constructor for dependency injection
+   *
+   * Initializes URL state service by reading current route parameters and
+   * setting up automatic synchronization with Angular router navigation events.
+   *
+   * @param router - Angular Router for navigation and state updates
+   * @param route - ActivatedRoute for reading current route parameters
+   */
   constructor(
     private router: Router,
     private route: ActivatedRoute

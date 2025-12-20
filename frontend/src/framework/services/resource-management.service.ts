@@ -93,10 +93,40 @@ import { UrlStateService } from './url-state.service';
 @Injectable()
 export class ResourceManagementService<TFilters, TData, TStatistics = any>
   implements OnDestroy {
+  /**
+   * Internal state BehaviorSubject
+   *
+   * Single source of truth for all service state (filters, results, loading, error, statistics).
+   * All public observable streams (state$, filters$, results$, etc.) are derived from this subject.
+   * Updated by updateState() when URL changes or API calls complete.
+   *
+   * @private
+   */
   private stateSubject: BehaviorSubject<
     ResourceState<TFilters, TData, TStatistics>
   >;
+
+  /**
+   * RxJS Subject for component destruction cleanup
+   *
+   * Emits when ngOnDestroy is called, signaling all subscribers to
+   * unsubscribe. Used with takeUntil() in internal subscriptions.
+   *
+   * @private
+   */
   private destroy$ = new Subject<void>();
+
+  /**
+   * Service configuration from DOMAIN_CONFIG
+   *
+   * Merged configuration containing:
+   * - filterMapper: URL ↔ filter object conversion
+   * - apiAdapter: API calls for this domain
+   * - defaultFilters: Initial filter values
+   * - autoFetch: Whether to call API (disabled in pop-outs)
+   *
+   * @private
+   */
   private config: ResourceManagementConfig<TFilters, TData, TStatistics>;
 
   /**
@@ -139,6 +169,16 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
    */
   public highlights$: Observable<any>;
 
+  /**
+   * Constructor for dependency injection
+   *
+   * Initializes service with domain configuration and sets up state management,
+   * observable streams, and URL/pop-out synchronization.
+   *
+   * @param urlState - UrlStateService for URL parameter synchronization
+   * @param domainConfig - Domain configuration with filter mappers and API adapters (injected)
+   * @param popOutContext - PopOutContextService for pop-out window detection
+   */
   constructor(
     private urlState: UrlStateService,
     @Inject(DOMAIN_CONFIG)
