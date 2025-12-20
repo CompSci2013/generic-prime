@@ -44,7 +44,7 @@
     "@types/plotly.js": "^3.0.8",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "compodoc": "^0.0.41",
+    "@compodoc/compodoc": "^1.1.32",
     "concurrently": "^9.2.1",
     "eslint": "^8.57.0",
     "http-server": "^14.1.1",
