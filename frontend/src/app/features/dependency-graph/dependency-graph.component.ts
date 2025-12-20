@@ -253,6 +253,37 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * Initialize Cytoscape.js instance with complete dependency graph configuration
+   *
+   * Creates and configures the Cytoscape instance with:
+   * - Dagre hierarchical layout (left-to-right)
+   * - All 118 dependency nodes from ALL_DEPENDENCY_NODES
+   * - All 350+ edges from ALL_DEPENDENCY_EDGES
+   * - Event handlers for node selection and visualization
+   * - Custom styling via getCytoscapeStyle()
+   *
+   * @private
+   * @remarks
+   * **Configuration**:
+   * - Uses Dagre layout for automatic hierarchical positioning
+   * - Configures 2.25x wheel sensitivity for responsive zooming
+   * - Enables animation on layout (500ms duration)
+   * - Sets up tap event handlers for node selection
+   * - Calls fitToView() after 500ms to center the graph
+   *
+   * **Event Handling**:
+   * - Tap on node: Sets selectedNode, highlights node and adjacent nodes
+   * - Tap on background: Clears selection and resets highlighting
+   * - Errors caught and logged without breaking visualization
+   *
+   * **Error Handling**:
+   * - Validates cyContainer exists before initializing
+   * - Wraps event handlers in try-catch to prevent UI breakage
+   * - Catches and logs any initialization errors
+   *
+   * @throws {Error} If cyContainer element is not available
+   */
   private initializeCytoscape(): void {
     try {
       // Validate container exists
@@ -325,6 +356,44 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * Build Cytoscape.js element objects from dependency graph data
+   *
+   * Transforms raw dependency nodes and edges from dependency-graph.ts into the Cytoscape.js
+   * element format. Creates element objects with data, styling, and classification information.
+   *
+   * @private
+   * @returns {any[]} Array of Cytoscape element objects (nodes and edges combined)
+   *
+   * @remarks
+   * **Node Elements**:
+   * - Includes all properties from ALL_DEPENDENCY_NODES
+   * - Assigns node.category as CSS class for styling
+   * - Applies node.color and node.shape from dependency definition
+   * - Data includes: id, label, description, version
+   *
+   * **Edge Elements**:
+   * - Creates edge IDs in format: `source-target`
+   * - Assigns edge.type or 'uses' as CSS class
+   * - Data includes: source, target, and relationship label
+   * - Label is edge.type, edge.label, or empty string
+   *
+   * **Total Elements Returned**:
+   * - Nodes: 118 (from ALL_DEPENDENCY_NODES)
+   * - Edges: 350+ (from ALL_DEPENDENCY_EDGES)
+   * - Total: 468+ elements
+   *
+   * **Used By**:
+   * - initializeCytoscape() to populate the Cytoscape instance
+   * - Called during graph initialization with elements array
+   *
+   * @example
+   * ```typescript
+   * const elements = this.buildCytoscapeElements();
+   * // elements[0] = { data: { id: 'npm-angular', label: '@angular/core', ... }, classes: ['npm-peer'] }
+   * // elements[118+] = { data: { id: 'npm-angular-svc-api', source: 'npm-angular', target: 'svc-api' }, classes: ['imports'] }
+   * ```
+   */
   private buildCytoscapeElements(): any[] {
     const elements: any[] = [];
 
@@ -361,6 +430,58 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     return elements;
   }
 
+  /**
+   * Generate Cytoscape.js stylesheet definitions for graph visualization
+   *
+   * Creates comprehensive CSS-like styling rules for all node and edge types in the
+   * dependency graph. Defines colors, sizes, fonts, animations, and visual states
+   * for all 12 node categories and 6 edge types.
+   *
+   * @private
+   * @returns {any} Array of Cytoscape style objects defining node and edge appearance
+   *
+   * @remarks
+   * **Node Styling**:
+   * - Default node: 60px circles with category-based colors
+   * - Selected node: 80px circles with white border and glow effect
+   * - Adjacent node: Highlighted when parent is selected
+   * - Font: 11px Arial, white text, bold weight
+   *
+   * **Category Colors** (12 types):
+   * - npm-peer (Angular): #DD0031 (red)
+   * - npm-prod (Libraries): #3776AB (blue)
+   * - framework-service: #C7CEEA (purple)
+   * - framework-component: #F8B195 (orange)
+   * - framework-model: #95E1D3 (mint)
+   * - domain-adapter: #6BCB77 (green)
+   * - domain-config: #FFD93D (yellow)
+   * - domain-chart: #A8E6CF (emerald)
+   * - feature-component: #B4A7D6 (lavender)
+   * - build-tool: #E8DAEF (pink)
+   * - test-tool: #D7BDE2 (plum)
+   * - external-lib: #F5B7B1 (light red)
+   *
+   * **Edge Styling**:
+   * - Default edge: 1px gray lines with arrow tips
+   * - Edge types (imports, provides, injects, extends, implements, uses): Each with distinct style
+   * - Hover state: Thicker lines (2px) for visibility
+   *
+   * **Visual States**:
+   * - :selected - Node selection styling (larger, white border, glow)
+   * - :hover - Hover effects (opacity, cursor changes)
+   * - adjacent-node class - Highlighted neighbors of selected node
+   * - selected-node class - The actively selected node
+   *
+   * @used-by initializeCytoscape() passes result to Cytoscape constructor
+   *
+   * @example
+   * ```typescript
+   * const style = this.getCytoscapeStyle();
+   * // style[0] = { selector: 'node', style: { ... } }
+   * // style[1] = { selector: 'node.npm-peer', style: { 'background-color': '#DD0031' } }
+   * // style[12] = { selector: 'edge.imports', style: { 'line-color': '#333' } }
+   * ```
+   */
   private getCytoscapeStyle(): any {
     return [
       {
@@ -597,6 +718,43 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * Update node visibility based on category filters
+   *
+   * Filters the dependency graph to show/hide nodes according to the currently selected
+   * categories. Automatically hides edges when either endpoint is hidden, maintaining
+   * graph integrity. Recalculates zoom/pan to fit visible nodes.
+   *
+   * @private
+   * @remarks
+   * **Visibility Logic**:
+   * - Iterates all 118 nodes in the dependency graph
+   * - Checks each node's Cytoscape class set against visible categories
+   * - Sets node display to 'element' (visible) or 'none' (hidden)
+   * - Each node can belong to multiple categories (e.g., feature AND shared)
+   *
+   * **Edge Handling**:
+   * - Cascading visibility: edges are hidden if source OR target node is hidden
+   * - Prevents orphaned edges from appearing between hidden nodes
+   * - Ensures visual consistency in graph display
+   *
+   * **View Adjustment**:
+   * - Calls fitToView() after updating visibility
+   * - Re-centers and zooms to fit all currently visible nodes
+   * - Accounts for visibility changes in responsive zoom calculations
+   *
+   * **Performance**:
+   * - Uses forEach for node/edge iteration (Cytoscape collection operation)
+   * - Single pass through nodes and edges
+   * - No animation—instant visibility toggle
+   *
+   * **Called By**:
+   * - toggleCategory() - when user clicks category filter button
+   * - resetView() - when user resets all filters
+   *
+   * @see categoryFilters - Array of CategoryFilter objects determining visibility
+   * @see fitToView - Recalculates zoom/pan after visibility change
+   */
   private updateNodeVisibility(): void {
     const visibleCategories = this.categoryFilters
       .filter(f => f.visible)
