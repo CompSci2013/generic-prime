@@ -625,9 +625,47 @@ podman exec -it generic-prime-frontend-dev npm run build
 
 ## E2E Testing with Playwright
 
-### Quick Start: Live Development Workflow
+### ⭐ Recommended: All-in-One Single Terminal
 
-This is the **recommended setup for active development** - watch your code changes in real-time while monitoring test results:
+This is the **easiest setup** - everything in one terminal:
+
+```bash
+cd ~/projects/generic-prime/frontend
+npm run dev:all
+```
+
+This starts **three services simultaneously**:
+1. **Angular Dev Server** on port 4205 (dev app)
+2. **Playwright UI Mode** on port 3000 (auto-reruns tests)
+3. **Test Report Server** on port 9323 (results viewer)
+
+**Then open three browser windows:**
+```
+Windows PC Browser 1: http://192.168.0.244:4205 (Dev App)
+Windows PC Browser 2: http://localhost:3000 (Playwright UI)
+Windows PC Browser 3: http://192.168.0.244:9323 (Test Results)
+```
+
+**Your Development Workflow**:
+1. Edit code in VS Code
+2. See changes compile in Terminal → Dev app browser updates (4205)
+3. Playwright automatically reruns tests → Tests browser shows execution (3000)
+4. Test failures visible immediately → Results browser shows summary (9323)
+5. Fix code → Tests auto-rerun → See green checkmarks!
+
+**Advantages**:
+- ✅ Single terminal - no context switching
+- ✅ Auto-recompilation with hot reload
+- ✅ Tests auto-run when code changes
+- ✅ Colored output for easy reading
+- ✅ All browsers accessible from Windows PC
+- ✅ Exit with Ctrl+C stops all services
+
+---
+
+### Alternative: Traditional Multi-Terminal Setup
+
+If you prefer separate terminals:
 
 ```bash
 # Terminal 1: Start dev server (watch for Angular compilation)
@@ -650,11 +688,10 @@ npm run test:e2e
 # 4. View results in Terminal 2 browser (9323)
 ```
 
-**Workflow Benefits**:
-- ✅ Dev server auto-recompiles on file changes
-- ✅ Test results visible immediately after running
-- ✅ Catch regressions: app looks good but tests fail = bug found!
-- ✅ All three browsers accessible from Windows PC
+**Use this if**:
+- You prefer separate terminal windows
+- You want more control over each service
+- You need to restart individual services without affecting others
 
 ### Alternative: Interactive Test Mode
 

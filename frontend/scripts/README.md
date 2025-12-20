@@ -2,7 +2,31 @@
 
 This directory contains helper scripts for managing development and testing workflows.
 
-## Quick Start Workflows
+## ⭐ Ultra-Quick Start: Single Terminal
+
+Want everything in one terminal? **This is the easiest way:**
+
+```bash
+npm run dev:all
+```
+
+This starts **all three services** in one terminal with colored prefixes:
+- Dev server (port 4205) - watch for changes
+- Playwright UI (port 3000) - auto-reruns tests
+- Test report (port 9323) - shows results
+
+Then open three browser windows:
+- Dev app: http://192.168.0.244:4205
+- Tests: http://localhost:3000
+- Results: http://192.168.0.244:9323
+
+Edit code → Tests auto-run → See results immediately! ✨
+
+---
+
+## Traditional Multi-Terminal Workflows
+
+If you prefer separate terminals:
 
 ### Workflow 1: Development with Live Test Results (Recommended)
 
@@ -78,12 +102,13 @@ npm run test:report
 
 All scripts run from the `frontend/` directory:
 
-| Script | Purpose | Port | Notes |
-|--------|---------|------|-------|
-| `npm run dev:server` | Start Angular dev server | 4205 | Required for all E2E tests |
-| `npm run test:e2e` | Run all tests once | - | Tests run against port 4205 |
-| `npm run test:watch` | Run tests in UI mode | 3000 | Auto-reruns on code changes |
-| `npm run test:report` | View test results | 9323 | Shows latest results |
+| Script | Purpose | Port | Best For |
+|--------|---------|------|----------|
+| **`npm run dev:all`** | **All services in one terminal** | 4205, 3000, 9323 | **👉 Recommended for most development** |
+| `npm run dev:server` | Start Angular dev server only | 4205 | Minimal setup, simple development |
+| `npm run test:e2e` | Run all tests once | - | Validation, CI/CD pipelines |
+| `npm run test:watch` | Interactive test mode | 3000 | Debugging specific tests |
+| `npm run test:report` | View HTML test report | 9323 | Monitoring test results |
 
 ---
 
