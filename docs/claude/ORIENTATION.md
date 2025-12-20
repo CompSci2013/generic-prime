@@ -210,9 +210,35 @@ kubectl rollout restart deployment/generic-prime-backend-api -n generic-prime
 
 ## Network Configuration & Debugging
 
+### Frontend Access: Development vs Production
+
+**DEVELOPMENT** (Current active environment):
+- **URL**: `http://192.168.0.244:4205` (IP address + port)
+- **Why**: Running `ng serve` in development container on Thor
+- **Access from**: Windows: Add to hosts → `192.168.0.244 thor` (or just use IP directly)
+- **Backend API**: Currently hardcoded to `http://generic-prime.minilab/api/specs/v1/` (falls through to production ingress)
+
+**PRODUCTION** (Future - when frontend deployed to Kubernetes):
+- **URL**: `http://generic-prime.minilab/` (fully qualified domain name)
+- **Why**: Frontend served via Kubernetes Ingress + Traefik
+- **Access from**: Windows: Add to hosts → `192.168.0.244 generic-prime.minilab` (or `192.168.0.110`)
+- **Backend API**: Same `http://generic-prime.minilab/api/specs/v1/` (via Traefik ingress)
+
+### /etc/hosts Entries (Windows Client)
+
+For development access, add this line to `C:\Windows\System32\drivers\etc\hosts`:
+
+```
+192.168.0.244 thor generic-prime.minilab
+```
+
+This maps both:
+- Thor hostname (for direct IP access reference)
+- `generic-prime.minilab` (for production access when deployed to K8s)
+
 ### /etc/hosts Entries (Thor Host)
 
-The following hostnames are configured for accessing services:
+The following hostnames are configured on Thor for K8s/Traefik routing:
 
 ```
 192.168.0.244 thor thor.minilab                          # Host machine
@@ -221,19 +247,34 @@ The following hostnames are configured for accessing services:
 ```
 
 **Key Hostnames for generic-prime**:
-- `generic-prime.minilab` - Traefik ingress to both frontend (/) and backend (/api)
+- `generic-prime.minilab` - Traefik ingress (production) - routes to both frontend (/) and backend (/api)
 - `generic-prime-dockview.minilab` - Direct backend access (used by E2E container)
 
 ### Network Access Paths
 
+**DEVELOPMENT** (Current):
 ```
-FRONTEND (Angular App)
+Windows Browser (http://192.168.0.244:4205)
   ↓
-  curl/fetch to: http://generic-prime.minilab/api/specs/v1/...
+  Direct to Thor:4205 (ng serve dev container)
+  ↓
+  Frontend makes API calls to: http://generic-prime.minilab/api/specs/v1/
+  ↓
+  Traefik Ingress routes /api → generic-prime-backend-api:3000
+  ↓
+  Backend Pod (Node.js Express)
+  ↓
+  Elasticsearch: elasticsearch.data.svc.cluster.local:9200
+```
+
+**PRODUCTION** (Future - when frontend deployed to K8s):
+```
+Windows Browser (http://generic-prime.minilab/)
   ↓
   Traefik Ingress (K8s port 80)
   ↓
-  Routes /api prefix to service generic-prime-backend-api:3000
+  Routes / → generic-prime-frontend:80 (Frontend Pod)
+  Routes /api → generic-prime-backend-api:3000 (Backend Pod)
   ↓
   Backend Pod (Node.js Express)
   ↓
@@ -244,7 +285,7 @@ FRONTEND (Angular App)
 
 **VERIFIED WORKING APPROACH**: All three environments access the backend via `generic-prime.minilab/api/specs/v1/` (Traefik ingress).
 
-The frontend is configured to use `http://generic-prime.minilab/api/specs/v1/` in development. This hostname is available in all three environments via `/etc/hosts` mapping to `192.168.0.244` (Thor).
+During development, the frontend is configured to use `http://generic-prime.minilab/api/specs/v1/` even though the frontend itself runs on `192.168.0.244:4205`. This works because the hostname is mapped in `/etc/hosts` to `192.168.0.244` (Thor), which has Traefik routing the request to the backend.
 
 #### **1. Thor Host SSH**
 
