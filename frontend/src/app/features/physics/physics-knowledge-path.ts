@@ -103,13 +103,44 @@
  * @see PHYSICS_KNOWLEDGE_PATH - Complete curriculum tree
  */
 export interface PhysicsNode {
+  /**
+   * Unique identifier for the node (kebab-case)
+   */
   id: string;
+
+  /**
+   * Display name of the topic/course
+   */
   title: string;
+
+  /**
+   * Emoji icon for visual categorization
+   */
   icon: string;
+
+  /**
+   * Brief summary of content
+   */
   description: string;
+
+  /**
+   * Academic tier (undergraduate/graduate/phd-specialization)
+   */
   level: 'undergraduate' | 'graduate' | 'phd-specialization';
+
+  /**
+   * Typical year in curriculum (1-4)
+   */
   year: number;
+
+  /**
+   * Nested child topics
+   */
   children?: PhysicsNode[];
+
+  /**
+   * Detailed topic breakdowns
+   */
   syllabus?: SyllabusItem[];
 }
 
@@ -169,9 +200,24 @@ export interface PhysicsNode {
  * @see PHYSICS_KNOWLEDGE_PATH - Complete curriculum containing all syllabus items
  */
 export interface SyllabusItem {
+  /**
+   * Name of the syllabus topic
+   */
   topic: string;
+
+  /**
+   * Brief explanation of topic content
+   */
   description: string;
+
+  /**
+   * Bullet points of key concepts covered
+   */
   keyPoints: string[];
+
+  /**
+   * Approximate study hours for mastery
+   */
   estimatedHours: number;
 }
 
