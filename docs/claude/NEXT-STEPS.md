@@ -1,12 +1,13 @@
 # Next Steps
 
-**Current Session**: Session 20 Complete - Backend Infrastructure Analysis Done
+**Current Session**: Session 21 Complete - Infrastructure Cleaned Up & Documented
 
 ---
 
 ## IMMEDIATE PRIORITY: Fix Module Re-export Anti-pattern (Session 19 Carryover)
 
-**Blocking Issue**: FrameworkModule re-exports CommonModule, FormsModule, PrimengModule
+**Status**: Still pending - infrastructure work took priority
+**Issue**: FrameworkModule re-exports CommonModule, FormsModule, PrimengModule
 - Creates hidden dependencies for downstream modules
 - Must be fixed to establish proper architectural foundation
 - Fix: Remove 3 lines in 1 file
@@ -16,14 +17,17 @@
 2. Identified in Session 19, documented in MODULE-ARCHITECTURE-AUDIT.md
 3. Only 20 minutes to fix completely
 4. Enables automated checking for all future modules
-5. No blocking issues with generic-prime's backend (Session 20 verified)
+5. Infrastructure now cleaned up (Session 21) - no blockers remain
 
-**Session 20 Status**: Backend infrastructure verified working - no blockers
-- All 5 API endpoints tested and documented
-- Integration points clearly defined
-- Ready for module fix in Session 21
+**Session 21 Accomplished**: Infrastructure audit & cleanup
+- Fixed Dockerfile.prod (created nginx.conf, fixed dist path)
+- Removed cruft (duplicate Dockerfiles, proxy configs, test scripts)
+- Unified API hostname across dev/prod
+- Added K8s health checks
+- Created comprehensive INFRASTRUCTURE.md
+- Clarified dev vs production network access in documentation
 
-**Immediate Actions (Session 21)**:
+**Immediate Actions (Session 22)**:
 
 1. **Remove re-exports from FrameworkModule** (5 min)
    - File: `frontend/src/framework/framework.module.ts`
