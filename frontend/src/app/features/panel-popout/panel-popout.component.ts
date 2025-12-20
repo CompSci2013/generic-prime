@@ -143,7 +143,7 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
    *
    * @param message - Message from main window
    */
-  private handleMessage(message: PopOutMessage): void {
+  private async handleMessage(message: PopOutMessage): Promise<void> {
     console.log('[PanelPopout] 📨 handleMessage() processing:', message.type);
 
     switch (message.type) {
@@ -165,6 +165,22 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
           console.log('[PanelPopout] ✅ Triggered change detection');
         } else {
           console.warn('[PanelPopout] ⚠️  STATE_UPDATE missing payload.state');
+        }
+        break;
+
+      case PopOutMessageType.URL_PARAMS_SYNC:
+        // Sync URL parameters from main window
+        // Needed for Query Control and other components that listen to URL params
+        if (message.payload && message.payload.params) {
+          console.log('[PanelPopout] 🔵 Received URL_PARAMS_SYNC message');
+          console.log('[PanelPopout] URL params payload:', message.payload.params);
+          // Update pop-out's URL parameters (this triggers QueryControl to update its filters)
+          await this.urlState.setParams(message.payload.params);
+          console.log('[PanelPopout] ✅ Called urlState.setParams()');
+          this.cdr.markForCheck();
+          console.log('[PanelPopout] ✅ Triggered change detection');
+        } else {
+          console.warn('[PanelPopout] ⚠️  URL_PARAMS_SYNC missing payload.params');
         }
         break;
 

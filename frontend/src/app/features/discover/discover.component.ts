@@ -267,6 +267,16 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       this.broadcastStateToPopOuts(state);
     });
     console.log('[Discover] Subscribed to resourceService.state$ for broadcasting');
+
+    // STEP 7: Broadcast URL parameter changes to pop-outs (especially for Query Control)
+    // Query Control doesn't use ResourceManagementService - it only listens to URL params
+    // Pop-out Query Control needs to know about URL changes from main window
+    // Pop-out windows can't listen to main window's router URL, so we send via BroadcastChannel
+    this.urlStateService.params$.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      console.log('[Discover] URL params changed, broadcasting URL_PARAMS_SYNC to pop-outs:', params);
+      this.broadcastUrlParamsToPopOuts(params);
+    });
+    console.log('[Discover] Subscribed to urlStateService.params$ for URL sync broadcasting');
   }
 
   /**
@@ -463,22 +473,16 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
           message.payload?.params
         );
         if (message.payload?.params) {
-          // 1. Update the single source of truth (the URL)
+          // Update the single source of truth (the URL)
+          // This triggers the normal state update flow:
+          // 1. URL change detected by resourceService.watchUrlChanges()
+          // 2. fetchData() API call happens
+          // 3. API response updates state with results + statistics
+          // 4. state$ subscription fires and broadcasts complete state to pop-outs
+          // DO NOT manually broadcast incomplete state here - that causes race conditions
+          // where pop-outs receive state with empty results before API completes
+          console.log('[Discover] URL update will trigger state$ subscription and broadcast');
           await this.urlStateService.setParams(message.payload.params);
-
-          // 2. Construct the new state by merging the old state with the new filters from the message.
-          // This avoids a race condition where getCurrentState() might be stale.
-          const currentState = this.resourceService.getCurrentState();
-          const newState = {
-            ...currentState,
-            filters: {
-              ...currentState.filters,
-              ...message.payload.params
-            }
-          };
-
-          // 3. Broadcast the explicitly constructed new state.
-          this.broadcastStateToPopOuts(newState);
         }
         break;
 
@@ -593,6 +597,42 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       channel.postMessage({
         type: PopOutMessageType.STATE_UPDATE,
         payload: { state },
+        timestamp: Date.now()
+      });
+    });
+  }
+
+  /**
+   * Broadcast URL parameters to all pop-out windows
+   * This is called whenever URL parameters change in the main window
+   *
+   * **Why This is Needed**:
+   * Pop-out windows have their own separate router context and can't listen to
+   * the main window's URL changes. Query Control in pop-outs needs to know about
+   * URL parameter changes so it can update its filter chips.
+   *
+   * Flow: Main URL changes → urlStateService.params$ emits →
+   *       broadcastUrlParamsToPopOuts() → BroadcastChannel URL_PARAMS_SYNC →
+   *       pop-out UrlStateService updates → Query Control re-renders filters
+   *
+   * @param params - Current URL parameters
+   */
+  private broadcastUrlParamsToPopOuts(params: any): void {
+    if (this.popoutWindows.size === 0) {
+      return; // No pop-outs, skip broadcast
+    }
+
+    console.log('[Discover] Broadcasting URL params to pop-outs:', {
+      params,
+      popoutsCount: this.popoutWindows.size
+    });
+
+    // Send URL_PARAMS_SYNC to all pop-outs
+    this.popoutWindows.forEach(({ channel, panelId }) => {
+      console.log(`[Discover] Sending URL_PARAMS_SYNC to panel: ${panelId}`);
+      channel.postMessage({
+        type: PopOutMessageType.URL_PARAMS_SYNC,
+        payload: { params },
         timestamp: Date.now()
       });
     });
