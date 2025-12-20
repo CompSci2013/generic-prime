@@ -22,6 +22,19 @@ import { UrlStateService } from '../../services/url-state.service';
 
 /**
  * Active filter representation
+ *
+ * Represents a currently active filter with its definition, selected values, and URL representation.
+ * Used internally to track filters in the QueryControlComponent.
+ *
+ * @interface ActiveFilter
+ *
+ * @property {FilterDefinition} definition - The filter definition containing metadata like field, label, and type
+ *
+ * @property {(string|number)[]} values - Array of selected values for this filter.
+ *           Examples: ["Toyota", "Honda"] for multiselect or [1990, 2020] for range
+ *
+ * @property {string} urlValue - Serialized string representation for URL parameters.
+ *           Examples: "Toyota,Honda" (comma-separated) or "1990-2020" (range format)
  */
 interface ActiveFilter {
   definition: FilterDefinition;
