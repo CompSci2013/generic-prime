@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/app/frontend/playwright.config.ts",
-    "rootDir": "/app/frontend/e2e",
+    "configFile": "/home/odin/projects/generic-prime/frontend/playwright.config.ts",
+    "rootDir": "/home/odin/projects/generic-prime/frontend/e2e",
     "forbidOnly": false,
     "fullyParallel": false,
     "globalSetup": null,
@@ -33,7 +33,7 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "/app/frontend/test-results",
+        "outputDir": "/home/odin/projects/generic-prime/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
@@ -41,7 +41,7 @@
         },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/app/frontend/e2e",
+        "testDir": "/home/odin/projects/generic-prime/frontend/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -82,7 +82,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                         "line": 32,
                         "column": 8
                       }
@@ -101,12 +101,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.090Z",
+                      "startTime": "2025-12-20T21:43:54.740Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                             "line": 32,
                             "column": 8
                           }
@@ -134,7 +134,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                         "line": 52,
                         "column": 8
                       }
@@ -153,12 +153,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.090Z",
+                      "startTime": "2025-12-20T21:43:54.740Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                             "line": 52,
                             "column": 8
                           }
@@ -194,7 +194,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                         "line": 80,
                         "column": 8
                       }
@@ -213,12 +213,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.090Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                             "line": 80,
                             "column": 8
                           }
@@ -246,7 +246,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                         "line": 98,
                         "column": 8
                       }
@@ -265,12 +265,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.090Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                             "line": 98,
                             "column": 8
                           }
@@ -306,7 +306,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                         "line": 121,
                         "column": 8
                       }
@@ -325,12 +325,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                             "line": 121,
                             "column": 8
                           }
@@ -366,7 +366,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                         "line": 145,
                         "column": 8
                       }
@@ -385,12 +385,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                             "line": 145,
                             "column": 8
                           }
@@ -426,7 +426,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/agriculture.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                         "line": 169,
                         "column": 8
                       }
@@ -445,12 +445,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/agriculture.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/agriculture.spec.ts",
                             "line": 169,
                             "column": 8
                           }
@@ -491,50 +491,32 @@
               "tests": [
                 {
                   "timeout": 10000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
-                        "line": 37,
-                        "column": 8
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
+                  "annotations": [],
+                  "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
                   "results": [
                     {
                       "workerIndex": 0,
                       "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 0,
+                      "status": "passed",
+                      "duration": 3212,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.329Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
-                            "line": 37,
-                            "column": 8
-                          }
-                        }
-                      ],
+                      "startTime": "2025-12-20T21:43:54.998Z",
+                      "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "skipped"
+                  "status": "expected"
                 }
               ],
               "id": "c31ff144dc4fee3acd0a-d08edec1fd6b5bc6aac9",
               "file": "app.spec.ts",
               "line": 37,
-              "column": 8
+              "column": 7
             },
             {
               "title": "1.2: Panel collapse/expand - state independent of URL",
@@ -543,50 +525,32 @@
               "tests": [
                 {
                   "timeout": 10000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
-                        "line": 58,
-                        "column": 8
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
+                  "annotations": [],
+                  "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
                   "results": [
                     {
                       "workerIndex": 0,
                       "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 0,
+                      "status": "passed",
+                      "duration": 831,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.329Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
-                            "line": 58,
-                            "column": 8
-                          }
-                        }
-                      ],
+                      "startTime": "2025-12-20T21:43:58.574Z",
+                      "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "skipped"
+                  "status": "expected"
                 }
               ],
               "id": "c31ff144dc4fee3acd0a-c2faac0051e7ac53e527",
               "file": "app.spec.ts",
               "line": 58,
-              "column": 8
+              "column": 7
             },
             {
               "title": "1.3: Panel drag-drop reordering - does not affect URL",
@@ -595,50 +559,32 @@
               "tests": [
                 {
                   "timeout": 10000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
-                        "line": 82,
-                        "column": 8
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
+                  "annotations": [],
+                  "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
                   "results": [
                     {
                       "workerIndex": 0,
                       "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 0,
+                      "status": "passed",
+                      "duration": 823,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.329Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
-                            "line": 82,
-                            "column": 8
-                          }
-                        }
-                      ],
+                      "startTime": "2025-12-20T21:43:59.410Z",
+                      "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "skipped"
+                  "status": "expected"
                 }
               ],
               "id": "c31ff144dc4fee3acd0a-ecccd7f6a07296a81f3f",
               "file": "app.spec.ts",
               "line": 82,
-              "column": 8
+              "column": 7
             }
           ]
         },
@@ -659,7 +605,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 121,
                         "column": 8
                       }
@@ -678,12 +624,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.329Z",
+                      "startTime": "2025-12-20T21:44:00.237Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 121,
                             "column": 8
                           }
@@ -711,7 +657,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 183,
                         "column": 8
                       }
@@ -730,12 +676,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.329Z",
+                      "startTime": "2025-12-20T21:44:00.237Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 183,
                             "column": 8
                           }
@@ -763,7 +709,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 254,
                         "column": 8
                       }
@@ -782,12 +728,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.329Z",
+                      "startTime": "2025-12-20T21:44:00.237Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 254,
                             "column": 8
                           }
@@ -815,7 +761,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 285,
                         "column": 8
                       }
@@ -834,12 +780,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.329Z",
+                      "startTime": "2025-12-20T21:44:00.237Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 285,
                             "column": 8
                           }
@@ -867,7 +813,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 320,
                         "column": 8
                       }
@@ -886,12 +832,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.237Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 320,
                             "column": 8
                           }
@@ -927,7 +873,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 363,
                         "column": 8
                       }
@@ -946,12 +892,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.237Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 363,
                             "column": 8
                           }
@@ -979,7 +925,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 410,
                         "column": 8
                       }
@@ -998,12 +944,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 410,
                             "column": 8
                           }
@@ -1031,7 +977,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 460,
                         "column": 8
                       }
@@ -1050,12 +996,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 460,
                             "column": 8
                           }
@@ -1091,7 +1037,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 482,
                         "column": 8
                       }
@@ -1110,12 +1056,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 482,
                             "column": 8
                           }
@@ -1143,7 +1089,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 522,
                         "column": 8
                       }
@@ -1162,12 +1108,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 522,
                             "column": 8
                           }
@@ -1195,7 +1141,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 562,
                         "column": 8
                       }
@@ -1214,12 +1160,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 562,
                             "column": 8
                           }
@@ -1255,7 +1201,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 608,
                         "column": 8
                       }
@@ -1274,12 +1220,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 608,
                             "column": 8
                           }
@@ -1307,7 +1253,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 628,
                         "column": 8
                       }
@@ -1326,12 +1272,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 628,
                             "column": 8
                           }
@@ -1359,7 +1305,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 649,
                         "column": 8
                       }
@@ -1378,12 +1324,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 649,
                             "column": 8
                           }
@@ -1411,7 +1357,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 671,
                         "column": 8
                       }
@@ -1430,12 +1376,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 671,
                             "column": 8
                           }
@@ -1471,7 +1417,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 693,
                         "column": 8
                       }
@@ -1490,12 +1436,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 693,
                             "column": 8
                           }
@@ -1523,7 +1469,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 709,
                         "column": 8
                       }
@@ -1542,12 +1488,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 709,
                             "column": 8
                           }
@@ -1575,7 +1521,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 726,
                         "column": 8
                       }
@@ -1594,12 +1540,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 726,
                             "column": 8
                           }
@@ -1635,7 +1581,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 754,
                         "column": 8
                       }
@@ -1654,12 +1600,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 754,
                             "column": 8
                           }
@@ -1687,7 +1633,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 782,
                         "column": 8
                       }
@@ -1706,12 +1652,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 782,
                             "column": 8
                           }
@@ -1747,7 +1693,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 815,
                         "column": 8
                       }
@@ -1766,12 +1712,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 815,
                             "column": 8
                           }
@@ -1807,7 +1753,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 871,
                         "column": 8
                       }
@@ -1826,12 +1772,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 871,
                             "column": 8
                           }
@@ -1859,7 +1805,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 891,
                         "column": 8
                       }
@@ -1878,12 +1824,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 891,
                             "column": 8
                           }
@@ -1911,7 +1857,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 912,
                         "column": 8
                       }
@@ -1930,12 +1876,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 912,
                             "column": 8
                           }
@@ -1971,7 +1917,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 950,
                         "column": 8
                       }
@@ -1990,12 +1936,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 950,
                             "column": 8
                           }
@@ -2023,7 +1969,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 972,
                         "column": 8
                       }
@@ -2042,12 +1988,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 972,
                             "column": 8
                           }
@@ -2075,7 +2021,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 992,
                         "column": 8
                       }
@@ -2094,12 +2040,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 992,
                             "column": 8
                           }
@@ -2135,7 +2081,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 1023,
                         "column": 8
                       }
@@ -2154,12 +2100,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 1023,
                             "column": 8
                           }
@@ -2187,7 +2133,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 1035,
                         "column": 8
                       }
@@ -2206,12 +2152,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 1035,
                             "column": 8
                           }
@@ -2239,7 +2185,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                         "line": 1048,
                         "column": 8
                       }
@@ -2258,12 +2204,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
                             "line": 1048,
                             "column": 8
                           }
@@ -2304,25 +2250,25 @@
                       "workerIndex": 0,
                       "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 2599,
+                      "duration": 2756,
                       "error": {
-                        "message": "Error: locator.count: Target page, context or browser has been closed",
-                        "stack": "Error: locator.count: Target page, context or browser has been closed\n    at /app/frontend/e2e/app.spec.ts:1183:41",
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at /home/odin/projects/generic-prime/frontend/e2e/app.spec.ts:1186:23",
                         "location": {
-                          "file": "/app/frontend/e2e/app.spec.ts",
-                          "column": 41,
-                          "line": 1183
+                          "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
+                          "column": 23,
+                          "line": 1186
                         },
-                        "snippet": "  1181 |\n  1182 |     // After filter applied, at least one filter chip should be visible (the year range)\n> 1183 |     const chipCount = await filterChips.count();\n       |                                         ^\n  1184 |     console.log(`[Test] Filter chips in Query Control pop-out: ${chipCount}`);\n  1185 |\n  1186 |     // BUG CHECK: With the bug, chipCount will be 0"
+                        "snippet": "  1184 |     // BUG CHECK: With the bug, chipCount will be 0\n  1185 |     // Without bug, chipCount should be > 0\n> 1186 |     expect(chipCount).toBeGreaterThan(0);\n       |                       ^\n  1187 |\n  1188 |     // Step 7: Verify Picker pop-out shows highlight for selected filter\n  1189 |     const pickerComponent = pickerPanelPopout.locator('app-base-picker');"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
-                            "column": 41,
-                            "line": 1183
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
+                            "column": 23,
+                            "line": 1186
                           },
-                          "message": "Error: locator.count: Target page, context or browser has been closed\n\n  1181 |\n  1182 |     // After filter applied, at least one filter chip should be visible (the year range)\n> 1183 |     const chipCount = await filterChips.count();\n       |                                         ^\n  1184 |     console.log(`[Test] Filter chips in Query Control pop-out: ${chipCount}`);\n  1185 |\n  1186 |     // BUG CHECK: With the bug, chipCount will be 0\n    at /app/frontend/e2e/app.spec.ts:1183:41"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n  1184 |     // BUG CHECK: With the bug, chipCount will be 0\n  1185 |     // Without bug, chipCount should be > 0\n> 1186 |     expect(chipCount).toBeGreaterThan(0);\n       |                       ^\n  1187 |\n  1188 |     // Step 7: Verify Picker pop-out shows highlight for selected filter\n  1189 |     const pickerComponent = pickerPanelPopout.locator('app-base-picker');\n    at /home/odin/projects/generic-prime/frontend/e2e/app.spec.ts:1186:23"
                         }
                       ],
                       "stdout": [
@@ -2342,27 +2288,27 @@
                           "text": "[Test] All panels popped out, proceeding with chart selection test\n"
                         },
                         {
-                          "text": "[Test] Results before chart selection: Showing 1 to 20 of 4887 results\n"
+                          "text": "[Test] Applying year filter via Results Table pop-out...\n"
                         },
                         {
-                          "text": "[Test] Applying year filter via URL parameter...\n"
+                          "text": "[Test] Filter chips in Query Control pop-out: 0\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.330Z",
+                      "startTime": "2025-12-20T21:44:00.238Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "/app/frontend/test-results/app-PHASE-6-Pop-Out-Window-6635e-l-other-popped-out-controls-chromium/error-context.md"
+                          "path": "/home/odin/projects/generic-prime/frontend/test-results/app-PHASE-6-Pop-Out-Window-6635e-l-other-popped-out-controls-chromium/error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
-                        "column": 41,
-                        "line": 1183
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
+                        "column": 23,
+                        "line": 1186
                       }
                     }
                   ],
@@ -2390,25 +2336,25 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 2304,
+                      "duration": 2789,
                       "error": {
-                        "message": "Error: locator.count: Target page, context or browser has been closed",
-                        "stack": "Error: locator.count: Target page, context or browser has been closed\n    at /app/frontend/e2e/app.spec.ts:1274:49",
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at /home/odin/projects/generic-prime/frontend/e2e/app.spec.ts:1290:30",
                         "location": {
-                          "file": "/app/frontend/e2e/app.spec.ts",
-                          "column": 49,
-                          "line": 1274
+                          "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
+                          "column": 30,
+                          "line": 1290
                         },
-                        "snippet": "  1272 |     // Verify all pop-outs updated\n  1273 |     const statsFilters = statsPanelPopout.locator('app-statistics-panel').locator('[class*=\"selected\"]');\n> 1274 |     const statsFilterCount = await statsFilters.count();\n       |                                                 ^\n  1275 |\n  1276 |     const queryFilters = queryPanelPopout.locator('app-query-control').locator('p-chip');\n  1277 |     const queryFilterCount = await queryFilters.count();"
+                        "snippet": "  1288 |\n  1289 |     // BUG CHECK: At least Query Control should show the filter chip\n> 1290 |     expect(queryFilterCount).toBeGreaterThan(0);\n       |                              ^\n  1291 |\n  1292 |     // Verify main window also shows the filter\n  1293 |     const mainFilterChips = page.locator('#panel-query-control').locator('p-chip');"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/app/frontend/e2e/app.spec.ts",
-                            "column": 49,
-                            "line": 1274
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
+                            "column": 30,
+                            "line": 1290
                           },
-                          "message": "Error: locator.count: Target page, context or browser has been closed\n\n  1272 |     // Verify all pop-outs updated\n  1273 |     const statsFilters = statsPanelPopout.locator('app-statistics-panel').locator('[class*=\"selected\"]');\n> 1274 |     const statsFilterCount = await statsFilters.count();\n       |                                                 ^\n  1275 |\n  1276 |     const queryFilters = queryPanelPopout.locator('app-query-control').locator('p-chip');\n  1277 |     const queryFilterCount = await queryFilters.count();\n    at /app/frontend/e2e/app.spec.ts:1274:49"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n  1288 |\n  1289 |     // BUG CHECK: At least Query Control should show the filter chip\n> 1290 |     expect(queryFilterCount).toBeGreaterThan(0);\n       |                              ^\n  1291 |\n  1292 |     // Verify main window also shows the filter\n  1293 |     const mainFilterChips = page.locator('#panel-query-control').locator('p-chip');\n    at /home/odin/projects/generic-prime/frontend/e2e/app.spec.ts:1290:30"
                         }
                       ],
                       "stdout": [
@@ -2416,24 +2362,27 @@
                           "text": "[Test 6.2] Initial result count: Showing 1 to 20 of 4887 results\n"
                         },
                         {
-                          "text": "[Test 6.2] Applying manufacturer filter via URL parameter...\n"
+                          "text": "[Test 6.2] Applying manufacturer filter via Results Table pop-out...\n"
+                        },
+                        {
+                          "text": "[Test 6.2] After selection 1: Stats=0, Query=0, Picker=0\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:35.224Z",
+                      "startTime": "2025-12-20T21:44:03.282Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "/app/frontend/test-results/app-PHASE-6-Pop-Out-Window-6b271-y-pop-out-makes-a-selection-chromium/error-context.md"
+                          "path": "/home/odin/projects/generic-prime/frontend/test-results/app-PHASE-6-Pop-Out-Window-6b271-y-pop-out-makes-a-selection-chromium/error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "/app/frontend/e2e/app.spec.ts",
-                        "column": 49,
-                        "line": 1274
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/app.spec.ts",
+                        "column": 30,
+                        "line": 1290
                       }
                     }
                   ],
@@ -2442,7 +2391,7 @@
               ],
               "id": "c31ff144dc4fee3acd0a-c758d8076ff4cfdc3528",
               "file": "app.spec.ts",
-              "line": 1233,
+              "line": 1231,
               "column": 7
             }
           ]
@@ -2473,7 +2422,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                         "line": 32,
                         "column": 8
                       }
@@ -2492,12 +2441,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                             "line": 32,
                             "column": 8
                           }
@@ -2525,7 +2474,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                         "line": 52,
                         "column": 8
                       }
@@ -2544,12 +2493,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                             "line": 52,
                             "column": 8
                           }
@@ -2585,7 +2534,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                         "line": 80,
                         "column": 8
                       }
@@ -2604,12 +2553,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                             "line": 80,
                             "column": 8
                           }
@@ -2637,7 +2586,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                         "line": 98,
                         "column": 8
                       }
@@ -2656,12 +2605,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                             "line": 98,
                             "column": 8
                           }
@@ -2697,7 +2646,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                         "line": 121,
                         "column": 8
                       }
@@ -2716,12 +2665,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                             "line": 121,
                             "column": 8
                           }
@@ -2757,7 +2706,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                         "line": 145,
                         "column": 8
                       }
@@ -2776,12 +2725,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                             "line": 145,
                             "column": 8
                           }
@@ -2817,7 +2766,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/chemistry.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                         "line": 169,
                         "column": 8
                       }
@@ -2836,12 +2785,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.741Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/chemistry.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/chemistry.spec.ts",
                             "line": 169,
                             "column": 8
                           }
@@ -2886,7 +2835,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                         "line": 32,
                         "column": 8
                       }
@@ -2905,12 +2854,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                             "line": 32,
                             "column": 8
                           }
@@ -2938,7 +2887,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                         "line": 52,
                         "column": 8
                       }
@@ -2957,12 +2906,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                             "line": 52,
                             "column": 8
                           }
@@ -2998,7 +2947,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                         "line": 80,
                         "column": 8
                       }
@@ -3017,12 +2966,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                             "line": 80,
                             "column": 8
                           }
@@ -3050,7 +2999,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                         "line": 98,
                         "column": 8
                       }
@@ -3069,12 +3018,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                             "line": 98,
                             "column": 8
                           }
@@ -3110,7 +3059,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                         "line": 121,
                         "column": 8
                       }
@@ -3129,12 +3078,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                             "line": 121,
                             "column": 8
                           }
@@ -3170,7 +3119,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                         "line": 145,
                         "column": 8
                       }
@@ -3189,12 +3138,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                             "line": 145,
                             "column": 8
                           }
@@ -3230,7 +3179,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/math.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                         "line": 169,
                         "column": 8
                       }
@@ -3249,12 +3198,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/math.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/math.spec.ts",
                             "line": 169,
                             "column": 8
                           }
@@ -3299,7 +3248,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                         "line": 32,
                         "column": 8
                       }
@@ -3318,12 +3267,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                             "line": 32,
                             "column": 8
                           }
@@ -3351,7 +3300,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                         "line": 52,
                         "column": 8
                       }
@@ -3370,12 +3319,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                             "line": 52,
                             "column": 8
                           }
@@ -3411,7 +3360,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                         "line": 80,
                         "column": 8
                       }
@@ -3430,12 +3379,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                             "line": 80,
                             "column": 8
                           }
@@ -3463,7 +3412,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                         "line": 98,
                         "column": 8
                       }
@@ -3482,12 +3431,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                             "line": 98,
                             "column": 8
                           }
@@ -3523,7 +3472,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                         "line": 121,
                         "column": 8
                       }
@@ -3542,12 +3491,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                             "line": 121,
                             "column": 8
                           }
@@ -3583,7 +3532,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                         "line": 145,
                         "column": 8
                       }
@@ -3602,12 +3551,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                             "line": 145,
                             "column": 8
                           }
@@ -3643,7 +3592,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/app/frontend/e2e/physics.spec.ts",
+                        "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                         "line": 169,
                         "column": 8
                       }
@@ -3662,12 +3611,12 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-20T20:01:32.091Z",
+                      "startTime": "2025-12-20T21:43:54.742Z",
                       "annotations": [
                         {
                           "type": "skip",
                           "location": {
-                            "file": "/app/frontend/e2e/physics.spec.ts",
+                            "file": "/home/odin/projects/generic-prime/frontend/e2e/physics.spec.ts",
                             "line": 169,
                             "column": 8
                           }
@@ -3691,10 +3640,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-12-20T20:01:32.024Z",
-    "duration": 5557.125,
-    "expected": 0,
-    "skipped": 61,
+    "startTime": "2025-12-20T21:43:54.714Z",
+    "duration": 11422.12,
+    "expected": 3,
+    "skipped": 58,
     "unexpected": 2,
     "flaky": 0
   }

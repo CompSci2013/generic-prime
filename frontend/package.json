@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "dev:server": "ng serve --host 0.0.0.0 --port 4205",
-    "dev:all": "concurrently --kill-others-on-fail --prefix '[DEV]' --prefix '[TEST]' --prefix '[REPORT]' --prefix-colors 'cyan,green,yellow' 'ng serve --host 0.0.0.0 --port 4205' 'npx playwright test --ui --host 0.0.0.0' 'npx playwright show-report --host 0.0.0.0'",
+    "dev:all": "concurrently --kill-others-on-fail --names DEV,TEST,REPORT --prefix-colors cyan,green,yellow \"ng serve --host 0.0.0.0 --port 4205\" \"npx playwright test\" \"npx playwright show-report --host 0.0.0.0\"",
     "test:e2e": "npx playwright test",
     "test:watch": "npx playwright test --ui --host 0.0.0.0",
     "test:report": "npx playwright show-report --host 0.0.0.0",
