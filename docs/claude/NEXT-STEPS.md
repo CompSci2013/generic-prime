@@ -1,6 +1,19 @@
 # Next Steps
 
-**Current Session**: Session 31 - Pop-Out Panel Styling Refinement Complete
+**Current Session**: Session 32 - Pop-Out State Synchronization Fix Complete
+
+---
+
+## SESSION 32 COMPLETED: Fixed Pop-Out State Synchronization
+
+**Status**: ✅ Completed. Resolved race condition and implemented URL parameter sync.
+
+### What Was Done
+- ✅ Identified and fixed race condition in state broadcasting
+- ✅ Implemented URL_PARAMS_SYNC message type for pop-out URL synchronization
+- ✅ Tested all three pop-out panels updating correctly
+- ✅ Query Control filter chips now render in pop-out windows
+- ✅ All pop-outs maintain state synchronization
 
 ---
 
@@ -50,41 +63,42 @@
 
 ---
 
-## SESSION 32 PLAN: Pop-Out Window Manual Testing
+## SESSION 33 PLAN: Complete Pop-Out Manual Testing
 
-**Status**: Ready to perform comprehensive pop-out functionality testing.
+**Status**: Pop-out state synchronization fixed. Ready for comprehensive testing of all pop-out features.
 
 ### Immediate Next Actions
 
-**1. Manual Testing Protocol** (1-2 hours)
-   Follow the 10 test scenarios documented in the pop-out architecture:
-   - [ ] Test 1: Open pop-out on Model Picker
-   - [ ] Test 2: Verify state sync from main → pop-out
-   - [ ] Test 3: Verify state sync from pop-out → main
-   - [ ] Test 4: Verify multiple pop-outs work independently
-   - [ ] Test 5: Verify filter operations propagate correctly
-   - [ ] Test 6: Verify pop-out closes cleanly
-   - [ ] Test 7: Verify page refresh closes all pop-outs
-   - [ ] Test 8: Multi-monitor scenario (if available)
-   - [ ] Test 9: Network latency simulation with DevTools throttling
-   - [ ] Test 10: Console validation - verify message flow
+**1. Pop-Out Manual Testing Protocol** (comprehensive 10-test scenario)
+   Validate all pop-out functionality after state sync fix:
+   - [ ] Test 1: Open pop-out on Query Control and apply filter
+   - [ ] Test 2: Verify filter chips render in Query Control pop-out
+   - [ ] Test 3: Verify Statistics pop-out updates with filtered data
+   - [ ] Test 4: Verify Results Table pop-out updates with filtered data
+   - [ ] Test 5: Open multiple pop-outs simultaneously
+   - [ ] Test 6: Apply filter from one pop-out, verify all pop-outs update
+   - [ ] Test 7: Close pop-out and verify panel reappears in main
+   - [ ] Test 8: Refresh page and verify pop-outs close automatically
+   - [ ] Test 9: Test "Clear All Filters" from pop-out Query Control
+   - [ ] Test 10: Drag-drop panels in main while pop-outs are open
 
 **2. Testing Checklist**
-   - Open Developer Console to monitor BroadcastChannel messages
-   - Open multiple pop-out windows simultaneously
-   - Test filter changes in main window (should propagate to pop-outs)
-   - Test filter changes in pop-out (should propagate to main)
-   - Close pop-out windows and verify state cleanup
-   - Refresh page and verify all pop-outs close automatically
+   - Open Developer Console to monitor BroadcastChannel URL_PARAMS_SYNC messages
+   - Verify filter changes propagate instantly to all pop-outs
+   - Verify pop-out windows can send filter changes back to main
+   - Verify state consistency across all windows
+   - Test edge cases: rapid filter changes, simultaneous pop-outs
+   - Check browser console for any warnings or errors
 
-**3. Document Results**
-   - Note any issues found during testing
-   - If bugs discovered, add to PROJECT-STATUS.md Known Bugs section
-   - Create reproduction steps for any failing tests
+**3. Known Issues to Monitor**
+   - Bug #13: Dropdown keyboard navigation (different issue, lower priority)
+   - Bug #7: Multiselect visual state (cosmetic issue, lower priority)
+   - Watch for any new race conditions in the fixed state sync logic
 
-**4. Next Priority After Testing**
-   - Fix Bug #13: PrimeNG dropdown keyboard navigation in Query Control
-   - Fix Bug #7: p-multiSelect visual state issue
+**4. After Passing All Tests**
+   - Document testing results in TESTING.md
+   - Mark pop-out feature as "Stable"
+   - Next priority: Fix Bug #13 (PrimeNG dropdown keyboard nav)
 
 ---
 

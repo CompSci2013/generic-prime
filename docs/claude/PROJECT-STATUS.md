@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.31
-**Timestamp**: 2025-12-20T19:30:00Z
-**Updated By**: Session 31 - Pop-Out Panel Styling Refinement
+**Version**: 5.32
+**Timestamp**: 2025-12-20T22:45:00Z
+**Updated By**: Session 32 - Pop-Out State Synchronization Fix
 
 ---
 
@@ -172,6 +172,64 @@
 
 **Files Not Requiring Changes**:
 - Statistics Panel, Results Table, Base Picker - Already styled appropriately with PrimeNG CSS variables
+
+---
+
+## Session 32 Progress: Pop-Out State Synchronization Fix
+
+### Primary Objective: Fix pop-out window state synchronization
+
+**Status**: ✅ COMPLETE - Pop-Out State Synchronization Bug Fixed
+
+**Problem Discovered During Testing**:
+When a filter was applied in a popped-out Query Control:
+- Statistics and Results pop-outs updated with filtered data ✅
+- But Query Control pop-out didn't show the filter chip ❌
+- Root cause: Race condition + URL parameters not synced to pop-outs
+
+**Root Causes Identified**:
+1. **Race Condition**: Manual state broadcast in `URL_PARAMS_CHANGED` handler
+   - Broadcast incomplete state (empty results/statistics) before API call completes
+   - Pop-outs received stale data before fresh API results arrived
+
+2. **Missing URL Sync**: Pop-out windows have separate router contexts
+   - Pop-out Query Control only listens to its own router URL
+   - When main window's URL changes, pop-out windows don't receive the change
+   - URL_PARAMS_SYNC message type existed in interface but was never implemented
+
+**Solution Implemented** (2 files, 72 insertions):
+
+1. ✅ **Removed Manual Broadcast** ([discover.component.ts:473-490](frontend/src/app/features/discover/discover.component.ts#L473-L490))
+   - Simplified `URL_PARAMS_CHANGED` handler
+   - Removed manual state construction and broadcast
+   - Now only updates URL, letting natural flow handle state updates
+   - Eliminates race condition - complete state broadcast happens after API completes
+
+2. ✅ **Implemented URL Parameter Sync** ([discover.component.ts:605-639](frontend/src/app/features/discover/discover.component.ts#L605-L639))
+   - Added `broadcastUrlParamsToPopOuts()` method
+   - Main window broadcasts URL changes via `URL_PARAMS_SYNC` message
+   - Triggered by `urlStateService.params$` subscription
+   - Ensures all pop-outs stay synchronized with URL
+
+3. ✅ **Added Pop-Out Handler** ([panel-popout.component.ts:171-185](frontend/src/app/features/panel-popout/panel-popout.component.ts#L171-L185))
+   - Pop-out windows listen for `URL_PARAMS_SYNC` messages
+   - Call `urlState.setParams()` to update local URL parameters
+   - Query Control subscribes to URL changes and re-renders filter chips
+   - Made `handleMessage()` async to support setParams() call
+
+**Testing Results**:
+✅ Query Control pop-out filter chips render correctly
+✅ Statistics pop-out updates with filtered data
+✅ Results table updates with filtered data
+✅ All three components stay synchronized
+✅ No race conditions - data consistency maintained
+
+**Files Enhanced**:
+- `frontend/src/app/features/discover/discover.component.ts`
+- `frontend/src/app/features/panel-popout/panel-popout.component.ts`
+
+**Commits**:
+- 233975f: fix: Resolve pop-out state synchronization race condition
 
 ---
 
