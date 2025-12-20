@@ -1281,6 +1281,15 @@
   syllabus?: SyllabusItem[];
 }
 
+/**
+ * Represents a single syllabus topic within a course
+ *
+ * @interface SyllabusItem
+ * @property {string} topic - Name of the syllabus topic
+ * @property {string} description - Brief explanation of topic content
+ * @property {string[]} keyPoints - Bullet points of key concepts covered
+ * @property {number} estimatedHours - Approximate study hours for mastery
+ */
 export interface SyllabusItem {
   topic: string;
   description: string;
