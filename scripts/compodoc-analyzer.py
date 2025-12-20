@@ -284,6 +284,79 @@ def analyze_module_issues():
     print("\n" + "=" * 90)
 
 
+def regenerate_compodoc():
+    """Regenerate Compodoc documentation inside the container."""
+    import subprocess
+
+    print("\n" + "=" * 90)
+    print("COMPODOC REGENERATION (Container Operation)")
+    print("=" * 90)
+
+    try:
+        # Step 1: Clean old documents
+        print("\n📦 Step 1: Cleaning old documentation...")
+        result = subprocess.run(
+            ['podman', 'exec', '-it', 'generic-prime-dev', 'bash', '-c',
+             'cd /app/frontend && rm -fr documents/'],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if result.returncode != 0:
+            print(f"❌ Failed to clean documents: {result.stderr}")
+            return
+        print("   ✅ Old documents cleaned")
+
+        # Step 2: Build documentation source
+        print("\n📚 Step 2: Building documentation source (npm run build:doc)...")
+        result = subprocess.run(
+            ['podman', 'exec', '-it', 'generic-prime-dev', 'npm', 'run', 'build:doc'],
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+        if result.returncode != 0:
+            print(f"❌ Failed to build documentation: {result.stderr}")
+            return
+        print("   ✅ Documentation source built")
+
+        # Step 3: Generate Compodoc
+        print("\n🔍 Step 3: Generating Compodoc (npm run compodoc)...")
+        result = subprocess.run(
+            ['podman', 'exec', '-it', 'generic-prime-dev', 'npm', 'run', 'compodoc'],
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+        if result.returncode != 0:
+            print(f"❌ Failed to generate Compodoc: {result.stderr}")
+            return
+        print("   ✅ Compodoc generated")
+
+        # Step 4: Verify completion
+        print("\n✨ Step 4: Verifying documentation update...")
+        if COVERAGE_FILE.exists():
+            import datetime
+            mtime = datetime.datetime.fromtimestamp(COVERAGE_FILE.stat().st_mtime)
+            print(f"   ✅ Documentation updated successfully at {mtime}")
+        else:
+            print("   ⚠️  Coverage file not yet visible on host (may need brief delay)")
+
+        print("\n" + "=" * 90)
+        print("✅ COMPODOC REGENERATION COMPLETE")
+        print("=" * 90)
+        print("\nNext steps:")
+        print("  • Run '/compodoc -doc' to analyze updated coverage metrics")
+        print("  • Run '/compodoc -all' for complete diagnostic report")
+
+    except subprocess.TimeoutExpired:
+        print("❌ Compodoc regeneration timed out (took too long)")
+    except FileNotFoundError:
+        print("❌ Error: podman command not found. Make sure podman is installed and in PATH")
+    except Exception as e:
+        print(f"❌ Error during Compodoc regeneration: {e}")
+
+
 def main():
     """Main entry point."""
     if len(sys.argv) < 2:
@@ -301,6 +374,8 @@ def main():
         analyze_documentation_coverage()
         analyze_circular_dependencies()
         analyze_module_issues()
+    elif flag == '-gen':
+        regenerate_compodoc()
     elif flag == '-help':
         print(__doc__)
     else:

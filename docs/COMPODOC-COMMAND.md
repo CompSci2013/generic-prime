@@ -209,22 +209,48 @@ Combines `-doc`, `-circular`, and `-module` analysis in a single command.
 
 ### `-gen` | Regenerate Compodoc
 
-Regenerates the Compodoc documentation files.
+Regenerates the Compodoc documentation files by running the build sequence inside the container.
 
-**Command:**
+**What happens when you run `/compodoc -gen`:**
+
+The command automatically executes the complete Compodoc regeneration sequence inside the `generic-prime-dev` container:
+
 ```bash
-podman exec -it generic-prime-frontend-dev npx compodoc -p tsconfig.json
+# Inside container (generic-prime-dev):
+cd /app/frontend
+rm -fr documents/                    # Clean old docs
+npm run build:doc                    # Build documentation source
+npm run compodoc                     # Generate Compodoc coverage
 ```
 
-**What it updates:**
+**Output updates:**
 - `frontend/documents/coverage.html` - Documentation coverage metrics
 - `frontend/documents/index.html` - API documentation
-- All other generated documentation files
+- All other generated documentation files (components, interfaces, classes, etc.)
 
-**Note:** This command requires:
-- Development container running
-- npm dependencies installed
-- ~5-10 seconds to complete
+**Execution Flow:**
+1. Command runs inside container (no podman exec needed from your terminal)
+2. Removes old `documents/` directory
+3. Runs npm build:doc task
+4. Runs npm compodoc task
+5. Waits for completion (~30-60 seconds total)
+6. Returns status message with success/failure
+
+**Requirements:**
+- ✅ `generic-prime-dev` container must be running
+- ✅ npm dependencies must be installed in container
+- ✅ ~30-60 seconds execution time
+
+**Example workflow:**
+```bash
+/compodoc -gen
+# Wait for message: "✅ Compodoc regeneration complete"
+
+/compodoc -doc
+# View updated documentation coverage metrics
+```
+
+**Note:** This is the only flag that requires the container to be running. All other flags (-doc, -circular, -module) run on the host and don't need the container.
 
 ### `-help` | Show Help
 
