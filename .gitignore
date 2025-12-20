@@ -24,3 +24,8 @@ Thumbs.db
 
 # Generated documentation
 frontend/documents/
+
+# Playwright E2E test artifacts
+frontend/playwright-report/
+frontend/test-results/
+frontend/test-results.json
