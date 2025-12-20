@@ -29,12 +29,27 @@ import { ErrorCategory } from '../models/error-notification.interface';
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
   /**
-   * ErrorNotificationService instance (lazy-loaded to avoid circular dependency)
+   * ErrorNotificationService instance
+   *
+   * Lazy-loaded via getter to avoid circular dependency issues.
+   * Service is requested from injector on first access and cached
+   * by Angular's dependency injection system.
+   *
+   * @private
    */
   private get errorNotificationService(): ErrorNotificationService {
     return this.injector.get(ErrorNotificationService);
   }
 
+  /**
+   * Angular injector for lazy-loading ErrorNotificationService
+   *
+   * Stored to allow late binding of ErrorNotificationService,
+   * which helps avoid circular dependency issues between
+   * GlobalErrorHandler and ErrorNotificationService.
+   *
+   * @private
+   */
   constructor(private injector: Injector) {}
 
   /**

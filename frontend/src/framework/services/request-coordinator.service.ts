@@ -82,18 +82,48 @@ interface CacheEntry<T> {
   providedIn: 'root'
 })
 export class RequestCoordinatorService {
-  /** Response cache storage */
+  /**
+   * Response cache storage
+   *
+   * Maps request keys to CacheEntry objects containing cached data, timestamp,
+   * and TTL. Used by getCachedResponse() for cache hits and setCachedResponse()
+   * for storing successful responses.
+   *
+   * @private
+   */
   private cache = new Map<string, CacheEntry<any>>();
 
-  /** In-flight requests storage */
+  /**
+   * In-flight requests storage
+   *
+   * Maps request keys to Observable instances of ongoing HTTP requests.
+   * Enables deduplication: if same request key is requested again before
+   * first completes, returns same shared Observable instead of executing new request.
+   *
+   * @private
+   */
   private inFlightRequests = new Map<string, Observable<any>>();
 
-  /** Loading state per request key */
+  /**
+   * Loading state per request key
+   *
+   * BehaviorSubject that tracks which requests are currently loading.
+   * Maps request key to boolean (true = loading, false/absent = idle).
+   * Used internally to emit loadingState$ observable updates.
+   *
+   * @private
+   */
   private loadingStateSubject = new BehaviorSubject<Map<string, boolean>>(
     new Map()
   );
 
-  /** Observable of loading states */
+  /**
+   * Observable of loading states
+   *
+   * Public observable stream that emits Map of request keys to loading states.
+   * Subscribers can use getLoadingState$() to filter for specific requests
+   * or getGlobalLoading$() for overall loading status.
+   */
   public loadingState$ = this.loadingStateSubject.asObservable();
 
   /**

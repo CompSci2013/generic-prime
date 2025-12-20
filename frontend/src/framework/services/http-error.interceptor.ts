@@ -55,6 +55,15 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
  */
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
+  /**
+   * Retry configuration for transient errors
+   *
+   * Controls which HTTP status codes should trigger automatic retries and
+   * how many retry attempts are allowed. Initialized with DEFAULT_RETRY_CONFIG
+   * (2 retries for 5xx and 429 errors). Can be customized via setRetryConfig().
+   *
+   * @private
+   */
   private retryConfig: RetryConfig = DEFAULT_RETRY_CONFIG;
 
   /**
