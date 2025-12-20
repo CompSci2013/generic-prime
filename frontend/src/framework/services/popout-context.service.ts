@@ -63,28 +63,52 @@ import {
 export class PopOutContextService implements OnDestroy {
   /**
    * BroadcastChannel for cross-window communication
-   * Null when not initialized
+   *
+   * Holds the BroadcastChannel instance used for efficient cross-window messaging.
+   * Null when not initialized. Created by setupChannel() and cleaned up on destroy.
+   *
+   * @private
    */
   private channel: BroadcastChannel | null = null;
 
   /**
    * Subject for received messages
-   * Emits all messages received via BroadcastChannel
+   *
+   * RxJS Subject that emits all PopOutMessage instances received via BroadcastChannel.
+   * Subscribers use getMessages$() to receive observable stream.
+   *
+   * @private
    */
   private messagesSubject = new Subject<PopOutMessage>();
 
   /**
    * Current pop-out context
-   * Cached result of parsePopOutRoute()
+   *
+   * Cached result of parsePopOutRoute(). Lazily initialized from router URL.
+   * Identifies panel ID, panel type, and whether current window is a pop-out.
+   *
+   * @private
    */
   private context: PopOutContext | null = null;
 
   /**
-   * Is service initialized?
-   * Prevents double initialization
+   * Service initialization flag
+   *
+   * Prevents double initialization when initializeAsPopOut() or initializeAsParent()
+   * is called multiple times. Set to true after first initialization.
+   *
+   * @private
    */
   private initialized = false;
 
+  /**
+   * Constructor for dependency injection
+   *
+   * Automatically parses the current router URL to detect if running in a pop-out.
+   *
+   * @param router - Angular Router for URL-based pop-out detection
+   * @param ngZone - Angular NgZone for running BroadcastChannel callbacks in zone
+   */
   constructor(
     private router: Router,
     private ngZone: NgZone

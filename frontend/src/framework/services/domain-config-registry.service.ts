@@ -55,15 +55,30 @@ export const DOMAIN_CONFIG = new InjectionToken<DomainConfig<any, any, any>>(
 export class DomainConfigRegistry {
   /**
    * Registered domain configurations
-   * Maps domain name to configuration
+   *
+   * Maps domain name (e.g., 'automobile', 'agriculture') to their corresponding
+   * DomainConfig instances. Allows runtime switching between different domain
+   * contexts with different data models, filter definitions, and statistics.
+   *
+   * @private
    */
   private configs = new Map<string, DomainConfig<any, any, any>>();
 
   /**
    * Active domain name
+   *
+   * Tracks the currently active domain. When undefined, no domain is active.
+   * Set automatically when first domain is registered or via setActive().
+   *
+   * @private
    */
   private activeDomainName?: string;
 
+  /**
+   * Constructor for dependency injection
+   *
+   * @param validator - DomainConfigValidator service for validating domain configurations
+   */
   constructor(private validator: DomainConfigValidator) {}
 
   /**

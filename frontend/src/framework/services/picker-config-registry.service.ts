@@ -38,7 +38,14 @@ import { PickerConfig } from '../models/picker-config.interface';
   providedIn: 'root'
 })
 export class PickerConfigRegistry {
-  /** Storage for registered picker configs */
+  /**
+   * Storage for registered picker configurations
+   *
+   * Maps picker ID strings to their corresponding PickerConfig instances.
+   * Used internally to store and retrieve picker configurations.
+   *
+   * @private
+   */
   private configs = new Map<string, PickerConfig<any>>();
 
   /**
