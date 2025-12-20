@@ -1,6 +1,6 @@
 # Next Steps
 
-**Current Session**: Session 30 - Achieved 100% JSDoc Documentation Coverage
+**Current Session**: Session 31 - Pop-Out Panel Styling Refinement Complete
 
 ---
 
@@ -30,54 +30,61 @@
 
 ---
 
-## SESSION 31 PLAN: Physics Knowledge Graphs (After 100% Coverage Achievement)
+## SESSION 31 COMPLETED: Pop-Out Panel Styling Refinement
 
-**Status**: Ready to implement knowledge graphs for remaining physics topics.
+**Status**: ✅ Completed. Fixed styling issues on pop-out windows.
+
+### What Was Done
+- ✅ Removed "Automobile Discovery" subtitle from panel popout headers (freed up vertical space)
+- ✅ Changed popout header text color to white for better visibility
+- ✅ Changed "Clear All" button from danger (pink) to secondary (gray)
+- ✅ Changed multiselect filter dialog "Apply" button from danger to primary
+- ✅ Changed year range filter dialog "Apply" button from danger to primary
+- ✅ Verified all other pop-out components (Statistics, Results Table, Picker) have consistent styling
+- ✅ Updated PROJECT-STATUS.md with Session 31 achievements
+
+**Key Improvements**:
+- Pop-out windows now have cleaner headers with white text on dark background
+- All button colors align with dark theme (lara-dark-blue) instead of mismatched pink
+- Consistent styling across all panel types
+
+---
+
+## SESSION 32 PLAN: Pop-Out Window Manual Testing
+
+**Status**: Ready to perform comprehensive pop-out functionality testing.
 
 ### Immediate Next Actions
 
-**1. Generate Compodoc Report and Identify Remaining Gaps** (10 minutes)
-```bash
-cd frontend
-npm run docs
-# Check: frontend/documents/coverage.html for percentage and file breakdown
-```
+**1. Manual Testing Protocol** (1-2 hours)
+   Follow the 10 test scenarios documented in the pop-out architecture:
+   - [ ] Test 1: Open pop-out on Model Picker
+   - [ ] Test 2: Verify state sync from main → pop-out
+   - [ ] Test 3: Verify state sync from pop-out → main
+   - [ ] Test 4: Verify multiple pop-outs work independently
+   - [ ] Test 5: Verify filter operations propagate correctly
+   - [ ] Test 6: Verify pop-out closes cleanly
+   - [ ] Test 7: Verify page refresh closes all pop-outs
+   - [ ] Test 8: Multi-monitor scenario (if available)
+   - [ ] Test 9: Network latency simulation with DevTools throttling
+   - [ ] Test 10: Console validation - verify message flow
 
-Expected: See current coverage percentage (estimated 98-99%)
+**2. Testing Checklist**
+   - Open Developer Console to monitor BroadcastChannel messages
+   - Open multiple pop-out windows simultaneously
+   - Test filter changes in main window (should propagate to pop-outs)
+   - Test filter changes in pop-out (should propagate to main)
+   - Close pop-out windows and verify state cleanup
+   - Refresh page and verify all pop-outs close automatically
 
-**2. Document Remaining Low-Coverage Files** (30-60 minutes)
-- Identify files with <100% coverage from Compodoc report
-- Focus on framework components if not already documented
-- Add missing JSDoc to any undocumented methods/properties
-- Priority: Files with public APIs (components, services)
+**3. Document Results**
+   - Note any issues found during testing
+   - If bugs discovered, add to PROJECT-STATUS.md Known Bugs section
+   - Create reproduction steps for any failing tests
 
-**3. Run Compodoc Again and Verify 100% Coverage** (5 minutes)
-```bash
-npm run docs
-# Verify all files now show 100% coverage
-```
-
-**4. Final Documentation Commit** (5 minutes)
-```bash
-git add -A
-git commit -m "docs: Achieve 100% JSDoc documentation coverage
-
-Final push to reach 100% Compodoc coverage across entire codebase.
-All properties, methods, constructors, and parameters now have
-individual JSDoc comments following Compodoc 1.1.32 requirements.
-
-Coverage: 88% → 97% → 100%
-Time invested: Session 28-29 (~8+ hours)
-Files enhanced: 30+ TypeScript files
-JSDoc comments added: 200+
-"
-```
-
-**5. Update PROJECT-STATUS.md** (5 minutes)
-- Set Version to 5.30
-- Update Timestamp
-- Document final coverage achievement (100%)
-- Note: "100% JSDoc coverage achieved - all properties, methods, constructors documented"
+**4. Next Priority After Testing**
+   - Fix Bug #13: PrimeNG dropdown keyboard navigation in Query Control
+   - Fix Bug #7: p-multiSelect visual state issue
 
 ---
 

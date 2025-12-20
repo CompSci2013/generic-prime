@@ -20,7 +20,7 @@
       label="Clear All"
       icon="pi pi-times"
       (onClick)="clearAll()"
-      styleClass="p-button-danger p-button-sm"
+      styleClass="p-button-secondary p-button-sm"
       [disabled]="!hasActiveFiltersOrHighlights()">
     </p-button>
   </div>
@@ -146,7 +146,7 @@
       <p-button
         label="Apply"
         (onClick)="applyFilter()"
-        styleClass="p-button-danger"
+        styleClass="p-button-primary"
         [disabled]="selectedOptions.length === 0">
       </p-button>
     </ng-template>
@@ -206,7 +206,7 @@
       <p-button
         label="Apply"
         (onClick)="applyYearRange()"
-        styleClass="p-button-danger"
+        styleClass="p-button-primary"
         [disabled]="!yearMin && !yearMax">
       </p-button>
     </ng-template>

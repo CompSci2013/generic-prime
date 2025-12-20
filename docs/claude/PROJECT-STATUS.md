@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.30
-**Timestamp**: 2025-12-20T17:00:00Z
-**Updated By**: Session 30 - Achieved 100% JSDoc Documentation Coverage
+**Version**: 5.31
+**Timestamp**: 2025-12-20T19:30:00Z
+**Updated By**: Session 31 - Pop-Out Panel Styling Refinement
 
 ---
 
@@ -142,6 +142,36 @@
 - All utility methods fully documented with return values
 - Consistent documentation pattern across all model classes
 - All documentation includes context about usage and data types
+
+---
+
+## Session 31 Progress: Pop-Out Panel Styling Refinement
+
+### Primary Objective: Improve visual consistency of pop-out windows
+
+**Status**: ✅ COMPLETE - Pop-Out Panel Styling Refinement Finished
+
+**Work Completed** (3 files updated, consistent styling applied to all pop-outs):
+
+1. ✅ **Panel Popout Header** ([panel-popout.component.html](frontend/src/app/features/panel-popout/panel-popout.component.html) & [.scss](frontend/src/app/features/panel-popout/panel-popout.component.scss))
+   - Removed "Automobile Discovery" subtitle to free up vertical space
+   - Changed h2 title color from dark gray (#333) to white (#ffffff) for better readability
+
+2. ✅ **Query Control Clear All Button** ([query-control.component.html](frontend/src/framework/components/query-control/query-control.component.html))
+   - Changed from `p-button-danger` (pink) to `p-button-secondary` (gray) to match dark theme
+
+3. ✅ **Query Control Dialog Apply Buttons** ([query-control.component.html](frontend/src/framework/components/query-control/query-control.component.html))
+   - Multiselect Filter Dialog: Changed "Apply" button from `p-button-danger` to `p-button-primary`
+   - Year Range Filter Dialog: Changed "Apply" button from `p-button-danger` to `p-button-primary`
+
+**Visual Improvements**:
+- Pop-out headers now display with white text on dark background for better contrast
+- Removed unnecessary domain label text that cluttered the header
+- All button colors now align with dark theme (lara-dark-blue) instead of mismatched pink
+- Consistent secondary/primary button styling across all dialogs
+
+**Files Not Requiring Changes**:
+- Statistics Panel, Results Table, Base Picker - Already styled appropriately with PrimeNG CSS variables
 
 ---
 
