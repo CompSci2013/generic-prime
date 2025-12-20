@@ -337,26 +337,21 @@ docs/claude/
 
 ## Recommendations for Session 21
 
-### Priority 1 (Quick Win - 20 minutes)
+### Priority 1 (Critical - generic-prime focus - 20 minutes)
 **Fix Module Anti-Pattern in generic-prime** (from Session 19)
 - Edit `frontend/src/framework/framework.module.ts` - remove 3 lines
-- Run validation script
-- Build & test
+- Run validation script (`scripts/check-module-reexports.js`)
+- Build & test (verify no regressions)
 - Already documented in `QUICK-START-MODULE-FIX.md`
 
-### Priority 2 (Major Feature - 1-2 days)
-**Implement Consumer-3 (Transportation API)**
-- Use `ADDING-CONSUMERS.md` as implementation guide
-- Copy generic-prime template
-- Customize controllers for transportation endpoints
-- Build, test, deploy to K8s
-- Verifies multi-consumer architecture works
+**Why This First**: Architectural correctness required before adding new features. Documented in Session 19.
 
-### Priority 3 (Documentation Update)
-**Update generic-prime docs with data-broker integration**
-- Link generic-prime docs to data-broker docs
-- Update infrastructure diagram with Consumer-3
-- Document transportation endpoints once implemented
+### Priority 2 (Follow-up - if needed)
+**Verify data-broker connectivity for generic-prime**
+- data-broker documentation is created (INTEGRATION-ARCHITECTURE.md, DATA-BROKER-INTEGRATION.md)
+- All APIs verified working
+- generic-prime frontend integration confirmed via API service
+- No further data-broker work needed unless generic-prime encounters backend issues
 
 ---
 
@@ -395,18 +390,21 @@ docs/claude/
 
 ## Conclusion
 
-**data-broker is now a production-grade, documented, multi-consumer backend infrastructure project.**
+**generic-prime backend dependency is now well-documented and verified working.**
 
-Key achievements:
-- ✅ Infrastructure is version-controlled (all 78 files committed)
-- ✅ Protected from accidental commits (comprehensive .gitignore)
-- ✅ Well-documented (README, API reference, consumer guide)
-- ✅ First consumer (generic-prime) verified working
-- ✅ Second consumer template (generic-prime-dockview) available
-- ✅ Third consumer (transportation) implementation guide complete
-- ✅ Future expansion path clear (ADDING-CONSUMERS.md)
+Key achievements for generic-prime:
+- ✅ Backend API fully verified (all 5 endpoints tested)
+- ✅ API contract documented with live examples (API-REFERENCE.md)
+- ✅ Integration guide created for frontend developers (DATA-BROKER-INTEGRATION.md)
+- ✅ Cross-project relationship documented (CROSS-PROJECT-ANALYSIS.md)
+- ✅ No blocking issues with backend - fully operational
 
-**Ready for**: Implementing Consumer-3 and expanding to multi-consumer architecture serving multiple frontend applications.
+**Impact on generic-prime**:
+- Backend infrastructure is stable and documented
+- All API endpoints confirmed working with examples
+- Field naming and request/response formats verified
+- Ready for frontend feature development
+- Module anti-pattern fix (Session 19) remains the priority for architectural quality
 
 ---
 
