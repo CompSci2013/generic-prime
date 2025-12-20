@@ -100,12 +100,41 @@ cytoscape.use(dagre);
 /**
  * Represents a single node in the knowledge graph
  *
+ * Generic node interface for representing any kind of knowledge entity (concept, topic, skill)
+ * in a graph visualization. Supports customizable levels, descriptions, and colors.
+ *
  * @interface KnowledgeNode
  * @property {string} id - Unique identifier for the node
  * @property {string} label - Display text for the node
  * @property {string} description - Detailed description shown on selection
  * @property {string} level - Categorization level for color coding
  * @property {string} [color] - Optional custom hex color
+ *
+ * @remarks
+ * **Property Details**:
+ * - **id**: Kebab-case identifier used for lookup and edge connection. Example: "classical-mechanics"
+ * - **label**: Human-readable display name shown in graph. Example: "Classical Mechanics"
+ * - **description**: Detailed information shown in tooltip/modal when node is selected
+ * - **level**: Categorization for visual styling (color-coding). Examples: 'foundational', 'intermediate', 'advanced'
+ * - **color**: Optional override for default level-based color. Hex format: '#RRGGBB'
+ *
+ * **Usage Context**:
+ * This is a generic interface used across multiple knowledge graphs:
+ * - Physics concept graphs
+ * - Classical mechanics topic graphs
+ * - Curriculum dependency graphs
+ * - Any domain-specific knowledge visualization
+ *
+ * **Level-Based Coloring**:
+ * Nodes are color-coded by level:
+ * - Foundational topics: Cyan (#64c8ff)
+ * - Intermediate topics: Orange (#ffa500)
+ * - Advanced topics: Pink (#ff6b9d)
+ * - Specialization topics: Green (#6BCB77)
+ *
+ * @see KnowledgeEdge - Edges connecting knowledge nodes
+ * @see KnowledgeGraphData - Container with nodes and edges
+ * @see KnowledgeGraphComponent - Component that visualizes this graph
  */
 export interface KnowledgeNode {
   id: string;
@@ -135,18 +164,47 @@ export interface KnowledgeNode {
  *           - 'depends-on': Source depends on target for functionality
  *
  * @remarks
+ * **Directionality**:
  * The edge is directional: source → target. Visual representation shows an arrow
  * pointing from source to target node. The label is displayed on hover in the UI.
  *
+ * **Relationship Semantics**:
+ * - **'prerequisite'**: Target cannot be studied effectively without first mastering source
+ *   Example: vectors-calculus --prerequisite--> newtonian-mechanics
+ * - **'foundation'**: Source provides the mathematical or conceptual basis for target
+ *   Example: newtonian-mechanics --foundation--> lagrangian-mechanics
+ * - **'extends'**: Target builds upon, generalizes, or extends knowledge from source
+ *   Example: kinematics-1d --extends--> kinematics-3d
+ * - **'related'**: Nodes are conceptually connected but have no strict dependency
+ *   Example: thermodynamics --related--> statistical-mechanics
+ * - **'implements'**: Source implements or provides the interface/concept of target
+ *   Example: class --implements--> interface
+ * - **'depends-on'**: Source depends on target for its functionality or meaning
+ *   Example: component --depends-on--> service
+ *
+ * **Visual Encoding**:
+ * - Edge color/style varies by label (may use different line styles for different relationship types)
+ * - Arrow always points from source to target
+ * - Label displayed on edge hover for user understanding
+ * - Edges auto-hide when either endpoint is hidden by filtering
+ *
+ * **Graph Context**:
+ * Edges connect KnowledgeNode instances in a directed acyclic graph (DAG) structure.
+ * Used in multiple visualization contexts (physics curriculum, topics, concepts, etc).
+ *
  * @example
+ * ```typescript
  * {
  *   source: 'vectors-calculus',
  *   target: 'newtonian-mechanics',
  *   label: 'prerequisite'
  * }
+ * // Means: Vectors & Calculus is prerequisite for Newtonian Mechanics
+ * ```
  *
  * @see KnowledgeNode - Node interface paired with this edge
  * @see KnowledgeGraphComponent - Component that visualizes edges
+ * @see KnowledgeGraphData - Container holding all edges
  */
 export interface KnowledgeEdge {
   source: string;

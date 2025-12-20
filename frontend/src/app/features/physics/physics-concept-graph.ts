@@ -55,6 +55,34 @@
  *
  * @property {string} [color] - Optional hex color code for the node background. Overrides default color
  *           assigned by level when provided. Allows custom styling for specific nodes.
+ *
+ * @remarks
+ * **Property Details**:
+ * - **id**: Kebab-case identifier used internally. Examples: "classical-mechanics", "quantum-field-theory", "thermodynamics"
+ * - **label**: Human-readable display text. Examples: "Classical Mechanics", "Quantum Field Theory", "Statistical Mechanics"
+ * - **level**: Determines node color and organization:
+ *   - `'foundational'`: Cyan (#64c8ff) - Entry-level physics concepts
+ *   - `'intermediate'`: Orange (#ffa500) - Intermediate concepts building on foundations
+ *   - `'advanced'`: Pink (#ff6b9d) - Graduate-level advanced topics
+ *   - `'specialization'`: Green (#6BCB77) - PhD specialization topics
+ * - **description**: Shown in modal when node is selected. Example: "Study of forces, motion, and energy in classical systems"
+ * - **color**: If provided, overrides the level-based color. Allows highlighting specific nodes differently
+ *
+ * **Graph Context**:
+ * Physics concept graph has:
+ * - 17 total concept nodes across 4 academic levels
+ * - 26 directed edges showing prerequisite and conceptual relationships
+ * - Visualized with Cytoscape.js using hierarchical Dagre layout
+ *
+ * **Level Distribution**:
+ * - Foundational (2): Classical Mechanics, Electricity & Magnetism
+ * - Intermediate (3): Thermodynamics, Quantum Mechanics, Special Relativity
+ * - Advanced (6): Quantum Field Theory, Statistical Mechanics, Solid State Physics, etc.
+ * - Specialization (6): Advanced thermodynamics, computational physics, etc.
+ *
+ * @see ConceptEdge - Relationships between concepts
+ * @see PhysicsConceptGraphComponent - Component that visualizes this graph
+ * @see PHYSICS_CONCEPT_GRAPH - The exported instance containing all nodes
  */
 export interface ConceptNode {
   id: string;
@@ -83,6 +111,45 @@ export interface ConceptNode {
  *           - "foundation for" - Source provides basis for target
  *           - "extends" - Target builds upon source
  *           - "required for" - Source is prerequisite for target
+ *
+ * @remarks
+ * **Directionality & Semantics**:
+ * Edges are always directional: source → target with specific semantic meaning:
+ * - `classical-mechanics --"foundation for"--> quantum-mechanics` = Classical mechanics provides foundation for quantum mechanics
+ * - `special-relativity --"extends"--> quantum-field-theory` = Special relativity extends into quantum field theory
+ *
+ * **Relationship Types** (4 categories):
+ * - **"leads to"**: Sequential/temporal progression. Example: Classical → Quantum
+ * - **"foundation for"**: Provides conceptual/mathematical basis. Example: Calculus → Mechanics
+ * - **"extends"**: Generalization or advanced application. Example: Mechanics → Statistical Mechanics
+ * - **"required for"**: Strict prerequisite. Example: Calculus required for all other physics
+ *
+ * **Graph Structure**:
+ * Physics concept graph has:
+ * - 17 concept nodes total
+ * - 26 directed edges forming a Directed Acyclic Graph (DAG)
+ * - No circular dependencies
+ * - Enables visualization of prerequisite and conceptual relationships
+ *
+ * **Visual Encoding**:
+ * - Edge color/style determined by relationship label
+ * - Arrow indicates direction from source to target
+ * - Label shown on hover in graph visualization
+ * - Auto-hides edges when either endpoint is hidden by filters
+ *
+ * @example
+ * ```typescript
+ * const edge: ConceptEdge = {
+ *   source: 'classical-mechanics',
+ *   target: 'quantum-mechanics',
+ *   label: 'foundation for'
+ * };
+ * // Means: Classical mechanics is foundation for quantum mechanics
+ * ```
+ *
+ * @see ConceptNode - Nodes connected by these edges
+ * @see PhysicsConceptGraph - Complete graph containing all edges
+ * @see PHYSICS_CONCEPT_GRAPH - The exported instance
  */
 export interface ConceptEdge {
   source: string;
