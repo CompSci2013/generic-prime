@@ -53,6 +53,10 @@
 /**
  * Represents a single node in the physics curriculum hierarchy
  *
+ * Nodes form a tree structure representing the complete physics curriculum from
+ * undergraduate foundations through PhD specialization. Each node can have child nodes
+ * and an optional syllabus with detailed topic breakdowns.
+ *
  * @interface PhysicsNode
  * @property {string} id - Unique identifier for the node (kebab-case)
  * @property {string} title - Display name of the topic/course
@@ -62,6 +66,41 @@
  * @property {number} year - Typical year in curriculum (1-4)
  * @property {PhysicsNode[]} [children] - Nested child topics
  * @property {SyllabusItem[]} [syllabus] - Detailed topic breakdowns
+ *
+ * @remarks
+ * **Property Details**:
+ * - **id**: Kebab-case identifier. Examples: "tier-1-undergrad", "classical-mechanics", "quantum-field-theory"
+ * - **title**: Human-readable course/topic name. Examples: "Classical Mechanics", "Quantum Mechanics", "PhD Specialization"
+ * - **icon**: Single emoji character for visual identification. Examples: "📚" (course), "⚛️" (physics), "🔬" (advanced)
+ * - **description**: 1-2 sentence overview of the course/topic content and learning outcomes
+ * - **level**: Tier in the curriculum structure:
+ *   - `'undergraduate'`: Years 1-4, foundational physics courses
+ *   - `'graduate'`: Years 5-6, advanced core physics
+ *   - `'phd-specialization'`: Years 7+, specialized research topics
+ * - **year**: Number from 1 to 4 indicating typical curriculum year. Values 5+ for graduate courses
+ * - **children**: Optional array of child nodes forming a hierarchical tree. Root has 3 tier nodes; each tier has course children
+ * - **syllabus**: Optional detailed syllabus with topics, key points, and estimated study hours for this node
+ *
+ * **Hierarchy Example**:
+ * ```
+ * PHYSICS_KNOWLEDGE_PATH [0]
+ *   ├─ Tier 1: Undergraduate Physics
+ *   │  ├─ Classical Mechanics (1 course)
+ *   │  ├─ Electricity & Magnetism (1 course)
+ *   │  ├─ Thermodynamics (1 course)
+ *   │  └─ Quantum Mechanics I (1 course)
+ *   ├─ Tier 2: Graduate Physics
+ *   │  ├─ Classical Field Theory (1 course)
+ *   │  ├─ Quantum Mechanics II (1 course)
+ *   │  └─ Statistical Mechanics (1 course)
+ *   └─ Tier 3: PhD Specialization
+ *      ├─ Advanced Quantum Mechanics (1 course)
+ *      ├─ Solid State Physics (1 course)
+ *      └─ [more specialization courses...]
+ * ```
+ *
+ * @see SyllabusItem - Detailed topics within a node
+ * @see PHYSICS_KNOWLEDGE_PATH - Complete curriculum tree
  */
 export interface PhysicsNode {
   id: string;
@@ -77,14 +116,9 @@ export interface PhysicsNode {
 /**
  * Represents a single syllabus topic within a course
  *
- * @interface SyllabusItem
- * @property {string} topic - Name of the syllabus topic
- * @property {string} description - Brief explanation of topic content
- * @property {string[]} keyPoints - Bullet points of key concepts covered
- * @property {number} estimatedHours - Approximate study hours for mastery
- */
-/**
- * Represents a single syllabus topic within a course
+ * Fine-grained breakdown of topics covered in a physics course. Each syllabus item
+ * represents a specific subject area, its key concepts, and estimated study time.
+ * These are contained in a PhysicsNode's syllabus array.
  *
  * @interface SyllabusItem
  * @property {string} topic - Name of the syllabus topic
@@ -93,21 +127,46 @@ export interface PhysicsNode {
  * @property {number} estimatedHours - Approximate study hours for mastery
  *
  * @remarks
+ * **Purpose**:
+ * SyllabusItem objects provide a detailed breakdown of what's covered in each physics course.
+ * They help students understand the scope and time investment for each topic.
+ *
+ * **Property Details**:
+ * - **topic**: Main subject area. Examples: "Classical Mechanics", "Wave Mechanics", "Quantum Field Theory"
+ * - **description**: Concise 1-2 sentence overview of the topic's scope. Example: "Lagrangian formalism, oscillations, dynamics"
+ * - **keyPoints**: Array of important concepts and subtopics to study. Examples:
+ *   - ["Lagrangian & Hamiltonian", "Oscillations & Waves", "Central Forces"]
+ *   - ["Operator formalism", "Eigenvalue problems", "Perturbation theory"]
+ *   - ["Field quantization", "Feynman diagrams", "Cross sections"]
+ * - **estimatedHours**: Total study hours needed to master this topic (including lectures, reading, problem sets, exams)
+ *
  * **Usage in PhysicsNode**:
- * Each course node contains an optional syllabus array of SyllabusItem objects.
- * These provide detailed breakdowns of what's covered in each course.
+ * Each course PhysicsNode contains an optional `syllabus: SyllabusItem[]` array.
+ * Expanding a course shows all its syllabus items with estimated time per topic.
+ *
+ * **Curriculum Statistics**:
+ * - Total of ~110 syllabus items across all 15 courses
+ * - Average 7-8 items per course
+ * - Total estimated hours: 2,500+
+ * - Ranges from 20 hours (intro topics) to 80+ hours (advanced specializations)
  *
  * **Example**:
  * ```typescript
- * {
+ * const mechanics: SyllabusItem = {
  *   topic: 'Classical Mechanics',
  *   description: 'Lagrangian formalism, oscillations, dynamics',
- *   keyPoints: ['Lagrangian & Hamiltonian', 'Oscillations & Waves', 'Central Forces'],
+ *   keyPoints: [
+ *     'Lagrangian & Hamiltonian mechanics',
+ *     'Oscillations & Waves',
+ *     'Central Forces & Orbits',
+ *     'Small oscillations & resonance'
+ *   ],
  *   estimatedHours: 40
- * }
+ * };
  * ```
  *
  * @see PhysicsNode - Parent node that contains syllabus items
+ * @see PHYSICS_KNOWLEDGE_PATH - Complete curriculum containing all syllabus items
  */
 export interface SyllabusItem {
   topic: string;

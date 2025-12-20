@@ -118,6 +118,36 @@ export function createAutomobileDomainConfig(injector: Injector): DomainConfig<
   };
 }
 
+/**
+ * Angular dependency injection provider for Automobile Domain Configuration
+ *
+ * Pre-configured provider that can be used directly in Angular module declarations
+ * to register the automobile domain configuration with the dependency injection container.
+ *
+ * @constant {Provider} DOMAIN_PROVIDER
+ * @remarks
+ * This is an Angular Provider object that:
+ * - Provides the DOMAIN_CONFIG injection token
+ * - Uses a factory function to create the configuration instance
+ * - Automatically resolves the Injector dependency
+ *
+ * **Usage in Module**:
+ * ```typescript
+ * @NgModule({
+ *   providers: [DOMAIN_PROVIDER] // Add to any module
+ * })
+ * export class AppModule { }
+ * ```
+ *
+ * **Internally**:
+ * - provide: Points to the DOMAIN_CONFIG injection token
+ * - useFactory: References createAutomobileDomainConfig function
+ * - deps: Specifies that Injector should be injected into the factory
+ *
+ * @see createAutomobileDomainConfig - The factory function that creates the configuration
+ * @see DomainConfig - The interface describing configuration structure
+ * @see DOMAIN_CONFIG - The injection token this provider uses
+ */
 export const DOMAIN_PROVIDER: Provider = {
   provide: DOMAIN_CONFIG,
   useFactory: createAutomobileDomainConfig,

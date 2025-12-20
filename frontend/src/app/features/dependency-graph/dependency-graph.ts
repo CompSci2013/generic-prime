@@ -102,6 +102,19 @@
  * @property {string[]} [observables] Optional list of observable streams (primary for services and reactive components)
  * @property {string} [color] Optional hex color code for graph visualization and legend representation
  * @property {string} [shape] Optional shape identifier for Cytoscape rendering (rectangle, circle, etc.)
+ *
+ * @remarks
+ * **Property Details**:
+ * - **id**: Kebab-case format ensures consistency and readability in graphs. Examples: "svc-api-service", "npm-angular-core", "cmp-base-picker"
+ * - **label**: Human-readable text displayed in the graph visualization. Used for legend and node labels in the UI
+ * - **category**: Determines visual styling (color, shape) and enables filtering by component type in the visualization
+ * - **version**: Typically used for npm packages (e.g., "@angular/core@14.2.0"). Omitted for internal modules
+ * - **description**: Single-line summary shown in tooltips and modal popups when node is selected
+ * - **detailedDescription**: Extended context useful for documentation and architectural analysis
+ * - **methods**: Exported API surface for services and utilities (e.g., ["get()", "post()", "handle()"])
+ * - **observables**: Observable streams from reactive services (e.g., ["data$", "error$", "loading$"])
+ * - **color**: Hex color code applied to node background in visualization. Auto-assigned by category if omitted
+ * - **shape**: Cytoscape shape identifier. Defaults to 'ellipse' if omitted. Options: 'rectangle', 'circle', 'diamond'
  */
 export interface DependencyNode {
   id: string;
@@ -138,6 +151,39 @@ export interface DependencyNode {
  * @property {string} target The unique ID of the target node (destination component/service/library)
  * @property {string} [label] Optional descriptive label for the edge (e.g., "imports", "depends on")
  * @property {('imports'|'provides'|'injects'|'extends'|'implements'|'uses')} [type] The semantic type of relationship between source and target nodes
+ *
+ * @remarks
+ * **Directionality**:
+ * - Edges are always directional: source → target
+ * - Visual arrow in graph points from source to target
+ * - Represents dependency flow: source depends on target
+ *
+ * **Property Details**:
+ * - **source**: The originating node ID in kebab-case (e.g., "cmp-base-picker")
+ * - **target**: The destination node ID in kebab-case (e.g., "svc-api-service")
+ * - **label**: Human-readable edge label shown on hover in the visualization. Examples: "depends on", "imports from"
+ * - **type**: Semantic relationship type affects edge styling (color, line style):
+ *   - `imports`: Solid gray line (standard dependency)
+ *   - `provides`: Purple dashed line (service provider relationship)
+ *   - `injects`: Yellow dotted line (Angular dependency injection)
+ *   - `extends`: Orange dashed line (inheritance relationship)
+ *   - `implements`: Green dashed line (interface implementation)
+ *   - `uses`: Gray solid line (general usage)
+ *
+ * **Visual Encoding**:
+ * - Edge color and style determined by type
+ * - Edges auto-hide when either endpoint is hidden
+ * - Edge thickness and opacity fixed for clarity
+ *
+ * @example
+ * ```typescript
+ * const edge: DependencyEdge = {
+ *   source: "cmp-base-picker",
+ *   target: "svc-api-service",
+ *   label: "imports",
+ *   type: "imports"
+ * };
+ * ```
  */
 export interface DependencyEdge {
   source: string;

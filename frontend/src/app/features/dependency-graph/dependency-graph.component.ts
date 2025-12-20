@@ -157,10 +157,41 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
 
   constructor(private cdr: ChangeDetectorRef) {}
 
+  /**
+   * Angular lifecycle hook - Component initialization
+   *
+   * Called once when the component is created. In this component,
+   * initialization is minimal as Cytoscape setup happens in ngAfterViewInit.
+   *
+   * @lifecycle
+   * Executes: After constructor, before ngAfterViewInit
+   * Change Detection: Safe to trigger
+   * DOM Access: Not yet available
+   */
   ngOnInit(): void {
     // Initialization complete
   }
 
+  /**
+   * Angular lifecycle hook - View initialization completion
+   *
+   * Called once after the component's view and child views are initialized.
+   * This is where the Cytoscape instance is created and configured with the
+   * complete dependency graph visualization.
+   *
+   * @lifecycle
+   * Executes: After ngOnInit, after DOM is fully rendered
+   * Change Detection: Can be triggered
+   * DOM Access: ViewChild references now available
+   *
+   * @remarks
+   * Initializes:
+   * - Cytoscape instance with Dagre hierarchical layout
+   * - 118 nodes representing dependencies
+   * - 350+ edges representing relationships
+   * - Event handlers for click, tap, and selection events
+   * - Initial fit-to-view after layout completes
+   */
   ngAfterViewInit(): void {
     try {
       this.initializeCytoscape();
@@ -469,6 +500,42 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     ];
   }
 
+  /**
+   * Toggle visibility of a dependency category
+   *
+   * Shows or hides all nodes in the specified category (e.g., Angular Framework,
+   * Production Dependencies, Services, etc.) and automatically updates the graph
+   * layout to fit the visible nodes.
+   *
+   * @param category - The category identifier to toggle (from LAYER_GROUPS)
+   *
+   * @remarks
+   * **Category Options**:
+   * - NPM_PEER: Angular framework packages
+   * - NPM_PROD: Production dependencies
+   * - SERVICES: Framework services
+   * - COMPONENTS: Framework UI components
+   * - MODELS: TypeScript interfaces
+   * - DOMAIN: Domain configurations
+   * - ADAPTERS: Domain API adapters
+   * - CHARTS: Chart data sources
+   * - FEATURES: Page/route components
+   * - BUILD: Build tools
+   * - TEST: Testing tools
+   * - EXTERNAL: External libraries
+   *
+   * **Side Effects**:
+   * - Updates categoryFilters visibility state
+   * - Hides/shows all nodes in the category
+   * - Automatically hides edges connected to hidden nodes
+   * - Calls fitToView() to adjust zoom/pan for visible elements
+   *
+   * @example
+   * ```typescript
+   * // Hide all Angular framework packages
+   * this.toggleCategory(LAYER_GROUPS.NPM_PEER);
+   * ```
+   */
   toggleCategory(category: string): void {
     const filter = this.categoryFilters.find(f => f.category === category);
     if (filter) {
@@ -506,6 +573,29 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     this.fitToView();
   }
 
+  /**
+   * Filter graph nodes by search text
+   *
+   * Shows only nodes whose label or description contains the search text (case-insensitive).
+   * Automatically hides edges connected to hidden nodes and adjusts zoom/pan to fit visible nodes.
+   *
+   * @remarks
+   * **Filtering Logic**:
+   * - Searches node labels (e.g., "Angular Core", "RxJS")
+   * - Searches node descriptions (e.g., "Reactive programming library")
+   * - Case-insensitive matching
+   * - Partial matches (substring search)
+   *
+   * **Empty Search**:
+   * - If searchText is empty, all nodes are shown
+   * - Call clearSearch() to reset
+
+   * @example
+   * ```typescript
+   * this.searchText = 'Angular';
+   * this.filterBySearch(); // Shows only Angular-related nodes
+   * ```
+   */
   filterBySearch(): void {
     if (!this.searchText.trim()) {
       this.cy.elements().style('display', 'element');
@@ -537,12 +627,29 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     this.fitToView();
   }
 
+  /**
+   * Clear search filter and show all nodes
+   *
+   * Resets search text and displays all dependency nodes and edges.
+   * Respects category filter visibility settings.
+   */
   clearSearch(): void {
     this.searchText = '';
     this.cy.elements().style('display', 'element');
     this.updateNodeVisibility();
   }
 
+  /**
+   * Fit graph view to show all visible nodes
+   *
+   * Adjusts zoom and pan to center and fit all visible nodes within the viewport.
+   * Adds 50px padding around nodes for visual breathing room.
+   *
+   * @remarks
+   * - Only fits visible nodes (respects category and search filters)
+   * - Safely handles cases where no nodes are visible
+   * - Includes error handling for Cytoscape exceptions
+   */
   fitToView(): void {
     try {
       if (this.cy && this.cy.elements(':visible').length > 0) {
@@ -553,6 +660,21 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * Reset graph to initial state
+   *
+   * Clears all filters, resets selection, and shows entire dependency graph.
+   * Provides a quick way to return to the default view after filtering/searching.
+   *
+   * @remarks
+   * **Reset Actions**:
+   * - Deselects any selected node
+   * - Removes all CSS classes (selected-node, adjacent-node)
+   * - Clears search text
+   * - Shows all category filters
+   * - Refits graph view to all nodes
+   * - Includes error handling for Cytoscape exceptions
+   */
   resetView(): void {
     try {
       this.selectedNode = null;
@@ -567,6 +689,16 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * Zoom in on the graph (1.2x magnification)
+   *
+   * Increases the zoom level by 20% to allow closer inspection of nodes and edges.
+   * Multiple calls zoom progressively closer.
+   *
+   * @remarks
+   * Each call multiplies current zoom by 1.2x
+   * Includes error handling for Cytoscape exceptions
+   */
   zoomIn(): void {
     try {
       if (this.cy) {
@@ -577,6 +709,16 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * Zoom out on the graph (0.83x magnification)
+   *
+   * Decreases the zoom level by approximately 17% to see more of the dependency graph.
+   * Multiple calls zoom progressively further out.
+   *
+   * @remarks
+   * Each call divides current zoom by 1.2x (approximately 0.83x)
+   * Includes error handling for Cytoscape exceptions
+   */
   zoomOut(): void {
     try {
       if (this.cy) {
@@ -587,18 +729,61 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * Toggle legend visibility
+   *
+   * Shows or hides the legend panel that displays all node category colors and labels.
+   * Legend state is independent of legend expanded state.
+   */
   toggleLegend(): void {
     this.showLegend = !this.showLegend;
   }
 
+  /**
+   * Toggle legend expansion state
+   *
+   * Shows or hides the detailed legend content while keeping the legend panel visible.
+   * Used for collapsing/expanding the full legend to save screen space.
+   */
   toggleLegendExpanded(): void {
     this.legendExpanded = !this.legendExpanded;
   }
 
+  /**
+   * Toggle filter panel visibility
+   *
+   * Shows or hides the category filter panel that allows toggling individual
+   * dependency categories on and off.
+   */
   toggleFilters(): void {
     this.showFilters = !this.showFilters;
   }
 
+  /**
+   * Export dependency graph data as JSON file
+   *
+   * Downloads the complete dependency graph (nodes, edges, and statistics)
+   * as a JSON file for external analysis or import into other tools.
+   *
+   * @remarks
+   * **Exported Data**:
+   * - ALL_DEPENDENCY_NODES: 118 nodes with id, label, category, color
+   * - ALL_DEPENDENCY_EDGES: 350+ edges with source, target, type
+   * - DEPENDENCY_STATS: Aggregated statistics by category
+   * - exportedAt: ISO timestamp of export
+   *
+   * **File Details**:
+   * - Filename: generic-prime-dependency-graph.json
+   * - Format: Minified JSON (2-space indentation)
+   * - Triggers browser download dialog
+   *
+   * @example
+   * ```typescript
+   * // User clicks Export button
+   * this.exportAsJson();
+   * // Browser downloads: generic-prime-dependency-graph.json
+   * ```
+   */
   exportAsJson(): void {
     const data = {
       nodes: ALL_DEPENDENCY_NODES,
@@ -616,10 +801,42 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     URL.revokeObjectURL(url);
   }
 
+  /**
+   * Get hex color for a node category
+   *
+   * Looks up the color value for a given category from the categoryFilters array.
+   * Used by the template to color-code category legend items and nodes.
+   *
+   * @param category - The category identifier (from LAYER_GROUPS)
+   * @returns Hex color code for the category, or '#888' (gray) if not found
+   *
+   * @example
+   * ```typescript
+   * const color = this.getNodeColor(LAYER_GROUPS.NPM_PEER); // Returns '#DD0031'
+   * ```
+   */
   getNodeColor(category: string): string {
     return this.categoryFilters.find(f => f.category === category)?.color || '#888';
   }
 
+  /**
+   * Handle modal mouse down event for dragging
+   *
+   * Initiates modal window dragging when user presses mouse down on the modal header.
+   * Calculates the drag offset to enable smooth movement without jumping.
+   *
+   * @param event - Mouse event from the modal container
+   *
+   * @remarks
+   * **Drag Behavior**:
+   * - Only activates when dragging from .modal-header element
+   * - Calculates offset between click position and element corner
+   * - Stores initial state in isDraggingModal flag
+   * - Prevents default behavior to avoid text selection
+   *
+   * @see onModalMouseMove - Handles drag movement
+   * @see onModalMouseUp - Handles drag completion
+   */
   onModalMouseDown(event: MouseEvent): void {
     // Only allow dragging from the header
     if ((event.target as HTMLElement).closest('.modal-header')) {
@@ -633,6 +850,24 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * Handle modal mouse move event during dragging
+   *
+   * Updates modal position while user drags the modal window.
+   * Only active when isDraggingModal is true (mouse down on header).
+   *
+   * @param event - Mouse move event with current mouse coordinates
+   *
+   * @remarks
+   * **Movement Calculation**:
+   * - Subtracts stored dragOffset from current mouse position
+   * - Results in smooth, natural dragging without position jumps
+   * - Triggers change detection for smooth visual updates
+   * - Uses CSS transform translate() for hardware-accelerated movement
+   *
+   * @see onModalMouseDown - Initiates dragging
+   * @see getModalStyle - Returns CSS transform string for positioned modal
+   */
   onModalMouseMove(event: MouseEvent): void {
     if (this.isDraggingModal) {
       this.modalPosition = {
@@ -643,10 +878,52 @@ export class DependencyGraphComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * Handle modal mouse up event to end dragging
+   *
+   * Completes the modal dragging operation when user releases the mouse.
+   * Called on window document mouseup event to handle cases where mouse
+   * leaves the modal area during dragging.
+   *
+   * @remarks
+   * - Simply sets isDraggingModal flag to false
+   * - Modal stays in final position
+   * - No animation or smoothing
+   *
+   * @see onModalMouseDown - Initiates dragging
+   * @see onModalMouseMove - Updates position during drag
+   */
   onModalMouseUp(): void {
     this.isDraggingModal = false;
   }
 
+  /**
+   * Get CSS transform string for modal positioning
+   *
+   * Returns a CSS transform style string that applies the current modal position.
+   * Used in template [style.transform] attribute to position the draggable modal.
+   *
+   * @returns CSS transform string with current modal x,y position
+   *
+   * @remarks
+   * **CSS Output**:
+   * - Format: `transform: translate(Xpx, Ypx);`
+   * - Uses CSS translate() for hardware-accelerated movement
+   * - Called whenever modalPosition changes
+   *
+   * **Example Output**:
+   * - `transform: translate(150px, 200px);`
+   *
+   * @example
+   * ```html
+   * <div [style]="getModalStyle()" class="modal">
+   *   Modal content that can be dragged
+   * </div>
+   * ```
+   *
+   * @see onModalMouseDown - Updates modalPosition
+   * @see onModalMouseMove - Updates modalPosition during drag
+   */
   getModalStyle(): string {
     return `transform: translate(${this.modalPosition.x}px, ${this.modalPosition.y}px);`;
   }

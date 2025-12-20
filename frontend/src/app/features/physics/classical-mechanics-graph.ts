@@ -58,14 +58,36 @@
  *           - 'advanced': Specialized extensions and cutting-edge topics (color: #ff6b9d)
  * @property {string} [color] - Optional hex color for graph visualization (overrides level default)
  *
+ * @remarks
+ * **Property Details**:
+ * - **id**: Kebab-case format. Examples: "newtonian-mechanics", "rigid-body-rotation", "lagrange-equations"
+ * - **label**: Displayed in graph nodes and legend. Examples: "Elements of Newtonian Mechanics", "Rigid Body Rotation"
+ * - **description**: 1-2 sentence overview. Example: "Newton's laws, forces, and basic dynamics"
+ * - **level**: Determines:
+ *   - `'foundational'`: Cyan (#64c8ff) - Entry-level concepts needed first
+ *   - `'core'`: Orange (#ffa500) - Main curriculum content
+ *   - `'advanced'`: Pink (#ff6b9d) - Specialized/cutting-edge topics
+ * - **color**: Optional override for node background color in visualization. Uses level default if omitted
+ *
+ * **Academic Levels in Classical Mechanics**:
+ * - **Foundational (3)**: Vectors & Calculus, Newtonian Mechanics, 1D Kinematics
+ * - **Core (6)**: 2D/3D Motion, Particle Systems, Rigid Bodies, Gravitation, Rotating Frames, Continuous Media
+ * - **Advanced (9)**: Lagrange, Tensors, Rotation Dynamics, Vibrations, Relativity, Hamiltonian, etc.
+ *
  * @example
- * {
+ * ```typescript
+ * const node: TopicNode = {
  *   id: 'newtonian-mechanics',
  *   label: 'Elements of Newtonian Mechanics',
  *   description: 'Newton\'s laws, forces, and basic dynamics',
  *   level: 'foundational',
  *   color: '#64c8ff'
- * }
+ * };
+ * ```
+ *
+ * @see TopicEdge - Relationships connecting topic nodes
+ * @see TopicGraph - Complete graph containing all nodes
+ * @see CLASSICAL_MECHANICS_GRAPH - The exported instance
  */
 export interface TopicNode {
   id: string;
@@ -91,16 +113,39 @@ export interface TopicNode {
  *           - 'related': Topics share connections but no strict dependency exists
  *
  * @remarks
- * The directed nature of edges means source → target. For example:
- * - Edge(source: 'vectors-calculus', target: 'newtonian-mechanics', label: 'prerequisite')
- *   means students should learn vectors & calculus before Newtonian mechanics.
+ * **Directionality & Meaning**:
+ * The directed nature of edges means source → target with semantic meaning:
+ * - `source --label--> target` = "source is the label-type of target"
+ * - `vectors-calculus --prerequisite--> newtonian-mechanics` = "Vectors & Calculus is prerequisite for Newtonian Mechanics"
+ *
+ * **Relationship Types** (4 categories):
+ * - **'prerequisite'**: Target cannot be studied effectively without mastery of source first
+ *   - Examples: vectors-calculus → newtonian-mechanics, kinematics-1d → kinematics-3d
+ * - **'foundation'**: Source provides the conceptual/mathematical foundation for target
+ *   - Examples: newtonian-mechanics → lagrange-equations (Newton's laws underlie Lagrangian)
+ * - **'extends'**: Target is an extension, generalization, or advanced application of source
+ *   - Examples: kinematics-1d → kinematics-3d, particle-motion → rigid-body-motion
+ * - **'related'**: Topics are conceptually connected but have no strict dependency
+ *   - Examples: rigid-body-motion ← → rotating-frames (both involve rotation, mutual context)
+ *
+ * **Graph Context**:
+ * - Classical Mechanics has 27 total edges across 18 nodes
+ * - Creates a Directed Acyclic Graph (DAG) - no circular dependencies
+ * - Visualized with Cytoscape.js using arrow edges pointing source → target
  *
  * @example
- * {
+ * ```typescript
+ * const edge: TopicEdge = {
  *   source: 'kinematics-1d',
  *   target: 'kinematics-3d',
  *   label: 'extends'
- * }
+ * };
+ * // Means: 1D Kinematics extends into 3D Kinematics
+ * ```
+ *
+ * @see TopicNode - Nodes that are connected by these edges
+ * @see TopicGraph - Complete graph containing all edges
+ * @see CLASSICAL_MECHANICS_GRAPH - The exported instance
  */
 export interface TopicEdge {
   source: string;

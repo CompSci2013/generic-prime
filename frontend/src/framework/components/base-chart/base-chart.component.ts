@@ -23,10 +23,70 @@ import {
 } from '@angular/core';
 import { Subject } from 'rxjs';
 
-// Type-safe import of Plotly
+/**
+ * Plotly.js graph visualization library
+ *
+ * Open-source data visualization library for JavaScript.
+ * Provides declarative charting for creating statistical charts with support for
+ * interactive features like click events, box selection, lasso selection, and hover tooltips.
+ *
+ * @constant {Object} Plotly
+ * @remarks
+ * Using plotly.js-dist-min (minified distribution) for reduced bundle size.
+ * Imported via require() to avoid TypeScript module resolution issues.
+ * Used in BaseChartComponent for rendering reactive charts based on statistics data.
+ *
+ * Features:
+ * - Multiple chart types (scatter, bar, line, histogram, etc.)
+ * - Interactive features (zoom, pan, box select, lasso select)
+ * - Event handling (plotly_click, plotly_selected, plotly_hover)
+ * - Responsive resizing
+ * - Export to PNG
+ *
+ * @see {@link https://plotly.com/javascript/} Official Plotly.js documentation
+ * @see BaseChartComponent - Component that uses Plotly
+ */
 const Plotly = require('plotly.js-dist-min');
 
-// Define minimal Plotly types we need
+/**
+ * Extended HTMLElement interface for Plotly charts
+ *
+ * Extends HTMLElement with Plotly-specific methods and properties required
+ * for chart event handling and data access after a chart has been rendered
+ * by Plotly.newPlot() or Plotly.react().
+ *
+ * @interface PlotlyHTMLElement
+ * @extends HTMLElement
+ * @property {Function} on - Attach event listener to Plotly chart
+ * @property {any[]} [data] - Array of Plotly data traces (read-only after render)
+ * @property {any} [layout] - Plotly layout configuration object (read-only after render)
+ *
+ * @remarks
+ * **Event Listeners**:
+ * - 'plotly_click': User clicks on a data point
+ * - 'plotly_selected': User completes a box or lasso selection
+ * - 'plotly_hover': User hovers over a data point
+ * - 'plotly_unhover': User moves mouse away from data point
+ *
+ * **Data Access**:
+ * After Plotly.newPlot() or Plotly.react() completes, the element becomes a
+ * PlotlyHTMLElement and you can read its data and layout properties to inspect
+ * the rendered chart's configuration.
+ *
+ * @example
+ * ```typescript
+ * Plotly.newPlot(element, traces, layout).then((gd: PlotlyHTMLElement) => {
+ *   // gd is now a PlotlyHTMLElement with data, layout, and on() method
+ *   gd.on('plotly_click', (data) => {
+ *     console.log('Clicked:', data.points[0]);
+ *   });
+ *   console.log('Chart traces:', gd.data);
+ * });
+ * ```
+ *
+ * @see Plotly - The library that creates these elements
+ * @see BaseChartComponent.attachEventHandlers - Example usage
+ */
 interface PlotlyHTMLElement extends HTMLElement {
   on(event: string, callback: (data: any) => void): void;
   data?: any[];

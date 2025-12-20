@@ -1,8 +1,38 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PHYSICS_CONCEPT_GRAPH, ConceptNode, ConceptEdge } from './physics-concept-graph';
+
+/**
+ * Cytoscape.js graph visualization library
+ *
+ * Open-source graph theory (network) library for analysis and visualization.
+ * Provides the core functionality for rendering interactive node-link diagrams
+ * with support for multiple layout algorithms, event handlers, and styling.
+ *
+ * @constant {Object} cytoscape
+ * @see {@link https://js.cytoscape.org} Official Cytoscape.js documentation
+ * @remarks
+ * Imported via require() to avoid TypeScript module resolution issues.
+ * Used in PhysicsConceptGraphComponent for rendering physics concept relationships.
+ */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cytoscape = require('cytoscape');
+
+/**
+ * Cytoscape-Dagre layout plugin
+ *
+ * Implements the Dagre hierarchical graph layout algorithm for Cytoscape.js.
+ * Provides directed acyclic graph (DAG) layout with automatic node positioning
+ * to visualize concept hierarchies (foundational → intermediate → advanced).
+ *
+ * @constant {Object} dagre
+ * @remarks
+ * Imported via require() to avoid TypeScript module resolution issues.
+ * Must be registered with cytoscape.use(dagre) before use.
+ * Provides automatic hierarchical layout positioning for physics concepts.
+ *
+ * @see {@link https://github.com/cytoscape/cytoscape.js-dagre} Cytoscape-Dagre documentation
+ */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const dagre = require('cytoscape-dagre');
 
