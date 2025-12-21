@@ -180,7 +180,6 @@ export class PopOutContextService implements OnDestroy {
    */
   initializeAsPopOut(panelId: string): void {
     if (this.initialized) {
-      console.warn('PopOutContextService already initialized');
       return;
     }
 
@@ -192,8 +191,6 @@ export class PopOutContextService implements OnDestroy {
       type: PopOutMessageType.PANEL_READY,
       timestamp: Date.now()
     });
-
-    console.log(`[PopOut] Initialized as pop-out for panel: ${panelId}`);
   }
 
   /**
@@ -215,12 +212,10 @@ export class PopOutContextService implements OnDestroy {
    */
   initializeAsParent(): void {
     if (this.initialized) {
-      console.warn('PopOutContextService already initialized');
       return;
     }
 
     this.initialized = true;
-    console.log('[PopOut] Initialized as parent window');
   }
 
   /**
@@ -246,19 +241,14 @@ export class PopOutContextService implements OnDestroy {
       // Run in Angular zone to trigger change detection
       this.ngZone.run(() => {
         const message = event.data as PopOutMessage;
-
-        console.log(`[PopOut] Received message:`, message.type, message.payload);
-
         this.messagesSubject.next(message);
       });
     };
 
     // Set up error handler
-    this.channel.onmessageerror = (event: MessageEvent) => {
-      console.error('[PopOut] Message error:', event);
+    this.channel.onmessageerror = () => {
+      // Silently ignore message errors
     };
-
-    console.log(`[PopOut] Channel created: ${channelName}`);
   }
 
   /**
@@ -284,7 +274,6 @@ export class PopOutContextService implements OnDestroy {
    */
   sendMessage<T = any>(message: PopOutMessage<T>): void {
     if (!this.channel) {
-      console.warn('[PopOut] No channel available, cannot send message');
       return;
     }
 
@@ -293,12 +282,10 @@ export class PopOutContextService implements OnDestroy {
       message.timestamp = Date.now();
     }
 
-    console.log(`[PopOut] Sending message:`, message.type, message.payload);
-
     try {
       this.channel.postMessage(message);
-    } catch (error) {
-      console.error('[PopOut] Failed to send message:', error);
+    } catch {
+      // Silently ignore send errors
     }
   }
 
@@ -359,9 +346,6 @@ export class PopOutContextService implements OnDestroy {
   createChannelForPanel(panelId: string): BroadcastChannel {
     const channelName = `panel-${panelId}`;
     const channel = new BroadcastChannel(channelName);
-
-    console.log(`[PopOut] Created channel for panel: ${channelName}`);
-
     return channel;
   }
 
@@ -379,7 +363,6 @@ export class PopOutContextService implements OnDestroy {
    */
   close(): void {
     if (this.channel) {
-      console.log('[PopOut] Closing channel');
       this.channel.close();
       this.channel = null;
     }

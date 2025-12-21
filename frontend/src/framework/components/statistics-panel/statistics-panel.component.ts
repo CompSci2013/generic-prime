@@ -142,13 +142,11 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
    */
   private getDataSource(dataSourceId: string): ChartDataSource {
     if (!this.domainConfig.chartDataSources) {
-      console.warn(`No chartDataSources map in domain config`);
       return null as any;
     }
 
     const dataSource = this.domainConfig.chartDataSources[dataSourceId];
     if (!dataSource) {
-      console.warn(`No data source found for ID: ${dataSourceId}`);
       return null as any;
     }
 
@@ -176,11 +174,7 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
    * Handle chart click event
    */
   onChartClick(event: { value: string; isHighlightMode: boolean }, chartId: string): void {
-    console.log(`[StatisticsPanel] 🎯 onChartClick() - chartId: ${chartId}, isHighlightMode: ${event.isHighlightMode}, value: ${event.value}`);
-    console.log(`[StatisticsPanel] Context: isInPopOut=${this.popOutContext.isInPopOut()}`);
-
     if (event.isHighlightMode) {
-      console.log('[StatisticsPanel] Processing HIGHLIGHT MODE click');
       // Highlight mode: Add h_* URL parameter based on chart type
       const newParams: Record<string, any> = {};
 
@@ -189,15 +183,11 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
         const [min, max] = event.value.split('|');
         newParams['h_yearMin'] = min;
         newParams['h_yearMax'] = max;
-        console.log('[StatisticsPanel] Parsed range:', { h_yearMin: min, h_yearMax: max });
       } else {
         // Single value or other chart types
         const paramName = this.getHighlightParamName(chartId);
         if (paramName) {
           newParams[paramName] = event.value;
-          console.log(`[StatisticsPanel] Mapped chart '${chartId}' to param '${paramName}' with value '${event.value}'`);
-        } else {
-          console.warn(`[StatisticsPanel] ⚠️  No param mapping for chart: ${chartId}`);
         }
       }
 
@@ -205,22 +195,16 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
       // Pop-out windows must NOT mutate their URL - main window URL is the single source of truth
       if (this.popOutContext.isInPopOut()) {
         // In pop-out: Send URL change to main window via BroadcastChannel
-        console.log('[StatisticsPanel] 🟡 In Pop-Out - Broadcasting highlight params to main window:', newParams);
-        console.log('[StatisticsPanel] Sending URL_PARAMS_CHANGED with payload:', { params: newParams });
         this.popOutContext.sendMessage({
           type: PopOutMessageType.URL_PARAMS_CHANGED,
           payload: { params: newParams },
           timestamp: Date.now()
         });
-        console.log('[StatisticsPanel] ✅ Broadcast message sent via popOutContext.sendMessage()');
       } else {
         // In main window: Update URL directly
-        console.log('[StatisticsPanel] 🔵 In Main Window - Setting highlight params:', newParams);
         this.urlState.setParams(newParams);
-        console.log('[StatisticsPanel] ✅ URL params set via urlState.setParams()');
       }
     } else {
-      console.log('[StatisticsPanel] Processing NORMAL MODE click (non-highlight)');
       // Normal mode: Add filter URL parameter (non-highlight)
       const newParams: Record<string, any> = {};
 
@@ -229,15 +213,11 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
         const [min, max] = event.value.split('|');
         newParams['yearMin'] = min;
         newParams['yearMax'] = max;
-        console.log('[StatisticsPanel] Parsed range:', { yearMin: min, yearMax: max });
       } else {
         // Single value or other chart types
         const paramName = this.getFilterParamName(chartId);
         if (paramName) {
           newParams[paramName] = event.value;
-          console.log(`[StatisticsPanel] Mapped chart '${chartId}' to param '${paramName}' with value '${event.value}'`);
-        } else {
-          console.warn(`[StatisticsPanel] ⚠️  No param mapping for chart: ${chartId}`);
         }
       }
 
@@ -245,22 +225,16 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
       // Pop-out windows must NOT mutate their URL - main window URL is the single source of truth
       if (this.popOutContext.isInPopOut()) {
         // In pop-out: Send URL change to main window via BroadcastChannel
-        console.log('[StatisticsPanel] 🟡 In Pop-Out - Broadcasting filter params to main window:', newParams);
-        console.log('[StatisticsPanel] Sending URL_PARAMS_CHANGED with payload:', { params: newParams });
         this.popOutContext.sendMessage({
           type: PopOutMessageType.URL_PARAMS_CHANGED,
           payload: { params: newParams },
           timestamp: Date.now()
         });
-        console.log('[StatisticsPanel] ✅ Broadcast message sent via popOutContext.sendMessage()');
       } else {
         // In main window: Update URL directly
-        console.log('[StatisticsPanel] 🔵 In Main Window - Setting filter params:', newParams);
         this.urlState.setParams(newParams);
-        console.log('[StatisticsPanel] ✅ URL params set via urlState.setParams()');
       }
     }
-    console.log('[StatisticsPanel] ✅ onChartClick() complete');
   }
 
   /**
