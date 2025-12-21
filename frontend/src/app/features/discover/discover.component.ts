@@ -29,7 +29,7 @@ import { UrlStateService } from '../../../framework/services/url-state.service';
  * Single component renders different UIs based on DOMAIN_CONFIG.
  *
  * **Primary Responsibilities**:
- * 1. Orchestrate 4 framework panels (QueryControl, Picker, Statistics, ResultsTable)
+ * 1. Orchestrate 3 framework panels (QueryControl, Statistics, ResultsTable)
  * 2. Manage panel lifecycle (collapse, drag-drop reorder, pop-out)
  * 3. Handle URL state synchronization with ResourceManagementService
  * 4. Manage pop-out windows (create, monitor, close)
@@ -47,7 +47,6 @@ import { UrlStateService } from '../../../framework/services/url-state.service';
  * │
  * ├─ Panel renders
  * │  ├─ Query Control (filters$)
- * │  ├─ Picker (results$ with filter)
  * │  ├─ Statistics (statistics$)
  * │  └─ Results Table (results$)
  * │
@@ -58,7 +57,7 @@ import { UrlStateService } from '../../../framework/services/url-state.service';
  *    │
  *    └─ BroadcastChannel sync
  *       ├─ Main → Pop-out: STATE_UPDATE (on URL change)
- *       └─ Pop-out → Main: PICKER_SELECTION_CHANGE, FILTER_ADD, etc.
+ *       └─ Pop-out → Main: FILTER_ADD, FILTER_REMOVE, etc.
  * ```
  *
  * **Key Features**:
@@ -217,7 +216,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
 
     // STEP 4: Listen for messages from pop-outs via PopOutContextService
     // PopOutContextService maintains a global subscription to BroadcastChannel
-    // This captures any messages sent by pop-outs (PANEL_READY, PICKER_SELECTION_CHANGE, etc.)
+    // This captures any messages sent by pop-outs (PANEL_READY, etc.)
     this.popOutContext
       .getMessages$()
       .pipe(takeUntil(this.destroy$))
