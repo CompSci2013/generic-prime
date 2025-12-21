@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.40
-**Timestamp**: 2025-12-21T12:00:00Z
-**Updated By**: Session 40 - Gemini Assessment Follow-up & Pop-Out Optimization
+**Version**: 5.41
+**Timestamp**: 2025-12-21T12:03:00Z
+**Updated By**: Session 40 (Continued) - Pop-Out Zone Boundary Critical Fix
 
 ---
 
@@ -96,10 +96,49 @@ Pop-Out Window (e.g., Query Control):
 **Commits**:
 - 61b4aa9: chore: Remove redundant URL_PARAMS_SYNC broadcast from pop-out architecture
 
-**Next Steps**:
-- Manual testing of pop-out filter rendering (6 scenarios from POP-OUT-REQUIREMENTS-RUBRIC.md)
-- Verify filter chips render correctly when main window applies filters
-- Confirm no console errors or duplicate messages
+**Post-Gemini Issues Discovered During Testing**:
+
+During manual testing of pop-outs following Gemini's recommendations, two critical bugs were discovered and fixed:
+
+1. ✅ **Session 40 Part 2**: Pop-out URL mutation (StatisticsPanel calling setParams before isInPopOut check)
+   - Fixed by reordering logic to check isInPopOut() FIRST
+   - Commit: 383a2fa
+
+2. ✅ **Session 40 Part 4**: Pop-out state not rendering (BehaviorSubject emissions outside zone)
+   - Fixed by moving ngZone.run() wrapper to service level
+   - Commit: 767034b (THIS SESSION)
+
+---
+
+## Session 40 Continued: Critical Pop-Out State Update Fix
+
+### Secondary Issue Found: Pop-Out Windows Not Updating UI
+
+**Problem**: Pop-out windows received STATE_UPDATE messages but the UI remained frozen. Console showed BroadcastChannel messages arriving successfully, state being synced, but no visual changes.
+
+**Root Cause**: BehaviorSubject emissions in ResourceManagementService were happening outside the Angular zone, causing child component subscription callbacks to run outside the zone, making their `cdr.markForCheck()` calls ineffective.
+
+**Why Previous Fix Failed**: Initial attempt wrapped syncStateFromExternal() call in ngZone.run() in PanelPopoutComponent, but the BehaviorSubject emission itself (inside the service) still ran outside the proper zone context.
+
+**Solution Implemented**:
+1. Injected NgZone into ResourceManagementService
+2. Wrapped `stateSubject.next()` call inside `ngZone.run()` in syncStateFromExternal()
+3. Removed redundant ngZone wrapping from PanelPopoutComponent
+4. Ensured the entire observable emission chain runs inside the Angular zone
+
+**Files Modified**:
+- `frontend/src/framework/services/resource-management.service.ts` (zone-aware state emissions)
+- `frontend/src/app/features/panel-popout/panel-popout.component.ts` (simplified, removed redundant wrapping)
+
+**Build Status**: ✅ SUCCESSFUL
+**Documentation**: ✅ COMPLETE (SESSION-40-ZONE-FIX-COMPLETE.md created)
+
+**Key Insight**: Observable sources that handle external events must be zone-aware. Moving zone awareness from consumer level (PanelPopoutComponent) to service level (ResourceManagementService) ensures the entire subscription chain runs correctly.
+
+**Commits in This Session**:
+- 61b4aa9: chore: Remove redundant URL_PARAMS_SYNC broadcast
+- 383a2fa: fix: Prevent pop-out URL mutation in StatisticsPanel
+- 767034b: fix: Ensure BehaviorSubject emissions in pop-outs run inside Angular zone
 
 ---
 

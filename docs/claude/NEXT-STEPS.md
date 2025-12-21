@@ -1,11 +1,40 @@
 # Next Steps
 
-**Current Session**: Session 40 - Gemini Assessment & Pop-Out Optimization (COMPLETE)
-**Next Session**: Session 41 - Manual Pop-Out Testing & Bug Fixes
+**Current Session**: Session 40 (Continued) - Critical Pop-Out State Update Fix (COMPLETE)
+**Next Session**: Session 41 - Manual Pop-Out Testing & Verification
 
 ---
 
-## SESSION 40 COMPLETED: Gemini Assessment & Pop-Out Architecture Optimization
+## SESSION 40 FINAL COMPLETION: Zone Boundary Fix for Pop-Out State Updates
+
+**Status**: ✅ IMPLEMENTATION COMPLETE - Pop-Out State Sync Fixed
+
+**Critical Issue Resolved**:
+Pop-out windows were receiving STATE_UPDATE messages but the UI remained frozen. The root cause was that BehaviorSubject emissions in ResourceManagementService were happening outside the Angular zone, causing child component subscription callbacks to run outside the zone.
+
+**Solution Implemented**:
+- Injected NgZone into ResourceManagementService
+- Wrapped `stateSubject.next()` in `ngZone.run()` in syncStateFromExternal()
+- This ensures the entire observable emission chain runs inside the Angular zone
+- Child components' cdr.markForCheck() calls now become effective
+- Pop-out windows will now update immediately when receiving state from main window
+
+**Files Modified**:
+- `frontend/src/framework/services/resource-management.service.ts` (zone-aware emissions)
+- `frontend/src/app/features/panel-popout/panel-popout.component.ts` (simplified, removed redundant wrapping)
+
+**Commits in Session 40**:
+1. 61b4aa9: chore: Remove redundant URL_PARAMS_SYNC broadcast
+2. 383a2fa: fix: Prevent pop-out URL mutation in StatisticsPanel
+3. 767034b: fix: Ensure BehaviorSubject emissions in pop-outs run inside Angular zone
+
+**Documentation**: Created SESSION-40-ZONE-FIX-COMPLETE.md with comprehensive technical analysis
+
+**Next**: Manual pop-out testing to verify fixes work correctly
+
+---
+
+## SESSION 40 PART 1 COMPLETED: Gemini Assessment & Pop-Out Architecture Optimization
 
 **Status**: ✅ IMPLEMENTATION COMPLETE - Architecture Optimized
 
