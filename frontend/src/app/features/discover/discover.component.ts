@@ -210,27 +210,22 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * All subscriptions are cleaned up via takeUntil(destroy$) in ngOnDestroy.
    */
   ngOnInit(): void {
-    console.log('[Discover] ngOnInit() called');
-
     // STEP 1: Register domain-specific picker configurations
     // Pickers are domain-specific (e.g., ManufacturerModel for automobiles)
     // createAutomobilePickerConfigs() returns an array of PickerConfig objects
     // These are registered globally so any component can reference them by ID
     const pickerConfigs = createAutomobilePickerConfigs(this.injector);
     this.pickerRegistry.registerMultiple(pickerConfigs);
-    console.log('[Discover] Picker configs registered:', pickerConfigs.length);
 
     // STEP 2: Initialize PopOutContextService as parent (main) window
     // This marks the service as "not a pop-out" (as opposed to PanelPopoutComponent)
     // Allows PopOutContextService to distinguish main window from pop-outs
     this.popOutContext.initializeAsParent();
-    console.log('[Discover] Initialized as parent window');
 
     // STEP 3: Close all pop-outs when user refreshes/closes main window
     // beforeunload is more reliable than unload for cleanup
     // Ensures pop-out windows are explicitly closed before main window unloads
     window.addEventListener('beforeunload', this.beforeUnloadHandler);
-    console.log('[Discover] beforeunload handler attached');
 
     // STEP 4: Listen for messages from pop-outs via PopOutContextService
     // PopOutContextService maintains a global subscription to BroadcastChannel
@@ -239,10 +234,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       .getMessages$()
       .pipe(takeUntil(this.destroy$))
       .subscribe(message => {
-        console.log('[Discover] PopOutContextService message received:', message);
         this.handlePopOutMessage('', message);
       });
-    console.log('[Discover] Subscribed to popOutContext messages');
 
     // STEP 5: Subscribe to pop-out BroadcastChannel messages
     // BroadcastChannel.onmessage callbacks run OUTSIDE Angular zone
@@ -252,10 +245,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     this.popoutMessages$
       .pipe(takeUntil(this.destroy$))
       .subscribe(({ panelId, event }) => {
-        console.log('[Discover] BroadcastChannel message from panel:', panelId, event.data);
         this.handlePopOutMessage(panelId, event.data);
       });
-    console.log('[Discover] Subscribed to popoutMessages$ subject');
 
     // STEP 6: Broadcast state changes to all open pop-outs
     // URL-First Architecture: Main window is source of truth
@@ -264,10 +255,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     //       pop-outs' ResourceManagementService.syncStateFromExternal() → pop-out components re-render
     // This subscription fires every time state$ emits (filters, results, loading, error, statistics)
     this.resourceService.state$.pipe(takeUntil(this.destroy$)).subscribe(state => {
-      console.log('[Discover] State changed, broadcasting to pop-outs:', state);
       this.broadcastStateToPopOuts(state);
     });
-    console.log('[Discover] Subscribed to resourceService.state$ for broadcasting');
 
     // Note: URL parameter broadcasting to pop-outs is now handled exclusively through STATE_UPDATE
     // messages (broadcastStateUpdateToPopOuts). Pop-out Query Control subscribes to STATE_UPDATE
@@ -314,7 +303,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   onPanelDrop(event: CdkDragDrop<string[]>): void {
     moveItemInArray(this.panelOrder, event.previousIndex, event.currentIndex);
     this.cdr.markForCheck();
-    console.log('[Discover] Panel order updated:', this.panelOrder);
   }
 
   /**
@@ -356,11 +344,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * @param panelType - Panel type for routing (e.g., 'query-control', 'picker', 'statistics', 'results')
    */
   popOutPanel(panelId: string, panelType: string): void {
-    console.log(`[Discover] popOutPanel() called - panelId: ${panelId}, panelType: ${panelType}`);
-
     // Check if already popped out
     if (this.poppedOutPanels.has(panelId)) {
-      console.warn(`[Discover] Panel ${panelId} is already popped out`);
       return;
     }
 
@@ -368,7 +353,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     // Same app URL, but with ?popout=panelId flag that AppComponent detects to hide header
     // This approach is used by GoldenLayout and other layout libraries - same app, different UI mode
     const url = `/panel/${this.gridId}/${panelId}/${panelType}?popout=${panelId}`;
-    console.log(`[Discover] Opening pop-out window at URL: ${url}`);
 
     // Window features
     const features = buildWindowFeatures({
@@ -382,11 +366,9 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
 
     // Open window (state will be broadcast via BroadcastChannel, not URL)
     const popoutWindow = window.open(url, `panel-${panelId}`, features);
-    console.log(`[Discover] window.open() returned:`, popoutWindow ? 'SUCCESS' : 'BLOCKED');
 
     if (!popoutWindow) {
       // Pop-up blocked
-      console.error(`[Discover] Pop-up BLOCKED for panel: ${panelId}`);
       this.messageService.add({
         severity: 'warn',
         summary: 'Pop-up Blocked',
@@ -398,11 +380,9 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
 
     // Track as popped out
     this.poppedOutPanels.add(panelId);
-    console.log(`[Discover] Marked panel as popped out. Total popped out: ${this.poppedOutPanels.size}`);
 
     // Set up BroadcastChannel for this panel
     const channel = this.popOutContext.createChannelForPanel(panelId);
-    console.log(`[Discover] Created BroadcastChannel for panel: ${panelId}`);
 
     // Listen for messages from pop-out (Observable Pattern)
     // IMPORTANT: Wrap handler in ngZone.run() to re-enter Angular zone immediately
@@ -412,20 +392,16 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     // change detection awareness. This is architecturally correct per Angular zone principles.
     channel.onmessage = event => {
       this.ngZone.run(() => {
-        console.log(`[Discover] BroadcastChannel.onmessage received from ${panelId}:`, event.data);
         this.popoutMessages$.next({ panelId, event });
       });
     };
-    console.log(`[Discover] Set up channel.onmessage listener for panel: ${panelId}`);
 
     // Monitor for window close
     const checkInterval = window.setInterval(() => {
       if (popoutWindow.closed) {
-        console.log(`[Discover] Detected pop-out window closed for panel: ${panelId}`);
         this.onPopOutClosed(panelId, channel, checkInterval);
       }
     }, 500);
-    console.log(`[Discover] Set up window close monitor for panel: ${panelId}`);
 
     // Store reference
     this.popoutWindows.set(panelId, {
@@ -435,12 +411,9 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       panelId,
       panelType
     });
-    console.log(`[Discover] Stored popout reference. Total popouts: ${this.popoutWindows.size}`);
 
     // Trigger change detection to hide panel
     this.cdr.markForCheck();
-
-    console.log(`[Discover] ✅ Successfully popped out panel: ${panelId}`);
   }
 
   /**
@@ -450,27 +423,16 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * @param message - Message from pop-out
    */
   private async handlePopOutMessage(_panelId: string, message: any): Promise<void> {
-    console.log(
-      `[Discover] Message from pop-out:`,
-      message.type,
-      message.payload
-    );
-
     switch (message.type) {
       case PopOutMessageType.PANEL_READY:
         // Pop-out is ready - broadcast current state immediately
         // (state$ subscription only fires on changes, not on initial subscription)
-        console.log('[Discover] Pop-out ready, broadcasting current state');
         const currentState = this.resourceService.getCurrentState();
         this.broadcastStateToPopOuts(currentState);
         break;
 
       case PopOutMessageType.URL_PARAMS_CHANGED:
         // Pop-out sent URL params change - update main window URL
-        console.log(
-          '[Discover] URL params change from pop-out - RECEIVED PARAMS:',
-          message.payload?.params
-        );
         if (message.payload?.params) {
           // Update the single source of truth (the URL)
           // This triggers the normal state update flow:
@@ -480,15 +442,12 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
           // 4. state$ subscription fires and broadcasts complete state to pop-outs
           // DO NOT manually broadcast incomplete state here - that causes race conditions
           // where pop-outs receive state with empty results before API completes
-          console.log('[Discover] URL update will trigger state$ subscription and broadcast');
           await this.urlStateService.setParams(message.payload.params);
-          console.log('[Discover] urlStateService.setParams() called in main window.');
         }
         break;
 
       case PopOutMessageType.CLEAR_ALL_FILTERS:
         // Pop-out requested to clear all filters - clear all URL params
-        console.log('[Discover] Clear all filters from pop-out');
         await this.urlStateService.clearParams();
         break;
     }
@@ -506,7 +465,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     channel: BroadcastChannel,
     checkInterval: number
   ): void {
-    console.log(`[Discover] Pop-out ${panelId} closed, restoring panel`);
 
     // Clean up
     clearInterval(checkInterval);
@@ -542,8 +500,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * @param event - Picker selection event containing selected items and URL value
    */
   async onPickerSelectionChangeAndUpdateUrl(event: any): Promise<void> {
-    console.log('[Discover] Picker selection changed:', event);
-
     // Extract the URL param name from the picker config
     // For now, we'll use a hardcoded value - this should come from the picker config
     const paramName = 'modelCombos'; // TODO: Get from picker config
@@ -560,7 +516,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * Called on beforeunload to clean up pop-outs when main window refreshes
    */
   private closeAllPopOuts(): void {
-    console.log('[Discover] Closing all pop-outs (main window unloading)');
 
     // Send CLOSE_POPOUT to all pop-outs
     this.popoutWindows.forEach(({ channel }) => {
@@ -585,12 +540,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     if (this.popoutWindows.size === 0) {
       return; // No pop-outs, skip broadcast
     }
-
-    console.log('[Discover] Broadcasting state to all pop-outs:', {
-      resultsCount: state.results?.length,
-      filters: state.filters,
-      popoutsCount: this.popoutWindows.size
-    });
 
     // Send STATE_UPDATE to all pop-outs
     this.popoutWindows.forEach(({ channel }) => {

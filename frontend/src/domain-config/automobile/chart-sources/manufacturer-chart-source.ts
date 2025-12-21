@@ -99,8 +99,6 @@ export class ManufacturerChartDataSource extends ChartDataSource<VehicleStatisti
       xaxis: {
         tickangle: -45,
         automargin: true,
-        scaleanchor: 'y',
-        scaleratio: 1,
         color: '#FFFFFF',
         gridcolor: '#333333'
       },
@@ -108,8 +106,6 @@ export class ManufacturerChartDataSource extends ChartDataSource<VehicleStatisti
         title: { text: '' },
         gridcolor: '#333333',
         automargin: true,
-        scaleanchor: 'x',
-        scaleratio: 1,
         color: '#FFFFFF'
       },
       margin: {

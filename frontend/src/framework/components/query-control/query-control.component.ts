@@ -223,19 +223,14 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   ) {}
 
   ngOnInit(): void {
-    console.log('[QueryControl] ngOnInit() starting...');
-
     // Initialize filter field options from domain config
     // Only include queryControlFilters, NOT highlightFilters
     // (highlightFilters are for highlighting data, not for main filter selection)
     this.filterFieldOptions = this.domainConfig.queryControlFilters
       .map(f => ({ label: f.label, value: f }));
-    console.log('[QueryControl] ✅ Initialized filter field options:', this.filterFieldOptions.length);
 
     // Check if running in pop-out window
     if (this.popOutContext.isInPopOut()) {
-      console.log('[QueryControl] 📍 Pop-out mode detected - subscribing to BroadcastChannel STATE_UPDATE messages');
-
       // In pop-out window: Subscribe to STATE_UPDATE messages from main window
       // These arrive via BroadcastChannel (not @Input bindings, which don't work across zones)
       this.popOutContext
@@ -245,25 +240,18 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
           takeUntil(this.destroy$)
         )
         .subscribe(message => {
-          console.log('[QueryControl] 🟢 Received STATE_UPDATE from BroadcastChannel');
           if (message.payload && message.payload.state) {
             // Extract filters from the state object and render them
             this.syncFiltersFromPopoutState(message.payload.state);
             this.cdr.markForCheck();
           }
         });
-
-      console.log('[QueryControl] ✅ ngOnInit() complete (pop-out mode)');
     } else {
       // In main window: Sync from URL state on init and on changes
-      console.log('[QueryControl] 📍 Main window mode, subscribing to URL params$');
       this.urlState.params$.pipe(takeUntil(this.destroy$)).subscribe(params => {
-        console.log('[QueryControl] 📨 URL params changed:', params);
         this.syncFiltersFromUrl(params);
-        console.log('[QueryControl] ✅ Called syncFiltersFromUrl(), marking for check');
         this.cdr.markForCheck();
       });
-      console.log('[QueryControl] ✅ ngOnInit() complete (main window mode)');
     }
   }
 
@@ -443,8 +431,7 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
           this.optionsError = null;
           this.cdr.markForCheck();
         },
-        error: (error) => {
-          console.error('Failed to load filter options:', error);
+        error: () => {
           this.loadingOptions = false;
           this.optionsError = 'Failed to load options. Please try again.';
           this.cdr.markForCheck();
@@ -542,8 +529,7 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
           }
           this.cdr.markForCheck();
         },
-        error: (error) => {
-          console.error('Failed to load year range:', error);
+        error: () => {
           // Use defaults if API fails
           this.cdr.markForCheck();
         }

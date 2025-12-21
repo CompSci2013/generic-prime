@@ -112,8 +112,6 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
       xaxis: {
         tickangle: -45,
         automargin: true,
-        scaleanchor: 'y',
-        scaleratio: 1,
         color: '#FFFFFF',
         gridcolor: '#333333'
       },
@@ -121,8 +119,6 @@ export class BodyClassChartDataSource extends ChartDataSource<VehicleStatistics>
         title: { text: '' },
         gridcolor: '#333333',
         automargin: true,
-        scaleanchor: 'x',
-        scaleratio: 1,
         color: '#FFFFFF'
       },
       margin: {
