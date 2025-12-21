@@ -1,7 +1,84 @@
 # Next Steps
 
-**Current Session**: Session 41 - Minimal Automobiles-Only Build (COMPLETE)
-**Next Session**: Session 42 - Manual Pop-Out Testing on Minimal Build
+**Current Session**: Session 42 - Pop-Out Architecture Fixed (COMPLETE)
+**Next Session**: Session 43 - Merge to Main & Full Testing
+
+---
+
+## SESSION 42 COMPLETION: Pop-Out Architecture Fixed ✅
+
+**Status**: ✅ COMPLETE - Pop-out windows working perfectly
+
+### What Was Accomplished
+
+1. ✅ **Diagnosed root cause of pop-out header issue**:
+   - Pop-outs were rendering full AppComponent (with Home/Domains banner)
+   - Attempted separate entry point approach (popout.html) but dev server couldn't serve it
+   - Realized: GoldenLayout and professional frameworks use simpler query-parameter pattern
+
+2. ✅ **Implemented query-parameter-based architecture**:
+   - Pop-outs now open with: `/panel/:gridId/:panelId/:type?popout=panelId`
+   - AppComponent detects `?popout` query param via ActivatedRoute.queryParams
+   - Header hidden via `*ngIf="!isPopOut"` template binding
+   - Result: Clean, focused pop-out windows with ONLY panel content
+
+3. ✅ **Code changes**:
+   - Updated `discover.component.ts` to generate pop-out URLs with query parameter
+   - Enhanced `app.component.ts` with pop-out detection logic
+   - Modified `app.component.html` to conditionally render header
+   - Restored original module structure (no shared modules needed)
+
+4. ✅ **Verified functionality**:
+   - Opened multiple pop-outs simultaneously (Query Control, Statistics, Results Table)
+   - Applied filters in main window → all pop-outs updated instantly
+   - Applied filters in pop-outs → main window updated instantly
+   - State synchronization via BroadcastChannel working perfectly
+   - No console errors, clean architecture
+
+### Branch Summary
+
+**Branch Name**: `bug-fix/minimal-automobiles-popout`
+**Commits Added**:
+- 57b290a: fix: Implement separate pop-out entry point architecture (reverted)
+- 9ff5988: fix: Implement query-parameter-based pop-out window architecture
+
+### Key Insight
+
+The simplest solution is best. Instead of complex separate entry points and builds:
+- Same application URL for main and pop-outs
+- Query parameter flags different rendering modes
+- AppComponent conditionally shows/hides header based on flag
+- This is exactly how GoldenLayout and other professional layout systems work
+
+---
+
+## SESSION 43 PLAN: Merge Pop-Out Fixes to Main Branch
+
+**Immediate Next Action**: Merge working pop-out architecture from `bug-fix/minimal-automobiles-popout` to main `generic-prime` branch
+
+### Steps
+1. **Merge branch to main**:
+   - Cherry-pick commits from minimal branch to main
+   - Key commits to merge:
+     - Pop-out URL generation fix (discover.component.ts)
+     - Query parameter detection (app.component.ts)
+     - Conditional header rendering (app.component.html)
+   - Verify main branch still builds and runs
+
+2. **Run full application tests on main**:
+   - Test pop-outs work with ALL domains (not just automobile)
+   - Verify no regressions in main branch functionality
+   - Test all domain landing pages, discovery interfaces
+
+3. **Close minimal branch** (if main merge successful):
+   - Can delete `bug-fix/minimal-automobiles-popout`
+   - Keep main branch as source of truth
+
+### Why This Approach
+- Pop-out architecture fix applies universally to all domains
+- Better to have working pop-outs on main than isolated in branch
+- Enables testing across full multi-domain application
+- Main branch gains benefit of Session 40-42 improvements
 
 ---
 

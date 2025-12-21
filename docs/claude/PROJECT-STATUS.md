@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.42
-**Timestamp**: 2025-12-21T16:45:00Z
-**Updated By**: Session 41 - Minimal Automobiles-Only Build Complete
+**Version**: 5.43
+**Timestamp**: 2025-12-21T17:00:00Z
+**Updated By**: Session 42 - Pop-Out Architecture Fixed
 
 ---
 
@@ -19,15 +19,32 @@
 - Dedicated domain landing pages (Home, Automobile, Agriculture, Physics, Chemistry, Math)
 - Reorganized routing: `/automobiles/discover` (was `/discover`)
 
-### New Branch: bug-fix/minimal-automobiles-popout - FOCUSED DEVELOPMENT
+### New Branch: bug-fix/minimal-automobiles-popout - POP-OUT ARCHITECTURE FIXED ✅
 
 **Purpose**: Minimal automobiles-only branch for perfecting pop-out state synchronization
+
+**Status**: ✅ COMPLETE - Pop-out architecture working perfectly
+
+**Session 42 Achievement**: Fixed pop-out UI and verified state synchronization
+- Diagnosed root cause: Pop-outs were loading main app shell (AppComponent with header)
+- Implemented simple, proven query-parameter-based architecture (like GoldenLayout)
+- Pop-outs now load same app URL with `?popout=panelId` flag
+- AppComponent detects query param and conditionally hides header via `*ngIf="!isPopOut"`
+- Result: Pop-outs show ONLY panel content, no app header/navigation
+
+**Build & Configuration**:
 - Stripped to bare minimum: only automobile discovery + 3 panels
 - All non-automobile domains removed (physics, agriculture, chemistry, math, home, dependency-graph)
 - All testing infrastructure removed (E2E, Playwright, Karma, Compodoc)
-- Bundle size optimized: 6.84 MB → 5.66 MB (18% reduction)
-- Build verified: Clean TypeScript compilation, no errors
-- Focus: Perfecting pop-out state management without distractions
+- Bundle size: 5.66 MB (18% reduction from original 6.84 MB)
+- Clean TypeScript compilation, no errors
+
+**Pop-Out Testing**: ✅ VERIFIED WORKING
+- Filters applied in main window → instantly visible in all pop-outs
+- Filters applied in pop-outs → instantly visible in main window
+- Multiple pop-outs (Query Control, Statistics, Results Table) stay perfectly in sync
+- State synchronization via BroadcastChannel working correctly
+- Pop-out URLs clean and functional: `/panel/:gridId/:panelId/:type?popout=panelId`
 
 **Backend**: `generic-prime-backend-api:v1.5.0` (Kubernetes)
 - Elasticsearch integration: autos-unified (4,887 docs), autos-vins (55,463 docs)
