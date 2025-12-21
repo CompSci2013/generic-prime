@@ -1,7 +1,66 @@
 # Next Steps
 
-**Current Session**: Session 43 - Pop-Out Fixes Merged to Main (COMPLETE)
-**Next Session**: Session 44 - Testing & Next Priority Features
+**Current Session**: Session 44 - Monster Protocol Initialized (COMPLETE)
+**Next Session**: Session 45 - Choose One Priority Task
+
+---
+
+## SESSION 45 STARTING POINT: Choose One Priority Task
+
+The Monster Protocol is now fully operational. For the next session, choose ONE of these priorities:
+
+### Priority 1 (HIGH) - Pop-Out Manual Testing
+**Scope**: Comprehensive testing of all 6 pop-out scenarios
+- Test 1: Pop-out URL stays clean (no query parameters)
+- Test 2: Filter chips render from BroadcastChannel
+- Test 3: Filter chips update dynamically when main window applies filters
+- Test 4: Apply filter from pop-out updates main window
+- Test 5: Clear All works from pop-out QueryControl
+- Test 6: Multiple pop-outs stay in sync
+
+**Expected Time**: 1-2 hours
+**Success Criteria**: All 6 tests pass, no console errors, pop-out feature marked stable
+
+### Priority 2 (MEDIUM) - Bug Fixes
+- **Bug #13**: Dropdown keyboard navigation (PrimeNG 14.2.3 issue with arrow keys, space bar)
+- **Bug #7**: Multiselect visual state (cosmetic issue)
+
+**Expected Time**: 1-3 hours per bug
+**Success Criteria**: Keyboard navigation works correctly, no visual glitches
+
+### Priority 3 (MEDIUM) - Refactoring Anti-Pattern
+Remove component-level ResourceManagementService provider from DiscoverComponent
+
+**Expected Time**: 30 minutes
+**Success Criteria**: Service remains singleton, all functionality works, no side effects
+
+### Priority 4 (LOW) - Feature Implementation
+- UserPreferencesService for panel order persistence
+- Additional domain implementations
+
+---
+
+## SESSION 44 COMPLETION: Monster Protocol Initialized
+
+**Status**: ✅ COMPLETE
+
+### What Was Done
+
+1. ✅ **Executed `/monster` command**
+   - Read MONSTER-CLAUDE.md (Gemini's reality check)
+   - Read MONSTER-LOG.md (previous architectural context)
+   - Analyzed current state of application
+
+2. ✅ **Updated MONSTER-LOG.md**
+   - Documented current architecture state (5 areas verified)
+   - Listed known issues and priorities
+   - Set up framework for theoretical analysis
+   - Prepared for Gemini hand-offs during session
+
+3. ✅ **Established Shutdown Protocol**
+   - Version bumped: 5.45 → 5.46
+   - Timestamp updated: 2025-12-21T16:45:00Z
+   - SESSION 44 summary documented in PROJECT-STATUS.md
 
 ---
 
