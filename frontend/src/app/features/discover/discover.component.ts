@@ -181,12 +181,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * Angular lifecycle hook - Initialize component
    *
    * **Initialization Sequence**:
-   * 1. Register picker configs with registry (domain-specific pickers)
-   * 2. Initialize PopOutContextService as parent window
-   * 3. Set up beforeunload handler to close pop-outs on page refresh
-   * 4. Subscribe to pop-out context messages
-   * 5. Subscribe to pop-out BroadcastChannel messages via RxJS Subject
-   * 6. Subscribe to ResourceManagementService.state$ and broadcast to all pop-outs
+   * 1. Initialize PopOutContextService as parent window
+   * 2. Set up beforeunload handler to close pop-outs on page refresh
+   * 3. Subscribe to pop-out context messages
+   * 4. Subscribe to pop-out BroadcastChannel messages via RxJS Subject
+   * 5. Subscribe to ResourceManagementService.state$ and broadcast to all pop-outs
    *
    * **Observable Subscriptions**:
    * - popOutContext.getMessages$(): Pop-out context messages from PopOutContextService
