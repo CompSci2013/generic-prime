@@ -375,7 +375,7 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
   onLazyLoad(event: any): void {
     // Ignore lazy load events while already loading to prevent race conditions
     if (this.state.loading) {
-      console.warn('[BasePickerComponent] Ignoring lazy load while loading', event);
+      console.debug('[BasePickerComponent] Ignoring lazy load while loading', event);
       return;
     }
 
@@ -387,12 +387,6 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
     this.state.sortField = event.sortField || undefined;
     this.state.sortOrder = event.sortOrder || 1;
 
-    console.log('[BasePickerComponent] onLazyLoad:', {
-      page: this.state.currentPage,
-      sortField: this.state.sortField,
-      sortOrder: this.state.sortOrder
-    });
-
     this.loadData();
   }
 
@@ -403,7 +397,7 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
     // Ignore page changes while loading to prevent race conditions
     // (e.g., hydration updating selectedItems might trigger PrimeNG pagination event)
     if (this.state.loading) {
-      console.warn('[BasePickerComponent] Ignoring page change while loading', event);
+      console.debug('[BasePickerComponent] Ignoring page change while loading', event);
       return;
     }
 
