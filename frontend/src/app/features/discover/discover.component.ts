@@ -3,7 +3,6 @@ import {
   ChangeDetectorRef,
   Component,
   Inject,
-  Injector,
   OnDestroy,
   OnInit
 } from '@angular/core';
@@ -12,16 +11,13 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { createAutomobilePickerConfigs } from '../../../domain-config/automobile/configs/automobile.picker-configs';
 import { DomainConfig } from '../../../framework/models';
-import { PickerSelectionEvent } from '../../../framework/models/picker-config.interface';
 import {
   buildWindowFeatures,
   PopOutMessageType,
   PopOutWindowRef
 } from '../../../framework/models/popout.interface';
 import { DOMAIN_CONFIG } from '../../../framework/services/domain-config-registry.service';
-import { PickerConfigRegistry } from '../../../framework/services/picker-config-registry.service';
 import { PopOutContextService } from '../../../framework/services/popout-context.service';
 import { ResourceManagementService } from '../../../framework/services/resource-management.service';
 import { UrlStateService } from '../../../framework/services/url-state.service';
@@ -128,7 +124,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    */
   panelOrder: string[] = [
     'query-control',
-    'manufacturer-model-picker',
     'statistics-panel',
     'results-table'
   ];
@@ -169,8 +164,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       TData,
       TStatistics
     >,
-    private pickerRegistry: PickerConfigRegistry,
-    private injector: Injector,
     private popOutContext: PopOutContextService,
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
@@ -211,15 +204,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   ngOnInit(): void {
     console.log('[Discover] ngOnInit() called');
 
-    // STEP 1: Register domain-specific picker configurations
-    // Pickers are domain-specific (e.g., ManufacturerModel for automobiles)
-    // createAutomobilePickerConfigs() returns an array of PickerConfig objects
-    // These are registered globally so any component can reference them by ID
-    const pickerConfigs = createAutomobilePickerConfigs(this.injector);
-    this.pickerRegistry.registerMultiple(pickerConfigs);
-    console.log('[Discover] Picker configs registered:', pickerConfigs.length);
-
-    // STEP 2: Initialize PopOutContextService as parent (main) window
+    // STEP 1: Initialize PopOutContextService as parent (main) window
     // This marks the service as "not a pop-out" (as opposed to PanelPopoutComponent)
     // Allows PopOutContextService to distinguish main window from pop-outs
     this.popOutContext.initializeAsParent();
@@ -325,7 +310,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   getPanelTitle(panelId: string): string {
     const titleMap: { [key: string]: string } = {
       'query-control': 'Query Control',
-      'manufacturer-model-picker': 'Manufacturer-Model Picker',
       'statistics-panel': 'Statistics',
       'results-table': 'Results'
     };
@@ -341,7 +325,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   getPanelType(panelId: string): string {
     const typeMap: { [key: string]: string } = {
       'query-control': 'query-control',
-      'manufacturer-model-picker': 'picker',
       'statistics-panel': 'statistics',
       'results-table': 'results'
     };
@@ -351,8 +334,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   /**
    * Pop out a panel to a separate window
    *
-   * @param panelId - Panel identifier (e.g., 'query-control', 'manufacturer-model-picker')
-   * @param panelType - Panel type for routing (e.g., 'query-control', 'picker', 'statistics', 'results')
+   * @param panelId - Panel identifier (e.g., 'query-control', 'statistics-panel', 'results-table')
+   * @param panelType - Panel type for routing (e.g., 'query-control', 'statistics', 'results')
    */
   popOutPanel(panelId: string, panelType: string): void {
     console.log(`[Discover] popOutPanel() called - panelId: ${panelId}, panelType: ${panelType}`);
@@ -448,11 +431,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     );
 
     switch (message.type) {
-      case PopOutMessageType.PICKER_SELECTION_CHANGE:
-        // Handle picker selection from pop-out
-        await this.onPickerSelectionChangeAndUpdateUrl(message.payload);
-        break;
-
       case PopOutMessageType.PANEL_READY:
         // Pop-out is ready - broadcast current state immediately
         // (state$ subscription only fires on changes, not on initial subscription)
@@ -530,25 +508,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    */
   async onClearAllFilters(): Promise<void> {
     await this.urlStateService.clearParams();
-  }
-
-  /**
-   * Handle picker selection changes and update URL
-   *
-   * @param event - Picker selection event containing selected items and URL value
-   */
-  async onPickerSelectionChangeAndUpdateUrl(event: PickerSelectionEvent<any>): Promise<void> {
-    console.log('[Discover] Picker selection changed:', event);
-
-    // Extract the URL param name from the picker config
-    // For now, we'll use a hardcoded value - this should come from the picker config
-    const paramName = 'modelCombos'; // TODO: Get from picker config
-
-    // Update URL with the serialized selection and reset pagination
-    await this.urlStateService.setParams({
-      [paramName]: event.urlValue || null,
-      page: 1 // Reset to first page when selection changes (1-indexed)
-    });
   }
 
   /**

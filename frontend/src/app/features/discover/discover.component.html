@@ -60,22 +60,6 @@
             </ng-template>
           </ng-container>
 
-          <!-- Manufacturer-Model Picker -->
-          <ng-container *ngIf="panelId === 'manufacturer-model-picker'">
-            <div *ngIf="!isPanelPoppedOut('manufacturer-model-picker'); else pickerPlaceholder">
-              <app-base-picker
-                [configId]="'manufacturer-model-picker'"
-                (selectionChange)="onPickerSelectionChangeAndUpdateUrl($event)">
-              </app-base-picker>
-            </div>
-            <ng-template #pickerPlaceholder>
-              <div class="popout-placeholder">
-                <i class="pi pi-external-link"></i>
-                <span>Manufacturer-Model Picker is open in a separate window</span>
-              </div>
-            </ng-template>
-          </ng-container>
-
           <!-- Statistics Panel -->
           <ng-container *ngIf="panelId === 'statistics-panel'">
             <div *ngIf="!isPanelPoppedOut('statistics-panel'); else statsPlaceholder">
