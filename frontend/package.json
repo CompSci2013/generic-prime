@@ -4,9 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build && npm run build:popout",
-    "build:main": "ng build",
-    "build:popout": "ng build --project frontend --main src/popout-main.ts --index src/popout.html --output-path dist/frontend/popout",
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "dev:server": "ng serve --host 0.0.0.0 --port 4205",
     "lint": "eslint \"src/**/*.ts\"",

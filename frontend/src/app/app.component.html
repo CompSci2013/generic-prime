@@ -1,8 +1,8 @@
 <!-- Global Toast Notifications -->
 <p-toast key="app-toast" position="top-right"></p-toast>
 
-<!-- Navigation Banner -->
-<header class="app-header">
+<!-- Navigation Banner - Hidden in pop-out windows -->
+<header class="app-header" *ngIf="!isPopOut">
   <a routerLink="/" class="home-link">🏠 Home</a>
 
   <!-- Domain Navigation TieredMenu with Flyout Submenus -->

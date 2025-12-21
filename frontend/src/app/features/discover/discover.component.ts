@@ -344,11 +344,10 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       return;
     }
 
-    // Build pop-out URL
-    // Use separate pop-out entry point (/popout/popout.html) with routing via hash
-    // This loads PopoutAppComponent (no header) instead of AppComponent (with header)
-    const panelRoute = `/panel/${this.gridId}/${panelId}/${panelType}`;
-    const url = `/popout/popout.html#${panelRoute}`;
+    // Build pop-out URL with query parameter to indicate this is a pop-out
+    // Same app URL, but with ?popout=panelId flag that AppComponent detects to hide header
+    // This approach is used by GoldenLayout and other layout libraries - same app, different UI mode
+    const url = `/panel/${this.gridId}/${panelId}/${panelType}?popout=${panelId}`;
     console.log(`[Discover] Opening pop-out window at URL: ${url}`);
 
     // Window features
