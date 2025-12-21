@@ -344,8 +344,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       return;
     }
 
-    // Build pop-out URL (NO query params - state comes via BroadcastChannel)
-    const url = `/panel/${this.gridId}/${panelId}/${panelType}`;
+    // Build pop-out URL
+    // Use separate pop-out entry point (/popout/popout.html) with routing via hash
+    // This loads PopoutAppComponent (no header) instead of AppComponent (with header)
+    const panelRoute = `/panel/${this.gridId}/${panelId}/${panelType}`;
+    const url = `/popout/popout.html#${panelRoute}`;
     console.log(`[Discover] Opening pop-out window at URL: ${url}`);
 
     // Window features

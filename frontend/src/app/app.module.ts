@@ -14,8 +14,8 @@ import { GlobalErrorHandler } from '../framework/services/global-error.handler';
 import { DOMAIN_CONFIG } from '../framework/services/domain-config-registry.service';
 import { createAutomobileDomainConfig } from '../domain-config/automobile';
 import { DiscoverComponent } from './features/discover/discover.component';
-import { PanelPopoutComponent } from './features/panel-popout/panel-popout.component';
 import { AutomobileComponent } from './features/automobile/automobile.component';
+import { SharedPopoutModule } from './shared-popout.module';
 
 /**
  * Root Application Module (AppModule) - MINIMAL AUTOMOBILES BUILD
@@ -47,7 +47,6 @@ import { AutomobileComponent } from './features/automobile/automobile.component'
   declarations: [
     AppComponent,
     DiscoverComponent,
-    PanelPopoutComponent,
     AutomobileComponent
   ],
   imports: [
@@ -58,7 +57,8 @@ import { AutomobileComponent } from './features/automobile/automobile.component'
     DragDropModule,
     AppRoutingModule,
     PrimengModule,
-    FrameworkModule
+    FrameworkModule,
+    SharedPopoutModule
   ],
   providers: [
     MessageService,
