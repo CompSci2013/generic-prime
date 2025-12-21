@@ -1,7 +1,81 @@
 # Next Steps
 
-**Current Session**: Session 40 (Continued) - Critical Pop-Out State Update Fix (COMPLETE)
-**Next Session**: Session 41 - Manual Pop-Out Testing & Verification
+**Current Session**: Session 41 - Minimal Automobiles-Only Build (COMPLETE)
+**Next Session**: Session 42 - Manual Pop-Out Testing on Minimal Build
+
+---
+
+## SESSION 41 COMPLETION: Minimal Automobiles-Only Build
+
+**Status**: ✅ COMPLETE - Branch created, all cleanup done
+
+### What Was Accomplished
+
+1. ✅ **Created minimal branch**: `bug-fix/minimal-automobiles-popout`
+   - Forked from Session 40 final (commit c6bc706)
+   - All previous zone-aware fixes maintained
+
+2. ✅ **Removed all non-automobile domains**:
+   - Deleted: physics/, agriculture/, chemistry/, math/, home/, dependency-graph/
+   - Deleted: frontend/e2e/ (all E2E tests)
+   - Removed: karma.conf.js, playwright.config.ts
+
+3. ✅ **Cleaned up package.json**:
+   - Removed test scripts: test, test:e2e, test:watch, test:report, test:report, build:doc, compodoc, dev, dev:all
+   - Removed 15+ devDependencies
+   - Reduced to 6 core scripts: ng, start, build, watch, dev:server, lint, lint:fix
+
+4. ✅ **Simplified routing** (app-routing.module.ts):
+   - Removed 14+ routes for removed domains
+   - Kept 4 core routes: '', '/automobiles', '/automobiles/discover', '/panel/:gridId/:panelId/:type'
+
+5. ✅ **Cleaned module declarations** (app.module.ts):
+   - Removed all domain component imports
+   - Kept only: AppComponent, AutomobileComponent, DiscoverComponent, PanelPopoutComponent
+
+6. ✅ **Removed Picker from Discover component** (THIS SESSION):
+   - Removed 'manufacturer-model-picker' from panelOrder
+   - Removed picker initialization code
+   - Removed picker entries from title/type maps
+   - Removed onPickerSelectionChangeAndUpdateUrl() method
+   - Removed picker panel rendering from template
+   - Updated all documentation and JSDoc comments
+   - Result: Only 3 panels remain (Query Control, Statistics, Results Table)
+
+7. ✅ **Build verified**:
+   - Bundle size: 5.66 MB (down from 6.84 MB, 18% reduction)
+   - No TypeScript errors
+   - All references cleaned up
+
+### Branch Details
+
+**Branch Name**: `bug-fix/minimal-automobiles-popout`
+**Based On**: Session 40 final (commit c6bc706)
+**5 Commits** on this branch:
+- ca793ba: chore: Create minimal automobiles-only branch
+- ce20e76: docs: Add comprehensive guide for minimal automobiles-only build
+- 02011af: fix: Remove manufacturer-model-picker from discover component
+- 2d2bd47: docs: Update ngOnInit JSDoc - remove outdated picker initialization step
+- 3dc99e2: docs: Remove picker references from discover component comments
+
+### Next Session Plan (Session 42)
+
+**Priority 1 (IMMEDIATE)**: Manual Pop-Out Testing on Minimal Build
+- Test all 3 panels (Query Control, Statistics, Results Table)
+- Verify state synchronization between main and pop-outs
+- Validate filter application works correctly
+- Confirm pop-out URLs remain clean (no query params)
+
+**Testing Checklist for Session 42**:
+- [ ] Pop-out Query Control opens and displays correctly
+- [ ] Pop-out Statistics panel opens and displays charts
+- [ ] Pop-out Results table opens
+- [ ] Apply filter in main window → all pop-outs update
+- [ ] Apply filter in pop-out → main window updates
+- [ ] Multiple pop-outs open simultaneously and stay in sync
+- [ ] Filter clear works from pop-out
+- [ ] Pop-out URLs stay clean (no query parameters)
+- [ ] No console errors
 
 ---
 
