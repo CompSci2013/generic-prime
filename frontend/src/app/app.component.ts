@@ -142,7 +142,6 @@ export class AppComponent {
     // Pop-out windows hide the header and show only the router-outlet with panel content
     this.route.queryParams.subscribe(params => {
       this.isPopOut = !!params['popout'];
-      console.log(`[AppComponent] isPopOut=${this.isPopOut}, popout param=${params['popout']}`);
     });
   }
 
