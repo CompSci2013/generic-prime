@@ -1,15 +1,115 @@
 # Next Steps
 
-**Current Session**: Session 47 - Implement UserPreferencesService (COMPLETE)
-**Next Session**: Session 48 - Manual Testing of Panel Persistence (Per Testing Checklist)
+**Current Session**: Session 48 - Manual Testing of Panel Persistence (COMPLETE)
+**Next Session**: Session 49 - Manual Pop-Out Testing (HIGH Priority)
 
 ---
 
-## SESSION 48 IMMEDIATE ACTION: Manual Testing of Panel Order Persistence
+## SESSION 49 IMMEDIATE ACTION: Manual Pop-Out Testing
 
 **Status**: Ready for testing
-**Priority**: HIGH (validate UserPreferencesService works correctly)
-**Scope**: Manual verification of panel order and collapsed state persistence
+**Priority**: HIGH (validate all pop-out scenarios work correctly)
+**Scope**: Complete 10-test pop-out scenario per POP-OUT-REQUIREMENTS-RUBRIC.md
+
+### Pop-Out Testing Checklist
+
+This is a comprehensive manual testing protocol to validate all pop-out functionality:
+
+**Test 1 - Pop-Out URL Stays Clean** (~1 min)
+1. Open application at `/automobiles/discover`
+2. Click "Pop-Out" button on Query Control panel
+3. New window opens
+4. Verify pop-out URL = `/panel/discover/query-control/query-control` (NO query params)
+5. Verify clean URL in address bar
+
+**Test 2 - Filter Chips Render in Pop-Out** (~1 min)
+1. Apply a filter in main window (e.g., select a manufacturer)
+2. Verify filter chips appear in pop-out Query Control
+3. Chips should show same filters as main window
+
+**Test 3 - Filter Chips Update Dynamically** (~2 min)
+1. Keep pop-out Query Control window open
+2. Apply new filters in main window
+3. Verify new filter chips appear in pop-out immediately
+4. Verify all filters sync correctly
+
+**Test 4 - Apply Filter from Pop-Out** (~2 min)
+1. Apply filter in pop-out Query Control window
+2. Verify filter chip appears in main window
+3. Verify results update in main window
+4. Both windows should be in sync
+
+**Test 5 - Clear All Works from Pop-Out** (~2 min)
+1. Apply multiple filters
+2. Click "Clear All" button in pop-out Query Control
+3. Verify filters disappear in both main and pop-out windows
+4. Verify results update to show all data
+
+**Test 6 - Multiple Pop-Outs Stay in Sync** (~3 min)
+1. Open 3 pop-outs: Query Control, Statistics, Results Table
+2. Apply filter in main window
+3. Verify all three pop-outs update immediately
+4. Apply filter from one pop-out
+5. Verify other pop-outs update
+
+**Test 7 - Pop-Out Statistics Updates** (~2 min)
+1. Pop out Statistics panel
+2. Apply filter in main or pop-out
+3. Verify statistics recalculate and display new values
+4. Verify charts update immediately
+
+**Test 8 - Pop-Out Results Table Updates** (~2 min)
+1. Pop out Results Table panel
+2. Apply filter that changes results
+3. Verify table rows update
+4. Verify pagination/record count updates
+
+**Test 9 - Close and Reopen Pop-Out** (~2 min)
+1. Open pop-out panel
+2. Close it (X button)
+3. Verify panel reappears in main window
+4. Reopen pop-out
+5. Verify it works again
+
+**Test 10 - Multiple Windows Rapid Changes** (~3 min)
+1. Open 2+ pop-outs
+2. Rapidly apply/clear filters
+3. Verify all windows stay in sync
+4. Verify no console errors
+5. Verify no lag or UI freezes
+
+### Console Validation
+
+Monitor Developer Tools console during testing:
+- Look for BroadcastChannel STATE_UPDATE messages (optional debug logging)
+- No console errors expected
+- No network errors
+- No zone-related warnings
+
+### Success Criteria
+
+- [ ] All 10 tests pass
+- [ ] Pop-out URLs stay clean (no query parameters)
+- [ ] Filter changes sync instantly across all windows
+- [ ] No console errors during any test
+- [ ] No lag or UI freezes during rapid changes
+- [ ] Multiple pop-outs work independently
+- [ ] Can apply/clear filters from any window
+
+### After Testing Passes
+
+Document results and choose next priority:
+1. **Fix Bug #13** (MEDIUM priority) - Dropdown keyboard navigation
+2. **Fix Bug #7** (MEDIUM priority) - Multiselect visual state
+3. **Remove Provider Anti-Pattern** (HIGH priority) - Clean up ResourceManagementService provider
+
+---
+
+## SESSION 48 COMPLETED: Manual Testing of Panel Order Persistence
+
+**Status**: ✅ COMPLETE
+**Priority**: HIGH
+**Result**: All 5 phases passed successfully
 
 ### Testing Checklist
 
