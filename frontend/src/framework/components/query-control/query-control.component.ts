@@ -96,6 +96,15 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
 
   /**
+   * Optional state object from pop-out parent window
+   * When provided (non-null), used instead of URL parameters for rendering filter chips
+   * Contains synced filters from main window via BroadcastChannel
+   *
+   * @remarks Only populated in pop-out windows. In main window, this is null.
+   */
+  @Input() popoutState: any = null;
+
+  /**
    * Emits when URL parameters should be updated with new filter values or other query parameters
    */
   @Output() urlParamsChange = new EventEmitter<{ [key: string]: any }>();
@@ -229,14 +238,42 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
       .map(f => ({ label: f.label, value: f }));
     console.log('[QueryControl] ✅ Initialized filter field options:', this.filterFieldOptions.length);
 
-    // Sync from URL state on init and on changes
-    this.urlState.params$.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      console.log('[QueryControl] 📨 URL params changed:', params);
-      this.syncFiltersFromUrl(params);
-      console.log('[QueryControl] ✅ Called syncFiltersFromUrl(), marking for check');
+    // Check if running in pop-out with state passed via @Input
+    if (this.popoutState) {
+      console.log('[QueryControl] 📍 Pop-out mode detected, subscribing to popoutState changes via @Input');
+      // In pop-out: watch for changes to the @Input popoutState property
+      // When pop-out receives STATE_UPDATE, parent sets this.popoutState, triggering this subscription
       this.cdr.markForCheck();
-    });
-    console.log('[QueryControl] ✅ ngOnInit() complete, subscribed to URL params$');
+
+      // Sync filters from popoutState initially
+      this.syncFiltersFromPopoutState(this.popoutState);
+
+      // Watch for future changes to popoutState
+      // Note: We'll handle this in ngOnChanges since @Input changes trigger that lifecycle hook
+      console.log('[QueryControl] ✅ ngOnInit() complete (pop-out mode)');
+    } else {
+      // In main window: Sync from URL state on init and on changes
+      console.log('[QueryControl] 📍 Main window mode, subscribing to URL params$');
+      this.urlState.params$.pipe(takeUntil(this.destroy$)).subscribe(params => {
+        console.log('[QueryControl] 📨 URL params changed:', params);
+        this.syncFiltersFromUrl(params);
+        console.log('[QueryControl] ✅ Called syncFiltersFromUrl(), marking for check');
+        this.cdr.markForCheck();
+      });
+      console.log('[QueryControl] ✅ ngOnInit() complete (main window mode)');
+    }
+  }
+
+  /**
+   * Handle @Input changes - specifically popoutState updates
+   */
+  ngOnChanges(changes: any): void {
+    if (changes && changes['popoutState'] && !changes['popoutState'].firstChange) {
+      // popoutState changed (not initial set) - sync filters
+      console.log('[QueryControl] 📨 @Input popoutState changed, syncing filters');
+      this.syncFiltersFromPopoutState(this.popoutState);
+      this.cdr.markForCheck();
+    }
   }
 
   ngOnDestroy(): void {
@@ -733,6 +770,44 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     }
     console.log('[QueryControl] ✅ Highlight filters synced. Count:', this.activeHighlights.length);
     console.log('[QueryControl] ✅ syncFiltersFromUrl() complete');
+  }
+
+  /**
+   * Sync filters from pop-out state object (used when running in pop-out window)
+   * In pop-outs, the state object contains filters synced from main window
+   * This method extracts those filters and renders them as filter chips
+   *
+   * @param state - The state object from pop-out parent containing filters
+   * @private
+   */
+  private syncFiltersFromPopoutState(state: any): void {
+    if (!state || !state.filters) {
+      console.log('[QueryControl] 🔄 syncFiltersFromPopoutState() - No filters in state');
+      this.activeFilters = [];
+      this.activeHighlights = [];
+      return;
+    }
+
+    console.log('[QueryControl] 🔄 syncFiltersFromPopoutState() starting...');
+    console.log('[QueryControl] Input filters:', state.filters);
+
+    // In pop-out windows, the state.filters object is already in TFilters format
+    // We need to convert it to URL parameter format to render filter chips
+    const filters = state.filters as any;
+    const params: any = {};
+
+    // Manually extract filter values from TFilters object
+    // This mirrors how URL params are extracted in the main window
+    for (const [key, value] of Object.entries(filters || {})) {
+      if (value !== undefined && value !== null && value !== '') {
+        params[key] = value;
+      }
+    }
+
+    console.log('[QueryControl] Extracted params from filters:', params);
+
+    // Now sync using the standard syncFiltersFromUrl logic
+    this.syncFiltersFromUrl(params);
   }
 
   /**

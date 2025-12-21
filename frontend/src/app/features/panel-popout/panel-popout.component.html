@@ -11,6 +11,7 @@
     <app-query-control
       *ngSwitchCase="'query-control'"
       [domainConfig]="domainConfig"
+      [popoutState]="state"
       (urlParamsChange)="onUrlParamsChange($event)"
       (clearAllFilters)="onClearAllFilters()">
     </app-query-control>
