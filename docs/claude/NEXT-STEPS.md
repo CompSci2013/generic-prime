@@ -1,56 +1,128 @@
 # Next Steps
 
-**Current Session**: Session 35 - E2E Tests Enabled and Artifacts Cleaned
+**Current Session**: Session 36 - Gemini Assessment Analysis & Implementation Planning
 
 ---
 
-## SESSION 36 PLAN: Execute Full E2E Test Suite
+## SESSION 37 PLAN: Priority 1 - Implement UserPreferencesService
 
-**Status**: All 33 E2E tests are now enabled and ready for execution. Test artifacts are properly ignored by git.
+**Status**: Implementation plan complete. Ready to code.
 
 ### Immediate Next Action
 
-**Run the Full E2E Test Suite**
+**Implement UserPreferencesService for Panel Order Persistence**
 
-```bash
-# On host (Thor):
-cd ~/projects/generic-prime/frontend
-npm run test:e2e
+See full implementation details in `/home/odin/projects/generic-prime/IMPLEMENTATION-PLAN.md`
 
-# Or in E2E container:
-podman exec generic-prime-e2e bash -c "cd /app/frontend && npm run test:e2e"
-```
+#### Phase 1 - Create the Service
 
-**What to Expect**:
-- All 33 tests across 7 phases should execute
-- Total runtime: ~60-90 seconds (10-15 seconds per phase)
-- Tests cover:
-  * Initial state and navigation
-  * Filter operations (Manufacturer, Model, Body Class, Year, Search)
-  * Page size changes
-  * Results table pagination and expansion
-  * Picker selections
-  * Statistics display and responsiveness
-  * Pop-out window state synchronization
+1. Create `frontend/src/framework/services/user-preferences.service.ts`
+   - Uses localStorage for persistence
+   - Provides RxJS observables for reactive updates
+   - Handles graceful failures (quota exceeded, private browsing)
+   - Support for domain-aware preferences
+
+2. Update `frontend/src/app/app.module.ts`
+   - Add UserPreferencesService to providers (providedIn: 'root')
+
+#### Phase 2 - Integrate with DiscoverComponent
+
+3. Update `frontend/src/app/features/discover/discover.component.ts`
+   - Inject UserPreferencesService in constructor
+   - Load panelOrder from preferences in ngOnInit (with defaults)
+   - Save panelOrder to preferences in onPanelDrop
+   - Save collapsedPanels to preferences in collapse handlers
+
+#### Phase 3 - Testing
+
+4. Manual testing:
+   - [ ] Drag panels to reorder
+   - [ ] Refresh page - order persists
+   - [ ] Clear localStorage - default order returns
+   - [ ] Collapse/expand - state persists
+   - [ ] Works across multiple browser tabs (BroadcastChannel support)
+
+**Expected Outcome**:
+- Users can reorder panels and have order persist across sessions
+- Clean, reusable service for future preference storage
+- Foundation for theme preferences, layout preferences, etc.
 
 **Success Criteria**:
-- All Phase 1 tests PASS (initial state)
-- All Phase 2 tests PASS (filters work correctly)
-- All Phase 3 tests PASS (results table works correctly)
-- All Phase 4 tests PASS (picker works correctly)
-- All Phase 5 tests PASS (statistics display correctly)
-- All Phase 6 tests PASS (pop-out synchronization works)
+- [ ] panelOrder persists to localStorage on drag-drop
+- [ ] panelOrder loads from localStorage on page load
+- [ ] Default order used when localStorage is empty
+- [ ] Collapsed state persists
+- [ ] No console errors
+- [ ] Works in all browsers (Chrome, Firefox, Safari)
 
-**If Tests Fail**:
-1. Review the HTML report: `npm run test:report`
-2. Check which phase failed and investigate specific test failure
-3. Look for timing issues or state synchronization problems
-4. Update test expectations if application behavior has changed
+---
 
-**After Tests Pass**:
-1. Document test results in PROJECT-STATUS.md (mark tests as "All Passing")
-2. Next priority: Fix Bug #13 (PrimeNG dropdown keyboard navigation)
-3. Consider adding more comprehensive test coverage for edge cases
+## SESSION 38 PLAN: Priority 2 - Remove Component-Level Provider Anti-Pattern
+
+**Status**: Refactoring plan complete. Low-risk change.
+
+### Immediate Next Action
+
+**Remove `providers: [ResourceManagementService]` from DiscoverComponent**
+
+See full refactoring details in `/home/odin/projects/generic-prime/IMPLEMENTATION-PLAN.md`
+
+#### Steps:
+
+1. Verify ResourceManagementService has `providedIn: 'root'` (singleton)
+2. Check for other components with component-level providers
+3. Remove the line: `providers: [ResourceManagementService]` from DiscoverComponent decorator
+4. Build and test:
+   - [ ] Dev server builds without errors
+   - [ ] Filters still work
+   - [ ] State updates propagate correctly
+   - [ ] Pop-outs still sync
+   - [ ] No service initialization errors
+
+---
+
+## SESSION 39+ PLAN: Priority 3 - Fix Dropdown Keyboard Navigation
+
+**Status**: Investigation and multiple solution paths documented.
+
+### Immediate Next Action
+
+**Investigate and Fix Dropdown Space Bar Selection (Bug #13)**
+
+See full investigation details in `/home/odin/projects/generic-prime/IMPLEMENTATION-PLAN.md`
+
+**Investigation Steps**:
+1. Reproduce in browser (arrow keys, space bar, enter key)
+2. Check PrimeNG 14.2.3 release notes for keyboard nav bugs
+3. Examine dropdown element in DevTools for missing attributes
+4. Determine if it's a PrimeNG bug or configuration issue
+
+**Solution Paths**:
+- Option A: PrimeNG bug workaround (quick fix)
+- Option B: Custom keyboard event handlers
+- Option C: Use alternative filter approach
+
+---
+
+## Deprioritized
+
+### E2E Testing
+- E2E tests have consumed excessive time with diminishing returns
+- 33 tests are written and enabled in `frontend/e2e/app.spec.ts`
+- Can be run manually: `npm run test:e2e` when needed
+- Lower priority than code quality and user-facing features
+- Will revisit if test infrastructure improves
+
+---
+
+## Priority Summary
+
+| Phase | Work | Priority | Status | Estimated |
+|-------|------|----------|--------|-----------|
+| **1** | **UserPreferencesService + Panel Order Persistence** | **HIGH** | Ready | 2-3 hrs |
+| **2** | **Remove Component-Level Provider Anti-Pattern** | **HIGH** | Ready | 1-2 hrs |
+| **3** | **Fix Dropdown Keyboard Navigation (Bug #13)** | **MEDIUM** | Ready | 1-3 hrs |
+| -- | **E2E Testing (DEPRIORITIZED)** | LOW | Deferred | -- |
 
 ---
 

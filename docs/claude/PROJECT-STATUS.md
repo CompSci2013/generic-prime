@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.35
-**Timestamp**: 2025-12-20T16:30:00Z
-**Updated By**: Session 35 - E2E Tests Enabled and Test Artifacts Cleaned
+**Version**: 5.36
+**Timestamp**: 2025-12-20T18:45:00Z
+**Updated By**: Session 36 - Strategic Assessment & Implementation Planning
 
 ---
 
@@ -420,6 +420,60 @@ Why: Simpler setup, less terminal clutter, good for quick validation
 
 **Commits**:
 - (Awaiting final commit - to be created below)
+
+---
+
+## Session 36 Progress: Gemini Assessment Analysis & Strategic Prioritization
+
+### Primary Objective: Review Gemini architectural assessment and establish development priorities
+
+**Status**: ✅ COMPLETE - Assessment reviewed, anti-patterns identified, 3-phase plan created
+
+**Key Decisions Made**:
+
+1. ✅ **E2E Tests Deprioritized**: E2E test development has consumed excessive time with diminishing returns. Moved to lowest priority.
+2. ✅ **Three Strategic Priorities Established**:
+   - **Priority 1**: Implement UserPreferencesService for panel order persistence
+   - **Priority 2**: Remove component-level provider anti-pattern (ResourceManagementService)
+   - **Priority 3**: Fix dropdown space bar selection (Bug #13)
+
+**Work Completed** (1 deliverable):
+
+1. ✅ **Gemini Assessment Review**
+   - Assessment Rating: **Mostly Accurate** (85% correct)
+   - Correctly identified: Excellent architecture, RxJS mastery, URL-First state, Pop-Out sophistication, hardcoded layout IDs
+   - **Incorrect Concern**: "Domain leakage in DiscoverComponent" - Code is actually domain-agnostic; the 'modelCombos' TODO is just a micro-optimization note
+   - **Valid Concerns**: Hardcoded layout IDs, pop-up blocker UX (both low priority)
+   - **Recommendation**: Did NOT refactor based on Gemini's suggestion about modelCombos - architecture is correct as-is
+
+2. ✅ **Anti-Pattern Discovery**: Identified component-level ResourceManagementService provider
+   - **Location**: `frontend/src/app/features/discover/discover.component.ts:106`
+   - **Problem**: Creates new service instance per component instead of using singleton
+   - **Impact**: Memory leaks, state isolation unclear, violates DI pattern
+   - **Fix**: Remove `providers: [ResourceManagementService]` from @Component decorator
+
+3. ✅ **Priority 1 Planning**: UserPreferencesService Design
+   - Service will manage localStorage-based user preferences
+   - Panel order will persist across sessions with sensible defaults
+   - Will support future preferences (theme, collapsed state, etc.)
+   - Design documented in IMPLEMENTATION-PLAN.md
+
+4. ✅ **Priority 2 Planning**: Refactoring Anti-Pattern
+   - Clear refactoring path identified
+   - Testing strategy defined
+   - No blocking dependencies
+
+5. ✅ **Priority 3 Investigation**: Dropdown Keyboard Navigation
+   - Root cause: Likely PrimeNG 14.2.3 bug with `[filter]="true"`
+   - Multiple solution paths identified (workaround, custom handler, alternative filter)
+   - Investigation steps documented
+
+**Comprehensive Plan Created**: `/home/odin/projects/generic-prime/IMPLEMENTATION-PLAN.md`
+- 300+ lines of detailed implementation guidance
+- Testing checklists for each priority
+- Code patterns and examples
+- Root cause analysis
+- Success criteria
 
 ---
 
