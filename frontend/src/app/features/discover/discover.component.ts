@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   Inject,
+  NgZone,
   OnDestroy,
   OnInit
 } from '@angular/core';
@@ -166,7 +167,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     private popOutContext: PopOutContextService,
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
-    private urlStateService: UrlStateService
+    private urlStateService: UrlStateService,
+    private ngZone: NgZone
   ) {
     // Store injected config (works with any domain)
     this.domainConfig = domainConfig as DomainConfig<
@@ -385,10 +387,16 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     console.log(`[Discover] Created BroadcastChannel for panel: ${panelId}`);
 
     // Listen for messages from pop-out (Observable Pattern)
-    // Push browser API events to RxJS Subject for handling in Angular zone
+    // IMPORTANT: Wrap handler in ngZone.run() to re-enter Angular zone immediately
+    // BroadcastChannel.onmessage is a native browser event that fires outside the zone.
+    // Re-entering the zone here ensures the entire downstream chain (Subject emission →
+    // handlePopOutMessage → UrlStateService → Router) runs inside the zone with proper
+    // change detection awareness. This is architecturally correct per Angular zone principles.
     channel.onmessage = event => {
-      console.log(`[Discover] BroadcastChannel.onmessage received from ${panelId}:`, event.data);
-      this.popoutMessages$.next({ panelId, event });
+      this.ngZone.run(() => {
+        console.log(`[Discover] BroadcastChannel.onmessage received from ${panelId}:`, event.data);
+        this.popoutMessages$.next({ panelId, event });
+      });
     };
     console.log(`[Discover] Set up channel.onmessage listener for panel: ${panelId}`);
 
