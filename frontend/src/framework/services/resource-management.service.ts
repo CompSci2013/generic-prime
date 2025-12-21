@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnDestroy } from '@angular/core';
+import { Inject, Injectable, NgZone, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
 import {
   catchError,
@@ -183,7 +183,8 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
     private urlState: UrlStateService,
     @Inject(DOMAIN_CONFIG)
     private domainConfig: DomainConfig<TFilters, TData, TStatistics>,
-    private popOutContext: PopOutContextService
+    private popOutContext: PopOutContextService,
+    private ngZone: NgZone
   ) {
     // STEP 1: Extract configuration from domain config
     // The domain config contains domain-specific implementations that work with generic types.
@@ -591,10 +592,15 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
   public syncStateFromExternal(
     externalState: ResourceState<TFilters, TData, TStatistics>
   ): void {
-    // Simply emit the external state through our BehaviorSubject.
-    // All subscribed observables (results$, filters$, etc.) will automatically
-    // emit new values to components, triggering change detection and re-renders.
-    this.stateSubject.next(externalState);
+    // Ensure state emission happens inside Angular zone so that all observable
+    // subscriptions (in child components) trigger change detection properly.
+    // This is critical for pop-out windows where BroadcastChannel messages arrive outside the zone.
+    this.ngZone.run(() => {
+      // Emit the external state through our BehaviorSubject.
+      // All subscribed observables (results$, filters$, etc.) will automatically
+      // emit new values to components, triggering change detection and re-renders.
+      this.stateSubject.next(externalState);
+    });
   }
 
   /**
