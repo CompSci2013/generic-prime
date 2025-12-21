@@ -25,6 +25,7 @@ import { PickerConfigRegistry } from '../../../framework/services/picker-config-
 import { PopOutContextService } from '../../../framework/services/popout-context.service';
 import { ResourceManagementService } from '../../../framework/services/resource-management.service';
 import { UrlStateService } from '../../../framework/services/url-state.service';
+import { UserPreferencesService } from '../../../framework/services/user-preferences.service';
 
 /**
  * Discover Component - Core discovery interface orchestrator
@@ -175,7 +176,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
     private urlStateService: UrlStateService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private userPreferences: UserPreferencesService
   ) {
     // Store injected config (works with any domain)
     this.domainConfig = domainConfig as DomainConfig<
@@ -210,24 +212,47 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * All subscriptions are cleaned up via takeUntil(destroy$) in ngOnDestroy.
    */
   ngOnInit(): void {
-    // STEP 1: Register domain-specific picker configurations
+    // STEP 1: Load panel preferences from UserPreferencesService
+    // Subscribe to panel order preference (persisted in localStorage)
+    // This ensures panels display in user's preferred order on every page load
+    this.userPreferences.getPanelOrder()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(order => {
+        this.panelOrder = order;
+        this.cdr.markForCheck();
+      });
+
+    // Subscribe to collapsed panels preference (persisted in localStorage)
+    // This ensures collapsed state is restored on page load
+    this.userPreferences.getCollapsedPanels()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(collapsedPanels => {
+        // Clear current collapsed state and restore from preferences
+        this.collapsedPanels.clear();
+        collapsedPanels.forEach(panelId => {
+          this.collapsedPanels.set(panelId, true);
+        });
+        this.cdr.markForCheck();
+      });
+
+    // STEP 2: Register domain-specific picker configurations
     // Pickers are domain-specific (e.g., ManufacturerModel for automobiles)
     // createAutomobilePickerConfigs() returns an array of PickerConfig objects
     // These are registered globally so any component can reference them by ID
     const pickerConfigs = createAutomobilePickerConfigs(this.injector);
     this.pickerRegistry.registerMultiple(pickerConfigs);
 
-    // STEP 2: Initialize PopOutContextService as parent (main) window
+    // STEP 3: Initialize PopOutContextService as parent (main) window
     // This marks the service as "not a pop-out" (as opposed to PanelPopoutComponent)
     // Allows PopOutContextService to distinguish main window from pop-outs
     this.popOutContext.initializeAsParent();
 
-    // STEP 3: Close all pop-outs when user refreshes/closes main window
+    // STEP 4: Close all pop-outs when user refreshes/closes main window
     // beforeunload is more reliable than unload for cleanup
     // Ensures pop-out windows are explicitly closed before main window unloads
     window.addEventListener('beforeunload', this.beforeUnloadHandler);
 
-    // STEP 4: Listen for messages from pop-outs via PopOutContextService
+    // STEP 5: Listen for messages from pop-outs via PopOutContextService
     // PopOutContextService maintains a global subscription to BroadcastChannel
     // This captures any messages sent by pop-outs (PANEL_READY, PICKER_SELECTION_CHANGE, etc.)
     this.popOutContext
@@ -237,7 +262,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
         this.handlePopOutMessage('', message);
       });
 
-    // STEP 5: Subscribe to pop-out BroadcastChannel messages
+    // STEP 6: Subscribe to pop-out BroadcastChannel messages
     // BroadcastChannel.onmessage callbacks run OUTSIDE Angular zone
     // We push them into popoutMessages$ Subject to bring them INTO Angular zone
     // This ensures Angular detects changes and re-renders components
@@ -248,7 +273,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
         this.handlePopOutMessage(panelId, event.data);
       });
 
-    // STEP 6: Broadcast state changes to all open pop-outs
+    // STEP 7: Broadcast state changes to all open pop-outs
     // URL-First Architecture: Main window is source of truth
     // Flow: URL change → ResourceManagementService.fetchData() →
     //       state$ emits → broadcastStateToPopOuts() → BroadcastChannel →
@@ -286,22 +311,35 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
 
   /**
    * Toggle panel collapsed state
+   * Saves new collapsed state to UserPreferencesService
    *
    * @param panelId - Panel identifier
    */
   togglePanelCollapse(panelId: string): void {
     const currentState = this.collapsedPanels.get(panelId) ?? false;
     this.collapsedPanels.set(panelId, !currentState);
+
+    // Save collapsed state to preferences
+    const collapsedPanels = Array.from(this.collapsedPanels.entries())
+      .filter(([_, isCollapsed]) => isCollapsed)
+      .map(([panelId, _]) => panelId);
+    this.userPreferences.saveCollapsedPanels(collapsedPanels);
+
     this.cdr.markForCheck();
   }
 
   /**
    * Handle panel drag-drop to reorder panels
+   * Saves new panel order to UserPreferencesService
    *
    * @param event - CDK drag-drop event
    */
   onPanelDrop(event: CdkDragDrop<string[]>): void {
     moveItemInArray(this.panelOrder, event.previousIndex, event.currentIndex);
+
+    // Save new panel order to preferences
+    this.userPreferences.savePanelOrder(this.panelOrder);
+
     this.cdr.markForCheck();
   }
 
