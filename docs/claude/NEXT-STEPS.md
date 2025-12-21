@@ -1,42 +1,67 @@
 # Next Steps
 
 **Current Session**: Session 44 - Monster Protocol Initialized (COMPLETE)
-**Next Session**: Session 45 - Choose One Priority Task
+**Next Session**: Session 45 - Pop-Out Manual Testing (CONCRETE TASK)
 
 ---
 
-## SESSION 45 STARTING POINT: Choose One Priority Task
+## SESSION 45 IMMEDIATE ACTION: Priority 1 - Pop-Out Manual Testing
 
-The Monster Protocol is now fully operational. For the next session, choose ONE of these priorities:
-
-### Priority 1 (HIGH) - Pop-Out Manual Testing
+**Status**: Ready to execute
 **Scope**: Comprehensive testing of all 6 pop-out scenarios
-- Test 1: Pop-out URL stays clean (no query parameters)
-- Test 2: Filter chips render from BroadcastChannel
-- Test 3: Filter chips update dynamically when main window applies filters
-- Test 4: Apply filter from pop-out updates main window
-- Test 5: Clear All works from pop-out QueryControl
-- Test 6: Multiple pop-outs stay in sync
-
-**Expected Time**: 1-2 hours
 **Success Criteria**: All 6 tests pass, no console errors, pop-out feature marked stable
 
-### Priority 2 (MEDIUM) - Bug Fixes
-- **Bug #13**: Dropdown keyboard navigation (PrimeNG 14.2.3 issue with arrow keys, space bar)
-- **Bug #7**: Multiselect visual state (cosmetic issue)
+### Test 1: Pop-Out URL Stays Clean
+- [ ] Open pop-out Query Control window
+- [ ] Apply filter in main window
+- [ ] Verify pop-out URL = `/panel/discover/query-control/query-control` (NO query params)
+- [ ] Expected: URL stays clean (no ?popout parameter visible in address bar)
 
-**Expected Time**: 1-3 hours per bug
-**Success Criteria**: Keyboard navigation works correctly, no visual glitches
+### Test 2: Filter Chips Render from BroadcastChannel
+- [ ] Pop-out window open (Query Control)
+- [ ] Apply filters in main window (multiple: manufacturer, body class, year)
+- [ ] Verify filter chips display in pop-out Query Control immediately
+- [ ] Expected: Chips appear without page reload
 
-### Priority 3 (MEDIUM) - Refactoring Anti-Pattern
-Remove component-level ResourceManagementService provider from DiscoverComponent
+### Test 3: Filter Chips Update Dynamically
+- [ ] Pop-out Query Control window remains open
+- [ ] Apply new filter in main window while pop-out is visible
+- [ ] Verify new filter chip appears in pop-out immediately
+- [ ] Expected: Real-time sync via BroadcastChannel
 
-**Expected Time**: 30 minutes
-**Success Criteria**: Service remains singleton, all functionality works, no side effects
+### Test 4: Apply Filter from Pop-Out Updates Main
+- [ ] Apply filter in pop-out Query Control
+- [ ] Verify filter chip appears in main window Query Control
+- [ ] Verify results update in main window automatically
+- [ ] Expected: Main window updates without refresh
 
-### Priority 4 (LOW) - Feature Implementation
-- UserPreferencesService for panel order persistence
-- Additional domain implementations
+### Test 5: Clear All Works from Pop-Out
+- [ ] Apply multiple filters (main or pop-out)
+- [ ] Click "Clear Filters" button in pop-out Query Control
+- [ ] Verify filters disappear in both main and pop-out windows
+- [ ] Verify results table refreshes in main window
+- [ ] Expected: Clean state in both windows
+
+### Test 6: Multiple Pop-Outs Stay in Sync
+- [ ] Open 3 pop-out windows simultaneously: Query Control, Statistics, Results Table
+- [ ] Apply filter in main window
+- [ ] Verify all three pop-outs update simultaneously
+- [ ] Apply another filter from one pop-out
+- [ ] Verify all windows (main + 3 pop-outs) reflect the new filter
+- [ ] Expected: Complete synchronization across all windows
+
+### Console Validation
+- [ ] Look for `[QueryControl] 🟢 Received STATE_UPDATE from BroadcastChannel` logs
+- [ ] Look for `[QueryControl] 🔄 syncFiltersFromPopoutState()` logs
+- [ ] **No console errors expected**
+- [ ] Check browser DevTools Network tab - verify BroadcastChannel messages flowing
+
+### Additional Test Notes
+- Use Automobile domain for testing (most complete implementation)
+- Test with different filter types: dropdowns, multiselect, date range
+- Close pop-outs cleanly between tests
+- Refresh page if any state inconsistencies occur
+- Document any unexpected behavior in console or UI
 
 ---
 
