@@ -1,7 +1,34 @@
 # Next Steps
 
-**Current Session**: Session 39 - Pop-Out BroadcastChannel Architecture Fix (COMPLETE)
-**Next Session**: Session 40 - Priority Testing & Bug Fixes
+**Current Session**: Session 40 - Gemini Assessment & Pop-Out Optimization (COMPLETE)
+**Next Session**: Session 41 - Manual Pop-Out Testing & Bug Fixes
+
+---
+
+## SESSION 40 COMPLETED: Gemini Assessment & Pop-Out Architecture Optimization
+
+**Status**: ✅ IMPLEMENTATION COMPLETE - Architecture Optimized
+
+**What Was Done**:
+- Reviewed Gemini's comprehensive code assessment
+- Identified and removed redundant `URL_PARAMS_SYNC` broadcast mechanism
+- Verified Session 39 BroadcastChannel implementation is correct
+- Confirmed pop-out architecture follows best practices (no @Input bindings)
+- Removed 44 lines of dead code from DiscoverComponent
+- Build successful with no TypeScript errors
+
+**Why This Matters**:
+- Eliminates unnecessary BroadcastChannel message traffic
+- Simplifies pop-out state flow (only STATE_UPDATE messages now)
+- Cleaner, more efficient architecture
+- Validates Session 39 implementation was correct
+
+**Key Architecture Insight**:
+The current implementation correctly avoids @Input() bindings and zone violations by:
+1. Using PopOutContextService.getMessages$() subscriptions in pop-outs
+2. Pop-outs filter for STATE_UPDATE messages only
+3. Extract state from message.payload.state and render without URL mutations
+4. Pop-out URLs stay clean - main window URL is only source of truth
 
 ---
 
@@ -25,7 +52,7 @@
 
 ---
 
-## SESSION 40 PLAN: Pop-Out Testing & Bug Fixes
+## SESSION 41 PLAN: Pop-Out Testing & Bug Fixes
 
 **Status**: Ready for next session
 

@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.39
-**Timestamp**: 2025-12-21T11:30:00Z
-**Updated By**: Session 39 - Pop-Out BroadcastChannel Architecture Fix
+**Version**: 5.40
+**Timestamp**: 2025-12-21T12:00:00Z
+**Updated By**: Session 40 - Gemini Assessment Follow-up & Pop-Out Optimization
 
 ---
 
@@ -36,6 +36,70 @@
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
 - Unaffected, serves as working reference
+
+---
+
+## Session 40 Progress: Gemini Assessment & Pop-Out Architecture Optimization
+
+### Primary Objective: Review Gemini Code Assessment and Implement Recommendations
+
+**Status**: ✅ COMPLETE - Redundant Code Removed, Architecture Verified
+
+**Key Finding from Gemini Assessment**:
+Gemini performed a comprehensive code review and identified a redundancy in the pop-out architecture:
+- **Issue**: The `broadcastUrlParamsToPopOuts()` method was sending `URL_PARAMS_SYNC` messages
+- **Root Cause**: These messages were never consumed (explicitly ignored by PanelPopoutComponent)
+- **Verdict**: The STATE_UPDATE mechanism already handles all state synchronization correctly
+- **Impact**: Unnecessary cross-window BroadcastChannel message traffic creating wasted CPU cycles
+
+**What Gemini Verified** (✅ Architecture Validation):
+1. ✅ Session 39 BroadcastChannel implementation is **correct**
+2. ✅ QueryControlComponent **correctly subscribes** to PopOutContextService (not @Input)
+3. ✅ Pop-out URLs remain **clean** (no query parameters)
+4. ✅ URL-First state management **fully preserved**
+5. ✅ No @Input() bindings that would violate Angular zone boundaries
+6. ✅ STATE_UPDATE message model is **sound**
+
+**Work Completed** (1 commit, code optimization):
+
+1. ✅ **Removed Dead Code**: `broadcastUrlParamsToPopOuts()` method (40 lines removed)
+   - Location: `frontend/src/app/features/discover/discover.component.ts`
+   - This method was sending URL_PARAMS_SYNC messages that were never used
+
+2. ✅ **Removed Redundant Subscription** (lines 275-279)
+   - Removed subscription to `urlStateService.params$` for URL_PARAMS_SYNC broadcast
+   - Added explanatory comment noting STATE_UPDATE handles all synchronization
+
+3. ✅ **Verified Build**: `npm run build` successful with no TypeScript errors
+
+**Architecture Summary**:
+
+The pop-out state flow is now exclusively via STATE_UPDATE messages:
+
+```
+Main Window:
+├─ URL changes → ResourceManagementService fetches data
+├─ State updates → broadcastStateToPopOuts() via STATE_UPDATE
+└─ Pop-out windows receive → syncStateFromExternal()
+
+Pop-Out Window (e.g., Query Control):
+├─ Subscribes to PopOutContextService.getMessages$()
+├─ Filters for STATE_UPDATE messages only
+├─ Extracts filters from message.payload.state
+├─ Renders filter chips WITHOUT updating pop-out URL
+└─ URL stays clean: /panel/discover/query-control/query-control
+```
+
+**Files Modified**:
+- `frontend/src/app/features/discover/discover.component.ts` - Removed dead code (44 lines deleted)
+
+**Commits**:
+- 61b4aa9: chore: Remove redundant URL_PARAMS_SYNC broadcast from pop-out architecture
+
+**Next Steps**:
+- Manual testing of pop-out filter rendering (6 scenarios from POP-OUT-REQUIREMENTS-RUBRIC.md)
+- Verify filter chips render correctly when main window applies filters
+- Confirm no console errors or duplicate messages
 
 ---
 
