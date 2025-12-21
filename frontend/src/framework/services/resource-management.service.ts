@@ -481,12 +481,6 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
    * 6. Unsubscribe on destroy via takeUntil(destroy$)
    */
   private fetchData(filters: TFilters): void {
-    console.log('[ResourceManagementService.fetchData] Fetching data', {
-      filters,
-      autoFetch: this.config.autoFetch,
-      isInPopOut: this.popOutContext.isInPopOut()
-    });
-
     // Step 1: Set loading state to show spinners/loaders to user
     this.updateState({ loading: true, error: null });
 
