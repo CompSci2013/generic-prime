@@ -169,19 +169,11 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
         break;
 
       case PopOutMessageType.URL_PARAMS_SYNC:
-        // Sync URL parameters from main window
-        // Needed for Query Control and other components that listen to URL params
-        if (message.payload && message.payload.params) {
-          console.log('[PanelPopout] 🔵 Received URL_PARAMS_SYNC message');
-          console.log('[PanelPopout] URL params payload:', message.payload.params);
-          // Update pop-out's URL parameters (this triggers QueryControl to update its filters)
-          await this.urlState.setParams(message.payload.params);
-          console.log('[PanelPopout] ✅ Called urlState.setParams()');
-          this.cdr.markForCheck();
-          console.log('[PanelPopout] ✅ Triggered change detection');
-        } else {
-          console.warn('[PanelPopout] ⚠️  URL_PARAMS_SYNC missing payload.params');
-        }
+        // Pop-out windows do NOT update their router URL with parameters
+        // URL-First architecture: Only main window's URL is the source of truth
+        // All state synchronization happens via STATE_UPDATE messages to pop-out's ResourceManagementService
+        // Pop-out URLs remain clean without query parameters
+        console.log('[PanelPopout] 🔵 Received URL_PARAMS_SYNC message (ignored - pop-outs use STATE_UPDATE)');
         break;
 
       default:
