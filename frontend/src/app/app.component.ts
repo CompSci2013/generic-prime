@@ -1,4 +1,5 @@
-import { Component, Injector } from '@angular/core';
+import { Component, Injector, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { DomainConfigRegistry } from '../framework/services';
 import { DOMAIN_PROVIDERS } from '../domain-config/domain-providers';
@@ -49,6 +50,13 @@ export class AppComponent {
    * @type {string}
    */
   title = 'generic-prime';
+
+  /**
+   * Whether this window is a pop-out (detected from ?popout=panelId query param)
+   * When true, the header is hidden and only the router-outlet is shown
+   * @type {boolean}
+   */
+  isPopOut = false;
 
   /**
    * Domain navigation menu items with TieredMenu structure (nested items with flyout submenus)
@@ -121,12 +129,21 @@ export class AppComponent {
    *
    * @param {DomainConfigRegistry} domainConfigRegistry - Service for managing domain configurations
    * @param {Injector} injector - Angular injector for dependency resolution
+   * @param {ActivatedRoute} route - ActivatedRoute for detecting query parameters
    */
   constructor(
     private domainConfigRegistry: DomainConfigRegistry,
-    private injector: Injector
+    private injector: Injector,
+    private route: ActivatedRoute
   ) {
     this.domainConfigRegistry.registerDomainProviders(DOMAIN_PROVIDERS, this.injector);
+
+    // Detect if this is a pop-out window by checking for ?popout query parameter
+    // Pop-out windows hide the header and show only the router-outlet with panel content
+    this.route.queryParams.subscribe(params => {
+      this.isPopOut = !!params['popout'];
+      console.log(`[AppComponent] isPopOut=${this.isPopOut}, popout param=${params['popout']}`);
+    });
   }
 
   /**

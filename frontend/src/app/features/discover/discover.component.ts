@@ -4,6 +4,7 @@ import {
   Component,
   Inject,
   Injector,
+  NgZone,
   OnDestroy,
   OnInit
 } from '@angular/core';
@@ -14,7 +15,6 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { createAutomobilePickerConfigs } from '../../../domain-config/automobile/configs/automobile.picker-configs';
 import { DomainConfig } from '../../../framework/models';
-import { PickerSelectionEvent } from '../../../framework/models/picker-config.interface';
 import {
   buildWindowFeatures,
   PopOutMessageType,
@@ -174,7 +174,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     private popOutContext: PopOutContextService,
     private cdr: ChangeDetectorRef,
     private messageService: MessageService,
-    private urlStateService: UrlStateService
+    private urlStateService: UrlStateService,
+    private ngZone: NgZone
   ) {
     // Store injected config (works with any domain)
     this.domainConfig = domainConfig as DomainConfig<
@@ -363,8 +364,10 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       return;
     }
 
-    // Build pop-out URL (NO query params - state comes via BroadcastChannel)
-    const url = `/panel/${this.gridId}/${panelId}/${panelType}`;
+    // Build pop-out URL with query parameter to indicate this is a pop-out
+    // Same app URL, but with ?popout=panelId flag that AppComponent detects to hide header
+    // This approach is used by GoldenLayout and other layout libraries - same app, different UI mode
+    const url = `/panel/${this.gridId}/${panelId}/${panelType}?popout=${panelId}`;
     console.log(`[Discover] Opening pop-out window at URL: ${url}`);
 
     // Window features
@@ -402,10 +405,16 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     console.log(`[Discover] Created BroadcastChannel for panel: ${panelId}`);
 
     // Listen for messages from pop-out (Observable Pattern)
-    // Push browser API events to RxJS Subject for handling in Angular zone
+    // IMPORTANT: Wrap handler in ngZone.run() to re-enter Angular zone immediately
+    // BroadcastChannel.onmessage is a native browser event that fires outside the zone.
+    // Re-entering the zone here ensures the entire downstream chain (Subject emission →
+    // handlePopOutMessage → UrlStateService → Router) runs inside the zone with proper
+    // change detection awareness. This is architecturally correct per Angular zone principles.
     channel.onmessage = event => {
-      console.log(`[Discover] BroadcastChannel.onmessage received from ${panelId}:`, event.data);
-      this.popoutMessages$.next({ panelId, event });
+      this.ngZone.run(() => {
+        console.log(`[Discover] BroadcastChannel.onmessage received from ${panelId}:`, event.data);
+        this.popoutMessages$.next({ panelId, event });
+      });
     };
     console.log(`[Discover] Set up channel.onmessage listener for panel: ${panelId}`);
 
@@ -448,11 +457,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     );
 
     switch (message.type) {
-      case PopOutMessageType.PICKER_SELECTION_CHANGE:
-        // Handle picker selection from pop-out
-        await this.onPickerSelectionChangeAndUpdateUrl(message.payload);
-        break;
-
       case PopOutMessageType.PANEL_READY:
         // Pop-out is ready - broadcast current state immediately
         // (state$ subscription only fires on changes, not on initial subscription)
@@ -537,7 +541,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    *
    * @param event - Picker selection event containing selected items and URL value
    */
-  async onPickerSelectionChangeAndUpdateUrl(event: PickerSelectionEvent<any>): Promise<void> {
+  async onPickerSelectionChangeAndUpdateUrl(event: any): Promise<void> {
     console.log('[Discover] Picker selection changed:', event);
 
     // Extract the URL param name from the picker config
