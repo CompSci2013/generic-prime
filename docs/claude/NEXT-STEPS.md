@@ -1,67 +1,80 @@
 # Next Steps
 
-**Current Session**: Session 44 - Monster Protocol Initialized (COMPLETE)
-**Next Session**: Session 45 - Pop-Out Manual Testing (CONCRETE TASK)
+**Current Session**: Session 45 - Pop-Out Manual Testing (COMPLETE)
+**Next Session**: Session 46 - Console Output Cleanup (CONCRETE TASK)
 
 ---
 
-## SESSION 45 IMMEDIATE ACTION: Priority 1 - Pop-Out Manual Testing
+## SESSION 46 IMMEDIATE ACTION: Clean Up Console Output
 
 **Status**: Ready to execute
-**Scope**: Comprehensive testing of all 6 pop-out scenarios
-**Success Criteria**: All 6 tests pass, no console errors, pop-out feature marked stable
+**Scope**: Remove all `console.*()` statements and debugging logs from production code
+**Success Criteria**: Zero console output on normal app operation, clean DevTools, build succeeds
 
-### Test 1: Pop-Out URL Stays Clean
-- [ ] Open pop-out Query Control window
-- [ ] Apply filter in main window
-- [ ] Verify pop-out URL = `/panel/discover/query-control/query-control` (NO query params)
-- [ ] Expected: URL stays clean (no ?popout parameter visible in address bar)
+### Current Console Issues (from screenshot)
+The browser console shows multiple categories of unwanted output:
 
-### Test 2: Filter Chips Render from BroadcastChannel
-- [ ] Pop-out window open (Query Control)
-- [ ] Apply filters in main window (multiple: manufacturer, body class, year)
-- [ ] Verify filter chips display in pop-out Query Control immediately
-- [ ] Expected: Chips appear without page reload
+1. **[QueryControl] Logging**
+   - `Called syncFiltersFromUrl()`
+   - `ngOnInit() complete (main window mode)`
+   - Multiple operational logs
 
-### Test 3: Filter Chips Update Dynamically
-- [ ] Pop-out Query Control window remains open
-- [ ] Apply new filter in main window while pop-out is visible
-- [ ] Verify new filter chip appears in pop-out immediately
-- [ ] Expected: Real-time sync via BroadcastChannel
+2. **[BasePicerComponent] Warnings**
+   - "Ignoring lazy load while loading"
+   - Messages about sorting and field state
 
-### Test 4: Apply Filter from Pop-Out Updates Main
-- [ ] Apply filter in pop-out Query Control
-- [ ] Verify filter chip appears in main window Query Control
-- [ ] Verify results update in main window automatically
-- [ ] Expected: Main window updates without refresh
+3. **API Response Logging**
+   - `[AutomobileApiAdapter] API Response received`
+   - Total/resultsCount/hasStatistics logged
 
-### Test 5: Clear All Works from Pop-Out
-- [ ] Apply multiple filters (main or pop-out)
-- [ ] Click "Clear Filters" button in pop-out Query Control
-- [ ] Verify filters disappear in both main and pop-out windows
-- [ ] Verify results table refreshes in main window
-- [ ] Expected: Clean state in both windows
+4. **[Discovery] State Broadcasts**
+   - `State changed, broadcasting to pop-outs`
+   - Filter state and results logged in detail
 
-### Test 6: Multiple Pop-Outs Stay in Sync
-- [ ] Open 3 pop-out windows simultaneously: Query Control, Statistics, Results Table
-- [ ] Apply filter in main window
-- [ ] Verify all three pop-outs update simultaneously
-- [ ] Apply another filter from one pop-out
-- [ ] Verify all windows (main + 3 pop-outs) reflect the new filter
-- [ ] Expected: Complete synchronization across all windows
+5. **Chart Component Warnings**
+   - "WARN: ignored yaxis.scaleanchor" warnings
+   - Multiple instances of axis constraint violations
 
-### Console Validation
-- [ ] Look for `[QueryControl] 🟢 Received STATE_UPDATE from BroadcastChannel` logs
-- [ ] Look for `[QueryControl] 🔄 syncFiltersFromPopoutState()` logs
-- [ ] **No console errors expected**
-- [ ] Check browser DevTools Network tab - verify BroadcastChannel messages flowing
+6. **Error Messages** (may indicate real issues)
+   - Various axis mismatch warnings from Plotly/base-chart
 
-### Additional Test Notes
-- Use Automobile domain for testing (most complete implementation)
-- Test with different filter types: dropdowns, multiselect, date range
-- Close pop-outs cleanly between tests
-- Refresh page if any state inconsistencies occur
-- Document any unexpected behavior in console or UI
+### Task Steps
+
+1. **Identify All Logging Statements**
+   - Find all `console.log()`, `console.warn()`, `console.error()` in TypeScript files
+   - Categorize by component/service
+
+2. **Remove Development Logs**
+   - Delete all `console.log()` statements (operational/debug logs)
+   - Delete all temporary/operational logging statements
+
+3. **Keep Only Critical Errors**
+   - Preserve any `console.error()` that indicates real failures
+   - Keep warnings only if they represent actionable issues
+
+4. **Address Plotly Chart Warnings**
+   - Investigate yaxis.scaleanchor and axis constraint warnings
+   - Determine if these are legitimate configuration issues or can be suppressed
+
+5. **Build and Verify**
+   - Run `npm run build` - verify no TypeScript errors
+   - Test application functionality
+   - Open DevTools console - should be clean (no logs except real errors)
+
+### Files Likely to Need Cleanup
+- `frontend/src/app/features/discover/discover.component.ts`
+- `frontend/src/app/features/query-control/query-control.component.ts`
+- `frontend/src/framework/services/resource-management.service.ts`
+- `frontend/src/app/features/base-chart/base-chart.component.ts`
+- `frontend/src/framework/adapters/automobile-api.adapter.ts`
+- Other components with operational logging
+
+### Success Criteria
+- [ ] No console.log() output on normal application startup
+- [ ] No operational/debug messages in DevTools console
+- [ ] Only legitimate errors/warnings remain (if any)
+- [ ] Build completes successfully with no new TypeScript errors
+- [ ] Application functionality unchanged after cleanup
 
 ---
 
