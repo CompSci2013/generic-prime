@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.38
-**Timestamp**: 2025-12-20T22:30:00Z
-**Updated By**: Session 38 - Pop-Out URL Parameter Fix
+**Version**: 5.39
+**Timestamp**: 2025-12-21T11:30:00Z
+**Updated By**: Session 39 - Pop-Out BroadcastChannel Architecture Fix
 
 ---
 
@@ -546,6 +546,71 @@ Why: Simpler setup, less terminal clutter, good for quick validation
 - URL-First architecture fully preserved: only main window URL is source of truth
 
 **Testing Ready**: See `SESSION-38-POP-OUT-FIX.md` for comprehensive testing checklist
+
+---
+
+## Session 39 Progress: Pop-Out BroadcastChannel Architecture Fix
+
+### Primary Objective: Correct pop-out filter chip rendering to use BroadcastChannel subscriptions instead of @Input bindings
+
+**Status**: ✅ COMPLETE - Correct architecture implemented
+
+**Problem with Session 38 Fix**:
+- Session 38 attempted to use `@Input() popoutState` binding to pass state from parent to QueryControl
+- This approach violates Angular zone boundaries - pop-out windows run in separate zones
+- @Input bindings require parent-child component relationship in same zone, which is impossible for pop-outs
+- User explicitly corrected: "popped out component cannot take @input() because of (zones?) and must instead rely on subscription to a broadcast service"
+
+**Solution Implemented** (Session 39 - Correct Approach):
+
+1. ✅ **Removed @Input() bindings**: Removed `@Input() popoutState` from QueryControl and PanelPopoutComponent
+2. ✅ **Removed ngOnChanges hook**: Lifecycle hook was tied to @Input bindings
+3. ✅ **Implemented BroadcastChannel subscription**: QueryControl now directly subscribes to PopOutContextService.getMessages$()
+4. ✅ **Filter extraction from STATE_UPDATE**: When STATE_UPDATE arrives, filters extracted from message.payload.state
+5. ✅ **Preserved URL-First architecture**: Pop-out URLs remain clean, main window URL is only source of truth
+6. ✅ **No service hacks**: ResourceManagementService unchanged, clean component-level logic
+
+**Key Implementation Details**:
+
+**QueryControl Changes**:
+- Injected PopOutContextService into constructor
+- In ngOnInit: Detect pop-out mode with `popOutContext.isInPopOut()`
+- If pop-out: Subscribe to `popOutContext.getMessages$()` filtered by STATE_UPDATE type
+- Extract filters from message.payload.state and call existing `syncFiltersFromPopoutState()` method
+- If main window: Subscribe to URL params$ as before (unchanged)
+- No @Input bindings, pure BroadcastChannel subscription
+
+**PanelPopoutComponent Changes**:
+- Removed `state` property (no longer needed for @Input)
+- Removed template binding `[popoutState]="state"`
+- STATE_UPDATE handler still calls `resourceService.syncStateFromExternal()` for service state sync
+- Pop-out QueryControl subscribes to BroadcastChannel independently
+
+**Files Modified**:
+- `frontend/src/framework/components/query-control/query-control.component.ts` - BroadcastChannel subscription, removed @Input
+- `frontend/src/app/features/panel-popout/panel-popout.component.ts` - Removed state property, removed setParams() hack
+- `frontend/src/app/features/panel-popout/panel-popout.component.html` - Removed [popoutState] binding
+
+**Architecture Preserved**:
+- ✅ URL-First: Main window URL is only source of truth for filter parameters
+- ✅ BroadcastChannel: Pop-out state flows via existing STATE_UPDATE mechanism
+- ✅ No service hacks: ResourceManagementService, UrlStateService, PopOutContextService all unchanged
+- ✅ Zone isolation: Each pop-out has its own Angular zone, subscriptions work independently
+- ✅ Clean communication: Parent→Child via BroadcastChannel messages, not zone-crossing @Input
+
+**Build Status**: ✅ Build successful, no TypeScript compilation errors
+
+**Testing Checklist** (From POP-OUT-REQUIREMENTS-RUBRIC.md):
+- [ ] Pop-out URL stays clean (no query parameters)
+- [ ] Filter chips render when main window applies filter
+- [ ] Filter chips update dynamically when new filters applied
+- [ ] Applying filter from pop-out updates main window
+- [ ] Clear All works from pop-out QueryControl
+- [ ] Multiple pop-outs stay in sync
+- [ ] No console errors
+- [ ] All scenarios in rubric verified
+
+**Key Insight**: The solution was already partially present - PopOutContextService and STATE_UPDATE mechanism existed, we just needed to leverage it correctly in QueryControl rather than trying to use @Input bindings.
 
 ---
 

@@ -1,7 +1,84 @@
 # Next Steps
 
-**Current Session**: Session 38 - Pop-Out URL Parameter Visibility Fix (COMPLETE)
-**Next Session**: Session 39 - Priority 2 (Remove Component-Level Provider Anti-Pattern)
+**Current Session**: Session 39 - Pop-Out BroadcastChannel Architecture Fix (COMPLETE)
+**Next Session**: Session 40 - Priority Testing & Bug Fixes
+
+---
+
+## SESSION 39 COMPLETED: Pop-Out BroadcastChannel Architecture Fix
+
+**Status**: ✅ IMPLEMENTATION COMPLETE - Ready for testing
+
+**What Was Done**:
+- Reverted @Input() bindings that couldn't work across Angular zones
+- Implemented BroadcastChannel subscription in QueryControl for pop-out mode
+- QueryControl now detects pop-out and subscribes to STATE_UPDATE messages
+- Filters extracted from BroadcastChannel messages and rendered without URL params
+- Pop-out URLs remain clean, URL-First architecture fully preserved
+- Build successful, no TypeScript errors
+
+**Why This Matters**:
+- Previous Session 38 attempt violated Angular zone architecture
+- Pop-out windows run in separate zones - @Input bindings impossible
+- Correct solution leverages existing BroadcastChannel mechanism already in place
+- Clean, zone-aware implementation
+
+---
+
+## SESSION 40 PLAN: Pop-Out Testing & Bug Fixes
+
+**Status**: Ready for next session
+
+### Immediate Next Action
+
+**Priority 1 (HIGH) - Manual Testing of Pop-Out Filter Rendering**
+
+Test all scenarios from `POP-OUT-REQUIREMENTS-RUBRIC.md`:
+
+1. **Test 1: Pop-Out URL Stays Clean**
+   - [ ] Open pop-out Query Control
+   - [ ] Apply filter in main window
+   - [ ] Verify pop-out URL = `/panel/discover/query-control/query-control` (NO query params)
+
+2. **Test 2: Filter Chips Render in Pop-Out**
+   - [ ] Apply filters in main window
+   - [ ] Verify filter chips display in pop-out Query Control
+
+3. **Test 3: Filter Chips Update Dynamically**
+   - [ ] Pop-out Query Control window open
+   - [ ] Apply new filter in main window
+   - [ ] Verify new filter chip appears in pop-out immediately
+
+4. **Test 4: Apply Filter from Pop-Out**
+   - [ ] Apply filter in pop-out Query Control
+   - [ ] Verify filter chip appears in main window
+   - [ ] Verify results update in main window
+
+5. **Test 5: Clear All Works from Pop-Out**
+   - [ ] Apply multiple filters
+   - [ ] Click "Clear Filters" in pop-out
+   - [ ] Verify filters disappear in both main and pop-out
+
+6. **Test 6: Multiple Pop-Outs Stay in Sync**
+   - [ ] Open 3 pop-outs: Query Control, Statistics, Results
+   - [ ] Apply filter in main window
+   - [ ] Verify all three pop-outs update simultaneously
+
+**Console Validation**:
+- Look for `[QueryControl] 🟢 Received STATE_UPDATE from BroadcastChannel` logs
+- Look for `[QueryControl] 🔄 syncFiltersFromPopoutState()` logs
+- No console errors expected
+
+**Success Criteria**:
+- [ ] All 6 tests pass
+- [ ] Pop-out URLs stay clean
+- [ ] Filter chips render and update correctly
+- [ ] No console errors
+- [ ] Multiple pop-outs stay in sync
+
+### Priority 2 (MEDIUM) - Bug #13: Dropdown Keyboard Navigation
+
+If pop-out testing passes, move on to fixing dropdown keyboard nav bug in Query Control (arrow keys, space bar not working with p-dropdown [filter]="true")
 
 ---
 

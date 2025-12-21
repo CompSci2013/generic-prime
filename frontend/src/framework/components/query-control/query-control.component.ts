@@ -10,7 +10,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { DomainConfig } from '../../models/domain-config.interface';
 import {
@@ -19,6 +19,8 @@ import {
 } from '../../models/filter-definition.interface';
 import { ApiService } from '../../services/api.service';
 import { UrlStateService } from '../../services/url-state.service';
+import { PopOutContextService } from '../../services/popout-context.service';
+import { PopOutMessageType } from '../../models/popout.interface';
 
 /**
  * Active filter representation
@@ -94,15 +96,6 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    * Domain configuration with filter definitions for this query control instance
    */
   @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
-
-  /**
-   * Optional state object from pop-out parent window
-   * When provided (non-null), used instead of URL parameters for rendering filter chips
-   * Contains synced filters from main window via BroadcastChannel
-   *
-   * @remarks Only populated in pop-out windows. In main window, this is null.
-   */
-  @Input() popoutState: any = null;
 
   /**
    * Emits when URL parameters should be updated with new filter values or other query parameters
@@ -225,7 +218,8 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   constructor(
     private cdr: ChangeDetectorRef,
     private apiService: ApiService,
-    private urlState: UrlStateService
+    private urlState: UrlStateService,
+    private popOutContext: PopOutContextService
   ) {}
 
   ngOnInit(): void {
@@ -238,18 +232,27 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
       .map(f => ({ label: f.label, value: f }));
     console.log('[QueryControl] ✅ Initialized filter field options:', this.filterFieldOptions.length);
 
-    // Check if running in pop-out with state passed via @Input
-    if (this.popoutState) {
-      console.log('[QueryControl] 📍 Pop-out mode detected, subscribing to popoutState changes via @Input');
-      // In pop-out: watch for changes to the @Input popoutState property
-      // When pop-out receives STATE_UPDATE, parent sets this.popoutState, triggering this subscription
-      this.cdr.markForCheck();
+    // Check if running in pop-out window
+    if (this.popOutContext.isInPopOut()) {
+      console.log('[QueryControl] 📍 Pop-out mode detected - subscribing to BroadcastChannel STATE_UPDATE messages');
 
-      // Sync filters from popoutState initially
-      this.syncFiltersFromPopoutState(this.popoutState);
+      // In pop-out window: Subscribe to STATE_UPDATE messages from main window
+      // These arrive via BroadcastChannel (not @Input bindings, which don't work across zones)
+      this.popOutContext
+        .getMessages$()
+        .pipe(
+          filter(msg => msg.type === PopOutMessageType.STATE_UPDATE),
+          takeUntil(this.destroy$)
+        )
+        .subscribe(message => {
+          console.log('[QueryControl] 🟢 Received STATE_UPDATE from BroadcastChannel');
+          if (message.payload && message.payload.state) {
+            // Extract filters from the state object and render them
+            this.syncFiltersFromPopoutState(message.payload.state);
+            this.cdr.markForCheck();
+          }
+        });
 
-      // Watch for future changes to popoutState
-      // Note: We'll handle this in ngOnChanges since @Input changes trigger that lifecycle hook
       console.log('[QueryControl] ✅ ngOnInit() complete (pop-out mode)');
     } else {
       // In main window: Sync from URL state on init and on changes
@@ -261,18 +264,6 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
         this.cdr.markForCheck();
       });
       console.log('[QueryControl] ✅ ngOnInit() complete (main window mode)');
-    }
-  }
-
-  /**
-   * Handle @Input changes - specifically popoutState updates
-   */
-  ngOnChanges(changes: any): void {
-    if (changes && changes['popoutState'] && !changes['popoutState'].firstChange) {
-      // popoutState changed (not initial set) - sync filters
-      console.log('[QueryControl] 📨 @Input popoutState changed, syncing filters');
-      this.syncFiltersFromPopoutState(this.popoutState);
-      this.cdr.markForCheck();
     }
   }
 

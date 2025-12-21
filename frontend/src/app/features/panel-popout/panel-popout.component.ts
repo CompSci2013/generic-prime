@@ -21,7 +21,6 @@ import { DOMAIN_CONFIG } from '../../../framework/services/domain-config-registr
 import { PickerConfigRegistry } from '../../../framework/services/picker-config-registry.service';
 import { PopOutContextService } from '../../../framework/services/popout-context.service';
 import { ResourceManagementService } from '../../../framework/services/resource-management.service';
-import { UrlStateService } from '../../../framework/services/url-state.service';
 
 /**
  * Panel Popout Component
@@ -80,16 +79,6 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
   domainConfig: DomainConfig<any, any, any>;
 
   /**
-   * Current state object passed to child components via @Input
-   * Updated when STATE_UPDATE messages arrive from main window
-   * QueryControl and other components read filters and data from this state
-   *
-   * @remarks In pop-out windows, this replaces URL-based state. Components read
-   * from this property instead of from UrlStateService params.
-   */
-  state: any = null;
-
-  /**
    * Destroy signal for subscription cleanup
    */
   private destroy$ = new Subject<void>();
@@ -100,7 +89,6 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private pickerRegistry: PickerConfigRegistry,
     private injector: Injector,
-    private urlState: UrlStateService,
     @Inject(DOMAIN_CONFIG) domainConfig: DomainConfig<any, any, any>,
     public resourceService: ResourceManagementService<any, any, any>
   ) {
@@ -169,12 +157,10 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
         if (message.payload && message.payload.state) {
           console.log('[PanelPopout] 🟢 Received STATE_UPDATE message');
           console.log('[PanelPopout] State payload:', message.payload.state);
-          // Store state locally for child components to read via @Input
-          // This allows QueryControl and other components to access filters without URL params
-          this.state = message.payload.state;
-          // Also sync to ResourceManagementService for services that subscribe to it
+          // Sync to ResourceManagementService for services that subscribe to it
+          // Child components (QueryControl, StatisticsPanel, etc.) can now read from resourceService.state$
           this.resourceService.syncStateFromExternal(message.payload.state);
-          console.log('[PanelPopout] ✅ Updated local state and called resourceService.syncStateFromExternal()');
+          console.log('[PanelPopout] ✅ Called resourceService.syncStateFromExternal()');
           this.cdr.markForCheck();
           console.log('[PanelPopout] ✅ Triggered change detection');
         } else {
