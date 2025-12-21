@@ -201,14 +201,10 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
         }
       }
 
-      // Use UrlStateService instead of router.navigate() directly
-      // This ensures URL-First architecture compliance
-      console.log('[StatisticsPanel] 🔵 In Main Window - Setting highlight params:', newParams);
-      this.urlState.setParams(newParams);
-      console.log('[StatisticsPanel] ✅ URL params set via urlState.setParams()');
-
-      // If we're in a pop-out window, broadcast the URL change to main window
+      // Only update URL in main window (not in pop-out)
+      // Pop-out windows must NOT mutate their URL - main window URL is the single source of truth
       if (this.popOutContext.isInPopOut()) {
+        // In pop-out: Send URL change to main window via BroadcastChannel
         console.log('[StatisticsPanel] 🟡 In Pop-Out - Broadcasting highlight params to main window:', newParams);
         console.log('[StatisticsPanel] Sending URL_PARAMS_CHANGED with payload:', { params: newParams });
         this.popOutContext.sendMessage({
@@ -217,6 +213,11 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
           timestamp: Date.now()
         });
         console.log('[StatisticsPanel] ✅ Broadcast message sent via popOutContext.sendMessage()');
+      } else {
+        // In main window: Update URL directly
+        console.log('[StatisticsPanel] 🔵 In Main Window - Setting highlight params:', newParams);
+        this.urlState.setParams(newParams);
+        console.log('[StatisticsPanel] ✅ URL params set via urlState.setParams()');
       }
     } else {
       console.log('[StatisticsPanel] Processing NORMAL MODE click (non-highlight)');
@@ -240,13 +241,10 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
         }
       }
 
-      // Use UrlStateService to update filter parameters
-      console.log('[StatisticsPanel] 🔵 In Main Window - Setting filter params:', newParams);
-      this.urlState.setParams(newParams);
-      console.log('[StatisticsPanel] ✅ URL params set via urlState.setParams()');
-
-      // If we're in a pop-out window, broadcast the URL change to main window
+      // Only update URL in main window (not in pop-out)
+      // Pop-out windows must NOT mutate their URL - main window URL is the single source of truth
       if (this.popOutContext.isInPopOut()) {
+        // In pop-out: Send URL change to main window via BroadcastChannel
         console.log('[StatisticsPanel] 🟡 In Pop-Out - Broadcasting filter params to main window:', newParams);
         console.log('[StatisticsPanel] Sending URL_PARAMS_CHANGED with payload:', { params: newParams });
         this.popOutContext.sendMessage({
@@ -255,6 +253,11 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
           timestamp: Date.now()
         });
         console.log('[StatisticsPanel] ✅ Broadcast message sent via popOutContext.sendMessage()');
+      } else {
+        // In main window: Update URL directly
+        console.log('[StatisticsPanel] 🔵 In Main Window - Setting filter params:', newParams);
+        this.urlState.setParams(newParams);
+        console.log('[StatisticsPanel] ✅ URL params set via urlState.setParams()');
       }
     }
     console.log('[StatisticsPanel] ✅ onChartClick() complete');
