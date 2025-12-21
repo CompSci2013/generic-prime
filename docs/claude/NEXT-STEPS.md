@@ -1,7 +1,83 @@
 # Next Steps
 
-**Current Session**: Session 46 - Console Cleanup + Performance Optimization (COMPLETE)
-**Next Session**: Session 47 - Implement UserPreferencesService (Per MONSTER-CLAUDE.md)
+**Current Session**: Session 47 - Implement UserPreferencesService (COMPLETE)
+**Next Session**: Session 48 - Manual Testing of Panel Persistence (Per Testing Checklist)
+
+---
+
+## SESSION 48 IMMEDIATE ACTION: Manual Testing of Panel Order Persistence
+
+**Status**: Ready for testing
+**Priority**: HIGH (validate UserPreferencesService works correctly)
+**Scope**: Manual verification of panel order and collapsed state persistence
+
+### Testing Checklist
+
+**Phase 1 - Panel Order Persistence** (~5 min)
+
+1. Open application at `/automobiles/discover`
+2. Drag panels to new order (e.g., move Statistics to top)
+3. Verify new order renders immediately
+4. Refresh page (Ctrl+R / Cmd+R)
+5. Verify panel order persists from localStorage
+6. Open Developer Tools → Application → Local Storage
+7. Find `prefs:automobiles:panelOrder` key
+8. Verify it contains the new order: `["statistics-panel", "query-control", ...]`
+
+**Phase 2 - Collapsed State Persistence** (~5 min)
+
+9. Collapse one or more panels (e.g., Statistics)
+10. Verify collapse state renders immediately
+11. Refresh page
+12. Verify collapsed panels remain collapsed
+13. Check localStorage for `prefs:automobiles:collapsedPanels` key
+14. Verify it contains collapsed panel IDs: `["statistics-panel"]`
+
+**Phase 3 - Default Fallback** (~3 min)
+
+15. Open Developer Tools → Application → Local Storage
+16. Delete `prefs:automobiles:panelOrder` key
+17. Delete `prefs:automobiles:collapsedPanels` key
+18. Refresh page
+19. Verify panels return to default order
+20. Verify no panels are collapsed (default state)
+
+**Phase 4 - Cross-Domain Support** (~2 min)
+
+21. Navigate to `/physics/discover` (if available)
+22. Reorder panels differently
+23. Refresh page
+24. Verify physics domain has separate preferences
+25. Check localStorage - should have both:
+    - `prefs:automobiles:panelOrder`
+    - `prefs:physics:panelOrder`
+
+**Phase 5 - Private Browsing / Quota Exceeded** (~2 min)
+
+26. Open in private/incognito window
+27. Try to reorder panels
+28. Should not throw errors
+29. Preferences won't persist (expected)
+30. Close private window without errors
+
+### Success Criteria
+
+- [ ] Panel order persists across page refresh
+- [ ] Collapsed state persists across page refresh
+- [ ] Default order returns when localStorage is cleared
+- [ ] Each domain has separate preferences
+- [ ] No console errors on startup or normal usage
+- [ ] Works in private browsing mode without errors
+- [ ] localStorage keys use correct domain namespace
+
+### After Testing Passes
+
+Document results in this file and choose next priority from available options:
+
+1. **Manual Pop-Out Testing** (HIGH priority) - Complete 10-test pop-out scenario
+2. **Fix Bug #13** (MEDIUM priority) - Dropdown keyboard navigation
+3. **Fix Bug #7** (MEDIUM priority) - Multiselect visual state
+4. **Remove Provider Anti-Pattern** (HIGH priority) - Clean up ResourceManagementService provider
 
 ---
 
