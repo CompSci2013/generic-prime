@@ -4,6 +4,7 @@ import {
   Component,
   Inject,
   Injector,
+  NgZone,
   OnDestroy,
   OnInit
 } from '@angular/core';
@@ -89,6 +90,7 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private pickerRegistry: PickerConfigRegistry,
     private injector: Injector,
+    private ngZone: NgZone,
     @Inject(DOMAIN_CONFIG) domainConfig: DomainConfig<any, any, any>,
     public resourceService: ResourceManagementService<any, any, any>
   ) {
@@ -154,15 +156,23 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       case PopOutMessageType.STATE_UPDATE:
         // Sync full state from main window
         // Main window URL → state$ → BroadcastChannel → pop-out
+        // CRITICAL: BroadcastChannel messages arrive OUTSIDE Angular zone
+        // Must use ngZone.run() to trigger change detection in pop-out's zone
         if (message.payload && message.payload.state) {
           console.log('[PanelPopout] 🟢 Received STATE_UPDATE message');
           console.log('[PanelPopout] State payload:', message.payload.state);
-          // Sync to ResourceManagementService for services that subscribe to it
-          // Child components (QueryControl, StatisticsPanel, etc.) can now read from resourceService.state$
-          this.resourceService.syncStateFromExternal(message.payload.state);
-          console.log('[PanelPopout] ✅ Called resourceService.syncStateFromExternal()');
-          this.cdr.markForCheck();
-          console.log('[PanelPopout] ✅ Triggered change detection');
+
+          // Run state sync inside Angular zone so change detection propagates to child components
+          this.ngZone.run(() => {
+            // Sync to ResourceManagementService for services that subscribe to it
+            // Child components (QueryControl, StatisticsPanel, etc.) can now read from resourceService.state$
+            this.resourceService.syncStateFromExternal(message.payload.state);
+            console.log('[PanelPopout] ✅ Called resourceService.syncStateFromExternal()');
+
+            // Trigger change detection for this component and all children
+            this.cdr.detectChanges();
+            console.log('[PanelPopout] ✅ Triggered detectChanges() inside Angular zone');
+          });
         } else {
           console.warn('[PanelPopout] ⚠️  STATE_UPDATE missing payload.state');
         }
