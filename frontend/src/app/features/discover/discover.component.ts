@@ -268,15 +268,10 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     });
     console.log('[Discover] Subscribed to resourceService.state$ for broadcasting');
 
-    // STEP 7: Broadcast URL parameter changes to pop-outs (especially for Query Control)
-    // Query Control doesn't use ResourceManagementService - it only listens to URL params
-    // Pop-out Query Control needs to know about URL changes from main window
-    // Pop-out windows can't listen to main window's router URL, so we send via BroadcastChannel
-    this.urlStateService.params$.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      console.log('[Discover] URL params changed, broadcasting URL_PARAMS_SYNC to pop-outs:', params);
-      this.broadcastUrlParamsToPopOuts(params);
-    });
-    console.log('[Discover] Subscribed to urlStateService.params$ for URL sync broadcasting');
+    // Note: URL parameter broadcasting to pop-outs is now handled exclusively through STATE_UPDATE
+    // messages (broadcastStateUpdateToPopOuts). Pop-out Query Control subscribes to STATE_UPDATE
+    // via BroadcastChannel and extracts filters from the state payload.
+    // Previous URL_PARAMS_SYNC mechanism was redundant and has been removed (Session 40).
   }
 
   /**
@@ -603,41 +598,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     });
   }
 
-  /**
-   * Broadcast URL parameters to all pop-out windows
-   * This is called whenever URL parameters change in the main window
-   *
-   * **Why This is Needed**:
-   * Pop-out windows have their own separate router context and can't listen to
-   * the main window's URL changes. Query Control in pop-outs needs to know about
-   * URL parameter changes so it can update its filter chips.
-   *
-   * Flow: Main URL changes → urlStateService.params$ emits →
-   *       broadcastUrlParamsToPopOuts() → BroadcastChannel URL_PARAMS_SYNC →
-   *       pop-out UrlStateService updates → Query Control re-renders filters
-   *
-   * @param params - Current URL parameters
-   */
-  private broadcastUrlParamsToPopOuts(params: any): void {
-    if (this.popoutWindows.size === 0) {
-      return; // No pop-outs, skip broadcast
-    }
-
-    console.log('[Discover] Broadcasting URL params to pop-outs:', {
-      params,
-      popoutsCount: this.popoutWindows.size
-    });
-
-    // Send URL_PARAMS_SYNC to all pop-outs
-    this.popoutWindows.forEach(({ channel, panelId }) => {
-      console.log(`[Discover] Sending URL_PARAMS_SYNC to panel: ${panelId}`);
-      channel.postMessage({
-        type: PopOutMessageType.URL_PARAMS_SYNC,
-        payload: { params },
-        timestamp: Date.now()
-      });
-    });
-  }
 
   ngOnDestroy(): void {
     // Remove beforeunload handler
