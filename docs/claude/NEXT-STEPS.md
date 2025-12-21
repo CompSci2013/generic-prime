@@ -1,15 +1,80 @@
 # Next Steps
 
-**Current Session**: Session 45 - Pop-Out Manual Testing (COMPLETE)
-**Next Session**: Session 46 - Console Output Cleanup (CONCRETE TASK)
+**Current Session**: Session 46 - Console Output Cleanup (COMPLETE)
+**Next Session**: Session 47 - (TBD - See priority options below)
 
 ---
 
-## SESSION 46 IMMEDIATE ACTION: Clean Up Console Output
+## SESSION 46 COMPLETION SUMMARY
 
-**Status**: Ready to execute
-**Scope**: Remove all `console.*()` statements and debugging logs from production code
-**Success Criteria**: Zero console output on normal app operation, clean DevTools, build succeeds
+**Status**: ✅ COMPLETE - Console clean, Plotly warnings eliminated
+
+### What Was Done
+
+1. ✅ **Removed 51 Development Console Logs**
+   - discover.component.ts: 34 console statements removed
+   - query-control.component.ts: 18 console statements removed
+   - Result: "[Discover]", "[QueryControl]", "[PanelPopout]" logs eliminated
+
+2. ✅ **Fixed Plotly Axis Configuration Warnings**
+   - Identified circular scaleanchor constraints in 4 automobile chart sources
+   - Removed xaxis.scaleanchor and yaxis.scaleanchor properties
+   - Result: "WARN: ignored yaxis.scaleanchor" messages completely gone
+
+3. ✅ **Build Verification**
+   - npm run build succeeded
+   - No TypeScript errors
+   - All 5 domains functional
+
+### Commit: `89251a5`
+
+---
+
+## SESSION 47 IMMEDIATE ACTION: Choose Priority Task
+
+**Status**: Ready for next session
+**Options**: Three priority paths available
+
+### Priority 1 (HIGH): Bug #13 - Dropdown Keyboard Navigation
+
+**Scope**: Fix PrimeNG dropdown arrow key and spacebar navigation in Query Control
+**Impact**: User experience improvement (currently mouse-only for filtered dropdowns)
+**Estimated Scope**: Focused, 1-2 files
+**Files**: `frontend/src/framework/components/query-control/query-control.component.ts`
+
+**Details**:
+- Arrow keys don't highlight options when `[filter]="true"`
+- Spacebar doesn't select when filter is active
+- Issue is in PrimeNG 14.2.3 with filtered dropdowns
+- Workaround likely needed with custom onKeyDown handler
+
+### Priority 2 (MEDIUM): Bug #7 - Multiselect Visual State
+
+**Scope**: Fix Body Class filter multiselect checkbox visual state
+**Impact**: Cosmetic issue (filtering works, UI display incorrect)
+**Estimated Scope**: Narrow, single component
+**Files**: `frontend/src/framework/components/statistics-panel/statistics-panel.component.ts`
+
+**Details**:
+- Checkboxes show as checked after clearing filters
+- Actual filtering works correctly
+- Only visual representation is incorrect
+
+### Priority 3 (MEDIUM): Remove Component-Level Provider Anti-Pattern
+
+**Scope**: Remove `providers: [ResourceManagementService]` from DiscoverComponent
+**Impact**: Code quality improvement (already using providedIn: 'root')
+**Estimated Scope**: Single line removal, verify no side effects
+**Files**: `frontend/src/app/features/discover/discover.component.ts` (line 106)
+
+**Details**:
+- ResourceManagementService has `providedIn: 'root'` (singleton)
+- Component-level provider creates duplicate instance
+- Low-risk removal, service already working as singleton
+
+---
+
+## Old SESSION 46 Plan (COMPLETED)
 
 ### Current Console Issues (from screenshot)
 The browser console shows multiple categories of unwanted output:
