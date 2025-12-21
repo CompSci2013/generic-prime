@@ -96,13 +96,10 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log('[PanelPopout] ngOnInit() starting...');
-
     // Register picker configurations (needed for BasePickerComponent in pop-out)
     // TODO: Make this domain-agnostic by using domain config
     const pickerConfigs = createAutomobilePickerConfigs(this.injector);
     this.pickerRegistry.registerMultiple(pickerConfigs);
-    console.log('[PanelPopout] ✅ Registered picker configs');
 
     // Extract route parameters
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
@@ -110,17 +107,11 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       this.panelId = params['panelId'];
       this.panelType = params['type'];
 
-      console.log(
-        `[PanelPopout] ✅ Route params received - Grid: ${this.gridId}, Panel: ${this.panelId}, Type: ${this.panelType}`
-      );
-
       // Initialize as pop-out
       this.popOutContext.initializeAsPopOut(this.panelId);
-      console.log('[PanelPopout] ✅ Initialized as pop-out in PopOutContextService');
 
       // Trigger change detection
       this.cdr.markForCheck();
-      console.log('[PanelPopout] ✅ Triggered change detection via markForCheck()');
     });
 
     // Subscribe to messages from main window
@@ -128,12 +119,8 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       .getMessages$()
       .pipe(takeUntil(this.destroy$))
       .subscribe(message => {
-        console.log('[PanelPopout] ⬇️  Message received from PopOutContextService:', message);
         this.handleMessage(message);
       });
-    console.log('[PanelPopout] ✅ Subscribed to PopOutContextService messages');
-
-    console.log('[PanelPopout] ✅ ngOnInit() complete');
   }
 
   /**
@@ -142,11 +129,8 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
    * @param message - Message from main window
    */
   private async handleMessage(message: PopOutMessage): Promise<void> {
-    console.log('[PanelPopout] 📨 handleMessage() processing:', message.type);
-
     switch (message.type) {
       case PopOutMessageType.CLOSE_POPOUT:
-        console.log('[PanelPopout] 🔴 Received CLOSE_POPOUT message, closing window...');
         // Close window when requested
         window.close();
         break;
@@ -155,20 +139,13 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
         // Sync full state from main window
         // Main window URL → state$ → BroadcastChannel → pop-out
         if (message.payload && message.payload.state) {
-          console.log('[PanelPopout] 🟢 Received STATE_UPDATE message');
-          console.log('[PanelPopout] State payload:', message.payload.state);
-
           // Sync to ResourceManagementService for services that subscribe to it
           // syncStateFromExternal() ensures zone handling and observable emissions
           // Child components (QueryControl, StatisticsPanel, etc.) can now read from resourceService.state$
           this.resourceService.syncStateFromExternal(message.payload.state);
-          console.log('[PanelPopout] ✅ Called resourceService.syncStateFromExternal()');
 
           // Trigger change detection for this component and all children
           this.cdr.detectChanges();
-          console.log('[PanelPopout] ✅ Triggered detectChanges() inside Angular zone');
-        } else {
-          console.warn('[PanelPopout] ⚠️  STATE_UPDATE missing payload.state');
         }
         break;
 
@@ -177,11 +154,11 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
         // URL-First architecture: Only main window's URL is the source of truth
         // All state synchronization happens via STATE_UPDATE messages to pop-out's ResourceManagementService
         // Pop-out URLs remain clean without query parameters
-        console.log('[PanelPopout] 🔵 Received URL_PARAMS_SYNC message (ignored - pop-outs use STATE_UPDATE)');
         break;
 
       default:
-        console.warn('[PanelPopout] ⚠️  Unknown message type:', message.type);
+        // Unknown message type - silently ignore
+        break;
     }
   }
 
@@ -217,8 +194,6 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
    * @param params - URL parameters from child component
    */
   onUrlParamsChange(params: any): void {
-    console.log('[PanelPopout] URL params change request:', params);
-
     // Send URL_PARAMS_CHANGED to main window
     // Main window will update its URL, which triggers state update, which broadcasts to pop-outs
     this.popOutContext.sendMessage({
@@ -233,8 +208,6 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
    * Sends message to main window to clear all URL params
    */
   onClearAllFilters(): void {
-    console.log('[PanelPopout] Clear all filters request');
-
     this.popOutContext.sendMessage({
       type: PopOutMessageType.CLEAR_ALL_FILTERS,
       timestamp: Date.now()
@@ -248,8 +221,6 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
    * @param event - Picker selection event
    */
   onPickerSelectionChange(event: PickerSelectionEvent<any>): void {
-    console.log('[PanelPopout] Picker selection change:', event);
-
     // Send picker selection event to main window
     // Main window will update its URL, which triggers state update, which broadcasts to pop-outs
     if (event.urlValue !== undefined) {

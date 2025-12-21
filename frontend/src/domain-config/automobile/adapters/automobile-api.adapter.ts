@@ -77,24 +77,11 @@ export class AutomobileApiAdapter
     const params = this.filtersToApiParams(filters, highlights);
     const url = `${this.baseUrl}${this.VEHICLES_ENDPOINT}`;
 
-    console.log('[AutomobileApiAdapter.fetchData] Starting request', {
-      url,
-      params,
-      filters
-    });
-
     // Fetch vehicle data
     return this.apiService
       .get<VehicleResult>(url, { params })
       .pipe(
         map((apiResponse: ApiResponse<VehicleResult>) => {
-          console.log('[AutomobileApiAdapter.fetchData] API Response received', {
-            total: apiResponse.total,
-            resultsCount: apiResponse.results?.length,
-            hasStatistics: !!apiResponse.statistics,
-            response: apiResponse
-          });
-
           // Transform API response to adapter response
           return {
             results: apiResponse.results.map((item) =>

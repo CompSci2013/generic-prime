@@ -725,28 +725,20 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    * Sync active filters from URL params
    */
   private syncFiltersFromUrl(params: any): void {
-    console.log('[QueryControl] 🔄 syncFiltersFromUrl() starting...');
-    console.log('[QueryControl] Input params:', params);
-
     this.activeFilters = [];
     this.activeHighlights = [];
 
     // Sync regular filters
     for (const filterDef of this.domainConfig.queryControlFilters) {
-      console.log(`[QueryControl] Processing regular filter: ${filterDef.label}`);
       this.syncFilterFromUrl(params, filterDef, this.activeFilters);
     }
-    console.log('[QueryControl] ✅ Regular filters synced. Count:', this.activeFilters.length);
 
     // Sync highlight filters
     if (this.domainConfig.highlightFilters) {
       for (const filterDef of this.domainConfig.highlightFilters) {
-        console.log(`[QueryControl] Processing highlight filter: ${filterDef.label}`);
         this.syncFilterFromUrl(params, filterDef, this.activeHighlights);
       }
     }
-    console.log('[QueryControl] ✅ Highlight filters synced. Count:', this.activeHighlights.length);
-    console.log('[QueryControl] ✅ syncFiltersFromUrl() complete');
   }
 
   /**
@@ -759,14 +751,10 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    */
   private syncFiltersFromPopoutState(state: any): void {
     if (!state || !state.filters) {
-      console.log('[QueryControl] 🔄 syncFiltersFromPopoutState() - No filters in state');
       this.activeFilters = [];
       this.activeHighlights = [];
       return;
     }
-
-    console.log('[QueryControl] 🔄 syncFiltersFromPopoutState() starting...');
-    console.log('[QueryControl] Input filters:', state.filters);
 
     // In pop-out windows, the state.filters object is already in TFilters format
     // We need to convert it to URL parameter format to render filter chips
@@ -780,8 +768,6 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
         params[key] = value;
       }
     }
-
-    console.log('[QueryControl] Extracted params from filters:', params);
 
     // Now sync using the standard syncFiltersFromUrl logic
     this.syncFiltersFromUrl(params);
