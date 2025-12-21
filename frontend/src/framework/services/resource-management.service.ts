@@ -430,6 +430,11 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
 
   /**
    * Initialize filters from current URL
+   *
+   * IMPORTANT: Only syncs filters from URL, does NOT fetch data.
+   * Data fetching is handled by watchUrlChanges() subscription which fires
+   * immediately after this initialization completes. Fetching here would cause
+   * duplicate API calls (one from init, one from watch subscription).
    */
   private initializeFromUrl(): void {
     const urlParams = this.urlState.getParams();
@@ -437,11 +442,7 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
     const highlights = this.extractHighlights(urlParams);
 
     this.updateState({ filters, highlights });
-
-    // Fetch data if auto-fetch is enabled
-    if (this.config.autoFetch) {
-      this.fetchData(filters);
-    }
+    // Note: Do NOT call fetchData() here - watchUrlChanges() handles initial fetch
   }
 
   /**
