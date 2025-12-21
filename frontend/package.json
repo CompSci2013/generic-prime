@@ -6,18 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
     "dev:server": "ng serve --host 0.0.0.0 --port 4205",
-    "dev:all": "concurrently --names DEV,TEST,REPORT --prefix-colors cyan,green,yellow \"ng serve --host 0.0.0.0 --port 4205\" \"npx playwright test\" \"npx playwright show-report --host 0.0.0.0\"",
-    "test:e2e": "npx playwright test",
-    "test:watch": "npx playwright test --ui --host 0.0.0.0",
-    "test:report": "npx playwright show-report --host 0.0.0.0",
     "lint": "eslint \"src/**/*.ts\"",
-    "lint:fix": "eslint \"src/**/*.ts\" --fix",
-    "lint:framework": "eslint \"src/framework/**/*.ts\"",
-    "build:doc": "compodoc -p ./tsconfig.app.json -d documents",
-    "compodoc": "http-server documents -p 4242 -c-1",
-    "dev": "concurrently \"ng serve --host 0.0.0.0 --port 4205\" \"npm run compodoc\""
+    "lint:fix": "eslint \"src/**/*.ts\" --fix"
   },
   "private": true,
   "dependencies": {
@@ -43,22 +34,10 @@
     "@angular-devkit/build-angular": "^14.2.13",
     "@angular/cli": "~14.2.13",
     "@angular/compiler-cli": "^14.2.0",
-    "@playwright/test": "^1.57.0",
-    "@types/jasmine": "~4.0.0",
     "@types/plotly.js": "^3.0.8",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "@compodoc/compodoc": "^1.1.32",
-    "concurrently": "^9.2.1",
     "eslint": "^8.57.0",
-    "http-server": "^14.1.1",
-    "jasmine-core": "~4.3.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.0.0",
-    "playwright": "^1.57.0",
     "typescript": "~4.7.2"
   }
 }
