@@ -1,7 +1,61 @@
 # Next Steps
 
 **Current Session**: Session 46 - Console Cleanup + Performance Optimization (COMPLETE)
-**Next Session**: Session 47 - (Choose from priority options below)
+**Next Session**: Session 47 - Implement UserPreferencesService (Per MONSTER-CLAUDE.md)
+
+---
+
+## SESSION 47 IMMEDIATE ACTION: Implement UserPreferencesService
+
+**Status**: Ready for implementation
+**Priority**: HIGH (Priority 1 from Gemini)
+**Scope**: Panel order persistence with localStorage backend
+
+### What to Implement
+
+**Phase 1 - Create the Service** (~30 min)
+
+1. Create `frontend/src/framework/services/user-preferences.service.ts`
+   - localStorage-backed preference storage
+   - RxJS observables for reactive updates
+   - Graceful failure handling (quota exceeded, private browsing)
+   - Domain-aware key namespacing
+
+2. Service interface:
+   - `panelOrder$: Observable<string[]>` - Get current panel order
+   - `savePanelOrder(order: string[]): void` - Save new order
+   - `collapsedPanels$: Observable<string[]>` - Get collapsed panels
+   - `saveCollapsedPanels(panels: string[]): void` - Save collapsed state
+   - `reset(domain: string): void` - Reset to defaults for domain
+
+**Phase 2 - Integrate with DiscoverComponent** (~20 min)
+
+3. Update `frontend/src/app/features/discover/discover.component.ts`
+   - Inject UserPreferencesService in constructor
+   - Load panelOrder from preferences in ngOnInit (with defaults)
+   - Load collapsedPanels from preferences in ngOnInit
+   - Call savePanelOrder() in onPanelDrop handler
+   - Call saveCollapsedPanels() in collapse handlers
+
+**Phase 3 - Testing** (~10 min)
+
+4. Manual verification:
+   - [ ] Drag panels to reorder
+   - [ ] Refresh page - order persists
+   - [ ] Clear localStorage - default order returns
+   - [ ] Collapse/expand - state persists
+   - [ ] Works across multiple browser tabs
+   - [ ] No console errors
+
+### Success Criteria
+- [ ] panelOrder persists to localStorage on drag-drop
+- [ ] panelOrder loads from localStorage on page load
+- [ ] Default order used when localStorage is empty
+- [ ] Collapsed state persists
+- [ ] No console errors
+- [ ] Works in all browsers
+
+### Estimated Time: 1 hour
 
 ---
 
