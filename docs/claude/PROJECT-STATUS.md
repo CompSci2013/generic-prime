@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.36
-**Timestamp**: 2025-12-20T18:45:00Z
-**Updated By**: Session 36 - Strategic Assessment & Implementation Planning
+**Version**: 5.38
+**Timestamp**: 2025-12-20T22:30:00Z
+**Updated By**: Session 38 - Pop-Out URL Parameter Fix
 
 ---
 
@@ -517,6 +517,35 @@ Why: Simpler setup, less terminal clutter, good for quick validation
 **Commits**:
 - 05afb5a: test: Enable all E2E tests - remove test.skip markers from 33 tests
 - 06f4a9b: chore: Add Playwright test artifacts to .gitignore and remove from git cache
+
+---
+
+## Session 38 Progress: Pop-Out URL Parameter Visibility Fix
+
+### Primary Objective: Fix pop-out windows displaying query parameters in URLs
+
+**Status**: ✅ COMPLETE - Implementation ready for testing
+
+**Problem**: Pop-out windows showed parameters in URLs (`/panel/discover/query-control?yearMin=1970...`) violating URL-First architecture
+
+**Solution Implemented**:
+
+1. ✅ **Removed URL mutation**: PanelPopoutComponent no longer calls `urlState.setParams()` for pop-outs
+2. ✅ **Added @Input binding**: PanelPopoutComponent receives state and passes to child components
+3. ✅ **Enhanced QueryControl**: Added `@Input() popoutState` to read filters from pop-out state instead of URL
+4. ✅ **Clean architecture**: No hacks to ResourceManagementService, pure component communication
+
+**Files Modified**:
+- `frontend/src/app/features/panel-popout/panel-popout.component.ts` - Added state property, updated message handler
+- `frontend/src/app/features/panel-popout/panel-popout.component.html` - Added [popoutState] binding
+- `frontend/src/framework/components/query-control/query-control.component.ts` - Added @Input, ngOnChanges, syncFiltersFromPopoutState()
+
+**Key Achievement**:
+- Pop-out URLs now remain clean: `/panel/discover/query-control/query-control` (no query params)
+- Filter chips still render correctly in pop-outs via state @Input binding
+- URL-First architecture fully preserved: only main window URL is source of truth
+
+**Testing Ready**: See `SESSION-38-POP-OUT-FIX.md` for comprehensive testing checklist
 
 ---
 

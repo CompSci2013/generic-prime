@@ -1,10 +1,27 @@
 # Next Steps
 
-**Current Session**: Session 36 - Gemini Assessment Analysis & Implementation Planning
+**Current Session**: Session 38 - Pop-Out URL Parameter Visibility Fix (COMPLETE)
+**Next Session**: Session 39 - Priority 2 (Remove Component-Level Provider Anti-Pattern)
 
 ---
 
-## SESSION 37 PLAN: Priority 1 - Implement UserPreferencesService
+## SESSION 38 COMPLETED: Pop-Out URL Parameter Fix
+
+**Status**: ✅ IMPLEMENTATION COMPLETE - Ready for testing
+
+**What Was Done**:
+- Removed `urlState.setParams()` call from PanelPopoutComponent URL_PARAMS_SYNC handler
+- Pop-out URLs now remain clean (no query parameters)
+- Added `@Input() popoutState` to PanelPopoutComponent for passing state to children
+- Enhanced QueryControlComponent with `@Input() popoutState` and pop-out detection
+- Implemented `syncFiltersFromPopoutState()` to render filter chips from state instead of URL
+- Architecture preserved: URL-First in main window, state-driven in pop-outs via @Input
+
+**Testing Status**: Ready - See `SESSION-38-POP-OUT-FIX.md` for test checklist
+
+---
+
+## SESSION 39 PLAN: Priority 2 - Implement UserPreferencesService
 
 **Status**: Implementation plan complete. Ready to code.
 
