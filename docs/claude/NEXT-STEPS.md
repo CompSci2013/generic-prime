@@ -1,7 +1,54 @@
 # Next Steps
 
-**Current Session**: Session 40 (Continued) - Critical Pop-Out State Update Fix (COMPLETE)
-**Next Session**: Session 41 - Manual Pop-Out Testing & Verification
+**Current Session**: Session 43 - Pop-Out Fixes Merged to Main (COMPLETE)
+**Next Session**: Session 44 - Testing & Next Priority Features
+
+---
+
+## SESSION 43 COMPLETION: Pop-Out Fixes Merged to Main Branch
+
+**Status**: ✅ COMPLETE - Query-Parameter Pop-Out Architecture Successfully Deployed
+
+### What Was Accomplished
+
+1. ✅ **Carefully cherry-picked only the pop-out fixes** from the bug-fix/minimal-automobiles-popout branch
+   - Did NOT merge the entire minimal branch (which had removed all domains)
+   - Only applied the 3 critical pop-out architecture files
+   - All domain code (Physics, Chemistry, Agriculture, Math) preserved
+
+2. ✅ **Applied three key changes to main**:
+   - AppComponent: Pop-out detection via `?popout` query parameter
+   - AppComponent template: Conditional header hiding with `*ngIf="!isPopOut"`
+   - DiscoverComponent: Updated pop-out URLs and added ngZone.run() wrapping
+
+3. ✅ **Verified functionality across all domains**:
+   - Pop-out windows open without header (clean UI)
+   - Query parameters correctly include `?popout=panelId` flag
+   - State synchronization working perfectly
+   - All 5 domains still intact and functional
+   - Build successful: 6.84 MB
+
+4. ✅ **Commit created**: `4d8ba3f` - "fix: Apply pop-out architecture fixes to main branch"
+
+### Immediate Next Session Plan (Session 44)
+
+Choose ONE priority from below:
+
+**Option A - Testing/Validation (RECOMMENDED)**
+- Comprehensive pop-out testing across all 5 domains
+- Verify pop-out behavior with Physics, Chemistry, Agriculture
+- Test edge cases: multiple pop-outs, rapid filter changes, browser refresh
+- Document any issues found
+
+**Option B - Bug Fixes**
+- Bug #13: Dropdown keyboard navigation (arrow keys, space bar not working)
+- Bug #7: Multiselect visual state (cosmetic issue)
+- Other known issues in codebase
+
+**Option C - Feature Implementation**
+- UserPreferencesService for panel order persistence
+- Agriculture domain implementation
+- Chemistry domain implementation
 
 ---
 

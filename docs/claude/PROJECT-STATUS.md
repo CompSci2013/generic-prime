@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.41
-**Timestamp**: 2025-12-21T12:03:00Z
-**Updated By**: Session 40 (Continued) - Pop-Out Zone Boundary Critical Fix
+**Version**: 5.44
+**Timestamp**: 2025-12-21T13:40:00Z
+**Updated By**: Session 43 - Pop-Out Architecture Merged to Main
 
 ---
 
@@ -36,6 +36,50 @@
 
 ### Port 4201 (autos-prime-ng) - REFERENCE
 - Unaffected, serves as working reference
+
+---
+
+## Session 43 Completion: Pop-Out Fixes Merged to Main Branch
+
+**Status**: ✅ COMPLETE - Query-Parameter Pop-Out Architecture Deployed
+
+### What Was Accomplished
+
+Successfully cherry-picked pop-out architecture fixes from `bug-fix/minimal-automobiles-popout` branch and applied them to main branch without removing any domain code. The pop-out fixes implement the GoldenLayout pattern used by professional layout libraries.
+
+### Changes Applied to Main (3 files)
+
+1. **AppComponent (app.component.ts)**
+   - Added `ActivatedRoute` injection for query parameter detection
+   - Added `isPopOut: boolean` property to track pop-out mode
+   - Added constructor logic to subscribe to `?popout` query parameter
+   - Result: Component detects when running in pop-out window
+
+2. **AppComponent Template (app.component.html)**
+   - Added `*ngIf="!isPopOut"` to header element
+   - Result: Navigation banner hidden in pop-outs, only panel content shown
+
+3. **DiscoverComponent (discover.component.ts)**
+   - Updated pop-out URL generation: `/panel/:gridId/:panelId/:type?popout=${panelId}`
+   - Wrapped `channel.onmessage` in `ngZone.run()` for zone awareness
+   - Result: Pop-outs use same app URL with query flag; state chain runs inside Angular zone
+
+### Verified Functionality
+
+✅ **Pop-Out UI**: Query Control, Statistics, and other panels open in separate windows without header
+✅ **Pop-Out URLs**: Query parameters correctly include `?popout=panelId` flag
+✅ **State Synchronization**: Filters applied in main → all pop-outs update instantly
+✅ **Multi-Domain**: Pop-outs work across ALL domains (Automobile, Physics, etc.), not just test branch
+✅ **Build Status**: All three domains intact, build successful (6.84 MB)
+✅ **Commit**: Applied with commit `4d8ba3f` to main branch
+
+### Key Architectural Pattern
+
+The pop-out implementation now follows the **GoldenLayout pattern**:
+- Same application instance handles both main and pop-out UI
+- Query parameter (`?popout=panelId`) tells AppComponent to hide header
+- No separate builds or entry points needed
+- Simpler, more maintainable architecture used by professional libraries
 
 ---
 
