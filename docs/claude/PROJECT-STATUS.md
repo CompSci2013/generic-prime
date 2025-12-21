@@ -1,8 +1,8 @@
 # Project Status
 
-**Version**: 5.44
-**Timestamp**: 2025-12-21T13:40:00Z
-**Updated By**: Session 43 - Pop-Out Architecture Merged to Main
+**Version**: 5.45
+**Timestamp**: 2025-12-21T14:00:00Z
+**Updated By**: Session 43 Complete - Pop-Out Fixes Deployed & Verified
 
 ---
 
@@ -12,7 +12,10 @@
 
 **Application**: Fully functional Angular 14 multi-domain discovery framework
 - All 4 panels operational (Query Control, Picker, Statistics, Results Table)
-- Drag-drop, collapse, and pop-out functionality working
+- Drag-drop, collapse, and pop-out functionality working ✅ (Session 43 verified)
+- Pop-out architecture: Query-parameter-based (GoldenLayout pattern)
+- Pop-out windows display without header (clean, focused UI)
+- State synchronization across main and pop-out windows perfect
 - Dark theme (PrimeNG lara-dark-blue) active
 - Panel headers streamlined with consistent compact design pattern
 - Multi-domain landing page with domain selector
