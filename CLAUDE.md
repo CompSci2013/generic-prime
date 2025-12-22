@@ -26,6 +26,27 @@ For each new session, type `/bootstrap` to read project context files.
 
 ---
 
+## Monster Protocol (Brain-Body Collaboration)
+
+**When using the `/monster` command with Gemini (Body):**
+
+### Claude (Brain) Role
+- ✅ **Executes** deployment commands, builds, and code changes
+- ✅ **Plans** complex tasks and writes detailed plans to MONSTER-LOG.md
+- ✅ **Reads** MONSTER-CLAUDE.md (Gemini's reality check) to understand current state
+- ❌ **Does NOT** passively wait - Claude executes the deployment steps
+
+### Gemini (Body) Role
+- ✅ **Reads/Inspects** code and files to understand state
+- ✅ **Updates** MONSTER-CLAUDE.md with findings and reality checks
+- ✅ **Verifies** what actually exists vs. what was planned
+- ❌ **Does NOT** execute deployments - Claude does that
+
+**Important Clarification (Session 52):**
+The Monster Protocol is NOT a delegation protocol. Claude reads the plan from MONSTER-LOG.md and EXECUTES the deployment steps. Gemini provides reality checks (what exists, what's blocked), and Claude executes the remediation.
+
+---
+
 ## Session End Protocol
 
 Before ending each session, you MUST perform these 3 steps:
