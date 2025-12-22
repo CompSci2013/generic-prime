@@ -1,8 +1,122 @@
 # Project Status
 
-**Version**: 5.52
-**Timestamp**: 2025-12-21T17:00:00Z
-**Updated By**: Session 48 - Manual Testing of Panel Persistence (COMPLETE)
+**Version**: 5.53
+**Timestamp**: 2025-12-22T09:45:00Z
+**Updated By**: Session 49 - File-Based Preferences Migration (COMPLETE)
+
+---
+
+## Session 49 Summary: File-Based Preferences Migration
+
+**Status**: ✅ COMPLETE - Implementation ready for manual testing. Architectural foundation for backend API established.
+
+### What Was Accomplished
+
+1. ✅ **Phase 1: Directory Structure** (5 min)
+   - Created `frontend/preferences/` directory
+   - Created `preferences/.gitkeep` for git tracking
+   - Created `preferences/default-user.json` with initial preferences
+   - Updated `.gitignore` to ignore JSON files but track directory
+   - **Result**: COMPLETE ✅
+
+2. ✅ **Phase 2: Proxy Configuration** (10 min)
+   - Extended `frontend/proxy.conf.js` with `/api/preferences` route
+   - Implemented GET `/api/preferences/load` handler
+   - Implemented POST `/api/preferences/save` handler
+   - Added directory creation, error handling, JSON validation
+   - Followed existing `/report` route pattern
+   - **Result**: COMPLETE ✅
+
+3. ✅ **Phase 3: Service Refactoring** (20 min)
+   - Added `HttpClient` injection to `UserPreferencesService`
+   - Implemented `loadFromFileApi()` with 5-second timeout
+   - Implemented `savePreferencesToFile()` with error handling
+   - Implemented `loadFromLocalStorage()` for multi-domain preference loading
+   - Implemented `saveToLocalStorage()` for fallback persistence
+   - Implemented `initializeFromPreferences()` for state initialization
+   - Updated `savePanelOrder()` to use file API + fallback
+   - Updated `saveCollapsedPanels()` to use file API + fallback
+   - Maintains same observable interface (no breaking changes)
+   - **Result**: COMPLETE ✅
+
+4. ✅ **Build Verification** (30 min)
+   - `npm run build` completed successfully
+   - Bundle size: 6.84 MB (unchanged from Session 48)
+   - TypeScript errors: 0
+   - Warnings: Pre-existing (not introduced by changes)
+   - **Result**: PASS ✅
+
+### Architecture
+
+**Storage Hierarchy**:
+1. Primary: File-based API (`/api/preferences/load|save`)
+   - Stores preferences in `frontend/preferences/default-user.json`
+   - Domain-aware structure: `{ automobiles: {...}, physics: {...}, ... }`
+
+2. Fallback: localStorage with domain namespacing
+   - Keys: `prefs:{domain}:{preference}`
+   - Automatic fallback if file API fails
+   - 5-second timeout on API calls before fallback
+
+**Service Flow**:
+- On init: Try file API → Fall back to localStorage
+- On save: Try file API → Fall back to localStorage
+- Maintains BehaviorSubject pattern (no subscriber API changes)
+- Graceful degradation in offline/failure scenarios
+
+### Key Files Modified
+
+1. `frontend/proxy.conf.js` (+54 lines)
+   - New `/api/preferences` route with file I/O handlers
+
+2. `frontend/src/framework/services/user-preferences.service.ts` (+150 lines)
+   - HttpClient injection
+   - 4 new private methods (loadFromFileApi, savePreferencesToFile, loadFromLocalStorage, saveToLocalStorage)
+   - 1 new private method (initializeFromPreferences)
+   - Updated savePanelOrder() and saveCollapsedPanels() methods
+
+3. `frontend/.gitignore` (+3 lines)
+   - Added preferences JSON ignore rules
+
+4. `frontend/preferences/` (new directory)
+   - `.gitkeep` file for tracking
+   - `default-user.json` with initial preferences
+
+### Testing Status
+
+Ready for manual testing with 6-scenario protocol:
+1. Cold start (no file, no localStorage)
+2. Hot reload (file exists)
+3. API failure scenario (fallback to localStorage)
+4. Domain-aware persistence (automobiles vs physics)
+5. Cross-tab synchronization
+6. Console validation (no errors)
+
+See `docs/claude/SESSION-49-FILE-PREFS-TEST.md` for detailed test checklist.
+
+### Build Status
+
+```
+✔ Browser application bundle generation complete.
+Initial Chunk Files: 6.84 MB / 1.46 MB (transfer)
+TypeScript errors: 0
+Build time: 33.9 seconds
+```
+
+### Next Session
+
+**Priority 1 (HIGH)**: Manual Pop-Out Testing
+- Complete 10-test pop-out scenario per requirements
+- Validate BroadcastChannel communication
+- Verify filter synchronization across windows
+
+**Priority 2 (MEDIUM)**: Bug Fixes
+- Bug #13 - Dropdown keyboard navigation
+- Bug #7 - Multiselect visual state
+
+### Commits
+
+1. `f98d343` - feat: Migrate UserPreferencesService to file-based storage with localStorage fallback
 
 ---
 
