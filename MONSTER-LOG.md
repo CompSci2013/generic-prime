@@ -1,12 +1,64 @@
 # MONSTER-LOG: Claude (George) to Gemini (Jerry)
 
+## Hand-Off Note from Session 51 Brain (CURRENT)
+
+**Date**: Monday, December 22, 2025
+**Branch**: main, data-broker master
+**Status**: ✅ IMPLEMENTATION COMPLETE - Backend Preferences Service Ready for Testing
+
+### Session 51 Implementation Summary
+
+**What Was Accomplished**:
+1. ✅ **Backend Preferences Service Created** in `data-broker/generic-prime/`
+   - `src/routes/preferencesRoutes.js` - Defines GET/POST/DELETE endpoints
+   - `src/controllers/preferencesController.js` - Handles HTTP requests with validation
+   - `src/services/fileStorageService.js` - File I/O with domain-aware storage
+   - Updated `src/index.js` to mount preferences routes at `/api/preferences/v1`
+
+2. ✅ **Frontend Service Updated**
+   - Changed `UserPreferencesService` from proxy endpoints to backend API calls
+   - Now calls `GET/POST /api/preferences/v1/{userId}` endpoints
+   - Uses hardcoded "default" userId (no auth yet)
+   - Maintains same observable interface (zero breaking changes)
+   - Keeps localStorage fallback for offline scenarios
+
+3. ✅ **Build Verification**
+   - Frontend build successful: 6.84 MB, no TypeScript errors
+   - All changes committed to respective repositories
+
+**Architecture**:
+- **Routes**: `/api/preferences/v1/:userId` with GET/POST/DELETE
+- **Storage**: File-based in `data-broker/generic-prime/preferences/` directory
+- **Structure**: Domain-aware (automobiles, physics, agriculture, chemistry, math)
+- **Default Preferences**: Includes panelOrder and collapsedPanels for each domain
+
+### Testing Requirements (For Gemini)
+
+**6 Manual Test Scenarios**:
+1. **Cold Start** - Panel reorder triggers backend save → verify file created
+2. **Hot Reload** - Preferences load from backend on page refresh
+3. **API Failure** - Fallback to localStorage when backend offline
+4. **Domain-Aware** - Automobiles and physics have separate preferences
+5. **Cross-Tab** - Changes persist across browser tabs
+6. **Console** - Clean output during operations
+
+**Success Criteria**:
+- ✅ Backend service accepts GET/POST/DELETE requests
+- ✅ Files written to `data-broker/generic-prime/preferences/`
+- ✅ All 6 manual tests pass
+- ✅ No breaking changes to frontend API
+
+**Next Step for Gemini**: Execute the 6-scenario manual testing protocol in NEXT-STEPS.md, then proceed to Session 52 (Pop-Out Testing).
+
+---
+
 ## Hand-Off Note from Session 50 Brain
 
 **Date**: Monday, December 22, 2025
 **Branch**: main
 **Status**: 🔄 IN PROGRESS - Session 50 (Backend Preferences Service). Session 49 code complete but testing requires backend architecture.
 
-### Critical Context for Next Brain Session
+### Session 50 Summary (Superseded by Session 51 Implementation)
 
 **Session 49 Status Summary**:
 - ✅ Implementation COMPLETE - File-based preferences code written and proxy configured
@@ -19,19 +71,6 @@
 - **New Architecture**: Move preferences to `data-broker/generic-prime/` backend service
 - Backend service will be production-ready, Kubernetes-deployable, and have clear Elasticsearch migration path
 - This unblocks testing AND provides proper microservice architecture
-
-**Implementation Roadmap for Next Session**:
-1. Create backend preferences service following existing specs service pattern
-2. Routes: `/api/preferences/v1/:userId` with GET/POST/DELETE
-3. Storage: File-based in `data-broker/generic-prime/preferences/` directory
-4. Update frontend UserPreferencesService to call backend instead of proxy
-5. Execute 6-scenario manual testing protocol
-6. Then proceed to Session 51: Pop-Out Testing
-
-**Key Architectural Insight**:
-- The frontend code (UserPreferencesService) is well-designed and will work with ANY backend
-- No frontend code changes needed except the HTTP endpoint URL
-- Backend ownership makes this production-ready for Kubernetes deployment
 
 ---
 

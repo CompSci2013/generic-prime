@@ -1,69 +1,91 @@
 # Next Steps
 
-**Current Session**: Session 50 - Backend Preferences Service Design (IN PROGRESS)
-**Previous Session**: Session 49 - File-Based Preferences Migration (CODE COMPLETE, TESTING PENDING)
-**Status**: Pivoting to backend-driven architecture due to frontend dev server WebSocket blocker
+**Current Session**: Session 51 - Backend Preferences Service (COMPLETE)
+**Previous Session**: Session 50 - Strategic Pivot Decision (Complete)
+**Status**: Implementation complete. Ready for manual testing.
 
 ---
 
-## SESSION 50 IMMEDIATE ACTION: Design & Implement Backend Preferences Service
+## SESSION 51 COMPLETION SUMMARY
 
-**Status**: Ready for implementation
-**Priority**: HIGH (Unblocks preferences testing with production-ready backend)
-**Scope**: Add preferences endpoint to `data-broker/generic-prime/` service
+**What Was Done**:
+1. ✅ Created backend preferences service in `data-broker/generic-prime/`
+2. ✅ Updated frontend `UserPreferencesService` to call backend API
+3. ✅ Frontend build verified: 6.84 MB, no TypeScript errors
+4. ✅ All changes committed to respective repositories
+
+**Architecture Details**:
+- Backend routes: `/api/preferences/v1/:userId` with GET/POST/DELETE endpoints
+- File storage: `data-broker/generic-prime/preferences/` directory
+- Domain-aware structure: supports all 5 domains
+- Frontend maintains same observable interface (zero breaking changes)
+
+---
+
+## SESSION 52 IMMEDIATE ACTION: Manual Preferences Testing (6 Scenarios)
 
 **Status**: Ready for testing
-**Priority**: HIGH (Validate all pop-out scenarios work correctly)
-**Scope**: Complete 10-test pop-out scenario per POP-OUT-REQUIREMENTS-RUBRIC.md
+**Priority**: HIGH (Validate backend service works correctly)
+**Scope**: Complete 6-test preferences scenario per NEXT-STEPS.md
 
-### Implementation Plan
+### Testing Protocol (~30 min total)
 
-**Phase 1: Create Backend Preferences Service** (~30 min)
-1. Create `data-broker/generic-prime/src/routes/preferencesRoutes.js`
-   - GET `/api/preferences/v1/:userId` - Load user preferences
-   - POST `/api/preferences/v1/:userId` - Save user preferences
-   - DELETE `/api/preferences/v1/:userId` - Reset preferences
+**Test 1 - Cold Start** (~5 min)
+1. Open application at `/automobiles/discover`
+2. Verify no preferences file exists yet
+3. Drag a panel to reorder (e.g., move Statistics to top)
+4. Check if file created in `data-broker/generic-prime/preferences/default.json`
+5. Verify file contains correct panel order
 
-2. Create `data-broker/generic-prime/src/controllers/preferencesController.js`
-   - Handle route requests with validation
-   - Follow existing specsController pattern
+**Test 2 - Hot Reload** (~5 min)
+1. Refresh the page (Ctrl+R / Cmd+R)
+2. Verify panel order persists from backend
+3. Check console for no errors on page load
+4. Verify preferences loaded from backend file (not localStorage)
 
-3. Create `data-broker/generic-prime/src/services/fileStorageService.js`
-   - Read/write JSON files from `data-broker/generic-prime/preferences/` directory
-   - Domain-aware structure: `{ automobiles: {...}, physics: {...}, ... }`
-   - Error handling and graceful fallback
+**Test 3 - API Failure Fallback** (~5 min)
+1. Stop the backend service (if running on port 3000)
+2. Open application at `/automobiles/discover`
+3. Make a panel order change
+4. Verify localStorage is used as fallback
+5. Check console for "Backend API not available" debug message
+6. Restart backend service
 
-4. Update `data-broker/generic-prime/src/index.js`
-   - Mount preferences routes alongside specs routes
-   - Add `/api/preferences/v1` route namespace
+**Test 4 - Domain-Aware Storage** (~5 min)
+1. Reorder panels in `/automobiles/discover`
+2. Navigate to `/physics/discover` (if available)
+3. Reorder panels differently in physics domain
+4. Refresh page - verify physics retains its separate panel order
+5. Navigate back to automobiles - verify its order is still different
+6. Check preferences file has both domains: `{ automobiles: {...}, physics: {...} }`
 
-5. Create `data-broker/generic-prime/preferences/` directory
-   - Store user preferences as JSON files: `user-{userId}.json`
-   - Initialize with default preferences structure
+**Test 5 - Cross-Tab Sync** (~5 min)
+1. Open `/automobiles/discover` in Tab A
+2. Open same URL in Tab B
+3. In Tab A, reorder a panel
+4. Wait 1-2 seconds for backend save
+5. In Tab B, refresh page
+6. Verify Tab B loads the new panel order from Tab A
+7. Both tabs should be in sync
 
-**Phase 2: Update Frontend to Call Backend** (~20 min)
-1. Modify `UserPreferencesService`
-   - Remove proxy endpoints (`/api/preferences/load|save`)
-   - Call backend service instead: `http://localhost:3000/api/preferences/v1/{userId}`
-   - Keep same observable interface (no breaking changes)
-
-2. Pass userId through service
-   - Hardcoded "default" for now (no auth yet)
-   - Future: extract from auth token when available
-
-**Phase 3: Manual Testing** (~30 min)
-1. Cold Start: Panel reorder triggers backend save
-2. Hot Reload: Preferences load from backend on refresh
-3. API Failure: Fallback to localStorage when backend offline
-4. Domain-Aware: Automobiles and physics have separate preferences
-5. Cross-Tab: Changes persist across browser tabs
-6. Console: Clean output during operations
+**Test 6 - Console Validation** (~5 min)
+1. Open DevTools console
+2. Perform all 5 tests above while watching console
+3. Verify NO errors during:
+   - Page load
+   - Panel reorder
+   - Page refresh
+   - Domain switching
+4. Only debug messages from "[UserPreferencesService]" are expected (if debug enabled)
+5. No "Failed to" or "error" messages should appear
 
 ### Success Criteria
-- ✅ Backend service accepts GET/POST requests
-- ✅ Files written to `data-broker/generic-prime/preferences/`
-- ✅ All 6 manual tests pass
-- ✅ No breaking changes to frontend API
+- ✅ Cold Start: Backend saves preferences to file
+- ✅ Hot Reload: Preferences load from backend on refresh
+- ✅ API Failure: Fallback to localStorage works correctly
+- ✅ Domain-Aware: Each domain has separate preferences
+- ✅ Cross-Tab: Changes sync across browser tabs
+- ✅ Console: Clean output (no errors)
 
 ---
 
