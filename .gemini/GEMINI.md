@@ -9,9 +9,10 @@
 **When triggered, I must:**
 1.  Read `CLAUDE.md`, `docs/claude/PROJECT-STATUS.md`, and `docs/claude/NEXT-STEPS.md`.
 2.  **Read `MONSTER-LOG.md`** (To understand the Brain's last known state/plan).
-3.  Run `git status` and `git branch --show-current`.
+3.  Run `git status`, `git branch --show-current`, and `git log -1 --format="%h - %s"`.
 4.  **Write to `MONSTER-CLAUDE.md`**:
     -   "Branch": [Current Branch]
+    -   "Last Commit": [Commit Hash - Message]
     -   "Status": [Last status from PROJECT-STATUS.md]
     -   "Next Task": [Item 1 from NEXT-STEPS.md]
     -   "Reality Check": [Any uncommitted files or anomalies]

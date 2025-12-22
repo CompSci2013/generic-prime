@@ -1,32 +1,38 @@
 # Next Steps
 
-**Current Session**: Session 51 - Backend Preferences Service (COMPLETE)
-**Previous Session**: Session 50 - Strategic Pivot Decision (Complete)
-**Status**: Implementation complete. Ready for manual testing.
+**Current Session**: Session 52 - Backend Deployment & Persistent Storage (COMPLETE)
+**Previous Session**: Session 51 - Backend Preferences Service (Complete)
+**Status**: Backend deployed and running. 3 of 6 tests PASSED.
 
 ---
 
-## SESSION 51 COMPLETION SUMMARY
+## SESSION 52 COMPLETION SUMMARY
 
 **What Was Done**:
-1. ✅ Created backend preferences service in `data-broker/generic-prime/`
-2. ✅ Updated frontend `UserPreferencesService` to call backend API
-3. ✅ Frontend build verified: 6.84 MB, no TypeScript errors
-4. ✅ All changes committed to respective repositories
+1. ✅ Rebuilt Docker image v1.6.0 with preferences routes
+2. ✅ Deployed to Kubernetes (both replicas running)
+3. ✅ Created PersistentVolume with hostPath storage at `/mnt/generic-prime-preferences/`
+4. ✅ Files directly accessible from thor filesystem
+5. ✅ Verified persistence across pod restarts and replicas
 
-**Architecture Details**:
-- Backend routes: `/api/preferences/v1/:userId` with GET/POST/DELETE endpoints
-- File storage: `data-broker/generic-prime/preferences/` directory
-- Domain-aware structure: supports all 5 domains
-- Frontend maintains same observable interface (zero breaking changes)
+**Manual Testing Results**:
+- ✅ Test 1 (Cold Start): PASS - Backend saves preferences to file
+- ✅ Test 2 (Hot Reload): PASS - Preferences load from backend on refresh
+- ✅ Test 3 (API Failure Fallback): PASS - Falls back to localStorage when backend scaled to 0
+
+**Architecture**:
+- Storage location: `/mnt/generic-prime-preferences/` on thor
+- Pod mount point: `/app/preferences`
+- File format: `{userId}.json` with domain-aware structure
+- Persistence: Across pod restarts and multiple replicas
 
 ---
 
-## SESSION 52 IMMEDIATE ACTION: Manual Preferences Testing (6 Scenarios)
+## SESSION 53 IMMEDIATE ACTION: Complete Remaining Preferences Tests (3/6)
 
-**Status**: Ready for testing
-**Priority**: HIGH (Validate backend service works correctly)
-**Scope**: Complete 6-test preferences scenario per NEXT-STEPS.md
+**Status**: Ready to test
+**Priority**: HIGH (Validate remaining scenarios)
+**Scope**: Complete Test 4, 5, and 6 from preferences testing protocol
 
 ### Testing Protocol (~30 min total)
 
