@@ -1,54 +1,87 @@
 # MONSTER-LOG: Claude (George) to Gemini (Jerry)
 
-## Hand-Off Note from Session 51 Brain (CURRENT)
+## Hand-Off Note from Session 52 Brain (CURRENT)
 
 **Date**: Monday, December 22, 2025
 **Branch**: main, data-broker master
-**Status**: ✅ IMPLEMENTATION COMPLETE - Backend Preferences Service Ready for Testing
+**Status**: 🚨 CRITICAL BLOCKER - Backend Code Written But NOT DEPLOYED to Kubernetes
 
-### Session 51 Implementation Summary
+### Session 52 Investigation Findings
 
-**What Was Accomplished**:
-1. ✅ **Backend Preferences Service Created** in `data-broker/generic-prime/`
-   - `src/routes/preferencesRoutes.js` - Defines GET/POST/DELETE endpoints
-   - `src/controllers/preferencesController.js` - Handles HTTP requests with validation
-   - `src/services/fileStorageService.js` - File I/O with domain-aware storage
-   - Updated `src/index.js` to mount preferences routes at `/api/preferences/v1`
+**The Problem**: Session 51 created the preferences service code in data-broker, but the code is **NOT running in Kubernetes**. The frontend is getting 404 errors because the deployment hasn't been updated.
 
-2. ✅ **Frontend Service Updated**
-   - Changed `UserPreferencesService` from proxy endpoints to backend API calls
-   - Now calls `GET/POST /api/preferences/v1/{userId}` endpoints
-   - Uses hardcoded "default" userId (no auth yet)
-   - Maintains same observable interface (zero breaking changes)
-   - Keeps localStorage fallback for offline scenarios
+**Root Cause Analysis**:
+1. ✅ Session 51 wrote backend code: `data-broker/generic-prime/src/routes/preferencesRoutes.js`, etc.
+2. ✅ Session 51 updated frontend `UserPreferencesService` to call the API
+3. ✅ Updated proxy.conf.js to route `/api/preferences/v1` to `generic-prime.minilab`
+4. ❌ **Backend Docker image was NOT rebuilt**
+5. ❌ **New image was NOT imported into K3s**
+6. ❌ **K8s deployment was NOT updated**
 
-3. ✅ **Build Verification**
-   - Frontend build successful: 6.84 MB, no TypeScript errors
-   - All changes committed to respective repositories
+**Current K8s Status**:
+- Deployment: `generic-prime-backend-api` in namespace `generic-prime`
+- Running Image: `localhost/generic-prime-backend-api:v1.5.0` (old code without preferences routes)
+- Kubernetes Service: `generic-prime-backend-api:3000` → Traefik ingress → `generic-prime.minilab`
+- When frontend calls `/api/preferences/v1/default`, it hits K8s, which returns 404 because the route doesn't exist in v1.5.0
 
-**Architecture**:
-- **Routes**: `/api/preferences/v1/:userId` with GET/POST/DELETE
-- **Storage**: File-based in `data-broker/generic-prime/preferences/` directory
-- **Structure**: Domain-aware (automobiles, physics, agriculture, chemistry, math)
-- **Default Preferences**: Includes panelOrder and collapsedPanels for each domain
+### Deployment Pipeline (What Needs to Happen)
 
-### Testing Requirements (For Gemini)
+**Steps for Gemini to Execute** (in data-broker directory):
 
-**6 Manual Test Scenarios**:
-1. **Cold Start** - Panel reorder triggers backend save → verify file created
-2. **Hot Reload** - Preferences load from backend on page refresh
-3. **API Failure** - Fallback to localStorage when backend offline
-4. **Domain-Aware** - Automobiles and physics have separate preferences
-5. **Cross-Tab** - Changes persist across browser tabs
-6. **Console** - Clean output during operations
+1. **Rebuild Docker Image**
+   ```bash
+   cd /home/odin/projects/data-broker
+   podman build -f generic-prime/infra/Dockerfile \
+     -t localhost/generic-prime-backend-api:v1.6.0 generic-prime
+   ```
+   - Includes the new preferences routes code from Session 51
+
+2. **Import Image into K3s**
+   ```bash
+   podman save localhost/generic-prime-backend-api:v1.6.0 -o /tmp/backend-v1.6.0.tar
+   sudo k3s ctr images import /tmp/backend-v1.6.0.tar
+   ```
+   - Makes image available to K3s nodes
+
+3. **Update Deployment Image Version**
+   ```bash
+   kubectl -n generic-prime set image deployment/generic-prime-backend-api \
+     backend-api=localhost/generic-prime-backend-api:v1.6.0
+   ```
+   - Triggers rollout of new pods with preferences routes
+
+4. **Verify Deployment**
+   ```bash
+   kubectl -n generic-prime rollout status deployment/generic-prime-backend-api
+   kubectl -n generic-prime get pods
+   kubectl -n generic-prime logs deployment/generic-prime-backend-api -f
+   ```
+   - Watch for successful pod startup
+
+5. **Test Backend Endpoint**
+   ```bash
+   curl http://generic-prime.minilab/api/preferences/v1/default
+   ```
+   - Should return 200 with preferences JSON (or empty object if file not exists yet)
 
 **Success Criteria**:
-- ✅ Backend service accepts GET/POST/DELETE requests
-- ✅ Files written to `data-broker/generic-prime/preferences/`
-- ✅ All 6 manual tests pass
-- ✅ No breaking changes to frontend API
+- ✅ K8s rollout completes without errors
+- ✅ Pods are running and healthy
+- ✅ `curl http://generic-prime.minilab/api/preferences/v1/default` returns 200 (not 404)
+- ✅ Frontend console no longer shows 404 errors
+- ✅ Frontend can save and load preferences from backend
 
-**Next Step for Gemini**: Execute the 6-scenario manual testing protocol in NEXT-STEPS.md, then proceed to Session 52 (Pop-Out Testing).
+### After Deployment: Manual Testing
+
+Once deployment succeeds, execute the 6-scenario testing protocol in NEXT-STEPS.md:
+1. Cold Start
+2. Hot Reload
+3. API Failure Fallback
+4. Domain-Aware Storage
+5. Cross-Tab Sync
+6. Console Validation
+
+**Next Step for Gemini**: Execute the deployment steps above, verify the endpoint is live, then report back via MONSTER-CLAUDE.md.
 
 ---
 

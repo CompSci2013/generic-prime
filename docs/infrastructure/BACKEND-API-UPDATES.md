@@ -1,58 +1,60 @@
 # Backend API Updates - Quick Reference
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-12-22 (CORRECTED)
+**Original:** 2025-11-23
 **Purpose:** Quick guide for updating the Generic-Prime backend API
 
 ---
 
-## Backend Location
+## ⚠️ IMPORTANT CORRECTION (2025-12-22)
 
-**All files in one project:** `~/projects/generic-prime/`
+**The backend is NOT in `~/projects/generic-prime/backend-specs/`**
 
+**Correct Location:**
 ```
-Backend Source:  ~/projects/generic-prime/backend-specs/
+Backend Source:  ~/projects/data-broker/generic-prime/
+K8s Configs:     ~/projects/data-broker/generic-prime/infra/k8s/
 Frontend Source: ~/projects/generic-prime/frontend/
-K8s Configs:     ~/projects/generic-prime/k8s/
 ```
+
+The backend is part of the **data-broker infrastructure project**, not the generic-prime project itself.
 
 ---
 
-## Quick Update Process
+## Quick Update Process (CORRECTED)
 
 ### 1. Edit Backend Code
 
 ```bash
-cd ~/projects/generic-prime/backend-specs/src
-nano services/elasticsearchService.js
+cd ~/projects/data-broker/generic-prime/src
+nano routes/preferencesRoutes.js    # Example: preferences service
+nano controllers/preferencesController.js
 ```
 
 ### 2. Build & Deploy
 
 ```bash
-cd ~/projects/generic-prime/backend-specs
+cd ~/projects/data-broker
 
-# Build image (increment version: v1.0.1 → v1.0.2)
-podman build -t localhost/generic-prime-backend:v1.0.2 .
+# Build image (increment version: v1.5.0 → v1.6.0)
+podman build -f generic-prime/infra/Dockerfile \
+  -t localhost/generic-prime-backend-api:v1.6.0 generic-prime
 
 # Export tar
-podman save localhost/generic-prime-backend:v1.0.2 -o generic-prime-backend-v1.0.2.tar
+podman save localhost/generic-prime-backend-api:v1.6.0 -o /tmp/backend-v1.6.0.tar
 
 # Import to K3s
-sudo k3s ctr images import generic-prime-backend-v1.0.2.tar
+sudo k3s ctr images import /tmp/backend-v1.6.0.tar
 
-# Update deployment manifest
-cd ~/projects/generic-prime/k8s
-nano backend-deployment.yaml  # Change image version to v1.0.2
-
-# Apply deployment
-kubectl apply -f backend-deployment.yaml
+# Update deployment
+kubectl -n generic-prime set image deployment/generic-prime-backend-api \
+  backend-api=localhost/generic-prime-backend-api:v1.6.0
 
 # Watch rollout
-kubectl rollout status deployment/generic-prime-backend -n generic-prime
+kubectl -n generic-prime rollout status deployment/generic-prime-backend-api
 
 # Clean up
-cd ~/projects/generic-prime/backend-specs
-rm generic-prime-backend-v1.0.2.tar
+rm /tmp/backend-v1.6.0.tar
 ```
 
 ### 3. Test Changes
@@ -62,21 +64,26 @@ rm generic-prime-backend-v1.0.2.tar
 curl http://generic-prime.minilab/api/health | jq
 
 # Test API endpoint
-curl "http://generic-prime.minilab/api/vehicles/details?page=1&size=2" | jq
+curl "http://generic-prime.minilab/api/specs/v1/vehicles/details?page=1&size=2" | jq
+
+# Test new endpoints (if added)
+curl http://generic-prime.minilab/api/preferences/v1/default | jq
 ```
 
 ---
 
 ## Current Backend Configuration
 
+**Location:** `/home/odin/projects/data-broker/generic-prime/`
 **Namespace:** `generic-prime`
-**Service:** `generic-prime-backend`
+**Service:** `generic-prime-backend-api`
 **Pods:** 2 replicas
 **Port:** 3000
-**Current Version:** v1.0.1 (as of 2025-11-23)
+**Current Version:** v1.5.0 (as of 2025-12-22, needs update for preferences)
 
-**Image:** `localhost/generic-prime-backend:v1.0.X`
-**Deployment File:** `~/projects/generic-prime/k8s/backend-deployment.yaml`
+**Image:** `localhost/generic-prime-backend-api:v1.X.X`
+**Deployment File:** `~/projects/data-broker/generic-prime/infra/k8s/deployment.yaml`
+**Service File:** `~/projects/data-broker/generic-prime/infra/k8s/service.yaml`
 
 ---
 

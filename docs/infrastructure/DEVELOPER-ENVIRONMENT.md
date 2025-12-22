@@ -1,26 +1,55 @@
 # Generic-Prime Development Environment Setup
 
-**Document Version:** 2.0
-**Date:** 2025-11-23
+**Document Version:** 3.0 (UPDATED 2025-12-22)
+**Date:** 2025-11-23 (Original), 2025-12-22 (Corrected)
 **Purpose:** Complete procedure to build, deploy, and develop the Generic Discovery Framework (Port 4205)
+
+**⚠️ CRITICAL: This document was updated on 2025-12-22 to correct architectural misunderstandings.**
 
 **Project:** Generic-Prime - Domain-agnostic Angular 14 discovery framework
 **Port:** 4205 (Development and Production)
-**All Files Location:** `/home/odin/projects/generic-prime/`
+**Frontend Location:** `/home/odin/projects/generic-prime/frontend/`
+**Backend Location:** `/home/odin/projects/data-broker/generic-prime/` ← **NOT in generic-prime project**
+
+---
+
+## ARCHITECTURAL REALITY (Updated 2025-12-22)
+
+**IMPORTANT:** The backend is NOT in `~/projects/generic-prime/backend-specs/`. That directory **does not exist**.
+
+### Correct Architecture:
+- **Frontend Source:** `~/projects/generic-prime/frontend/`
+- **Backend Source:** `~/projects/data-broker/generic-prime/` (separate infrastructure project)
+- **Backend Deployment:** `generic-prime-backend-api` (microservice in data-broker)
+- **Frontend Dev Container:** Runs in Podman, calls backend via Traefik
+- **Backend Production:** Runs in Kubernetes namespace `generic-prime`
+
+### What This Means:
+1. Frontend development uses `~/projects/generic-prime/frontend/`
+2. Backend changes require rebuilding image from `~/projects/data-broker/generic-prime/`
+3. Kubernetes deployment is centralized in data-broker, not generic-prime
+4. K8s deployment manifests are in `~/projects/data-broker/generic-prime/infra/k8s/`, not `~/projects/generic-prime/k8s/`
 
 ---
 
 ## Overview
 
 This document provides steps to:
-1. Build and deploy backend API to Kubernetes
-2. Build and deploy frontend to Kubernetes
-3. Set up frontend dev container for ongoing development
-4. Update backend code and redeploy (e.g., comma-separated filter support)
+1. ✅ Set up frontend dev container for ongoing development (IN generic-prime)
+2. ❌ Build and deploy backend API (DO NOT - handled by data-broker project)
+3. ⚠️ Call backend API from frontend (frontend calls data-broker backend)
+4. 📋 When backend changes needed: See `/home/odin/projects/data-broker/generic-prime/docs/README.md`
 
 **Architecture:**
 - **Backend:** Specs API (Port 3000) - vehicle specifications + statistics
+  - **Location:** `/home/odin/projects/data-broker/generic-prime/`
+  - **Namespace:** `generic-prime`
+  - **Service:** `generic-prime-backend-api:3000`
+  - **Image:** `localhost/generic-prime-backend-api:v1.X.X`
 - **Frontend:** Angular 14 with PrimeNG components (Port 4205)
+  - **Location:** `/home/odin/projects/generic-prime/frontend/`
+  - **Dev Container:** Podman on Thor
+  - **Production:** Kubernetes namespace `generic-prime`
 - **Data Store:** Elasticsearch (`elasticsearch.data.svc.cluster.local:9200`)
 - **Ingress:** Traefik routing to `generic-prime.minilab`
 - **Namespace:** `generic-prime`
@@ -35,6 +64,7 @@ This document provides steps to:
 - **📄 [CLAUDE.md](../CLAUDE.md)** - Complete framework reference
 - **📁 [plan/](../plan/)** - Architecture and implementation plans
 - **📁 [specs/](../specs/)** - Component specifications
+- **📁 [/home/odin/projects/data-broker/](../../../data-broker/)** - Backend infrastructure (separate project)
 
 ---
 
@@ -43,16 +73,16 @@ This document provides steps to:
 ### Access Points
 
 **Production (Kubernetes):**
-- **Frontend:** http://generic-prime.minilab:4205
-- **Backend API:** http://generic-prime.minilab/api/...
+- **Frontend:** http://generic-prime.minilab (port 80) or http://generic-prime.minilab:4205
+- **Backend API:** http://generic-prime.minilab/api/... (via Traefik routing)
 - **Backend Health:** http://generic-prime.minilab/api/health
 
 **Development (Podman):**
 - **Dev Frontend:** http://localhost:4205 or http://thor:4205
-- **Backend API:** http://generic-prime.minilab/api/... (use production backend)
+- **Backend API:** http://generic-prime.minilab/api/... (calls production K8s backend)
 
-**Internal Services:**
-- **Backend:** http://generic-prime-backend.generic-prime.svc.cluster.local:3000
+**Internal Services (Kubernetes):**
+- **Backend:** http://generic-prime-backend-api.generic-prime.svc.cluster.local:3000
 - **Frontend:** http://generic-prime-frontend.generic-prime.svc.cluster.local:80
 - **Elasticsearch:** http://elasticsearch.data.svc.cluster.local:9200
 
@@ -60,31 +90,35 @@ This document provides steps to:
 
 ```
 ~/projects/generic-prime/
-├── backend-specs/          # Backend API source code
-│   ├── src/
-│   │   ├── services/       # elasticsearchService.js (main API logic)
-│   │   ├── routes/         # API route definitions
-│   │   └── config/         # Elasticsearch config
-│   ├── Dockerfile          # Backend container image
-│   └── package.json
-├── frontend/               # Frontend source code
+├── frontend/               # Frontend source code (THIS PROJECT)
 │   ├── src/
 │   │   ├── app/
 │   │   ├── framework/      # Domain-agnostic components
 │   │   └── domain-config/  # Automobile domain config
+│   ├── proxy.conf.js       # Dev server proxy to backend
 │   ├── Dockerfile.dev      # Dev container
 │   ├── Dockerfile.prod     # Production container
 │   └── package.json
-├── k8s/                    # Kubernetes deployment manifests
-│   ├── namespace.yaml
-│   ├── backend-deployment.yaml
-│   ├── backend-service.yaml
-│   ├── frontend-deployment.yaml
-│   ├── frontend-service.yaml
-│   └── ingress.yaml
-└── docs/                   # Documentation
-    ├── DEVELOPER-ENVIRONMENT.md (this file)
-    └── BACKEND-API-UPDATES.md
+├── docs/
+│   ├── infrastructure/     # Infrastructure documentation (this file)
+│   │   └── DEVELOPER-ENVIRONMENT.md
+│   └── [other docs]
+└── [other frontend files]
+
+~/projects/data-broker/     # SEPARATE PROJECT - Backend infrastructure
+├── generic-prime/          # Backend source code
+│   ├── src/
+│   │   ├── routes/         # API route definitions
+│   │   ├── controllers/    # Request handlers
+│   │   ├── services/       # Business logic + ES queries
+│   │   └── config/         # Elasticsearch config
+│   ├── infra/
+│   │   ├── Dockerfile      # Backend container image
+│   │   └── k8s/            # Kubernetes manifests
+│   ├── package.json
+│   └── docs/
+│       └── README.md       # Backend API reference
+└── [other data-broker files]
 ```
 
 ---
