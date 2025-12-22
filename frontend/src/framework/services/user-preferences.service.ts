@@ -105,9 +105,16 @@ export class UserPreferencesService {
    */
   private fullPreferences: any = {};
 
+  /**
+   * User ID for backend preferences service
+   * Hardcoded to 'default' for now (no auth yet)
+   * @private
+   */
+  private userId = 'default';
+
   constructor(private http: HttpClient) {
-    // Try loading from file API first, fall back to localStorage
-    this.loadFromFileApi().pipe(
+    // Try loading from backend API first, fall back to localStorage
+    this.loadFromBackendApi().pipe(
       timeout(5000), // 5 second timeout
       catchError(() => {
         // Fall back to localStorage
@@ -156,8 +163,8 @@ export class UserPreferencesService {
     }
     this.fullPreferences[domain].panelOrder = order;
 
-    // Try saving to file API first
-    this.savePreferencesToFile(this.fullPreferences).pipe(
+    // Try saving to backend API first
+    this.savePreferencesToBackend(this.fullPreferences).pipe(
       catchError(() => {
         // Fall back to localStorage
         this.saveToLocalStorage('panelOrder', order);
@@ -183,8 +190,8 @@ export class UserPreferencesService {
     }
     this.fullPreferences[domain].collapsedPanels = panels;
 
-    // Try saving to file API first
-    this.savePreferencesToFile(this.fullPreferences).pipe(
+    // Try saving to backend API first
+    this.savePreferencesToBackend(this.fullPreferences).pipe(
       catchError(() => {
         // Fall back to localStorage
         this.saveToLocalStorage('collapsedPanels', panels);
@@ -280,17 +287,17 @@ export class UserPreferencesService {
   }
 
   /**
-   * Load preferences from file-based API
-   * Attempts to fetch preferences from `/api/preferences/load`
+   * Load preferences from backend API
+   * Attempts to fetch preferences from `/api/preferences/v1/:userId`
    *
    * @private
    * @returns Observable of preferences object
    */
-  private loadFromFileApi(): Observable<any> {
-    return this.http.get<any>('/api/preferences/load').pipe(
+  private loadFromBackendApi(): Observable<any> {
+    return this.http.get<any>(`/api/preferences/v1/${this.userId}`).pipe(
       catchError((error) => {
         if (isDevMode()) {
-          console.debug('[UserPreferencesService] File API not available, falling back to localStorage');
+          console.debug('[UserPreferencesService] Backend API not available, falling back to localStorage');
         }
         throw error;
       })
@@ -298,18 +305,18 @@ export class UserPreferencesService {
   }
 
   /**
-   * Save preferences to file-based API
-   * Sends preferences object to `/api/preferences/save`
+   * Save preferences to backend API
+   * Sends preferences object to `/api/preferences/v1/:userId`
    *
    * @private
    * @param prefs - Full preferences object to save
    * @returns Observable of save result
    */
-  private savePreferencesToFile(prefs: any): Observable<any> {
-    return this.http.post<any>('/api/preferences/save', prefs).pipe(
+  private savePreferencesToBackend(prefs: any): Observable<any> {
+    return this.http.post<any>(`/api/preferences/v1/${this.userId}`, prefs).pipe(
       catchError((error) => {
         if (isDevMode()) {
-          console.debug('[UserPreferencesService] Failed to save to file API:', error);
+          console.debug('[UserPreferencesService] Failed to save to backend API:', error);
         }
         throw error;
       })
