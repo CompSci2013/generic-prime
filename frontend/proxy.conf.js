@@ -14,7 +14,7 @@ module.exports = {
       }
 
       // GET /api/preferences/load
-      if (req.method === 'GET' && req.path === '/api/preferences/load') {
+      if (req.method === 'GET' && req.url === '/api/preferences/load') {
         if (fs.existsSync(filePath)) {
           const content = fs.readFileSync(filePath, 'utf8');
           res.setHeader('Content-Type', 'application/json');
@@ -31,7 +31,7 @@ module.exports = {
       }
 
       // POST /api/preferences/save
-      if (req.method === 'POST' && req.path === '/api/preferences/save') {
+      if (req.method === 'POST' && req.url === '/api/preferences/save') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
         req.on('end', () => {
@@ -63,7 +63,7 @@ module.exports = {
     bypass: (req, res, proxyOptions) => {
       // Serve static report files with aggressive no-cache headers
       // This ensures the browser always fetches fresh report data
-      const reportPath = path.join(__dirname, 'playwright-report', req.path.substring(8));
+      const reportPath = path.join(__dirname, 'playwright-report', req.url.substring(8));
 
       if (fs.existsSync(reportPath)) {
         try {

@@ -1,20 +1,73 @@
 # Next Steps
 
-**Current Session**: Session 50 - Manual Pop-Out Testing (READY)
-**Previous Session**: Session 49 - File-Based Preferences Migration (COMPLETE)
-**Status**: Ready for next session - Pop-Out Testing immediately after file-based preferences verified
+**Current Session**: Session 50 - Backend Preferences Service Design (IN PROGRESS)
+**Previous Session**: Session 49 - File-Based Preferences Migration (CODE COMPLETE, TESTING PENDING)
+**Status**: Pivoting to backend-driven architecture due to frontend dev server WebSocket blocker
 
 ---
 
-## SESSION 50 IMMEDIATE ACTION: Manual Pop-Out Testing
+## SESSION 50 IMMEDIATE ACTION: Design & Implement Backend Preferences Service
+
+**Status**: Ready for implementation
+**Priority**: HIGH (Unblocks preferences testing with production-ready backend)
+**Scope**: Add preferences endpoint to `data-broker/generic-prime/` service
 
 **Status**: Ready for testing
 **Priority**: HIGH (Validate all pop-out scenarios work correctly)
 **Scope**: Complete 10-test pop-out scenario per POP-OUT-REQUIREMENTS-RUBRIC.md
 
-### Pop-Out Testing Checklist
+### Implementation Plan
 
-This is a comprehensive manual testing protocol to validate all pop-out functionality:
+**Phase 1: Create Backend Preferences Service** (~30 min)
+1. Create `data-broker/generic-prime/src/routes/preferencesRoutes.js`
+   - GET `/api/preferences/v1/:userId` - Load user preferences
+   - POST `/api/preferences/v1/:userId` - Save user preferences
+   - DELETE `/api/preferences/v1/:userId` - Reset preferences
+
+2. Create `data-broker/generic-prime/src/controllers/preferencesController.js`
+   - Handle route requests with validation
+   - Follow existing specsController pattern
+
+3. Create `data-broker/generic-prime/src/services/fileStorageService.js`
+   - Read/write JSON files from `data-broker/generic-prime/preferences/` directory
+   - Domain-aware structure: `{ automobiles: {...}, physics: {...}, ... }`
+   - Error handling and graceful fallback
+
+4. Update `data-broker/generic-prime/src/index.js`
+   - Mount preferences routes alongside specs routes
+   - Add `/api/preferences/v1` route namespace
+
+5. Create `data-broker/generic-prime/preferences/` directory
+   - Store user preferences as JSON files: `user-{userId}.json`
+   - Initialize with default preferences structure
+
+**Phase 2: Update Frontend to Call Backend** (~20 min)
+1. Modify `UserPreferencesService`
+   - Remove proxy endpoints (`/api/preferences/load|save`)
+   - Call backend service instead: `http://localhost:3000/api/preferences/v1/{userId}`
+   - Keep same observable interface (no breaking changes)
+
+2. Pass userId through service
+   - Hardcoded "default" for now (no auth yet)
+   - Future: extract from auth token when available
+
+**Phase 3: Manual Testing** (~30 min)
+1. Cold Start: Panel reorder triggers backend save
+2. Hot Reload: Preferences load from backend on refresh
+3. API Failure: Fallback to localStorage when backend offline
+4. Domain-Aware: Automobiles and physics have separate preferences
+5. Cross-Tab: Changes persist across browser tabs
+6. Console: Clean output during operations
+
+### Success Criteria
+- ✅ Backend service accepts GET/POST requests
+- ✅ Files written to `data-broker/generic-prime/preferences/`
+- ✅ All 6 manual tests pass
+- ✅ No breaking changes to frontend API
+
+---
+
+## SESSION 49+ ACTION: Manual Pop-Out Testing (After Preferences Backend Complete)
 
 **Test 1 - Pop-Out URL Stays Clean** (~1 min)
 1. Open application at `/automobiles/discover`
