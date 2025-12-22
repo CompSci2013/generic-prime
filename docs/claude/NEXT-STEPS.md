@@ -1,14 +1,15 @@
 # Next Steps
 
-**Current Session**: Session 48 - Manual Testing of Panel Persistence (COMPLETE)
-**Next Session**: Session 49 - Manual Pop-Out Testing (HIGH Priority)
+**Current Session**: Session 50 - Manual Pop-Out Testing (READY)
+**Previous Session**: Session 49 - File-Based Preferences Migration (COMPLETE)
+**Status**: Ready for next session - Pop-Out Testing immediately after file-based preferences verified
 
 ---
 
-## SESSION 49 IMMEDIATE ACTION: Manual Pop-Out Testing
+## SESSION 50 IMMEDIATE ACTION: Manual Pop-Out Testing
 
 **Status**: Ready for testing
-**Priority**: HIGH (validate all pop-out scenarios work correctly)
+**Priority**: HIGH (Validate all pop-out scenarios work correctly)
 **Scope**: Complete 10-test pop-out scenario per POP-OUT-REQUIREMENTS-RUBRIC.md
 
 ### Pop-Out Testing Checklist
@@ -102,6 +103,57 @@ Document results and choose next priority:
 1. **Fix Bug #13** (MEDIUM priority) - Dropdown keyboard navigation
 2. **Fix Bug #7** (MEDIUM priority) - Multiselect visual state
 3. **Remove Provider Anti-Pattern** (HIGH priority) - Clean up ResourceManagementService provider
+
+---
+
+## SESSION 49 COMPLETED: File-Based Preferences Migration
+
+**Status**: ✅ COMPLETE
+**Priority**: HIGH
+**Result**: All 4 implementation phases completed successfully
+
+### What Was Done
+
+1. ✅ **Phase 1 - Directory Structure** (5 min)
+   - Created `frontend/preferences/` directory
+   - Created `.gitkeep` file for git tracking
+   - Created `default-user.json` with initial preferences
+   - Updated `.gitignore` to track directory but ignore JSON files
+
+2. ✅ **Phase 2 - Proxy Configuration** (10 min)
+   - Extended `frontend/proxy.conf.js` with `/api/preferences` route
+   - Implemented GET `/api/preferences/load` handler
+   - Implemented POST `/api/preferences/save` handler
+   - Added error handling and JSON validation
+
+3. ✅ **Phase 3 - Service Refactoring** (20 min)
+   - Added `HttpClient` injection to `UserPreferencesService`
+   - Implemented 6 new private methods for file I/O and fallback logic
+   - Updated `savePanelOrder()` and `saveCollapsedPanels()` methods
+   - Maintains same observable interface (no breaking changes)
+   - 5-second timeout on API calls with automatic fallback
+
+4. ✅ **Build Verification** (30 min)
+   - Build passed: `npm run build`
+   - Bundle size: 6.84 MB (unchanged)
+   - TypeScript errors: 0
+   - Ready for manual testing
+
+### Key Achievements
+
+- **Architectural Foundation**: Established file-based storage for future backend API
+- **Dual-Layer Storage**: Primary file API + localStorage fallback
+- **Domain-Aware**: Supports all 5 domains (automobiles, physics, agriculture, chemistry, math)
+- **Zero Breaking Changes**: Maintains same service API surface
+- **Build Success**: ✅ 6.84 MB, no TypeScript errors
+- **Documentation**: Complete testing checklist in SESSION-49-FILE-PREFS-TEST.md
+
+### Next Task
+
+**Priority 1 (HIGH)**: Manual Pop-Out Testing
+- Complete 10-test pop-out scenario per requirements
+- Validate BroadcastChannel communication works correctly
+- Verify filter synchronization across multiple windows
 
 ---
 
