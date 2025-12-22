@@ -30,9 +30,16 @@
 
 ## SESSION 53 IMMEDIATE ACTION: Complete Remaining Preferences Tests (3/6)
 
-**Status**: Ready to test
-**Priority**: HIGH (Validate remaining scenarios)
-**Scope**: Complete Test 4, 5, and 6 from preferences testing protocol
+**Status**: Ready to test - Backend fully deployed and operational
+**Priority**: HIGH (Validate remaining scenarios before moving to pop-out testing)
+**Scope**: Execute Test 4, 5, and 6 from preferences testing protocol
+
+**Starting Instructions for Next Brain**:
+1. Backend is deployed (v1.6.0) and running with 2 replicas
+2. Preferences files stored at `/mnt/generic-prime-preferences/` on thor
+3. Tests 1-3 already PASSED in Session 52
+4. Start with Test 4 (Domain-Aware Storage) - test that different domains have separate preference files
+5. All test instructions documented below
 
 ### Testing Protocol (~30 min total)
 
