@@ -1,5 +1,7 @@
 import { Injectable, isDevMode } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, timeout } from 'rxjs/operators';
 
 /**
  * User preferences service for persisting application state
@@ -90,10 +92,31 @@ export class UserPreferencesService {
    */
   private storageAvailable = this.checkStorageAvailable();
 
-  constructor() {
-    // Initialize subjects with loaded values
-    this.panelOrderSubject.next(this.loadPanelOrder());
-    this.collapsedPanelsSubject.next(this.loadCollapsedPanels());
+  /**
+   * File-based API availability flag
+   * Set to true if API is available, false otherwise
+   * @private
+   */
+  private apiAvailable = false;
+
+  /**
+   * Full preferences object for file-based storage
+   * @private
+   */
+  private fullPreferences: any = {};
+
+  constructor(private http: HttpClient) {
+    // Try loading from file API first, fall back to localStorage
+    this.loadFromFileApi().pipe(
+      timeout(5000), // 5 second timeout
+      catchError(() => {
+        // Fall back to localStorage
+        return of(this.loadFromLocalStorage());
+      })
+    ).subscribe(prefs => {
+      this.fullPreferences = prefs || {};
+      this.initializeFromPreferences(this.fullPreferences);
+    });
   }
 
   /**
@@ -126,16 +149,21 @@ export class UserPreferencesService {
     // Update subject (triggers subscribers)
     this.panelOrderSubject.next(order);
 
-    // Persist to localStorage if available
-    if (this.storageAvailable) {
-      try {
-        const key = this.getPrefKey('panelOrder');
-        localStorage.setItem(key, JSON.stringify(order));
-      } catch (e) {
-        // Handle quota exceeded or other storage errors
-        this.handleStorageError(e);
-      }
+    // Update full preferences object
+    const domain = this.currentDomain;
+    if (!this.fullPreferences[domain]) {
+      this.fullPreferences[domain] = {};
     }
+    this.fullPreferences[domain].panelOrder = order;
+
+    // Try saving to file API first
+    this.savePreferencesToFile(this.fullPreferences).pipe(
+      catchError(() => {
+        // Fall back to localStorage
+        this.saveToLocalStorage('panelOrder', order);
+        return of(null);
+      })
+    ).subscribe();
   }
 
   /**
@@ -148,16 +176,21 @@ export class UserPreferencesService {
     // Update subject (triggers subscribers)
     this.collapsedPanelsSubject.next(panels);
 
-    // Persist to localStorage if available
-    if (this.storageAvailable) {
-      try {
-        const key = this.getPrefKey('collapsedPanels');
-        localStorage.setItem(key, JSON.stringify(panels));
-      } catch (e) {
-        // Handle quota exceeded or other storage errors
-        this.handleStorageError(e);
-      }
+    // Update full preferences object
+    const domain = this.currentDomain;
+    if (!this.fullPreferences[domain]) {
+      this.fullPreferences[domain] = {};
     }
+    this.fullPreferences[domain].collapsedPanels = panels;
+
+    // Try saving to file API first
+    this.savePreferencesToFile(this.fullPreferences).pipe(
+      catchError(() => {
+        // Fall back to localStorage
+        this.saveToLocalStorage('collapsedPanels', panels);
+        return of(null);
+      })
+    ).subscribe();
   }
 
   /**
@@ -244,6 +277,117 @@ export class UserPreferencesService {
     }
 
     return this.DEFAULT_COLLAPSED_PANELS;
+  }
+
+  /**
+   * Load preferences from file-based API
+   * Attempts to fetch preferences from `/api/preferences/load`
+   *
+   * @private
+   * @returns Observable of preferences object
+   */
+  private loadFromFileApi(): Observable<any> {
+    return this.http.get<any>('/api/preferences/load').pipe(
+      catchError((error) => {
+        if (isDevMode()) {
+          console.debug('[UserPreferencesService] File API not available, falling back to localStorage');
+        }
+        throw error;
+      })
+    );
+  }
+
+  /**
+   * Save preferences to file-based API
+   * Sends preferences object to `/api/preferences/save`
+   *
+   * @private
+   * @param prefs - Full preferences object to save
+   * @returns Observable of save result
+   */
+  private savePreferencesToFile(prefs: any): Observable<any> {
+    return this.http.post<any>('/api/preferences/save', prefs).pipe(
+      catchError((error) => {
+        if (isDevMode()) {
+          console.debug('[UserPreferencesService] Failed to save to file API:', error);
+        }
+        throw error;
+      })
+    );
+  }
+
+  /**
+   * Load preferences from localStorage
+   * Returns full preferences object with domain-aware keys
+   *
+   * @private
+   * @returns Full preferences object
+   */
+  private loadFromLocalStorage(): any {
+    const prefs: any = {};
+
+    // Try to load preferences for each domain
+    ['automobiles', 'physics', 'agriculture', 'chemistry', 'math'].forEach(domain => {
+      const orderKey = this.getPrefKey('panelOrder', domain);
+      const collapsedKey = this.getPrefKey('collapsedPanels', domain);
+
+      try {
+        const orderStr = localStorage.getItem(orderKey);
+        const collapsedStr = localStorage.getItem(collapsedKey);
+
+        prefs[domain] = {
+          panelOrder: orderStr ? JSON.parse(orderStr) : this.DEFAULT_PANEL_ORDER,
+          collapsedPanels: collapsedStr ? JSON.parse(collapsedStr) : this.DEFAULT_COLLAPSED_PANELS
+        };
+      } catch (e) {
+        // If parsing fails, use defaults for this domain
+        prefs[domain] = {
+          panelOrder: this.DEFAULT_PANEL_ORDER,
+          collapsedPanels: this.DEFAULT_COLLAPSED_PANELS
+        };
+      }
+    });
+
+    return prefs;
+  }
+
+  /**
+   * Save preferences to localStorage
+   * Saves a specific preference (panelOrder or collapsedPanels) for current domain
+   *
+   * @private
+   * @param preference - Preference name ('panelOrder' or 'collapsedPanels')
+   * @param value - Value to save
+   */
+  private saveToLocalStorage(preference: string, value: any): void {
+    if (this.storageAvailable) {
+      try {
+        const key = this.getPrefKey(preference);
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (e) {
+        this.handleStorageError(e);
+      }
+    }
+  }
+
+  /**
+   * Initialize service state from loaded preferences
+   * Updates BehaviorSubjects with preferences for current domain
+   *
+   * @private
+   * @param prefs - Full preferences object
+   */
+  private initializeFromPreferences(prefs: any): void {
+    const domain = this.currentDomain;
+    const domainPrefs = prefs[domain];
+
+    if (domainPrefs) {
+      this.panelOrderSubject.next(domainPrefs.panelOrder || this.DEFAULT_PANEL_ORDER);
+      this.collapsedPanelsSubject.next(domainPrefs.collapsedPanels || this.DEFAULT_COLLAPSED_PANELS);
+    } else {
+      this.panelOrderSubject.next(this.DEFAULT_PANEL_ORDER);
+      this.collapsedPanelsSubject.next(this.DEFAULT_COLLAPSED_PANELS);
+    }
   }
 
   /**

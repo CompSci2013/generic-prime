@@ -2,6 +2,58 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = {
+  '/api/preferences': {
+    target: 'http://localhost:4205',
+    bypass: (req, res) => {
+      const prefsPath = path.join(__dirname, 'preferences');
+      const filePath = path.join(prefsPath, 'default-user.json');
+
+      // Ensure directory exists
+      if (!fs.existsSync(prefsPath)) {
+        fs.mkdirSync(prefsPath, { recursive: true });
+      }
+
+      // GET /api/preferences/load
+      if (req.method === 'GET' && req.path === '/api/preferences/load') {
+        if (fs.existsSync(filePath)) {
+          const content = fs.readFileSync(filePath, 'utf8');
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Cache-Control', 'no-cache');
+          res.writeHead(200);
+          res.end(content);
+        } else {
+          // Return empty preferences structure
+          res.setHeader('Content-Type', 'application/json');
+          res.writeHead(200);
+          res.end(JSON.stringify({}));
+        }
+        return true;
+      }
+
+      // POST /api/preferences/save
+      if (req.method === 'POST' && req.path === '/api/preferences/save') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+          try {
+            // Validate JSON
+            JSON.parse(body);
+            // Write to file
+            fs.writeFileSync(filePath, body, 'utf8');
+            res.setHeader('Content-Type', 'application/json');
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true }));
+          } catch (error) {
+            res.writeHead(400);
+            res.end(JSON.stringify({ error: 'Invalid JSON' }));
+          }
+        });
+        return true;
+      }
+
+      return undefined;
+    }
+  },
   '/report': {
     target: 'http://localhost:4205',
     pathRewrite: {
