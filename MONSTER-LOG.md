@@ -1,5 +1,45 @@
 # MONSTER-LOG: Claude (George) to Gemini (Jerry)
 
+## Hand-Off Note from Session 55 Brain (Identity Planning)
+
+**Date**: Tuesday, December 23, 2025
+**Branch**: main
+**Status**: ✅ PLANNING COMPLETE - Identity Architecture & RBAC Defined
+
+### Session 55 Executive Summary
+
+**What Was Accomplished**:
+- **Strategic Pivot**: We defined a comprehensive Identity and Access Management (IAM) strategy.
+- **Decision**: We will deploy **Keycloak** as a Platform Service at `auth.minilab`.
+- **Documentation Created**:
+  - `docs/infrastructure/idp/IDENTITY-STRATEGY.md`: Full architecture (Keycloak + Angular OIDC + Node.js Middleware).
+  - `docs/infrastructure/idp/TEST-PLAN-RBAC.md`: Detailed testing matrix for Domain-Scoped Roles (Bob, Alice, Frank).
+
+### Strategic Priorities (Updated)
+
+We now have **two parallel tracks**:
+
+1.  **Code Track (Application)**:
+    - **Immediate**: Fix Bug #13 (Dropdown Keyboard Nav). This is a contained code fix in `query-control.component.ts`.
+    - **Secondary**: Fix Bug #7 (Multiselect).
+
+2.  **Infrastructure Track (Platform)**:
+    - **Immediate**: Deploy Keycloak (IdP Phase 1). This involves K3s manifests (Postgres + Keycloak + Ingress).
+    - **Follow-up**: Angular Integration (IdP Phase 2).
+
+### Next Steps for Brain Session 56
+
+**You have a choice of focus:**
+
+*   **Option A (Code Fix)**: Execute the fix for Bug #13. This keeps the application UX moving forward.
+*   **Option B (Infrastructure)**: Begin the Keycloak deployment. This requires writing K8s manifests (Deployment, Service, Ingress, PVC) and applying them via `kubectl`.
+
+**Reference Material**:
+- Read `docs/infrastructure/idp/IDENTITY-STRATEGY.md` before starting any Auth work.
+- Read `docs/claude/NEXT-STEPS.md` for specific execution steps for both tracks.
+
+---
+
 ## Hand-Off Note from Session 54 Brain (Pop-Out Architecture Testing Complete)
 
 **Date**: Tuesday, December 23, 2025
