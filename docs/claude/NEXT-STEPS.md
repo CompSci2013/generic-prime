@@ -1,23 +1,63 @@
 # Next Steps
 
-**Current Session**: Session 53 - Preferences Testing Complete (COMPLETE)
-**Previous Session**: Session 52 - Backend Deployment & Persistent Storage (Complete)
-**Status**: All 6 preferences tests PASSED. Backend production-ready.
+**Current Session**: Session 54 - Pop-Out Testing Complete (COMPLETE)
+**Previous Session**: Session 53 - Preferences Testing Complete (Complete)
+**Status**: Pop-out architecture fully validated. All 6 tests PASSED.
 
 ---
 
-## SESSION 54 IMMEDIATE ACTION: Begin Pop-Out Window Testing (10 Tests)
+## SESSION 55 IMMEDIATE ACTION: Fix Bug #13 - Dropdown Keyboard Navigation
 
-**Status**: Ready to test - Preferences backend fully validated
-**Priority**: HIGH (Validate pop-out architecture and synchronization)
-**Scope**: Execute comprehensive 10-scenario pop-out testing protocol
+**Status**: Ready to implement - Pop-out architecture validated
+**Priority**: MEDIUM (User experience improvement)
+**Scope**: Fix PrimeNG dropdown keyboard navigation in Query Control
 
 **Starting Instructions for Next Brain**:
-1. Preferences system is complete and fully operational
-2. All 6 preference tests (1-6) have PASSED in Sessions 52-53
+1. Pop-out architecture is production-ready (all tests passed)
+2. Preferences backend is fully operational with persistent storage
 3. Frontend application is accessible at `http://generic-prime.minilab`
-4. Begin with Test 1 (Pop-Out URL stays clean) from POP-OUT-REQUIREMENTS-RUBRIC.md
-5. Test scenarios are documented below (inherited from SESSION 41+ PLAN)
+4. Bug #13 details are below (arrow keys and spacebar not working on filtered dropdowns)
+5. Implementation details documented in NEXT-STEPS.md section below
+
+### BUG #13: DROPDOWN KEYBOARD NAVIGATION
+
+**Component**: Query Control - Manufacturer filter dropdown
+**File**: `frontend/src/framework/components/query-control/query-control.component.ts`
+**Template**: `frontend/src/framework/components/query-control/query-control.component.html`
+
+**Current Behavior**:
+- Mouse clicks work perfectly
+- Arrow keys do NOT highlight options when `[filter]="true"`
+- Spacebar does NOT select options when filter is active
+- Enter key does NOT work to open/close dropdown
+
+**Expected Behavior**:
+- Arrow Up/Down should highlight options
+- Spacebar should select highlighted option
+- Enter should toggle dropdown open/close
+- Tab should move to next control
+
+**Root Cause** (PrimeNG 14.2.3 Issue):
+- When `[filter]="true"` is set on p-dropdown, keyboard events not properly captured
+- Filter input field takes focus but dropdown doesn't handle arrow keys
+- Issue specific to filtered dropdowns (non-filtered dropdowns work fine)
+
+**Solution Approach**:
+1. Investigate PrimeNG dropdown event handling with `[filter]="true"`
+2. Check if missing tabindex or accessibility attributes
+3. Add custom onKeyDown event handler if needed
+4. Route keyboard events to dropdown component
+5. Test with other filtered dropdowns (Body Class, etc.)
+
+**Testing Checklist** (after fix):
+- [ ] Arrow Up/Down highlight options in dropdown
+- [ ] Spacebar selects highlighted option
+- [ ] Enter opens/closes dropdown
+- [ ] Tab moves to next control
+- [ ] Mouse still works normally
+- [ ] Works with other filters (Body Class, Year Range)
+- [ ] Build passes without TypeScript errors
+- [ ] No console errors during filter changes
 
 ---
 

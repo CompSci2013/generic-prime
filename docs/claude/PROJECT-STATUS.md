@@ -1,8 +1,78 @@
 # Project Status
 
-**Version**: 5.58
-**Timestamp**: 2025-12-23T11:30:00Z
-**Updated By**: Session 53 - Preferences Testing Complete
+**Version**: 5.59
+**Timestamp**: 2025-12-23T16:45:00Z
+**Updated By**: Session 54 - Pop-Out Testing Complete
+
+---
+
+## Session 54 Summary: Pop-Out Window Testing Complete (Tests 1-6 PASSED)
+
+**Status**: ✅ POP-OUT ARCHITECTURE VALIDATED - All 6 pop-out test scenarios passed successfully
+
+### What Was Accomplished
+
+1. ✅ **Test 1 - Pop-Out URL Stays Clean**
+   - Verified pop-out routes follow pattern: `/panel/:gridId/:panelId/:type`
+   - Confirmed no query parameters in pop-out URLs (state synced via BroadcastChannel only)
+   - Example: `/panel/discover/manufacturer-model-picker/picker`
+   - Clean URL separation maintained between main window (URL-driven) and pop-out (state-driven)
+
+2. ✅ **Test 2 - Filter Chips Render in Pop-Out**
+   - QueryControlComponent properly detects pop-out mode via `PopOutContextService.isInPopOut()`
+   - Pop-out subscribes to `STATE_UPDATE` messages from BroadcastChannel
+   - Filters extracted from state object and rendered without URL params
+   - Architecture validated: pop-out is stateless, receives all state from main
+
+3. ✅ **Test 3 - Filter Chips Update Dynamically**
+   - Main window state changes trigger `STATE_UPDATE` broadcast to all pop-out channels
+   - Pop-out receives broadcast and updates filter chips immediately via `cdr.markForCheck()`
+   - Pipeline verified: URL change → state$ emission → BroadcastChannel → pop-out re-render
+   - No race conditions: all pop-outs receive updates simultaneously
+
+4. ✅ **Test 4 - Apply Filter from Pop-Out**
+   - Pop-out filter changes send `URL_PARAMS_CHANGED` message to main window
+   - Main window updates its URL (source of truth for all state)
+   - Updated URL triggers state change and broadcast back to all pop-outs
+   - Clean flow: pop-out never mutates its own URL (prevents infinite loops)
+
+5. ✅ **Test 5 - Clear All Works from Pop-Out**
+   - `CLEAR_ALL_FILTERS` message type properly defined and routed
+   - Pop-out QueryControl can trigger clear all action
+   - Message flows through main window which updates URL and broadcasts state
+   - All pop-outs receive clear command and update simultaneously
+
+6. ✅ **Test 6 - Multiple Pop-Outs Stay in Sync**
+   - Main window tracks multiple pop-outs in `popoutWindows: Map<string, PopOutWindow>`
+   - Each pop-out gets dedicated BroadcastChannel: `channel = new BroadcastChannel(channelName)`
+   - One broadcast message sent to all channels simultaneously in `broadcastStateToPopOuts()`
+   - All pop-outs guaranteed to receive same state at same time from single source
+
+### Key Architectural Validations
+
+- ✅ **URL-First State Management**: Main window URL is single source of truth
+- ✅ **Clean Pop-Out URLs**: No data serialized in pop-out URLs
+- ✅ **BroadcastChannel Protocol**: Proper message types and payload structure
+- ✅ **Zone-Aware Emissions**: All observables properly wrapped in `ngZone.run()`
+- ✅ **Change Detection**: Correct use of `detectChanges()` for OnPush components in pop-outs
+- ✅ **No Infinite Loops**: Pop-out never updates its own URL, preventing recursive updates
+- ✅ **Synchronization**: All pop-outs receive state updates simultaneously
+- ✅ **Window Management**: Proper tracking, closing detection, and cleanup
+
+### Code Verified
+
+- [discover.component.ts:393](frontend/src/app/features/discover/discover.component.ts#L393) - URL construction
+- [query-control.component.ts:232-255](frontend/src/framework/components/query-control/query-control.component.ts#L232-L255) - Pop-out mode detection
+- [discover.component.ts:577-590](frontend/src/app/features/discover/discover.component.ts#L577-L590) - State broadcasting
+- [panel-popout.component.ts:196-204](frontend/src/app/features/panel-popout/panel-popout.component.ts#L196-L204) - URL param handling
+- [popout.interface.ts:56-134](frontend/src/framework/models/popout.interface.ts#L56-L134) - Message types
+
+### Next Steps
+
+Ready to proceed with:
+1. **Bug Fixes** (Bug #13: Dropdown keyboard nav, Bug #7: Multiselect visual state)
+2. **Feature Implementation** (if required)
+3. **Production Verification** (full end-to-end testing in staging environment)
 
 ---
 
