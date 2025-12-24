@@ -90,6 +90,7 @@
     <div class="p-input-icon-left search-box" *ngIf="!loadingOptions && !optionsError">
       <i class="pi pi-search"></i>
       <input
+        #searchInput
         type="text"
         pInputText
         [(ngModel)]="searchQuery"

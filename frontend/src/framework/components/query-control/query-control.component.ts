@@ -107,6 +107,11 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    */
   @Output() clearAllFilters = new EventEmitter<void>();
 
+  /**
+   * Template reference to search input in multiselect dialog
+   */
+  @ViewChild('searchInput') searchInput: any;
+
   // ==================== Dropdown State ====================
 
   /**
@@ -285,12 +290,12 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    * if an option is currently highlighted.
    */
   onDropdownKeydown(event: KeyboardEvent): void {
-    // Only handle spacebar
-    if (event.key !== ' ') {
+    // Handle spacebar or Enter for selection
+    if (event.key !== ' ' && event.key !== 'Enter') {
       return;
     }
 
-    // When spacebar is pressed on a focused option (not in filter input),
+    // When spacebar or Enter is pressed on a focused option (not in filter input),
     // we need to manually trigger the selection since PrimeNG's filter input
     // will capture the spacebar for typing
 
@@ -299,7 +304,7 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     const highlightedOption = document.querySelector('.p-dropdown-items .p-highlight');
 
     if (highlightedOption) {
-      // Prevent the spacebar from being added to the filter input
+      // Prevent the key from being processed elsewhere
       event.preventDefault();
       event.stopPropagation();
 
@@ -445,11 +450,12 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    * This is called by PrimeNG's (onShow) event after dialog is fully rendered
    */
   onMultiselectDialogShow(): void {
-    // Shift focus to the first focusable element in the dialog
-    // Find the search input or first button
-    const dialogElement = document.querySelector('.p-dialog-content input, .p-dialog-content button, .p-dialog-content');
-    if (dialogElement) {
-      (dialogElement as HTMLElement).focus();
+    // Focus the search input field so users can immediately start typing
+    if (this.searchInput && this.searchInput.nativeElement) {
+      // Use setTimeout to ensure the dialog is fully rendered before focusing
+      setTimeout(() => {
+        this.searchInput.nativeElement.focus();
+      }, 0);
     }
   }
 
