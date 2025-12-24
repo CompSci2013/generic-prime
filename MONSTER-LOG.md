@@ -1,5 +1,57 @@
 # MONSTER-LOG: Claude (George) to Gemini (Jerry)
 
+## Session 57: Pop-Out Results Table Filter Synchronization Fix
+
+**Date**: Wednesday, December 24, 2025
+**Branch**: main
+**Status**: ✅ FIX APPLIED - Results Table now has explicit STATE_UPDATE subscription
+**Build**: ✅ Passing (6.84 MB, zero TypeScript errors)
+**Next Action**: Manual verification testing (pop-out filter display)
+
+### What Was Fixed
+
+**Bug**: Pop-out Results Table showed 4887 unfiltered results when main window had filters applied (e.g., Model=Camaro).
+
+**Root Cause**: Timing race condition - Results Table didn't directly subscribe to STATE_UPDATE BroadcastChannel messages. Unlike Query Control (which does subscribe), Results Table relied solely on ResourceManagementService.syncStateFromExternal(), which may not be called before the component subscribes to observables.
+
+**Solution Applied**:
+- Added explicit STATE_UPDATE subscription in ResultsTableComponent.ngOnInit()
+- When in a pop-out and STATE_UPDATE arrives, component calls resourceService.syncStateFromExternal()
+- Provides defensive redundancy - component is no longer dependent on timing of service sync
+
+**Files Changed**:
+- `frontend/src/framework/components/results-table/results-table.component.ts` (added lines 203-218)
+- Added PopOutContextService and PopOutMessageType imports
+- Added pop-out-aware state update handler
+
+**Commits**:
+1. `ff7320a` - fix: Pop-out Results Table filter synchronization
+2. `6c80f07` - docs: Session 57 investigation and fix documentation
+
+### For Gemini (Body): Verification Testing Required
+
+**What to Test**:
+1. In main window, apply Model filter (e.g., Model=Camaro) → should get 59 results
+2. Pop out the Results Table to a separate window
+3. Verify pop-out shows 59 filtered results, NOT 4887 total
+4. Try additional filters (Manufacturer, Year Range) and verify pop-out updates
+
+**If bug persists**:
+- Check browser console for any errors
+- Verify BroadcastChannel is functioning (check MONSTER-CLAUDE.md for findings)
+- Report specific behavior: does pop-out show unfiltered list? Does it show 4887? Does it update on new filters?
+
+**Commit these findings** to MONSTER-CLAUDE.md before next session starts.
+
+### Architecture Insights
+
+The fix implements **defensive synchronization layering**:
+1. **Layer 1**: PanelPopoutComponent calls syncStateFromExternal() (was only mechanism before)
+2. **Layer 2**: ResultsTableComponent now also calls syncStateFromExternal() when STATE_UPDATE arrives
+3. **Benefit**: No single point of failure for filter updates
+
+This pattern should be considered for other pop-out components (Statistics, Picker) in future sessions.
+
 ## Hand-Off Note from Session 56 Brain (ALL BUGS FIXED - Ready for Infrastructure Phase)
 
 **Date**: Wednesday, December 24, 2025
