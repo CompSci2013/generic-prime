@@ -222,9 +222,10 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
     this.destroy$.next();
     this.destroy$.complete();
 
-    if (this.resourceService) {
-      this.resourceService.destroy();
-    }
+    // NOTE: Do NOT call resourceService.destroy() here!
+    // ResourceManagementService is provided at the root level and should manage its own lifecycle.
+    // If this component destroys the service, it will break other components still using it.
+    // The service will be destroyed when the root component (DiscoverComponent) is destroyed.
   }
 
   /**
