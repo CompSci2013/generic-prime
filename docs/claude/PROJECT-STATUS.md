@@ -66,13 +66,46 @@
 - TypeScript Errors: ✅ Zero
 - Console Warnings: ✅ Zero
 
+### Critical Fix: Pop-Out Filter Synchronization (Bug #14)
+
+**Issue Discovered During Testing**:
+- Pop-out Query Control windows were not displaying filter chips when filters were applied in the main window
+- User selected "Camaro" model in main window, URL updated correctly, results filtered to 59 items
+- But pop-out Query Control showed ZERO filter chips and 4887 results (unfiltered)
+
+**Root Cause Identified**:
+- Race condition between PanelPopoutComponent and QueryControlComponent initialization
+- STATE_UPDATE messages from BroadcastChannel arrived before QueryControlComponent subscribed
+- Original Subject implementation doesn't buffer messages for late subscribers
+- Message was lost before QueryControlComponent could receive it
+
+**Solution Implemented**:
+- Changed `messagesSubject` from `Subject<PopOutMessage>` to `ReplaySubject<PopOutMessage>(10)`
+- ReplaySubject buffers last 10 messages and replays them to new subscribers
+- Ensures pop-out windows receive current filter state immediately upon opening
+
+**Verification Results**:
+- ✅ Test 1: Filter selection & pop-out creation - PASS
+- ✅ Test 2: Filter chip appears IMMEDIATELY - PASS (milliseconds, not seconds)
+- ✅ Test 3: Multi-filter synchronization - PASS
+- ✅ Test 4: Filter editing/clearing - PASS
+- ✅ Console: Zero errors, zero warnings
+- ✅ Build: 6.84 MB, zero TypeScript errors
+
+**File Changed**:
+- `frontend/src/framework/services/popout-context.service.ts` (line 82)
+
+**Commit**: `10fcc60` - fix: Pop-out Query Control filter synchronization
+
 ### Current State
 
 **Frontend**:
 - Pop-out architecture: Stable and fully tested ✅
+- Pop-out filter synchronization: Fixed with ReplaySubject(10) ✅
 - Keyboard navigation: Fully functional ✅
 - Filter dialogs: Working correctly with auto-focus ✅
 - API integration: No errors ✅
+- Multi-window state management: Zero race conditions ✅
 
 **Backend**:
 - Preferences API: Running (v1.6.0)
@@ -152,6 +185,7 @@
 | Bug | Component | Severity | Status |
 |-----|-----------|----------|--------|
 | #13 | p-dropdown (Query Control) | Medium | ✅ **FIXED - Session 56** |
+| #14 | Pop-Out Filter Sync | Medium | ✅ **FIXED - Session 56 (Critical Follow-up)** |
 | #7 | p-multiSelect (Body Class) | Low | Pending |
 | Live Report Updates | Playwright Report Component | Low | Deferred |
 
@@ -171,4 +205,4 @@
 
 ---
 
-**Last Updated**: 2025-12-24T20:30:00Z (Session 56 Code Fix Complete)
+**Last Updated**: 2025-12-24T22:45:00Z (Session 56 - Bug #13 + Bug #14 Fixed, Pop-Out Sync Complete)
