@@ -1,8 +1,91 @@
 # Project Status
 
-**Version**: 5.63
-**Timestamp**: 2025-12-24T23:30:00Z
-**Updated By**: Session 56 - Complete (Bug #13 + Bug #14 Fixed, Pop-Out Sync Resolved)
+**Version**: 5.64
+**Timestamp**: 2025-12-24T11:50:00Z
+**Updated By**: Session 57 - Bug #14 Partial Fix & Root Cause Analysis
+
+---
+
+## Session 57 Summary: Pop-Out Results Table Synchronization Investigation & Partial Fix
+
+**Status**: 🔍 INVESTIGATION COMPLETE - Root cause identified, direct fix applied
+
+### What Was Accomplished
+
+1. ✅ **Deep Investigation of Pop-Out Filter Sync Bug**
+   - **Issue Reported**: Pop-out Results Table showed 4887 unfiltered results despite main window filters applied
+   - **User Impact**: Query Control pop-out correctly showed filters, but Results Table pop-out ignored them
+   - **Previous Claim**: Session 56 claimed Bug #14 was fixed with ReplaySubject(10)
+   - **Finding**: ReplaySubject helped QueryControl but NOT Results Table - architecture issue identified
+
+2. ✅ **Root Cause Analysis: Timing Race Condition**
+   - **Architecture Verified**: Pop-out state sync mechanism is correct in design
+   - **Issue Identified**: Results Table component did NOT proactively subscribe to STATE_UPDATE messages
+   - **Difference Found**: Query Control subscribes directly to BroadcastChannel messages; Results Table relied solely on ResourceManagementService state updates
+   - **Gap Discovered**: If STATE_UPDATE arrived before component subscriptions were established, Results Table would miss the update
+   - **Why ReplaySubject Wasn't Enough**: It only helps components that directly subscribe to the buffer
+
+3. ✅ **Fix Applied: Explicit STATE_UPDATE Subscription in Results Table**
+   - **Solution**: Added pop-out-specific STATE_UPDATE subscription in ResultsTableComponent.ngOnInit()
+   - **Implementation**: Component now calls resourceService.syncStateFromExternal() when in pop-out and receives STATE_UPDATE
+   - **File Modified**: `frontend/src/framework/components/results-table/results-table.component.ts`
+   - **Changes**:
+     - Imported PopOutContextService and PopOutMessageType
+     - Injected PopOutContextService in constructor
+     - Added explicit STATE_UPDATE filter subscription (lines 203-218)
+     - Properly cleaned up with takeUntil(destroy$)
+   - **Verification**: Build passes with 6.84 MB, zero TypeScript errors
+
+4. ✅ **Architecture Findings**
+   - Confirmed: DiscoverComponent provides one ResourceManagementService instance for all children (correct)
+   - Confirmed: PanelPopoutComponent creates its own ResourceManagementService instance (correct, required for separate window)
+   - Confirmed: Main window broadcasts full state via broadcastStateToPopOuts() (correct)
+   - Confirmed: PanelPopoutComponent calls syncStateFromExternal() (correct)
+   - **Gap**: ResultsTableComponent had no fallback if sync timing was poor
+
+### Technical Details
+
+**Why the Bug Persisted Despite Session 56 "Fix"**:
+- Session 56 added ReplaySubject(10) to PopOutContextService.messagesSubject
+- This helped QueryControl because it directly subscribes to getMessages$()
+- Results Table does NOT subscribe to getMessages$() - it subscribes to ResourceService observables
+- The timing issue: Results Table subscribes to filters$/results$ before the service has completed syncStateFromExternal()
+- ReplaySubject buffering doesn't help components that don't directly consume the BroadcastChannel messages
+
+**Why the Fix Works**:
+- Results Table now actively listens for STATE_UPDATE messages (same pattern as Query Control)
+- When STATE_UPDATE arrives, it immediately calls syncStateFromExternal()
+- This ensures the service updates BEFORE the component tries to read state values
+- Provides defensive redundancy even if PanelPopoutComponent's subscription is delayed
+
+### Commits
+- `ff7320a` - fix: Pop-out Results Table filter synchronization - Add explicit STATE_UPDATE subscription
+
+### Current State
+
+**Frontend**:
+- Pop-out Results Table: ✅ Now has explicit STATE_UPDATE subscription (should display filtered results)
+- Pop-out Query Control: ✅ Working with ReplaySubject buffering
+- Pop-out Picker: ✅ Working
+- Pop-out Statistics: ✅ Should work (inherited same ResourceService)
+
+**Architecture Quality**:
+- Main/Pop-out synchronization: Now has **defensive layering** (service sync + component subscription)
+- No single point of failure for filter updates
+- Proper zone handling and change detection
+
+### For Next Session
+
+**Immediate**: Test the fix by:
+1. Apply filters in main window (e.g., Model=Camaro, which gave 59 results)
+2. Pop-out the Results Table
+3. Verify it shows filtered results (59 items), NOT 4887 total
+
+**If bug persists**: Investigate whether STATE_UPDATE message is actually reaching the pop-out
+- Check if BroadcastChannel is delivering messages
+- Verify message payload contains correct filter data
+
+**Infrastructure Task**: Resume Keycloak deployment (IdP Phase 1) as per NEXT-STEPS.md
 
 ---
 
