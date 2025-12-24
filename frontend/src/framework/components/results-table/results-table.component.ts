@@ -8,10 +8,12 @@ import {
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { DomainConfig, FilterOption } from '../../models/domain-config.interface';
 import { ResourceManagementService } from '../../services/resource-management.service';
+import { PopOutContextService } from '../../services/popout-context.service';
+import { PopOutMessageType } from '../../models/popout.interface';
 
 /**
  * Results Table Component
@@ -144,7 +146,8 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
       TStatistics
     >,
     private cdr: ChangeDetectorRef,
-    private http: HttpClient
+    private http: HttpClient,
+    private popOutContext: PopOutContextService
   ) {}
 
   ngOnInit(): void {
@@ -193,6 +196,26 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
         this.loading = loading;
         this.cdr.markForCheck();
       });
+
+    // In pop-out windows: Subscribe to STATE_UPDATE messages from main window
+    // This ensures Results Table gets filter updates even if there's a timing race condition
+    // with the ResourceManagementService.syncStateFromExternal() method
+    if (this.popOutContext.isInPopOut()) {
+      this.popOutContext
+        .getMessages$()
+        .pipe(
+          filter(msg => msg.type === PopOutMessageType.STATE_UPDATE),
+          takeUntil(this.destroy$)
+        )
+        .subscribe(message => {
+          if (message.payload && message.payload.state) {
+            // Sync the pop-out state to the ResourceManagementService
+            // This ensures this component and all sibling components get the updated state
+            this.resourceService.syncStateFromExternal(message.payload.state);
+            this.cdr.markForCheck();
+          }
+        });
+    }
   }
 
   ngOnDestroy(): void {
