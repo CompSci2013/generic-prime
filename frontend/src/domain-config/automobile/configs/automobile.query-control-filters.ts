@@ -114,7 +114,7 @@ export const AUTOMOBILE_QUERY_CONTROL_FILTERS: FilterDefinition<AutoSearchFilter
     field: 'modelCombos',
     label: 'Manufacturer & Model',
     type: 'multiselect',
-    optionsEndpoint: `${environment.apiBaseUrl}/manufacturer-model-combinations?page=1&size=1000`,
+    optionsEndpoint: `${environment.apiBaseUrl}/manufacturer-model-combinations?page=1&size=100`,
     optionsTransformer: (response: any): FilterOption[] => {
       // Response structure: { total, data: [ { manufacturer, count, models: [ { model, count } ] } ] }
       if (response && response.data) {

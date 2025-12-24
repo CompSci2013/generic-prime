@@ -1,5 +1,146 @@
 # MONSTER-LOG: Claude (George) to Gemini (Jerry)
 
+## Hand-Off Note from Session 56 Brain (Bug #13 Investigation & Testing Strategy)
+
+**Date**: Wednesday, December 24, 2025
+**Branch**: main
+**Status**: 🧪 TESTING REQUIRED - Simple fix identified, needs interactive verification
+
+### Session 56 Investigation & Solution
+
+**The Problem**:
+When `[filter]="true"` on p-dropdown, keyboard navigation (arrow keys, spacebar, enter) doesn't work because:
+1. PrimeNG auto-focuses the filter input field when dropdown opens
+2. Keyboard events are captured by the filter input, not the dropdown list
+3. Arrow keys type into the filter instead of navigating the list
+
+**Investigation Process**:
+1. ✅ Investigated existing keyboard handling (commit 73955de already added `onDropdownKeydown()` spacebar handler)
+2. ✅ Analyzed PrimeNG 14.2.3 public API
+3. ✅ Discovered PrimeNG provides `[autofocusFilter]="false"` property to prevent filter input auto-focus
+4. ✅ Verified build passes with change (6.84 MB, no TypeScript errors)
+5. ❌ Rejected initial DOM-manipulation approach (violated "no abstraction leaks" principle)
+
+**The Solution** (Minimal & API-Compliant):
+Added `[autofocusFilter]="false"` to the p-dropdown in query-control.component.html (line 11)
+
+**Rationale**:
+- When filter input doesn't auto-focus, keyboard focus stays on the dropdown list
+- PrimeNG's native `onKeydown()` method handles arrow key navigation
+- Existing `onDropdownKeydown()` handler catches spacebar for selection
+- Uses PrimeNG's public API, not DOM manipulation
+- Single line change, minimal risk
+
+**Code Change**:
+```html
+<p-dropdown
+  ...
+  [filter]="true"
+  filterPlaceholder="Search fields..."
+  [autofocusFilter]="false"    ← ADDED THIS LINE
+  ...
+</p-dropdown>
+```
+
+**Code Locations Verified**:
+- [query-control.component.ts:287-321](frontend/src/framework/components/query-control/query-control.component.ts#L287-L321) - Spacebar handler
+- [query-control.component.ts:338-360](frontend/src/framework/components/query-control/query-control.component.ts#L338-L360) - Arrow key detection
+- [query-control.component.html:4-18](frontend/src/framework/components/query-control/query-control.component.html#L4-L18) - p-dropdown with [filter]="true"
+
+### Testing Required (INTERACTIVE VERIFICATION PENDING)
+
+**Browser Testing Protocol**:
+Open `http://generic-prime.minilab/automobiles/discover` and execute:
+
+| Test | Scenario | Expected | Status |
+|------|----------|----------|--------|
+| 1 | Open dropdown, press Arrow Down | First option highlights | 🧪 PENDING |
+| 2 | Continue Arrow Down/Up | Highlight moves through list | 🧪 PENDING |
+| 3 | Highlighted option + Spacebar | Dialog opens | 🧪 PENDING |
+| 4 | Highlighted option + Enter | Dialog opens | 🧪 PENDING |
+| 5 | Click option with mouse | Dialog opens (existing) | 🧪 PENDING |
+| 6 | Open dropdown, type "b" | List filters (may not work) | 🧪 PENDING |
+
+**Trade-Off Analysis**:
+- ✅ Arrow navigation: Should work (filter input not focused)
+- ✅ Selection: Should work (spacebar handler intact)
+- ⚠️ Typing to filter: May not work (input lacks focus)
+  - This is acceptable: Users can click in filter field first
+  - Trade-off: keyboard-only nav beats nothing
+
+### Build Verification
+
+- ✅ Build passes: `npm run build` completes successfully
+- ✅ Bundle size: 6.84 MB (no increase)
+- ✅ TypeScript: No compilation errors
+- ✅ File modified: `frontend/src/framework/components/query-control/query-control.component.html` (1 line added)
+
+### Commit Status: READY TO COMMIT PENDING TEST VERIFICATION
+
+**Files with unstaged changes**:
+```
+frontend/src/framework/components/query-control/query-control.component.html
+```
+
+**Next Action for Gemini**:
+1. Copy test protocol above and run tests in browser
+2. Report results (PASS/FAIL for each test)
+3. If Tests 1-5 PASS: Ready to commit
+4. If Tests 1-2 FAIL: The `autofocusFilter=false` approach doesn't work, need fallback plan
+
+---
+
+## BUG FIXED: Manufacturer-Model Picker "Failed to load options"
+
+**Status**: ✅ FIXED - Invalid pagination parameter corrected
+**Root Cause**: Frontend requesting `size=1000` but backend API rejects sizes > 100
+**File Fixed**: `automobile.query-control-filters.ts` line 117
+
+**What Was Wrong**:
+```
+optionsEndpoint: `${environment.apiBaseUrl}/manufacturer-model-combinations?page=1&size=1000`,
+```
+
+**Fix Applied**:
+```
+optionsEndpoint: `${environment.apiBaseUrl}/manufacturer-model-combinations?page=1&size=100`,
+```
+
+**Verification**:
+- ✅ API tested: `curl "http://generic-prime.minilab/api/specs/v1/manufacturer-model-combinations?page=1&size=100"` returns 100 results
+- ✅ Build passes: 6.84 MB, no TypeScript errors
+- ✅ Ready for testing
+
+---
+
+## NEW ISSUE: Arrow Key Selection -> Dialog Not Opening
+
+**Status**: 🧪 UNDER INVESTIGATION
+**Severity**: MEDIUM - Keyboard navigation partially broken
+**User Report**: "Arrow key was used to select Model filter. Filter shows selected, but dialog did not open."
+
+**Expected Flow**:
+1. User presses Arrow Down → option highlights
+2. User presses Spacebar → dialog opens
+3. User can add filter
+
+**Actual Flow** (BROKEN):
+1. User presses Arrow Down → option highlights ✅
+2. User presses Spacebar → filter chip appears ✅ but dialog doesn't open ❌
+
+**Root Cause Analysis**:
+The `[autofocusFilter]="false"` change (to fix arrow navigation) may have prevented keyboard events from reaching the `(keydown)` handler.
+
+**Theory**:
+- With `[autofocusFilter]="false"`, the filter input never gets focus
+- Spacebar events might not bubble to the p-dropdown `(keydown)` handler
+- Need to test if spacebar handler is actually being called
+
+**Next Step**:
+Add explicit (keydown) handler to the filter input field itself, or refactor to ensure spacebar events are captured properly.
+
+---
+
 ## Hand-Off Note from Session 55 Brain (Identity Planning)
 
 **Date**: Tuesday, December 23, 2025
