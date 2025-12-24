@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, ReplaySubject } from 'rxjs';
 import {
   PopOutMessage,
   PopOutMessageType,
@@ -74,12 +74,16 @@ export class PopOutContextService implements OnDestroy {
   /**
    * Subject for received messages
    *
-   * RxJS Subject that emits all PopOutMessage instances received via BroadcastChannel.
+   * RxJS ReplaySubject that buffers PopOutMessage instances received via BroadcastChannel.
+   * Buffers last 10 messages to handle late subscribers (e.g., QueryControlComponent initializing after
+   * PanelPopoutComponent sends PANEL_READY). This prevents race conditions where STATE_UPDATE messages
+   * arrive before child components subscribe.
+   *
    * Subscribers use getMessages$() to receive observable stream.
    *
    * @private
    */
-  private messagesSubject = new Subject<PopOutMessage>();
+  private messagesSubject = new ReplaySubject<PopOutMessage>(10);
 
   /**
    * Current pop-out context
