@@ -104,6 +104,60 @@ Hovering on "Automobiles" shows flyout:
 - Verify navigation to all routes works correctly
 - Confirm visual styling and dark theme consistency
 
+### 3. Pop-Out Window Positioning for Multi-Monitor Support
+**Date Raised**: 2025-12-24
+**Status**: Identified - Ready for Future Implementation
+**Summary**:
+- During Session 56 testing, discovered that pop-out windows cannot be repositioned programmatically from the main window
+- Browser security model prevents main window from manipulating separate pop-out window state (same-origin policy applies at window level, not just tab level)
+- User requested ability to move pop-out panels to different monitors programmatically
+- Currently, pop-out windows appear in default browser position and cannot be repositioned without manual user interaction
+
+**Test Case That Identified This**:
+- User requested: "Three monitors are in use. Popout the Query Control and move it 800px to the left. This should cause it to appear on the left monitor."
+- Claude successfully opened pop-out window but could not execute `window.moveTo(800, 0)` from main window context
+- Root cause: Application design does not store window reference from `window.open()` call
+
+**Implementation Suggestions**:
+1. **Window Reference Storage**:
+   - Store window reference globally during `window.open()`:
+     ```typescript
+     const queryControlWindow = window.open(url, 'QueryControl');
+     window.global_openWindows = window.global_openWindows || {};
+     window.global_openWindows['QueryControl'] = queryControlWindow;
+     ```
+   - This enables reference-based positioning after window opens
+
+2. **PostMessage API for Cross-Window Communication**:
+   - Implement messaging protocol from main window to pop-out:
+     ```typescript
+     queryControlWindow.postMessage(
+       { action: 'moveWindow', x: 800, y: 0 },
+       window.location.origin
+     );
+     ```
+   - Pop-out window listens and executes: `window.moveTo(data.x, data.y);`
+
+3. **Window Layout Service**:
+   - Create service to manage multi-window state and positioning
+   - Store window positions in preferences API for restore on reload
+   - Support window "layout presets" (e.g., "dual-monitor", "triple-monitor")
+
+**Related Files**:
+- `frontend/src/framework/services/pop-out-context.service.ts` (current pop-out implementation)
+- `frontend/src/framework/components/query-control/query-control.component.ts` (Query Control component)
+- `frontend/src/framework/components/results-table/results-table.component.ts` (Results Table component)
+
+**Impact Assessment**:
+- **User Experience**: Current limitation doesn't break functionality; pop-outs work correctly regardless of position
+- **Workaround**: Users can manually move windows using mouse/OS window management
+- **Priority**: Low - nice to have, not blocking any workflow
+
+**Next Steps**:
+- Include in future requirements if multi-monitor support becomes critical
+- Would require: window reference storage + PostMessage listener implementation
+- Estimated effort: 2-4 hours for basic implementation
+
 ---
 
 ## Historical Tangents (Resolved)

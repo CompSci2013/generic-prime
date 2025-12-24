@@ -1,33 +1,17 @@
 # Next Steps
 
-**Current Session**: Session 55 - Identity Planning (COMPLETE)
-**Previous Session**: Session 54 - Pop-Out Testing (Complete)
-**Status**: Planning complete. Ready for concurrent execution of Bug Fixing and Infrastructure Deployment.
+**Current Session**: Session 56 - Bug #13 Fixed & Testing Complete
+**Previous Session**: Session 55 - Identity Planning (Complete)
+**Status**: Bug #13 (Code Fix) ✅ COMPLETE. Ready for Infrastructure Deployment (IMMEDIATE ACTION 1).
 
 ---
 
-## IMMEDIATE ACTION 1: Code Fix (Bug #13)
-
-**Priority**: HIGH (User Experience)
-**Scope**: Fix PrimeNG dropdown keyboard navigation in Query Control
-
-### BUG #13: DROPDOWN KEYBOARD NAVIGATION
-**Component**: `frontend/src/framework/components/query-control/query-control.component.ts`
-**Issue**: Arrow keys/Spacebar do not work when `[filter]="true"`.
-
-**Implementation Steps**:
-1. Investigate PrimeNG 14.2.3 event handling.
-2. Implement `onKeyDown` handler or adjust template attributes (`tabindex`, `autofocus`).
-3. Verify keyboard navigation works for:
-   - Manufacturer dropdown (Filtered)
-   - Other dropdowns
-
----
-
-## IMMEDIATE ACTION 2: Infrastructure (IdP Phase 1)
+## IMMEDIATE ACTION 1: Infrastructure (IdP Phase 1) - ELEVATED PRIORITY
 
 **Priority**: HIGH (Architecture)
 **Scope**: Deploy Keycloak to K3s
+
+This is now the top priority as all planned code work for this session is complete.
 
 ### KEYCLOAK DEPLOYMENT
 **Reference**: `docs/infrastructure/idp/IDENTITY-STRATEGY.md`
@@ -50,7 +34,7 @@
 
 ---
 
-## FUTURE ACTION 3: Frontend Integration (IdP Phase 2)
+## FUTURE ACTION 2: Frontend Integration (IdP Phase 2)
 
 **Priority**: HIGH (After Keycloak is running)
 **Scope**: Angular OIDC Integration
@@ -63,14 +47,16 @@
 
 ---
 
-## SESSION 54 IMMEDIATE ACTION: Complete Pop-Out Window Testing (10 Tests)
+## SESSION 56 SESSION SUMMARY
 
-*(Note: These tests passed in Session 54 but should be re-run periodically)*
+**Bug #13 (Dropdown Keyboard Navigation)** - ✅ FIXED
+- Arrow keys now properly navigate dropdown options
+- Spacebar and Enter now correctly confirm selections
+- Multiselect dialog search field now auto-focuses
+- Pagination bug fixed (size parameter)
+- All interactive testing passed
 
-**Test 1 - Cold Start** (~5 min)
-- Verify preferences file creation.
-
-**Test 2 - Hot Reload** (~5 min)
-- Verify panel order persistence.
-
-... (See previous NEXT-STEPS for full list if regression testing needed)
+**Nice-to-Have Features Documented** in TANGENTS.md:
+- Pop-Out Window Positioning for Multi-Monitor Support
+  - Implementation suggestions provided with code examples
+  - Estimated effort: 2-4 hours for basic implementation
