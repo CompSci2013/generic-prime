@@ -277,46 +277,105 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   /**
    * Handle dropdown keydown events for keyboard navigation
    *
-   * Intercepts spacebar to select the highlighted option in filtered dropdown.
-   * Reference: PrimeNG Issue #17779 - spacebar doesn't select when filter is active
+   * Handles multiple keyboard interactions with filtered dropdowns:
+   * 1. Arrow Up/Down: Navigate highlighted option in the list
+   * 2. Spacebar: Select the currently highlighted option
+   * 3. Enter: Select the currently highlighted option
    *
-   * When [filter]="true" is set, the filter input captures spacebar events,
-   * preventing selection. This handler detects spacebar and manually triggers selection
-   * if an option is currently highlighted.
+   * Reference: PrimeNG Issue #17779 - keyboard nav doesn't work when [filter]="true"
+   *
+   * When [filter]="true" is set, the filter input captures focus and keyboard events,
+   * preventing natural dropdown navigation. This handler:
+   * - Routes arrow keys to list navigation logic (not filter input)
+   * - Detects highlighted option and simulates selection on spacebar/enter
+   * - Manually manages option highlighting via DOM manipulation
    */
   onDropdownKeydown(event: KeyboardEvent): void {
-    // Only handle spacebar
-    if (event.key !== ' ') {
+    const key = event.key;
+
+    // Handle arrow key navigation
+    if (key === 'ArrowUp' || key === 'ArrowDown') {
+      event.preventDefault();
+      event.stopPropagation();
+      this.navigateDropdownOptions(key === 'ArrowUp' ? 'up' : 'down');
       return;
     }
 
-    // When spacebar is pressed on a focused option (not in filter input),
-    // we need to manually trigger the selection since PrimeNG's filter input
-    // will capture the spacebar for typing
-
-    // Check if there's a currently highlighted/focused option in the dropdown
-    // PrimeNG 14 uses the 'p-highlight' CSS class for highlighted options
-    const highlightedOption = document.querySelector('.p-dropdown-items .p-highlight');
-
-    if (highlightedOption) {
-      // Prevent the spacebar from being added to the filter input
+    // Handle selection with spacebar or enter
+    if (key === ' ' || key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
+      this.selectHighlightedOption();
+      return;
+    }
+  }
 
-      // Get the data-ng-reflect-ng-value or other data attribute that contains the selected value
-      // PrimeNG stores the option data on the element
-      const selectedIndex = Array.from(document.querySelectorAll('.p-dropdown-items li'))
-        .indexOf(highlightedOption as HTMLElement);
+  /**
+   * Navigate dropdown options up or down using arrow keys
+   * Manually manages highlighting when [filter]="true" prevents natural navigation
+   *
+   * @param direction - 'up' to move to previous option, 'down' to move to next option
+   */
+  private navigateDropdownOptions(direction: 'up' | 'down'): void {
+    // Get all available options in the dropdown
+    const optionElements = Array.from(document.querySelectorAll('.p-dropdown-items li'));
 
-      if (selectedIndex >= 0 && this.filterFieldOptions[selectedIndex]) {
-        // Directly call onFieldSelected with the highlighted option
-        // Create a synthetic onChange event with the correct value
-        const syntheticEvent = {
-          value: this.filterFieldOptions[selectedIndex].value,
-          originalEvent: event
-        };
-        this.onFieldSelected(syntheticEvent);
+    if (optionElements.length === 0) {
+      return;
+    }
+
+    // Find currently highlighted option
+    let currentIndex = optionElements.findIndex(el => el.classList.contains('p-highlight'));
+
+    // If no option is highlighted, start from first/last depending on direction
+    if (currentIndex === -1) {
+      currentIndex = direction === 'down' ? 0 : optionElements.length - 1;
+    } else {
+      // Move to next option in the requested direction
+      if (direction === 'down') {
+        currentIndex = Math.min(currentIndex + 1, optionElements.length - 1);
+      } else {
+        currentIndex = Math.max(currentIndex - 1, 0);
       }
+    }
+
+    // Remove highlight from all options
+    optionElements.forEach(el => el.classList.remove('p-highlight'));
+
+    // Add highlight to the target option
+    const targetOption = optionElements[currentIndex];
+    targetOption.classList.add('p-highlight');
+
+    // Scroll the option into view if necessary
+    targetOption.scrollIntoView({ block: 'nearest' });
+
+    // Trigger change detection so Angular updates the view
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Select the currently highlighted dropdown option
+   * Triggers the filter dialog for the selected field
+   */
+  private selectHighlightedOption(): void {
+    // Find currently highlighted option
+    const highlightedOption = document.querySelector('.p-dropdown-items .p-highlight');
+
+    if (!highlightedOption) {
+      return;
+    }
+
+    // Find the index of the highlighted option in the list
+    const optionElements = Array.from(document.querySelectorAll('.p-dropdown-items li'));
+    const selectedIndex = optionElements.indexOf(highlightedOption as HTMLElement);
+
+    if (selectedIndex >= 0 && this.filterFieldOptions[selectedIndex]) {
+      // Create a synthetic onChange event with the selected value
+      const syntheticEvent = {
+        value: this.filterFieldOptions[selectedIndex].value,
+        originalEvent: new KeyboardEvent('keydown', { key: 'Enter' })
+      };
+      this.onFieldSelected(syntheticEvent);
     }
   }
 
