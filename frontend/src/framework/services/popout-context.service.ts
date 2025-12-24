@@ -242,9 +242,9 @@ export class PopOutContextService implements OnDestroy {
     // Set up message handler
     // BroadcastChannel callbacks run outside Angular's zone
     this.channel.onmessage = (event: MessageEvent) => {
+      const message = event.data as PopOutMessage;
       // Run in Angular zone to trigger change detection
       this.ngZone.run(() => {
-        const message = event.data as PopOutMessage;
         this.messagesSubject.next(message);
       });
     };
@@ -288,7 +288,7 @@ export class PopOutContextService implements OnDestroy {
 
     try {
       this.channel.postMessage(message);
-    } catch {
+    } catch (error) {
       // Silently ignore send errors
     }
   }

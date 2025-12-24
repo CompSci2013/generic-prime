@@ -489,6 +489,12 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
   private fetchData(filters: TFilters): void {
     // Step 1: Set loading state to show spinners/loaders to user
     this.updateState({ loading: true, error: null });
+    const fetchStartTime = Date.now();
+    const fetchId = Math.random().toString(36).substring(7);
+    console.log(`[ResourceManagementService] FETCH START [${fetchId}]`, {
+      filters,
+      timestamp: new Date().toISOString()
+    });
 
     // Step 2: Get current highlights from state
     // Highlights are h_ prefixed params used for secondary filtering/highlighting
@@ -508,7 +514,7 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
 
         // Error handling: convert errors to user-friendly state
         catchError(error => {
-          console.error('[ResourceManagementService] Error fetching data:', error);
+          console.error(`[ResourceManagementService] FETCH ERROR [${fetchId}]:`, error);
           // Update state with error message, clear results
           this.updateState({
             loading: false,
@@ -523,6 +529,8 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
         // Ensure loading is always set to false, even on error
         // This prevents spinner from staying on screen if error occurs
         finalize(() => {
+          const duration = Date.now() - fetchStartTime;
+          console.log(`[ResourceManagementService] FETCH FINALIZE [${fetchId}] - Duration: ${duration}ms`);
           const currentState = this.stateSubject.value;
           if (currentState.loading) {
             this.updateState({ loading: false });
@@ -531,6 +539,12 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
       )
       .subscribe(response => {
         // Step 4: On success, extract data and update state
+        const duration = Date.now() - fetchStartTime;
+        console.log(`[ResourceManagementService] FETCH COMPLETE [${fetchId}] - Duration: ${duration}ms`, {
+          resultCount: response?.results?.length ?? 0,
+          totalResults: response?.total ?? 0,
+          timestamp: new Date().toISOString()
+        });
         if (response) {
           this.updateState({
             results: response.results,           // Array of TData items (e.g., VehicleResult[])

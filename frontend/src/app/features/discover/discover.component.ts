@@ -581,11 +581,17 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
 
     // Send STATE_UPDATE to all pop-outs
     this.popoutWindows.forEach(({ channel }) => {
-      channel.postMessage({
+      const message = {
         type: PopOutMessageType.STATE_UPDATE,
         payload: { state },
         timestamp: Date.now()
-      });
+      };
+
+      try {
+        channel.postMessage(message);
+      } catch (error) {
+        // Silently ignore posting errors (window may have closed)
+      }
     });
   }
 

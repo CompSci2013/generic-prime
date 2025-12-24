@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Router, ActivatedRoute, Params, NavigationEnd } from '@angular/router';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map, distinctUntilChanged, filter } from 'rxjs/operators';
@@ -64,7 +64,8 @@ export class UrlStateService {
    */
   constructor(
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private ngZone: NgZone
   ) {
     // Initialize from current URL
     this.initializeFromRoute();
@@ -123,7 +124,7 @@ export class UrlStateService {
       }
     });
 
-    return this.router.navigate([], {
+    return await this.router.navigate([], {
       relativeTo: this.route,
       queryParams: mergedParams,
       replaceUrl,
@@ -296,7 +297,9 @@ export class UrlStateService {
    */
   private initializeFromRoute(): void {
     const params = this.extractQueryParams();
-    this.paramsSubject.next(params);
+    this.ngZone.run(() => {
+      this.paramsSubject.next(params);
+    });
   }
 
   /**
@@ -315,7 +318,9 @@ export class UrlStateService {
         distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
       )
       .subscribe(params => {
-        this.paramsSubject.next(params);
+        this.ngZone.run(() => {
+          this.paramsSubject.next(params);
+        });
       });
   }
 

@@ -1,8 +1,72 @@
 # Project Status
 
-**Version**: 5.64
-**Timestamp**: 2025-12-24T11:50:00Z
-**Updated By**: Session 57 - Bug #14 Partial Fix & Root Cause Analysis
+**Version**: 5.65
+**Timestamp**: 2025-12-24T13:55:00Z
+**Updated By**: Session 58 - Bug #14 Root Cause & Final Fix
+
+---
+
+## Session 58 Summary: Bug #14 - PERMANENTLY FIXED - ResourceManagementService Lifecycle Management
+
+**Status**: ✅ **BUG #14 COMPLETELY FIXED** - Root cause identified and eliminated
+
+### Root Cause Discovered
+
+After deep investigation with comprehensive logging traces, the true root cause was identified:
+
+**The Problem**: `ResultsTableComponent.ngOnDestroy()` was calling `this.resourceService.destroy()`, which completely destroyed the main window's **singleton ResourceManagementService instance**. This killed all subscriptions, including the critical `watchUrlChanges()` subscription that listens for URL parameter changes from pop-outs.
+
+**Why it manifested**:
+1. User pops out Query Control → Works fine
+2. User pops out Results Table → Main window's ResultsTableComponent is destroyed (it's removed from DOM)
+3. ResultsTableComponent.ngOnDestroy() calls `resourceService.destroy()`
+4. Since ResourceManagementService is provided at root level (`providedIn: 'root'`), it's a **singleton shared across the entire app**
+5. Destroying it breaks ALL subscriptions in ALL components
+6. When user now changes filter in Query Control pop-out: URL updates but nothing else happens (subscription is dead)
+7. Result: No API call, no state update, pop-outs show stale data
+
+**Why Previous Attempts Missed It**:
+- Session 56 added ReplaySubject(10) buffering → Helped Query Control but not Results Table
+- Session 57 added explicit STATE_UPDATE subscription in Results Table → Helped but root cause remained
+- The real issue was at the SERVICE LIFECYCLE level, not the component level
+
+### The Fix
+
+**File**: `frontend/src/framework/components/results-table/results-table.component.ts`
+
+**Change**: Removed the `resourceService.destroy()` call from `ngOnDestroy()`
+
+```typescript
+ngOnDestroy(): void {
+  this.destroy$.next();
+  this.destroy$.complete();
+
+  // NOTE: Do NOT call resourceService.destroy() here!
+  // ResourceManagementService is provided at the root level and should manage its own lifecycle.
+  // If this component destroys the service, it will break other components still using it.
+  // The service will be destroyed when the root component (DiscoverComponent) is destroyed.
+}
+```
+
+**Why This Works**:
+- ResourceManagementService manages its own lifecycle at the root level
+- Only the root component (DiscoverComponent) should destroy it via `ngOnDestroy()`
+- Child components should NOT destroy shared services
+- This is a fundamental Angular dependency injection principle
+
+### Verification
+
+**Test Scenario**: Pop out both Query Control AND Results Table, apply a filter in Query Control
+- ✅ Filter changes immediately appear in pop-out Query Control
+- ✅ Main window URL updates
+- ✅ Results Table pop-out shows **59 results** (correct filtered count!)
+- ✅ Query Control pop-out shows filter chip "Model: Camaro"
+- ✅ No console errors or warnings
+- ✅ Complete state synchronization working
+
+### Commit
+
+- `9333306` - fix: Bug #14 - Prevent ResultsTableComponent from destroying shared ResourceManagementService
 
 ---
 
