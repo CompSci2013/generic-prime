@@ -1,14 +1,23 @@
 # Project Status
 
-**Version**: 5.65
-**Timestamp**: 2025-12-24T13:55:00Z
-**Updated By**: Session 58 - Bug #14 Root Cause & Final Fix
+**Version**: 5.66
+**Timestamp**: 2025-12-24T23:15:00Z
+**Updated By**: Session 58 - Bug #14 PERMANENTLY FIXED & DEBUGGED
 
 ---
 
-## Session 58 Summary: Bug #14 - PERMANENTLY FIXED - ResourceManagementService Lifecycle Management
+## Session 58 Summary: Bug #14 - PERMANENTLY FIXED & DEBUGGED - ResourceManagementService Lifecycle Management
 
-**Status**: ✅ **BUG #14 COMPLETELY FIXED** - Root cause identified and eliminated
+**Status**: ✅ **BUG #14 COMPLETELY FIXED** - Root cause identified, fixed, verified, and debugged
+
+### Summary of Work
+1. ✅ Investigated why popped-out Results Table displayed incorrect counts (4887 instead of 59)
+2. ✅ Traced complete message flow from Query Control pop-out through BroadcastChannel to main window
+3. ✅ Identified root cause: ResultsTableComponent.ngOnDestroy() was destroying shared singleton service
+4. ✅ Fixed: Removed problematic resourceService.destroy() call
+5. ✅ Verified fix with both Query Control AND Results Table popped out simultaneously
+6. ✅ Cleaned up all debug logging from investigation (removed 14 console.log statements)
+7. ✅ Committed fix and cleanup to git
 
 ### Root Cause Discovered
 
@@ -64,9 +73,10 @@ ngOnDestroy(): void {
 - ✅ No console errors or warnings
 - ✅ Complete state synchronization working
 
-### Commit
+### Commits
 
 - `9333306` - fix: Bug #14 - Prevent ResultsTableComponent from destroying shared ResourceManagementService
+- `0119802` - cleanup: Remove debug logging from Session 58 investigation
 
 ---
 
@@ -378,4 +388,4 @@ Gemini's investigation found an even more fundamental issue: The constructor rac
 
 ---
 
-**Last Updated**: 2025-12-24T22:45:00Z (Session 56 - Bug #13 + Bug #14 Fixed, Pop-Out Sync Complete)
+**Last Updated**: 2025-12-24T23:15:00Z (Session 58 - Bug #14 PERMANENTLY FIXED & DEBUGGED, All Logging Cleaned)
