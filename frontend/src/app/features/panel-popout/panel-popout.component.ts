@@ -21,6 +21,7 @@ import { DOMAIN_CONFIG } from '../../../framework/services/domain-config-registr
 import { PickerConfigRegistry } from '../../../framework/services/picker-config-registry.service';
 import { PopOutContextService } from '../../../framework/services/popout-context.service';
 import { ResourceManagementService } from '../../../framework/services/resource-management.service';
+import { IS_POPOUT_TOKEN } from '../../../framework/tokens/popout.token';
 
 /**
  * Panel Popout Component
@@ -55,7 +56,10 @@ import { ResourceManagementService } from '../../../framework/services/resource-
   templateUrl: './panel-popout.component.html',
   styleUrls: ['./panel-popout.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [ResourceManagementService]
+  providers: [
+    ResourceManagementService,
+    { provide: IS_POPOUT_TOKEN, useValue: true }
+  ]
 })
 export class PanelPopoutComponent implements OnInit, OnDestroy {
   /**

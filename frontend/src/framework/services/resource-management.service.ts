@@ -1,4 +1,4 @@
-import { Inject, Injectable, NgZone, OnDestroy } from '@angular/core';
+import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
 import {
   catchError,
@@ -15,6 +15,7 @@ import {
 import { DOMAIN_CONFIG } from './domain-config-registry.service';
 import { PopOutContextService } from './popout-context.service';
 import { UrlStateService } from './url-state.service';
+import { IS_POPOUT_TOKEN } from '../tokens/popout.token';
 
 /**
  * Generic resource management service - Core state orchestrator for URL-first architecture
@@ -178,13 +179,16 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
    * @param urlState - UrlStateService for URL parameter synchronization
    * @param domainConfig - Domain configuration with filter mappers and API adapters (injected)
    * @param popOutContext - PopOutContextService for pop-out window detection
+   * @param ngZone - Angular NgZone
+   * @param isPopOutToken - Optional injection token to explicitly signal pop-out context
    */
   constructor(
     private urlState: UrlStateService,
     @Inject(DOMAIN_CONFIG)
     private domainConfig: DomainConfig<TFilters, TData, TStatistics>,
     private popOutContext: PopOutContextService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    @Optional() @Inject(IS_POPOUT_TOKEN) private isPopOutToken: boolean
   ) {
     // STEP 1: Extract configuration from domain config
     // The domain config contains domain-specific implementations that work with generic types.
@@ -199,7 +203,8 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
       // **Pop-out aware**: Service disables API calls when running in pop-out windows.
       // Pop-outs receive state from main window via BroadcastChannel (syncStateFromExternal).
       // This prevents duplicate API calls and ensures state consistency.
-      autoFetch: !this.popOutContext.isInPopOut()
+      // We check both the injected token (robust) and the service context (fallback).
+      autoFetch: this.isPopOutToken ? false : !this.popOutContext.isInPopOut()
     };
 
     // STEP 2: Initialize internal state BehaviorSubject
