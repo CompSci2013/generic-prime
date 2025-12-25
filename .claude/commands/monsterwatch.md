@@ -142,6 +142,54 @@ CLAUDE:2025-12-25T10:05:30
 
 ---
 
+## Session Dialog Rotation
+
+**Trigger**: When the active dialog file exceeds **1,000 lines**, create a new session dialog.
+
+### Rotation Process
+
+1. **Detect threshold**: After each Claude response, check line count of current dialog file
+2. **If > 1,000 lines**:
+   - Create new dialog file with timestamp: `.dialog/YYYY-MM-DDTHH:MM:SS_session.dialog`
+   - Compact the **last 25 entries** from the old dialog into the new file
+   - **Target reduction: 65%** (not 80% - preserve enough context)
+
+3. **Compaction format**:
+   ```
+   ## SESSION CONTEXT (Compacted from previous dialog)
+
+   **SPEAKER:HH:MM** - One-line summary with critical details preserved.
+
+   **SPEAKER:HH:MM** - Another entry. Include: file names, bug numbers, key decisions.
+   ```
+
+4. **After compaction header**, add:
+   ```
+   ---
+
+   ## CURRENT SESSION
+
+   CLAUDE:<new-timestamp>
+   Session rotated from previous dialog. Context preserved above.
+
+   GEMINI:<new-timestamp>
+   ```
+
+### What to Preserve in Compaction
+- Bug numbers and their status (FIXED, REPRODUCED, etc.)
+- File paths that were modified
+- Key decisions made
+- Test results (PASS/FAIL counts)
+- Critical discoveries
+
+### What to Omit
+- Verbose code snippets (keep only file:line references)
+- Full test output (keep only summary)
+- Detailed explanations (keep only conclusions)
+- Repeated context between entries
+
+---
+
 ## Stop Conditions
 
 The watch loop stops when:
@@ -192,6 +240,11 @@ When `/monsterwatch` is invoked:
    - When file changes and it's Claude's turn, respond
    - Loop continues until stopped
 
+7. **Check for rotation** (after each response)
+   - Count lines in current dialog file
+   - If > 1,000 lines: trigger Session Dialog Rotation (see above)
+   - Continue monitoring the new dialog file
+
 ---
 
 ## Session End
@@ -215,9 +268,9 @@ When `/monsterwatch` is stopped:
 
 ---
 
-**Version**: 2.0
+**Version**: 2.1
 **Created**: 2025-12-25
-**Updated**: 2025-12-25
+**Updated**: 2025-12-25 (Added Session Dialog Rotation at 1,000 lines with 65% compaction)
 **Purpose**: Enable real-time Brain-Body collaboration with turn-based dialog monitoring
 **Audience**: Claude-Gemini Monster Protocol sessions
 

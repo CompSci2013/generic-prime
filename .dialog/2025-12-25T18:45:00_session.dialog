@@ -1,0 +1,79 @@
+## SESSION CONTEXT (Compacted from previous dialog - last 25 entries)
+
+**GEMINI:15:00** - Startup complete. Status v5.66, Bug #14 fixed. Next: Keycloak deployment.
+
+**GEMINI:15:05** - Priority override: Playwright testing, NOT Keycloak. Task: Create TestLogger for console/network capture.
+
+**CLAUDE:15:05** - Created `test-logger.ts` + `integration-suite.spec.ts`. 5 tests pass. Captures console logs, API calls.
+
+**GEMINI:15:20** - Verified. Task: Create `popout-sync.spec.ts` for pop-out window STATE_UPDATE testing.
+
+**CLAUDE:15:20** - Created pop-out sync tests. 2 pass. Key: Use `history.pushState()` to keep pop-outs alive.
+
+**GEMINI:15:30** - Verified. Pivot back to Keycloak.
+
+**GEMINI:15:40** - Developer override: Focus on Query Control bugs, not Keycloak. Bug: Arrow key selection not opening dialog.
+
+**CLAUDE:15:40** - Bug already fixed (commit 44e9292). Created `query-control-keyboard.spec.ts`, 3 tests pass.
+
+**CLAUDE:16:15** - Testing audit: 3 active bugs (#11 critical, #10, #7). Proposed docs consolidation.
+
+**GEMINI:16:00** - Approved cleanup. Next: Bug #11 test (must FAIL first).
+
+**CLAUDE:16:30** - Consolidated docs to `docs/testing/TEST-STATUS.md`. Bug #11 test shows 8 items (should be 881). Developer reported Bug #15: filtered dropdown selects wrong item.
+
+**GEMINI:16:45** - Bug #11 was false positive (TestLogger truncation). UI shows "881 entries" correctly. Priority: Bug #15.
+
+**CLAUDE:16:45** - **Bug #15 FIXED**. Root cause: index-based lookup failed with filtered list. Fix: label-based matching. `bug-15-dropdown-filter.spec.ts` passes.
+
+**GEMINI:17:00** - Verified Bug #15. Next: Bug #10 (Statistics pop-out with bodyClass).
+
+**CLAUDE:17:00** - Bug #10 NOT REPRODUCIBLE. Triple pop-out test passes. Created test infra: `test-helpers.ts`, directory structure.
+
+**CLAUDE:17:15** - E2E directory reorganized: `components/`, `integration/`, `popout/`, `regression/`, `domains/`, `archive/`.
+
+**CLAUDE:17:35** - Bug #10 verified FIXED (via Bug #14 lifecycle fix). Plan for Bug #7 (picker checkboxes not clearing).
+
+**GEMINI:17:35** - Bug #7 test FAILS as expected. Checkboxes stay checked after Clear All.
+
+**CLAUDE:17:45** - **Bug #7 FIXED**. Root cause: `markForCheck()` insufficient for pop-outs. Fix: `detectChanges()` in `BasePickerComponent.ts`.
+
+**GEMINI:17:50** - Verified Bug #7. CRITICAL DISCOVERY: Pop-out messages `PICKER_SELECTION_CHANGE`, `FILTER_ADD`, etc. ignored by main window.
+
+**CLAUDE:18:00** - Systemic bug REPRODUCED. Pop-out picker/QC selections don't update main URL.
+
+**GEMINI:18:20** - Verified systemic bug. Proceed with fix.
+
+**CLAUDE:18:20** - **SYSTEMIC FIX IMPLEMENTED**. Added handlers in `discover.component.ts` for all pop-out message types. URL-First architecture maintained.
+
+**GEMINI:18:40** - Verified systemic fix. Next: Exhaustive Query Control test suite (Sections 2 & 3 of TEST-LIST.md).
+
+**CLAUDE:18:40** - Created `query-control-exhaustive.spec.ts` (118 tests). NEW BUG: Highlight filters not appearing in QC.
+
+**GEMINI:18:40** - Highlight bug investigation: Code should work. Need browser console verification with `?h_manufacturer=Ford`.
+
+---
+
+## CURRENT SESSION
+
+CLAUDE:2025-12-25T18:45:00
+**NEW SESSION: Breaking exhaustive test task into smaller pieces.**
+
+## Summary of Fixes This Session
+- **Bug #15**: Filtered dropdown wrong selection → FIXED (label-based matching)
+- **Bug #10**: Statistics pop-out → Already FIXED (via Bug #14)
+- **Bug #7**: Picker checkboxes not clearing → FIXED (`detectChanges()`)
+- **Systemic**: Pop-out → main URL sync → FIXED (added message handlers)
+
+## Current Task
+Create `components/query-control-exhaustive.spec.ts` in phases:
+- Phase 1: Section 2.1 (Dropdown Opening) - 7 tests
+- Phase 2: Section 2.3 (Dropdown Search) - 8 tests
+- Phase 3: Section 3.4 (Selection Logic) - 9 tests
+
+All tests must use TestLogger for **Full Visibility**.
+
+## Pending Investigation
+- Highlight filters (`h_*` params) not appearing in Query Control chips
+
+GEMINI:2025-12-25T18:45:00
