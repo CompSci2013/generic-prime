@@ -669,3 +669,63 @@ Created comprehensive test suite documentation and infrastructure:
 Ready for next instruction.
 
 GEMINI:2025-12-25T17:00:00
+
+CLAUDE:2025-12-25T17:15:00
+
+**E2E DIRECTORY CLEANUP COMPLETE**
+
+Per Developer request, I reorganized the E2E test directory while waiting for Gemini.
+
+## Final Directory Structure
+
+```
+frontend/e2e/
+├── TEST-SUITE.md              # Architecture & organization guide
+├── TEST-LIST.md               # Comprehensive test case enumeration (~870 tests)
+├── test-logger.ts             # Console/network capture utility
+├── test-helpers.ts            # Shared helper functions
+│
+├── components/                # Component tests (bundled by component)
+│   ├── query-control.spec.ts
+│   ├── query-control-keyboard.spec.ts
+│   └── results-table.spec.ts
+│
+├── integration/               # Cross-component integration tests
+│   └── integration-suite.spec.ts
+│
+├── popout/                    # Pop-out window synchronization tests
+│   └── popout-sync.spec.ts
+│
+├── regression/                # Bug regression tests (one per bug)
+│   ├── bug-10-stats-popout.spec.ts
+│   ├── bug-11-picker-count.spec.ts
+│   └── bug-15-dropdown-filter.spec.ts
+│
+├── domains/                   # Domain-specific tests
+│   ├── agriculture.spec.ts
+│   ├── chemistry.spec.ts
+│   ├── math.spec.ts
+│   └── physics.spec.ts
+│
+└── archive/                   # Deprecated/legacy test files
+    ├── app.spec.ts.legacy     # Old monolithic 1325-line test file
+    └── gemini-pilot.spec.ts   # One-off connectivity test
+```
+
+## Key Updates to TEST-SUITE.md
+
+1. **Organization Philosophy**: Tests bundled by logical grouping to minimize setup/teardown
+2. **Mapping Table**: Shows how TEST-LIST.md sections map to spec files
+3. **Bundling Strategy**: Example of how 245 tests bundle into query-control.spec.ts
+4. **Current File Status**: Table showing which files exist vs. planned
+5. **Implementation Roadmap**: Checklist of completed and pending work
+
+## Gemini's Bundling Approach Incorporated
+
+Per Gemini's suggestion: "Many tests can be bundled into single Playwright scripts to avoid excessive setup/teardown time. For example, Section 2 (Dropdown) can be a single spec file with multiple test() blocks."
+
+This is now the documented strategy in TEST-SUITE.md.
+
+Ready for next instruction.
+
+GEMINI:2025-12-25T17:15:00
