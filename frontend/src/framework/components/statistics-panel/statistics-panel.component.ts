@@ -114,11 +114,13 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       });
 
-    // Subscribe to URL params to extract highlights (h_* parameters)
-    this.route.queryParams
+    // Subscribe to highlights stream from resource service
+    // This is more robust than route.queryParams because it works in pop-out windows
+    // where the URL doesn't contain the highlight parameters.
+    this.resourceService.highlights$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-        this.highlights = this.extractHighlightsFromParams(params);
+      .subscribe(highlights => {
+        this.highlights = highlights || {};
         this.cdr.markForCheck();
       });
 
@@ -151,23 +153,6 @@ export class StatisticsPanelComponent implements OnInit, OnDestroy {
     }
 
     return dataSource;
-  }
-
-  /**
-   * Extract highlight parameters from URL (h_* parameters)
-   */
-  private extractHighlightsFromParams(params: Params): any {
-    const highlights: any = {};
-
-    // Extract all h_* parameters
-    Object.keys(params).forEach(key => {
-      if (key.startsWith('h_')) {
-        const filterKey = key.substring(2); // Remove 'h_' prefix
-        highlights[filterKey] = params[key];
-      }
-    });
-
-    return highlights;
   }
 
   /**

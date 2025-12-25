@@ -768,26 +768,39 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    * @private
    */
   private syncFiltersFromPopoutState(state: any): void {
-    if (!state || !state.filters) {
+    if (!state) {
       this.activeFilters = [];
       this.activeHighlights = [];
       return;
     }
 
-    // In pop-out windows, the state.filters object is already in TFilters format
-    // We need to convert it to URL parameter format to render filter chips
-    const filters = state.filters as any;
+    // In pop-out windows, the state object contains filters and highlights
+    // We need to convert them to URL parameter format for syncFiltersFromUrl
     const params: any = {};
 
-    // Manually extract filter values from TFilters object
-    // This mirrors how URL params are extracted in the main window
-    for (const [key, value] of Object.entries(filters || {})) {
-      if (value !== undefined && value !== null && value !== '') {
-        params[key] = value;
+    // 1. Extract regular filters from TFilters object
+    const filters = state.filters as any;
+    if (filters) {
+      for (const [key, value] of Object.entries(filters)) {
+        if (value !== undefined && value !== null && value !== '') {
+          params[key] = value;
+        }
       }
     }
 
-    // Now sync using the standard syncFiltersFromUrl logic
+    // 2. Extract highlight filters from highlights object
+    // Highlights in state have keys WITHOUT the 'h_' prefix
+    // We add it back so syncFiltersFromUrl recognizes them
+    const highlights = state.highlights as any;
+    if (highlights) {
+      for (const [key, value] of Object.entries(highlights)) {
+        if (value !== undefined && value !== null && value !== '') {
+          params['h_' + key] = value;
+        }
+      }
+    }
+
+    // Now sync using the standard logic
     this.syncFiltersFromUrl(params);
   }
 
