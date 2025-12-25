@@ -497,13 +497,9 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
 
       case PopOutMessageType.PICKER_SELECTION_CHANGE:
         // Pop-out picker selection changed - update main window URL
-        // Payload: { urlParam: string, urlValue: string, configId: string }
+        // Payload: PickerSelectionEvent
         if (message.payload) {
-          const { urlParam, urlValue } = message.payload;
-          await this.urlStateService.setParams({
-            [urlParam]: urlValue || null,
-            page: 1 // Reset to first page when selection changes
-          });
+          await this.onPickerSelectionChangeAndUpdateUrl(message.payload);
         }
         break;
 
