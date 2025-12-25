@@ -288,6 +288,12 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    * When [filter]="true" is set, the filter input captures spacebar events,
    * preventing selection. This handler detects spacebar and manually triggers selection
    * if an option is currently highlighted.
+   *
+   * Bug #15 Fix: When the dropdown filter is active, the visible list is filtered.
+   * We cannot use index-based lookup on filterFieldOptions[] because the index
+   * in the filtered DOM list doesn't match the index in the unfiltered array.
+   * Instead, we extract the label from the highlighted element and find the
+   * matching option by label.
    */
   onDropdownKeydown(event: KeyboardEvent): void {
     // Handle spacebar or Enter for selection
@@ -308,19 +314,25 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
       event.preventDefault();
       event.stopPropagation();
 
-      // Get the data-ng-reflect-ng-value or other data attribute that contains the selected value
-      // PrimeNG stores the option data on the element
-      const selectedIndex = Array.from(document.querySelectorAll('.p-dropdown-items li'))
-        .indexOf(highlightedOption as HTMLElement);
+      // Bug #15 Fix: Get the label text from the highlighted element and find
+      // the matching option by label, not by index. This works correctly even
+      // when the dropdown list is filtered.
+      const highlightedLabel = highlightedOption.textContent?.trim();
 
-      if (selectedIndex >= 0 && this.filterFieldOptions[selectedIndex]) {
-        // Directly call onFieldSelected with the highlighted option
-        // Create a synthetic onChange event with the correct value
-        const syntheticEvent = {
-          value: this.filterFieldOptions[selectedIndex].value,
-          originalEvent: event
-        };
-        this.onFieldSelected(syntheticEvent);
+      if (highlightedLabel) {
+        // Find the option with matching label
+        const matchingOption = this.filterFieldOptions.find(
+          opt => opt.label === highlightedLabel
+        );
+
+        if (matchingOption) {
+          // Create a synthetic onChange event with the correct value
+          const syntheticEvent = {
+            value: matchingOption.value,
+            originalEvent: event
+          };
+          this.onFieldSelected(syntheticEvent);
+        }
       }
     }
   }
