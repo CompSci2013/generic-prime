@@ -52,6 +52,12 @@ export class AppComponent {
   title = 'generic-prime';
 
   /**
+   * Application version from package.json
+   * @type {string}
+   */
+  version = '1.0.0';
+
+  /**
    * Whether this window is a pop-out (detected from ?popout=panelId query param)
    * When true, the header is hidden and only the router-outlet is shown
    * @type {boolean}

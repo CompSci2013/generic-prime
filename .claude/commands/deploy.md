@@ -1,61 +1,56 @@
 # Deploy to Kubernetes
 
-**This command builds and deploys the Generic Prime application to Kubernetes on Loki.**
+**This command builds and deploys the Generic Prime application to Kubernetes.**
 
 ---
 
 ## Overview
 
-Deployment involves 3 phases:
-1. **Build**: Create production Docker image on Thor
-2. **Import**: Transfer image to Kubernetes containerd on Loki
-3. **Deploy**: Apply Kubernetes manifests and verify pods
+Deployment involves 4 phases:
+1. **Build**: Create production image with podman on Thor
+2. **Import**: Import image into K3s containerd on Thor
+3. **Deploy**: Restart deployment to pick up new image
+4. **Verify**: Confirm pods are running
 
 ---
 
 ## Prerequisites
 
-- SSH access to `loki` (Kubernetes master)
-- SSH access to `thor` (build server / k8s node)
-- Docker installed on Thor
-- kubectl configured on Loki
+- SSH session open to Thor (or running directly on Thor)
+- Podman installed on Thor
+- kubectl configured on Thor (points to Loki API server)
 - The `generic-prime` namespace exists
 
 ---
 
 ## Directive
 
-Execute the following deployment steps:
+Execute the following deployment steps. All commands run on **Thor**.
 
-### Phase 1: Build Production Image on Thor
+### Phase 1: Build Production Image
 
 ```bash
-# Build the production Docker image
-ssh thor "cd /home/odin/projects/generic-prime/frontend && docker build -f Dockerfile.prod -t generic-prime-frontend:prod ."
+cd ~/projects/generic-prime/frontend && podman build -f Dockerfile.prod -t localhost/generic-prime-frontend:prod .
 ```
 
 **Expected output**: Multi-stage build completing with nginx image
 
-### Phase 2: Transfer Image to Kubernetes
+### Phase 2: Import Image into K3s
 
 ```bash
-# Save image to tarball, pipe to Loki, import to containerd
-ssh thor "docker save generic-prime-frontend:prod" | ssh loki "sudo ctr -n k8s.io images import -"
+podman save localhost/generic-prime-frontend:prod -o /tmp/frontend.tar && sudo k3s ctr images import /tmp/frontend.tar && rm /tmp/frontend.tar
 ```
 
-**Expected output**: Image imported successfully into k8s.io namespace
+**Expected output**: Image imported successfully
 
 ### Phase 3: Deploy to Kubernetes
 
 ```bash
-# Apply all Kubernetes manifests
-ssh loki "kubectl apply -f /home/odin/projects/generic-prime/k8s/"
-
 # Restart deployment to pick up new image
-ssh loki "kubectl rollout restart deployment/generic-prime-frontend -n generic-prime"
+kubectl rollout restart deployment/generic-prime-frontend -n generic-prime
 
 # Wait for rollout to complete
-ssh loki "kubectl rollout status deployment/generic-prime-frontend -n generic-prime --timeout=120s"
+kubectl rollout status deployment/generic-prime-frontend -n generic-prime --timeout=120s
 ```
 
 **Expected output**: "deployment 'generic-prime-frontend' successfully rolled out"
@@ -64,13 +59,10 @@ ssh loki "kubectl rollout status deployment/generic-prime-frontend -n generic-pr
 
 ```bash
 # Check pod status
-ssh loki "kubectl get pods -n generic-prime -l app=generic-prime-frontend"
+kubectl get pods -n generic-prime -l app=generic-prime-frontend
 
 # Check service endpoints
-ssh loki "kubectl get svc -n generic-prime"
-
-# Quick health check
-ssh loki "kubectl exec -n generic-prime deploy/generic-prime-frontend -- curl -s localhost/health || echo 'Health endpoint not configured'"
+kubectl get svc -n generic-prime
 ```
 
 ---
@@ -80,16 +72,16 @@ ssh loki "kubectl exec -n generic-prime deploy/generic-prime-frontend -- curl -s
 If pods are not starting:
 ```bash
 # Check pod events
-ssh loki "kubectl describe pod -n generic-prime -l app=generic-prime-frontend"
+kubectl describe pod -n generic-prime -l app=generic-prime-frontend
 
 # Check logs
-ssh loki "kubectl logs -n generic-prime -l app=generic-prime-frontend --tail=50"
+kubectl logs -n generic-prime -l app=generic-prime-frontend --tail=50
 ```
 
 If image pull fails:
 ```bash
-# Verify image exists in containerd
-ssh loki "sudo ctr -n k8s.io images ls | grep generic-prime"
+# Verify image exists in K3s containerd
+sudo k3s ctr images ls | grep generic-prime
 ```
 
 ---
@@ -100,8 +92,10 @@ ssh loki "sudo ctr -n k8s.io images ls | grep generic-prime"
 - **Namespace**: `generic-prime`
 - **Deployment**: `generic-prime-frontend` (2 replicas)
 - **Service**: ClusterIP on port 80
-- **Ingress**: `generic-prime.minilab` via Traefik
+- **Ingress**: `generic-prime.minilab` via Traefik (runs on Loki)
 - **Node Selector**: `kubernetes.io/hostname: thor`
+- **Control Plane**: Loki (192.168.0.110)
+- **Worker Node**: Thor (192.168.0.244)
 
 ---
 
@@ -114,7 +108,7 @@ After successful deployment:
 
 ---
 
-**Version**: 1.0
-**Created**: 2025-12-25
+**Version**: 1.1
+**Updated**: 2025-12-25
 **Purpose**: Automate production deployment to Kubernetes
 **Audience**: Claude Code sessions requiring deployment

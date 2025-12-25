@@ -5,7 +5,7 @@
  * These helpers abstract away repetitive interactions and provide consistent behavior.
  */
 
-import { Page, expect, Locator } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 
 // ==================== Navigation Helpers ====================
 
@@ -14,11 +14,12 @@ import { Page, expect, Locator } from '@playwright/test';
  */
 export async function navigateToDiscover(page: Page): Promise<void> {
   await page.goto('/automobiles/discover');
-  await page.waitForSelector('.p-dropdown', { timeout: 10000 });
-  // Wait for initial data load
-  await page.waitForSelector('.results-count, [data-testid="results-count"]', { timeout: 10000 }).catch(() => {
-    // Results count selector may vary, continue if not found
-  });
+  // Wait for Query Control panel to be visible
+  await page.waitForSelector('.query-control-panel, [data-testid="query-control-panel"]', { timeout: 15000 });
+  // Wait for dropdown to be ready
+  await page.waitForSelector('.filter-field-dropdown, .p-dropdown', { timeout: 10000 });
+  // Give Angular time to finish rendering
+  await page.waitForTimeout(500);
 }
 
 /**
@@ -36,9 +37,9 @@ export async function navigateWithFilters(page: Page, params: Record<string, str
  * Open the filter field dropdown
  */
 export async function openFilterDropdown(page: Page): Promise<void> {
-  const dropdown = page.locator('.p-dropdown').first();
+  const dropdown = page.locator('.filter-field-dropdown, .query-control-panel .p-dropdown').first();
   await dropdown.click();
-  await page.waitForSelector('.p-dropdown-items', { timeout: 5000 });
+  await page.waitForSelector('.p-dropdown-items, .p-dropdown-panel', { timeout: 5000 });
 }
 
 /**
