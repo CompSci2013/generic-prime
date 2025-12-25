@@ -171,11 +171,13 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
             this.hydrateFromUrl(urlValue);
           } else {
             // Clear selections if filter value is removed
+            // Bug #7 fix: Use detectChanges() for pop-out windows where zone boundary
+            // prevents markForCheck() from triggering UI update
             this.state.selectedKeys = new Set<string>();
             this.state.selectedItems = [];
             this.state.pendingHydration = [];
             this.state.data = [...this.state.data];
-            this.cdr.markForCheck();
+            this.cdr.detectChanges();
           }
         });
     } else {
@@ -187,11 +189,12 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
           if (urlValue) {
             this.hydrateFromUrl(urlValue);
           } else {
+            // Bug #7 fix: Use detectChanges() for pop-out windows
             this.state.selectedKeys = new Set<string>();
             this.state.selectedItems = [];
             this.state.pendingHydration = [];
             this.state.data = [...this.state.data];
-            this.cdr.markForCheck();
+            this.cdr.detectChanges();
           }
         });
     }

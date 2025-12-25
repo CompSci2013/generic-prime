@@ -64,10 +64,12 @@ npx playwright test --ui
 
 | Bug | Test File | Status | Description |
 |-----|-----------|--------|-------------|
+| #10 | `bug-10-stats-popout.spec.ts` | **PASSING** | Stats charts render in pop-out (fixed) |
 | #11 | `bug-11-picker-count.spec.ts` | **PASSING** | Picker shows 881 entries (verified) |
 | #13 | `query-control-keyboard.spec.ts` | **PASSING** | Keyboard nav + dialog opening |
 | #14 | (in app.spec.ts) | **PASSING** | ResourceManagementService lifecycle |
 | #15 | `bug-15-dropdown-filter.spec.ts` | **PASSING** | Filtered dropdown correct selection |
+| #7 | `bug-7-picker-clear.spec.ts` | **FAILING** | Pop-out picker checkboxes remain checked |
 
 ---
 
@@ -83,10 +85,10 @@ npx playwright test --ui
 - [x] BroadcastChannel STATE_UPDATE messages
 - [x] Bug #11: Manufacturer-Model Picker count
 - [x] Bug #15: Filtered dropdown selection
+- [x] Bug #10: Statistics panel pop-out hydration
 
 ### Needs Testing
-- [ ] **Bug #10**: Statistics panel with bodyClass filters
-- [ ] **Bug #7**: Picker checkbox state after Clear
+- [ ] **Bug #7**: Picker checkbox state after Clear (In Progress)
 - [ ] Pop-out to pop-out synchronization
 - [ ] Year range filter edge cases
 - [ ] Highlight filters vs regular filters
@@ -100,13 +102,13 @@ npx playwright test --ui
 
 | Bug | Severity | Status | Description |
 |-----|----------|--------|-------------|
-| #10 | Medium | Not Fixed | Statistics panel breaks with bodyClass filters |
-| #7 | Medium | Needs Verification | Picker checkboxes remain checked after Clear |
+| #7 | Medium | **FAILING** | Picker checkboxes remain checked after Clear |
 
-### Recently Fixed (Session 56-58)
+### Recently Fixed (Session 56-59)
 
 | Bug | Fixed In | Description |
 |-----|----------|-------------|
+| #10 | Session 59 | Stats charts render in pop-out |
 | #15 | Session 59 | Filtered dropdown correct selection |
 | #11 | Session 59 | Picker total count verified |
 | #14 | Session 58 | ResourceManagementService lifecycle |

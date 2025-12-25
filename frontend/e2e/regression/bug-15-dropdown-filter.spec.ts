@@ -18,7 +18,7 @@
  */
 
 import { test, expect, Page } from '@playwright/test';
-import { TestLogger } from './test-logger';
+import { TestLogger } from '../test-logger';
 
 test.describe('Bug #15: Filtered Dropdown Wrong Selection', () => {
   let logger: TestLogger;

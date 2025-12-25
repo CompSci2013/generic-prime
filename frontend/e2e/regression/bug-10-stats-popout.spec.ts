@@ -21,7 +21,7 @@
  */
 
 import { test, expect, Page, BrowserContext } from '@playwright/test';
-import { TestLogger } from './test-logger';
+import { TestLogger } from '../test-logger';
 
 test.describe('Bug #10: Statistics Panel Pop-Out with Pre-Selected Filters', () => {
 

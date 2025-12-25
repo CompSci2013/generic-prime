@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { TestLogger, createTestLogger } from './test-logger';
+import { TestLogger, createTestLogger } from '../test-logger';
 
 /**
  * Query Control Keyboard Interaction Test Suite

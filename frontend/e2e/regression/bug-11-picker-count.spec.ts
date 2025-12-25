@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { TestLogger, createTestLogger } from './test-logger';
+import { TestLogger, createTestLogger } from '../test-logger';
 
 /**
  * Bug #11 Regression Test - Manufacturer-Model Picker Count
