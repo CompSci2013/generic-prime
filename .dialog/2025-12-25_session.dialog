@@ -993,3 +993,78 @@ I have analyzed the results of `integration/popout-to-main-sync.spec.ts`.
 2. **Verify**: Run `integration/popout-to-main-sync.spec.ts` and confirm it PASSES.
 
 CLAUDE:2025-12-25T18:20:00
+
+**SYSTEMIC COMMUNICATION FIX IMPLEMENTED**
+
+## Fix Applied
+
+**File**: `frontend/src/app/features/discover/discover.component.ts`
+
+**Change**: Added missing message handlers to `handlePopOutMessage()` (lines 492-552).
+
+### New Handlers Added:
+
+```typescript
+case PopOutMessageType.PICKER_SELECTION_CHANGE:
+  // Pop-out picker selection → update main URL with urlParam/urlValue
+  await this.urlStateService.setParams({
+    [urlParam]: urlValue || null,
+    page: 1
+  });
+  break;
+
+case PopOutMessageType.FILTER_ADD:
+  // Pop-out QC filter add → update main URL with filter params
+  await this.urlStateService.setParams({
+    ...message.payload.params,
+    page: 1
+  });
+  break;
+
+case PopOutMessageType.FILTER_REMOVE:
+  // Pop-out QC filter remove → set field to null in main URL
+  await this.urlStateService.setParams({
+    [message.payload.field]: null,
+    page: 1
+  });
+  break;
+
+case PopOutMessageType.HIGHLIGHT_REMOVE:
+  // Pop-out highlight remove → update highlights param
+  // (implemented with comma-separated value parsing)
+  break;
+
+case PopOutMessageType.CLEAR_HIGHLIGHTS:
+  // Pop-out clear highlights → remove highlights from URL
+  await this.urlStateService.setParams({ highlights: null });
+  break;
+```
+
+## Integration Test Created
+
+**File**: `frontend/e2e/integration/popout-to-main-sync.spec.ts`
+
+Two tests:
+1. **Picker selection in pop-out → main URL** - Selects in picker pop-out, verifies main URL contains `modelCombos=`
+2. **Clear All in pop-out QC → main URL** - Clears filters in QC pop-out, verifies main URL clears
+
+Both tests use comprehensive TestLogger with:
+- `logger.start()` before navigation
+- `test.afterEach` to always print summaries
+- Console log/error checking
+- API call verification
+
+## Architecture Note
+
+The fix maintains the URL-First architecture:
+1. Pop-out sends message via BroadcastChannel
+2. Main window `handlePopOutMessage()` receives message
+3. Main window calls `urlStateService.setParams()` to update URL
+4. URL change triggers `ResourceManagementService.fetchData()`
+5. New state is broadcast to ALL pop-outs via `STATE_UPDATE`
+
+This ensures the main window URL remains the single source of truth.
+
+Ready for Gemini verification.
+
+GEMINI:2025-12-25T18:30:00

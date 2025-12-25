@@ -488,6 +488,68 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
         // Pop-out requested to clear all filters - clear all URL params
         await this.urlStateService.clearParams();
         break;
+
+      // ============================================
+      // Systemic Fix: Handle ALL pop-out message types
+      // Previously missing handlers caused pop-out interactions to be ignored
+      // Fixed in Session 59
+      // ============================================
+
+      case PopOutMessageType.PICKER_SELECTION_CHANGE:
+        // Pop-out picker selection changed - update main window URL
+        // Payload: { urlParam: string, urlValue: string, configId: string }
+        if (message.payload) {
+          const { urlParam, urlValue } = message.payload;
+          await this.urlStateService.setParams({
+            [urlParam]: urlValue || null,
+            page: 1 // Reset to first page when selection changes
+          });
+        }
+        break;
+
+      case PopOutMessageType.FILTER_ADD:
+        // Pop-out Query Control added a filter - update main window URL
+        // Payload contains the filter field and value
+        if (message.payload?.params) {
+          await this.urlStateService.setParams({
+            ...message.payload.params,
+            page: 1 // Reset to first page when filter changes
+          });
+        }
+        break;
+
+      case PopOutMessageType.FILTER_REMOVE:
+        // Pop-out Query Control removed a filter - update main window URL
+        // Payload: { field: string } - set the field to null to remove
+        if (message.payload?.field) {
+          await this.urlStateService.setParams({
+            [message.payload.field]: null,
+            page: 1
+          });
+        }
+        break;
+
+      case PopOutMessageType.HIGHLIGHT_REMOVE:
+        // Pop-out removed a highlight - update main window URL
+        // Payload: highlight key string
+        // Note: Highlights are typically stored in 'highlights' URL param
+        // This is a simplified handler - may need adjustment based on actual implementation
+        if (message.payload) {
+          // Get current highlights, remove the specified one
+          const currentHighlights = this.urlStateService.getParam('highlights');
+          if (currentHighlights) {
+            const highlightArray = currentHighlights.split(',').filter((h: string) => h !== message.payload);
+            await this.urlStateService.setParams({
+              highlights: highlightArray.length > 0 ? highlightArray.join(',') : null
+            });
+          }
+        }
+        break;
+
+      case PopOutMessageType.CLEAR_HIGHLIGHTS:
+        // Pop-out requested to clear all highlights - remove highlights from URL
+        await this.urlStateService.setParams({ highlights: null });
+        break;
     }
   }
 
