@@ -1,40 +1,36 @@
 # Next Steps
 
-**Current Session**: Session 57 - Ready to Begin
-**Previous Session**: Session 56 - Bug #13 + Bug #14 Fixed (Complete)
-**Status**: All high-priority code fixes complete ✅. Infrastructure deployment (IMMEDIATE ACTION) ready to begin.
+**Current Session**: Session 59 - Highlight Filter Sync Fixed
+**Previous Session**: Session 58 - Bug #14 Lifecycle Fix
+**Status**: All high-priority highlight bugs fixed ✅. Pop-out architecture is now fully synchronized.
 
 ---
 
-## IMMEDIATE ACTION 1: Infrastructure (IdP Phase 1) - ELEVATED PRIORITY
+## IMMEDIATE ACTION 1: Exhaustive Query Control Testing
+
+**Priority**: HIGH (Verification)
+**Scope**: Complete and refine `components/query-control-exhaustive.spec.ts`
+
+While the core implementation is present, several tests failed during the initial run due to selector strictness and environment-specific behaviors (e.g., collapsed panels).
+
+**Steps**:
+1. **Refine Selectors**: Update `query-control-exhaustive.spec.ts` to use more specific selectors (e.g., `> .panel-header`) to avoid strict mode violations.
+2. **Handle Collapsed Panels**: Add logic to expand the Query Control panel if it's collapsed by default (using the `isPanelCollapsed` logic from `bug-highlight-chips.spec.ts`).
+3. **Fix NG0100 Errors**: Investigate why `ExpressionChangedAfterItHasBeenCheckedError` is occurring during keyboard navigation tests and fix if possible.
+4. **Complete Section 3**: Ensure all Multiselect Dialog tests are passing.
+
+---
+
+## IMMEDIATE ACTION 2: Infrastructure (IdP Phase 1) - RESUME
 
 **Priority**: HIGH (Architecture)
 **Scope**: Deploy Keycloak to K3s
 
-This is now the top priority as all planned code work for this session is complete.
-
-### KEYCLOAK DEPLOYMENT
-**Reference**: `docs/infrastructure/idp/IDENTITY-STRATEGY.md`
-
-**Implementation Steps**:
-1. **Create Namespace**: `kubectl create namespace platform` (or check if exists).
-2. **Deploy Postgres**:
-   - Create PVC `keycloak-postgres-pvc`.
-   - Deploy Postgres pod/service.
-3. **Deploy Keycloak**:
-   - Create Deployment using `quay.io/keycloak/keycloak:latest`.
-   - Mount certificates for TLS.
-   - Configure env vars (DB connection, Admin user).
-4. **Configure Ingress**:
-   - Route `auth.minilab` to Keycloak service via Traefik.
-5. **Initial Setup**:
-   - Log in to `https://auth.minilab`.
-   - Create `halo-labs` realm.
-   - Create Users per `docs/infrastructure/idp/TEST-PLAN-RBAC.md`.
+This task was deferred for bug fixing but remains the next architectural milestone.
 
 ---
 
-## FUTURE ACTION 2: Frontend Integration (IdP Phase 2)
+## FUTURE ACTION 3: Frontend Integration (IdP Phase 2)
 
 **Priority**: HIGH (After Keycloak is running)
 **Scope**: Angular OIDC Integration

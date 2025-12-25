@@ -1,8 +1,59 @@
 # Project Status
 
-**Version**: 5.66
-**Timestamp**: 2025-12-24T23:15:00Z
-**Updated By**: Session 58 - Bug #14 PERMANENTLY FIXED & DEBUGGED
+**Version**: 5.67
+**Timestamp**: 2025-12-25T19:15:00Z
+**Updated By**: Session 59 - Highlight Filter Sync Fixed
+
+---
+
+## Session 59 Summary: Highlight Filter Synchronization Fixed
+
+**Status**: ✅ **HIGHLIGHT FILTER SYNC FIXED** - Pop-out windows now correctly display highlight chips and charts.
+
+### Summary of Work
+1. ✅ **Investigated Highlight Filter Bug**: Reproduced issue where `h_*` parameters were ignored in pop-out windows.
+2. ✅ **Fixed Query Control Sync**: Updated `syncFiltersFromPopoutState()` to correctly extract and prefix highlight filters from the state object.
+3. ✅ **Fixed Statistics Panel Sync**: Refactored `StatisticsPanelComponent` to subscribe to `resourceService.highlights$` instead of `route.queryParams`, ensuring compatibility with pop-out windows.
+4. ✅ **Verified with Regression Tests**: Created `frontend/e2e/regression/bug-highlight-chips.spec.ts` which validates highlight display in main and pop-out windows for both Query Control and Statistics.
+5. ✅ **Cleaned up code**: Removed unused `extractHighlightsFromParams` method from Statistics Panel.
+
+### Root Causes Discovered
+
+1. **Query Control**: The component was only looking at the `filters` property of the synced state object, completely ignoring the `highlights` property.
+2. **Statistics Panel**: The component relied on `ActivatedRoute.queryParams` to detect highlights. In pop-out windows, the URL is clean (no query params), so highlights were always empty.
+
+### The Fixes
+
+#### Query Control
+Updated `syncFiltersFromPopoutState` to builds a combined params object:
+```typescript
+    // Extract highlight filters from highlights object
+    const highlights = state.highlights as any;
+    if (highlights) {
+      for (const [key, value] of Object.entries(highlights)) {
+        params['h_' + key] = value;
+      }
+    }
+```
+
+#### Statistics Panel
+Switched to reactive state from `ResourceManagementService`:
+```typescript
+    this.resourceService.highlights$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(highlights => {
+        this.highlights = highlights || {};
+        this.cdr.markForCheck();
+      });
+```
+
+### Verification Results
+
+**Regression Test**: `bug-highlight-chips.spec.ts`
+- ✅ Main window: Highlight chip visible ("Highlight Manufacturer: Ford") - PASS
+- ✅ Main window: Statistics charts rendered - PASS
+- ✅ Pop-out Query Control: Highlight chip visible - PASS (FIXED)
+- ✅ Pop-out Statistics: Highlights detected in component state - PASS (FIXED)
 
 ---
 
