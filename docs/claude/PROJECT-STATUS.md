@@ -1,8 +1,54 @@
 # Project Status
 
-**Version**: 5.69
-**Timestamp**: 2025-12-26T06:45:00-05:00
-**Updated By**: Session 61 - Shutdown Protocol Update
+**Version**: 5.70
+**Timestamp**: 2025-12-26T07:40:53-05:00
+**Updated By**: Session 62 - Pop-out BasicResultsTable Debugging
+
+---
+
+## Session 62 Summary: Pop-out BasicResultsTable Sort Bug Investigation
+
+**Status**: 🔶 **DEFERRED** - Root cause identified but fix deferred for future investigation
+
+### What Was Accomplished
+
+1. ✅ **Fixed Pop-out "Unknown panel type" Error** (v1.2.1)
+   - Added `*ngSwitchCase="'basic-results'"` to panel-popout.component.html
+   - Added title mapping for `basic-results-table` in panel-popout.component.ts
+   - Pop-out now renders BasicResultsTable correctly
+
+2. ✅ **Added Pop-out Sort/Pagination Communication** (v1.2.2)
+   - Added `@Output() urlParamsChange` emitter to BasicResultsTableComponent
+   - Modified `onSort()` and `onPageChange()` to emit events in pop-out mode
+   - Updated panel-popout.component.html with event binding
+
+3. ✅ **Verified Message Flow Working**
+   - Pop-out: `onSort()` → emits `urlParamsChange` → PanelPopout receives → sends `URL_PARAMS_CHANGED` via BroadcastChannel
+   - Main window: Receives message → updates URL → triggers API call → broadcasts `STATE_UPDATE` back
+   - **Confirmed**: Main window URL updates correctly when sort clicked in pop-out
+
+4. 🔶 **Deferred: Pop-out Re-rendering Issue**
+   - **Symptom**: Main window URL updates, but pop-out BasicResultsTable doesn't re-render with new data
+   - **Hypothesis**: OnPush change detection issue - `STATE_UPDATE` arrives but component doesn't detect change
+   - **Debug logging added** to trace message flow (to be removed later)
+
+### Files Modified
+- `frontend/src/framework/components/basic-results-table/basic-results-table.component.ts` (urlParamsChange output, debug logging)
+- `frontend/src/app/features/panel-popout/panel-popout.component.html` (basic-results case, event binding)
+- `frontend/src/app/features/panel-popout/panel-popout.component.ts` (title mapping, debug logging)
+- `frontend/src/app/features/discover/discover.component.ts` (debug logging)
+- `frontend/package.json` (version 1.2.2)
+
+### Debug Logging Locations (to remove later)
+- `basic-results-table.component.ts:182-189` - onSort logging
+- `panel-popout.component.ts:203,211` - onUrlParamsChange logging
+- `discover.component.ts` - BroadcastChannel and handlePopOutMessage logging
+
+### Next Session Investigation
+1. Check if `syncStateFromExternal()` triggers observable emissions
+2. Verify component subscriptions in pop-out context
+3. Compare with working QueryControl pop-out implementation
+4. Consider `detectChanges()` vs `markForCheck()` for OnPush components
 
 ---
 

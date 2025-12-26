@@ -177,7 +177,8 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       'query-panel': 'Query Panel',
       'manufacturer-model-picker': 'Manufacturer-Model Picker',
       'statistics-panel': 'Statistics',
-      'results-table': 'Results'
+      'results-table': 'Results',
+      'basic-results-table': 'Results Table'
     };
 
     return titleMap[this.panelId] || this.panelId;
@@ -199,6 +200,7 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
    * @param params - URL parameters from child component
    */
   onUrlParamsChange(params: any): void {
+    console.log('[PanelPopout] onUrlParamsChange received', params);
     // Send URL_PARAMS_CHANGED to main window
     // Main window will update its URL, which triggers state update, which broadcasts to pop-outs
     this.popOutContext.sendMessage({
@@ -206,6 +208,7 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       payload: { params },
       timestamp: Date.now()
     });
+    console.log('[PanelPopout] URL_PARAMS_CHANGED message sent');
   }
 
   /**

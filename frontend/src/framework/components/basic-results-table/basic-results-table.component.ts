@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  EventEmitter,
   Input,
   OnDestroy,
-  OnInit
+  OnInit,
+  Output
 } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
@@ -49,6 +51,12 @@ export class BasicResultsTableComponent<TFilters = any, TData = any, TStatistics
   readonly environment = environment;
 
   @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
+
+  /**
+   * Emits when URL parameters should be updated (sort, page, size)
+   * Used by parent components (e.g., panel-popout) to sync with main window
+   */
+  @Output() urlParamsChange = new EventEmitter<{ [key: string]: any }>();
 
   // Observables from resource service
   results$!: Observable<TData[]>;
@@ -147,24 +155,45 @@ export class BasicResultsTableComponent<TFilters = any, TData = any, TStatistics
    * Handle pagination events from PrimeNG Table
    */
   onPageChange(event: any): void {
-    const newFilters = {
-      ...this.currentFilters,
-      page: event.first / event.rows + 1,
-      size: event.rows
-    } as unknown as TFilters;
-    this.resourceService.updateFilters(newFilters);
+    const page = event.first / event.rows + 1;
+    const size = event.rows;
+
+    // In pop-out mode, emit to parent for main window sync
+    if (this.popOutContext.isInPopOut()) {
+      this.urlParamsChange.emit({ page, size });
+    } else {
+      const newFilters = {
+        ...this.currentFilters,
+        page,
+        size
+      } as unknown as TFilters;
+      this.resourceService.updateFilters(newFilters);
+    }
   }
 
   /**
    * Handle sort events from PrimeNG Table
    */
   onSort(event: any): void {
-    const newFilters = {
-      ...this.currentFilters,
-      sort: event.field,
-      sortDirection: event.order === 1 ? 'asc' as const : 'desc' as const
-    } as unknown as TFilters;
-    this.resourceService.updateFilters(newFilters);
+    const sort = event.field;
+    const sortDirection = event.order === 1 ? 'asc' : 'desc';
+    const isPopOut = this.popOutContext.isInPopOut();
+
+    console.log('[BasicResultsTable] onSort called', { sort, sortDirection, isPopOut });
+
+    // In pop-out mode, emit to parent for main window sync
+    if (isPopOut) {
+      console.log('[BasicResultsTable] Emitting urlParamsChange', { sort, sortDirection });
+      this.urlParamsChange.emit({ sort, sortDirection });
+    } else {
+      console.log('[BasicResultsTable] Calling updateFilters directly');
+      const newFilters = {
+        ...this.currentFilters,
+        sort,
+        sortDirection
+      } as unknown as TFilters;
+      this.resourceService.updateFilters(newFilters);
+    }
   }
 
   /**

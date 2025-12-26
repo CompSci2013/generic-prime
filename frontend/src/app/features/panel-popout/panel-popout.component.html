@@ -42,6 +42,13 @@
       (clearAllFilters)="onClearAllFilters()">
     </app-query-panel>
 
+    <!-- Basic Results Table (table only, no embedded filters) -->
+    <app-basic-results-table
+      *ngSwitchCase="'basic-results'"
+      [domainConfig]="domainConfig"
+      (urlParamsChange)="onUrlParamsChange($event)">
+    </app-basic-results-table>
+
     <!-- Unknown panel type -->
     <div *ngSwitchDefault class="unknown-panel">
       <p>Unknown panel type: {{ panelType }}</p>
