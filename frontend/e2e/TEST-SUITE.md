@@ -87,6 +87,7 @@ Tests are bundled into single Playwright spec files to **minimize setup/teardown
 | `bug-10-stats-popout.spec.ts` | Statistics panel with bodyClass filters | Passing (not reproducible) |
 | `bug-11-picker-count.spec.ts` | Picker showing ~72 vs 881 entries | Passing (verified fixed) |
 | `bug-15-dropdown-filter.spec.ts` | Filtered dropdown selects wrong item | Passing (fixed) |
+| `bug-highlight-chips.spec.ts` | Highlight filters not syncing to/from pop-outs | Passing (fixed) |
 
 ### Domains (`domains/`)
 

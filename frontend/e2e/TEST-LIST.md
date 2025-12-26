@@ -599,6 +599,7 @@ This document provides an exhaustive enumeration of all test cases required for 
 - [ ] 13.3.1 [I] Apply filter in Main - Pop-out charts update
 - [ ] 13.3.2 [I] Click chart in Pop-out - Main URL updates
 - [ ] 13.3.3 [I] Other pop-outs update when chart clicked
+- [ ] 13.3.4 [R] Highlight selection (h+click) in Pop-out Statistics - Main URL/QC updates
 
 ### 13.4 Bug #10 Regression
 - [ ] 13.4.1 [R] Load with `?bodyClass=Coupe,Sedan`

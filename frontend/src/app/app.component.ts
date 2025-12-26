@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { DomainConfigRegistry } from '../framework/services';
 import { DOMAIN_PROVIDERS } from '../domain-config/domain-providers';
+import packageJson from '../../package.json';
 
 /**
  * Root Application Component (AppComponent)
@@ -55,7 +56,7 @@ export class AppComponent {
    * Application version from package.json
    * @type {string}
    */
-  version = '1.0.0';
+  version = packageJson.version;
 
   /**
    * Whether this window is a pop-out (detected from ?popout=panelId query param)

@@ -9,14 +9,16 @@
 **When triggered, I must:**
 1.  Read `CLAUDE.md`, `docs/claude/PROJECT-STATUS.md`, and `docs/claude/NEXT-STEPS.md`.
 2.  **Read `MONSTER-LOG.md`** (To understand the Brain's last known state/plan).
-3.  Run `git status`, `git branch --show-current`, and `git log -1 --format="%h - %s"`.
-4.  **Write to `MONSTER-CLAUDE.md`**:
+3.  **Check `.dialog/`**: List files and read the most recent `*_session.dialog` file to check for active conversations.
+4.  Run `git status`, `git branch --show-current`, and `git log -1 --format="%h - %s"`.
+5.  **Write to `MONSTER-CLAUDE.md`**:
     -   "Branch": [Current Branch]
     -   "Last Commit": [Commit Hash - Message]
     -   "Status": [Last status from PROJECT-STATUS.md]
     -   "Next Task": [Item 1 from NEXT-STEPS.md]
     -   "Reality Check": [Any uncommitted files or anomalies]
-5.  **Respond**: "Ready. Wake the Brain."
+    -   "Dialog Status": [Last speaker and timestamp from dialog file]
+6.  **Respond**: "Ready. Wake the Brain."
 
 ### 2. Shutdown: `/bye` or "Shutdown"
 **When triggered, I must:**

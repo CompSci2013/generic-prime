@@ -14,10 +14,29 @@ import { Page, Locator } from '@playwright/test';
  */
 export async function navigateToDiscover(page: Page): Promise<void> {
   await page.goto('/automobiles/discover');
-  // Wait for Query Control panel to be visible
-  await page.waitForSelector('.query-control-panel, [data-testid="query-control-panel"]', { timeout: 15000 });
+  
+  // Wait for the main container to load
+  await page.waitForSelector('.discover-container', { timeout: 15000 });
+  
+  // Ensure Query Control panel is visible and expanded
+  const panel = page.locator('#panel-query-control');
+  await panel.waitFor({ timeout: 10000 });
+  
+  const expandButton = panel.locator('.panel-actions button').first();
+  const buttonHtml = await expandButton.innerHTML();
+  
+  if (buttonHtml.includes('pi-chevron-right')) {
+    console.log('[DEBUG] Query Control panel is collapsed, expanding...');
+    await expandButton.click();
+    await page.waitForTimeout(500);
+  }
+  
+  // Wait for the query control content to be visible
+  await page.waitForSelector('.query-control-panel, [data-testid="query-control-panel"]', { timeout: 10000 });
+  
   // Wait for dropdown to be ready
-  await page.waitForSelector('.filter-field-dropdown, .p-dropdown', { timeout: 10000 });
+  await page.waitForSelector('.filter-field-dropdown, .p-dropdown', { timeout: 5000 });
+  
   // Give Angular time to finish rendering
   await page.waitForTimeout(500);
 }
