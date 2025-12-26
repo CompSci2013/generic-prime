@@ -1,8 +1,8 @@
 # Next Steps
 
-**Current Session**: Session 60 - Component Split & Autocomplete
-**Previous Session**: Session 59 - Highlight Filter Sync Fixed
-**Status**: Component split complete ✅. Autocomplete implemented ✅. Query Panel pop-out working ✅.
+**Current Session**: Session 61 - Shutdown Protocol Update
+**Previous Session**: Session 60 - Component Split & Autocomplete
+**Status**: Protocols updated ✅. Component split complete ✅.
 
 ---
 
@@ -41,32 +41,18 @@ This task was deferred for component development but remains an architectural mi
 
 ---
 
-## SESSION 60 COMPLETION SUMMARY
+## SESSION 61 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. **Component Split** ✅
-   - Created BasicResultsTableComponent (pure display)
-   - Created QueryPanelComponent (domain-agnostic filters)
-   - Both components integrate with ResourceManagementService singleton
-   - Pop-out support added for QueryPanelComponent
-
-2. **Autocomplete Filter Type** ✅
-   - New filter type with backend search support
-   - Model field converted from text to autocomplete
-   - PrimeNG p-autoComplete with debounce and min chars
-   - API endpoint for suggestions working
-
-3. **Restore Point Created** ✅
-   - Tag `v1.1.0` created and pushed
-   - Version bumped to `1.2.0`
+1. **Shutdown Protocol Update** ✅
+   - Updated `.claude/commands/bye.md`, `.gemini/GEMINI.md`, and `.claude/commands/monsterwatch.md`.
+   - Mandated use of system time (Thor's time) for all timestamps.
+   - Assigned full shutdown responsibility (Docs, Archive, Commit) to Claude.
+   - Simplified Gemini's role to verification only.
 
 **Commits This Session**:
-- `ab2e2cf` - chore: Session 60 - Pre-refactor checkpoint
-- `4bb7123` - feat: Add autocomplete filter type with Model field implementation
-- `c8cc89b` - fix: Query Panel pop-out URL-first sync and UI cleanup
+- (Pending) docs: session 5.69 summary - Shutdown Protocol Update
 
 **Current State**:
-- 5 panels visible on Automobile Discovery page
-- Query Panel with autocomplete working
-- Pop-out synchronization functional
-- Build passing, no TypeScript errors
+- Project documentation reflects the new protocols.
+- Ready for next development session with aligned agents.
