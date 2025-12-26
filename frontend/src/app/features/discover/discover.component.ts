@@ -434,6 +434,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     // handlePopOutMessage → UrlStateService → Router) runs inside the zone with proper
     // change detection awareness. This is architecturally correct per Angular zone principles.
     channel.onmessage = event => {
+      console.log('[DiscoverComponent] BroadcastChannel message received', { panelId, message: event.data });
       this.ngZone.run(() => {
         this.popoutMessages$.next({ panelId, event });
       });
@@ -466,6 +467,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * @param message - Message from pop-out
    */
   private async handlePopOutMessage(_panelId: string, message: any): Promise<void> {
+    console.log('[DiscoverComponent] handlePopOutMessage', { panelId: _panelId, type: message.type, payload: message.payload });
     switch (message.type) {
       case PopOutMessageType.PANEL_READY:
         // Pop-out is ready - broadcast current state immediately
@@ -477,6 +479,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       case PopOutMessageType.URL_PARAMS_CHANGED:
         // Pop-out sent URL params change - update main window URL
         if (message.payload?.params) {
+          console.log('[DiscoverComponent] URL_PARAMS_CHANGED - updating URL with', message.payload.params);
           // Update the single source of truth (the URL)
           // This triggers the normal state update flow:
           // 1. URL change detected by resourceService.watchUrlChanges()

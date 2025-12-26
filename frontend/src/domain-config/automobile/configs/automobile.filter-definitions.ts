@@ -33,8 +33,10 @@ export const AUTOMOBILE_FILTER_DEFINITIONS: FilterDefinition[] = [
   {
     id: 'manufacturer',
     label: 'Manufacturer',
-    type: 'text',
+    type: 'autocomplete',
     placeholder: 'Enter manufacturer name...',
+    autocompleteEndpoint: 'filters/manufacturers',
+    autocompleteMinChars: 1,
     operators: ['contains', 'equals', 'startsWith'],
     defaultOperator: 'contains',
     validation: {

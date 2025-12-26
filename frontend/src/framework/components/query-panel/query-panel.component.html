@@ -18,7 +18,7 @@
             <input pInputText
                    [id]="filterDef.id"
                    [(ngModel)]="currentFilters[filterDef.id]"
-                   (ngModelChange)="onFilterChange(filterDef.id, $event)"
+                   (ngModelChange)="onFilterChange(filterDef.id, $event, true)"
                    [placeholder]="filterDef.placeholder || ''"
                    style="width: 100%;">
           </span>
@@ -77,6 +77,7 @@
                       [showClear]="true"
                       [filter]="true"
                       filterBy="label"
+                      [autofocusFilter]="false"
                       [placeholder]="filterDef.placeholder || 'Select...'">
           </p-dropdown>
 
@@ -102,6 +103,7 @@
                             (onSelect)="onFilterChange(filterDef.id, $event)"
                             (onClear)="onFilterChange(filterDef.id, null)"
                             (onKeyUp)="onAutocompleteKeyUp($event, autocomplete, filterDef.id)"
+                            (onBlur)="handleAutocompleteBlur($event, filterDef.id, autocomplete)"
                             [suggestions]="autocompleteSuggestions[filterDef.id] || []"
                             (completeMethod)="onAutocompleteSearch($event, filterDef)"
                             (onFocus)="onAutocompleteFocus(filterDef)"

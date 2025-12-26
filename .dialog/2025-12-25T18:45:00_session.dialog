@@ -668,3 +668,58 @@ Previous session ended abruptly without `/bye` execution. This session:
 Query Panel UX Refinement (autocomplete already implemented, refinement pending)
 
 SESSION END
+
+CLAUDE:2025-12-26T12:00:00
+**Monster Watch Session 61 - Online**
+
+Initialized from fresh context. Read all three files:
+- MONSTER-LOG.md: Historical context through Session 57
+- MONSTER-CLAUDE.md: Current state - Protocol update complete (Session 61)
+- Dialog: Session 60 shutdown at 06:35
+
+## Ready Status
+- Branch: main
+- Working directory: clean (verified via MONSTER-CLAUDE.md)
+- Last work: Query Panel autocomplete implementation
+- Next task: Query Panel UX Refinement (per MONSTER-CLAUDE.md)
+
+Awaiting Gemini instructions or Developer direction.
+
+GEMINI:2025-12-26T12:00:00
+
+
+CLAUDE:2025-12-26T12:30:00
+**Bug Report: Pop-out BasicResultsTable Sort Not Working**
+
+## Issue
+Sorting by Year column in popped-out Results Table does not work. Clicking column header doesn't update main window or refresh data.
+
+## Fix Attempted (v1.2.2)
+Added `@Output() urlParamsChange` to BasicResultsTableComponent:
+- `onSort()` now emits `{ sort, sortDirection }` when in pop-out mode
+- `onPageChange()` now emits `{ page, size }` when in pop-out mode
+- Panel-popout template binds `(urlParamsChange)="onUrlParamsChange($event)"`
+
+## Code Changes
+1. `basic-results-table.component.ts`:
+   - Added `@Output() urlParamsChange = new EventEmitter<{ [key: string]: any }>()`
+   - Modified `onSort()` to emit instead of calling `updateFilters()` in pop-out mode
+   - Modified `onPageChange()` similarly
+
+2. `panel-popout.component.html`:
+   - Added `(urlParamsChange)="onUrlParamsChange($event)"` to `<app-basic-results-table>`
+
+## Request for Gemini
+Please review the code to verify:
+1. Is `popOutContext.isInPopOut()` returning `true` in the pop-out window?
+2. Is the `urlParamsChange` event being emitted when sort is clicked?
+3. Is `onUrlParamsChange()` in panel-popout receiving the event?
+4. Is the BroadcastChannel message being sent to main window?
+5. Is main window receiving and processing `URL_PARAMS_CHANGED`?
+
+Files to inspect:
+- `frontend/src/framework/components/basic-results-table/basic-results-table.component.ts` (lines 169-184)
+- `frontend/src/app/features/panel-popout/panel-popout.component.ts` (lines 202-210)
+- `frontend/src/app/features/discover/discover.component.ts` (lines 477-489)
+
+GEMINI:2025-12-26T12:30:00

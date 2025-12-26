@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil, filter } from 'rxjs/operators';
+import { takeUntil, filter, debounceTime } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { DomainConfig, FilterDefinition, FilterOption } from '../../models/domain-config.interface';
 import { ResourceManagementService } from '../../services/resource-management.service';
@@ -79,13 +79,22 @@ export class QueryPanelComponent<TFilters = any, TData = any, TStatistics = any>
   autocompleteSuggestions: Record<string, string[]> = {};
 
   private destroy$ = new Subject<void>();
+  private searchSubject = new Subject<{ field: string; value: any }>();
 
   constructor(
     private resourceService: ResourceManagementService<TFilters, TData, TStatistics>,
     private cdr: ChangeDetectorRef,
     private http: HttpClient,
     private popOutContext: PopOutContextService
-  ) {}
+  ) {
+    // Setup debounced search for text inputs
+    this.searchSubject.pipe(
+      debounceTime(300),
+      takeUntil(this.destroy$)
+    ).subscribe(({ field, value }) => {
+      this.applyFilterChange(field, value);
+    });
+  }
 
   ngOnInit(): void {
     if (!this.domainConfig) {
@@ -130,10 +139,25 @@ export class QueryPanelComponent<TFilters = any, TData = any, TStatistics = any>
   /**
    * Handle filter input changes
    *
-   * In main window: Updates ResourceManagementService directly (triggers URL update)
-   * In pop-out: Emits urlParamsChange event for parent to send to main window
+   * @param field - Filter field ID
+   * @param value - New value
+   * @param debounce - Whether to debounce this change (default false)
    */
-  onFilterChange(field: string, value: any): void {
+  onFilterChange(field: string, value: any, debounce = false): void {
+    // Update local model immediately for UI responsiveness
+    this.currentFilters[field] = value;
+
+    if (debounce) {
+      this.searchSubject.next({ field, value });
+    } else {
+      this.applyFilterChange(field, value);
+    }
+  }
+
+  /**
+   * Apply filter change to state management
+   */
+  private applyFilterChange(field: string, value: any): void {
     const isEmpty = value === null ||
                     value === undefined ||
                     value === '' ||
@@ -236,6 +260,24 @@ export class QueryPanelComponent<TFilters = any, TData = any, TStatistics = any>
         autocomplete.selectItem(event, highlightedOption);
         this.onFilterChange(filterId, highlightedOption);
       }
+    }
+  }
+
+  /**
+   * Handle autocomplete blur event
+   * Ensures the current text value is applied as a filter even if not selected from dropdown
+   *
+   * @param event - Blur event
+   * @param filterId - Filter ID
+   * @param autocomplete - Autocomplete component reference
+   */
+  handleAutocompleteBlur(event: any, filterId: string, autocomplete: any): void {
+    // If there's input text but it differs from our current model (or model is empty), apply it
+    // The input element's value is the raw text
+    const inputValue = autocomplete.inputEL.nativeElement.value;
+
+    if (inputValue && inputValue !== this.currentFilters[filterId]) {
+      this.onFilterChange(filterId, inputValue);
     }
   }
 
