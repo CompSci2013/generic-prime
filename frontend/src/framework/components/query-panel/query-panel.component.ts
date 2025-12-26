@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  EventEmitter,
   Input,
   OnDestroy,
-  OnInit
+  OnInit,
+  Output
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
@@ -57,12 +59,22 @@ export class QueryPanelComponent<TFilters = any, TData = any, TStatistics = any>
 
   @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
 
+  /**
+   * Emits when URL parameters should be updated with new filter values
+   * Used by parent components (e.g., panel-popout) to sync with main window
+   */
+  @Output() urlParamsChange = new EventEmitter<{ [key: string]: any }>();
+
+  /**
+   * Emits when all filters should be cleared
+   */
+  @Output() clearAllFilters = new EventEmitter<void>();
+
   // Observables from resource service
   filters$!: Observable<TFilters>;
 
   // Component state
   currentFilters: Record<string, any> = {};
-  filterPanelCollapsed = false;
   dynamicOptions: Record<string, FilterOption[]> = {};
   autocompleteSuggestions: Record<string, string[]> = {};
 
@@ -117,43 +129,56 @@ export class QueryPanelComponent<TFilters = any, TData = any, TStatistics = any>
 
   /**
    * Handle filter input changes
+   *
+   * In main window: Updates ResourceManagementService directly (triggers URL update)
+   * In pop-out: Emits urlParamsChange event for parent to send to main window
    */
   onFilterChange(field: string, value: any): void {
-    const newFilters: Record<string, any> = {
-      ...this.currentFilters,
-      page: 1 // Reset to first page on filter change
-    };
-
     const isEmpty = value === null ||
                     value === undefined ||
                     value === '' ||
                     (Array.isArray(value) && value.length === 0);
 
-    if (isEmpty) {
-      newFilters[field] = undefined;
-    } else {
-      newFilters[field] = value;
-    }
+    const paramValue = isEmpty ? null : value;
 
-    this.resourceService.updateFilters(newFilters as unknown as TFilters);
+    // In pop-out: emit event for parent to handle
+    if (this.popOutContext.isInPopOut()) {
+      this.urlParamsChange.emit({
+        [field]: paramValue,
+        page: 1 // Reset to first page on filter change
+      });
+    } else {
+      // In main window: update ResourceManagementService directly
+      const newFilters: Record<string, any> = {
+        ...this.currentFilters,
+        page: 1
+      };
+
+      if (isEmpty) {
+        newFilters[field] = undefined;
+      } else {
+        newFilters[field] = value;
+      }
+
+      this.resourceService.updateFilters(newFilters as unknown as TFilters);
+    }
   }
 
   /**
    * Clear all filters
+   *
+   * In main window: Updates ResourceManagementService directly
+   * In pop-out: Emits clearAllFilters event for parent to send to main window
    */
   clearFilters(): void {
-    this.resourceService.updateFilters({
-      page: 1,
-      size: this.currentFilters['size'] || 20
-    } as unknown as TFilters);
-  }
-
-  /**
-   * Toggle filter panel collapse state
-   */
-  toggleFilterPanel(): void {
-    this.filterPanelCollapsed = !this.filterPanelCollapsed;
-    this.cdr.markForCheck();
+    if (this.popOutContext.isInPopOut()) {
+      this.clearAllFilters.emit();
+    } else {
+      this.resourceService.updateFilters({
+        page: 1,
+        size: this.currentFilters['size'] || 20
+      } as unknown as TFilters);
+    }
   }
 
   /**

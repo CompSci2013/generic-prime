@@ -34,6 +34,14 @@
       [domainConfig]="domainConfig">
     </app-results-table>
 
+    <!-- Query Panel (filters only) -->
+    <app-query-panel
+      *ngSwitchCase="'query-panel'"
+      [domainConfig]="domainConfig"
+      (urlParamsChange)="onUrlParamsChange($event)"
+      (clearAllFilters)="onClearAllFilters()">
+    </app-query-panel>
+
     <!-- Unknown panel type -->
     <div *ngSwitchDefault class="unknown-panel">
       <p>Unknown panel type: {{ panelType }}</p>

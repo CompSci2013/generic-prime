@@ -9,41 +9,6 @@
     border-radius: 6px;
     overflow: hidden;
     background: var(--surface-card);
-
-    &.collapsed .filter-grid {
-      display: none;
-    }
-  }
-
-  .filter-panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    background-color: var(--surface-50);
-    cursor: pointer;
-    user-select: none;
-    border-bottom: 1px solid var(--surface-border);
-
-    .filter-title {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 600;
-      color: var(--text-color);
-
-      i {
-        font-size: 1rem;
-      }
-    }
-
-    i:last-child {
-      color: var(--text-color-secondary);
-    }
-
-    &:hover {
-      background-color: var(--surface-section);
-    }
   }
 
   .filter-grid {
@@ -57,10 +22,6 @@
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-
-      &.filter-field-wide {
-        grid-column: 1 / -1;
-      }
 
       label {
         font-weight: 600;

@@ -174,6 +174,7 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
   getPanelTitle(): string {
     const titleMap: { [key: string]: string } = {
       'query-control': 'Query Control',
+      'query-panel': 'Query Panel',
       'manufacturer-model-picker': 'Manufacturer-Model Picker',
       'statistics-panel': 'Statistics',
       'results-table': 'Results'

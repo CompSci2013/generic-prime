@@ -1,17 +1,12 @@
 <div class="query-panel-container" [attr.data-testid]="environment.includeTestIds ? 'query-panel' : null">
   <!-- Filter Panel - Domain Agnostic -->
-  <div class="filter-panel-container" [ngClass]="{'collapsed': filterPanelCollapsed}">
-    <div class="filter-panel-header" (click)="toggleFilterPanel()">
-      <span class="filter-title">
-        <i class="pi pi-filter"></i>
-        Filters
-      </span>
-      <i [ngClass]="filterPanelCollapsed ? 'pi pi-chevron-right' : 'pi pi-chevron-down'"></i>
-    </div>
-    <div class="filter-grid" *ngIf="!filterPanelCollapsed">
+  <div class="filter-panel-container">
+    <div class="filter-grid">
       <!-- Dynamic Filter Rendering from domainConfig.filters -->
       <ng-container *ngFor="let filterDef of domainConfig.filters">
-        <div class="filter-field" [ngClass]="{'filter-field-wide': filterDef.id === 'search'}">
+        <!-- Skip search filter - outer panel handles global search -->
+        <ng-container *ngIf="filterDef.id !== 'search'">
+        <div class="filter-field">
           <label [for]="filterDef.id">{{ filterDef.label }}</label>
 
           <!-- Text Input with Clear -->
@@ -117,6 +112,7 @@
                             [showClear]="true"
                             [delay]="300"
                             [scrollHeight]="'300px'"
+                            appendTo="body"
                             styleClass="w-full">
             </p-autoComplete>
           </div>
@@ -165,6 +161,7 @@
                     (click)="onFilterChange(filterDef.id + 'Max', null)"></button>
           </div>
         </div>
+        </ng-container>
       </ng-container>
 
       <!-- Clear Filters Button -->
