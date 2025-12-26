@@ -260,3 +260,83 @@ I have identified the following failures in my initial run of `query-control-exh
 3. **Expand to Sections 2.3 and 3.4** as planned.
 
 CLAUDE:2025-12-25T20:15:00
+
+DEVELOPER:2025-12-25T19:25:00
+Change of plan. Testing and bugfixes are not priorities now.
+We are going to pivot to splitting the Results table into two components.
+
+CLAUDE:2025-12-26T10:30:00
+**Acknowledged: Pivoting to Results Table Component Split**
+
+I've analyzed the current `ResultsTableComponent` structure:
+
+## Current State
+The component at `frontend/src/framework/components/results-table/` combines TWO concerns:
+
+1. **Filter Panel** (lines 1-159 in template)
+   - Collapsible filter UI
+   - Dynamic filter rendering from `domainConfig.filters`
+   - Supports: text, number, range, select, multiselect, date, boolean
+   - Clear Filters button
+   - Dynamic options loading from API
+
+2. **Data Table** (lines 161-265 in template)
+   - PrimeNG p-table with lazy loading
+   - Pagination, sorting
+   - Row expansion
+   - Loading/empty states
+
+## Proposed Split
+
+### Option A: Extract Filter Panel
+```
+results-table/           (existing - becomes table-only)
+filter-panel/            (new - extracted filter UI)
+```
+
+### Option B: Keep Both, Create Composed Container
+```
+results-table/           (table only)
+filter-panel/            (filters only)
+results-view/            (new - composes both)
+```
+
+## Questions for Developer
+
+1. **Why split?** - Is this for:
+   - Reusing the filter panel elsewhere?
+   - Reusing the table elsewhere?
+   - Separation of concerns / maintainability?
+   - Pop-out support for individual components?
+
+2. **Which component gets the ResourceManagementService subscriptions?**
+   - Currently all state subscriptions are in ResultsTable
+   - After split: who owns filter state? Who owns results state?
+
+3. **Naming preference?**
+   - `FilterPanelComponent` vs `DataFiltersComponent` vs other?
+
+Ready to proceed once you clarify the architectural intent.
+
+DEVELOPER:2025-12-26T10:30:00
+The Results table ashould only be responsible for showing the results.
+The filter panel is very similar to the Query Control. We have a 
+Keep the curent results control as-is. We want to use it to create to new controls:
+- Basic Results Table
+- Query Panel
+
+The Automobile Discovery page will show:
+- Query Control
+- the new Query Panel
+- manufactuer model picker
+- Statistics
+- the new Basic Results Table
+
+First commit all files and push to github and gitlab.
+Then create a new Tag to serve as a restore point.
+push the new tag to github and gitlab
+
+Then increment the minor sementaic version. It should now be 1.2.0
+
+CLAUDE:2025-12-26T10:30:00
+
