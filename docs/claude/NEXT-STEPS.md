@@ -1,72 +1,72 @@
 # Next Steps
 
-**Current Session**: Session 59 - Highlight Filter Sync Fixed
-**Previous Session**: Session 58 - Bug #14 Lifecycle Fix
-**Status**: All high-priority highlight bugs fixed ✅. Pop-out architecture is now fully synchronized.
+**Current Session**: Session 60 - Component Split & Autocomplete
+**Previous Session**: Session 59 - Highlight Filter Sync Fixed
+**Status**: Component split complete ✅. Autocomplete implemented ✅. Query Panel pop-out working ✅.
 
 ---
 
-## IMMEDIATE ACTION 1: Exhaustive Query Control Testing
+## IMMEDIATE ACTION 1: Query Panel UX Refinement
+
+**Priority**: HIGH (Usability)
+**Scope**: The Model autocomplete field is now functional, but there may be additional UX improvements needed.
+
+**Pending Decisions**:
+1. Should other fields also use autocomplete? (e.g., Manufacturer)
+2. Should the Query Panel filters apply immediately or require a "Search" button?
+3. Any additional filter types needed?
+
+---
+
+## IMMEDIATE ACTION 2: Testing New Components
 
 **Priority**: HIGH (Verification)
-**Scope**: Complete and refine `components/query-control-exhaustive.spec.ts`
-
-While the core implementation is present, several tests failed during the initial run due to selector strictness and environment-specific behaviors (e.g., collapsed panels).
+**Scope**: Create e2e tests for the new components
 
 **Steps**:
-1. **Refine Selectors**: Update `query-control-exhaustive.spec.ts` to use more specific selectors (e.g., `> .panel-header`) to avoid strict mode violations.
-2. **Handle Collapsed Panels**: Add logic to expand the Query Control panel if it's collapsed by default (using the `isPanelCollapsed` logic from `bug-highlight-chips.spec.ts`).
-3. **Fix NG0100 Errors**: Investigate why `ExpressionChangedAfterItHasBeenCheckedError` is occurring during keyboard navigation tests and fix if possible.
-4. **Complete Section 3**: Ensure all Multiselect Dialog tests are passing.
+1. Create `query-panel.spec.ts` - Test filter application, autocomplete behavior
+2. Create `basic-results-table.spec.ts` - Test pagination, sorting, row expansion
+3. Test pop-out synchronization for both new components
 
 ---
 
-## IMMEDIATE ACTION 2: Infrastructure (IdP Phase 1) - RESUME
+## IMMEDIATE ACTION 3: Infrastructure (IdP Phase 1) - RESUME
 
-**Priority**: HIGH (Architecture)
+**Priority**: MEDIUM (Architecture)
 **Scope**: Deploy Keycloak to K3s
 
-This task was deferred for bug fixing but remains the next architectural milestone.
+This task was deferred for component development but remains an architectural milestone.
+
+**Reference**: `docs/infrastructure/idp/IDENTITY-STRATEGY.md`
 
 ---
 
-## FUTURE ACTION 3: Frontend Integration (IdP Phase 2)
+## SESSION 60 COMPLETION SUMMARY
 
-**Priority**: HIGH (After Keycloak is running)
-**Scope**: Angular OIDC Integration
+**Primary Accomplishments**:
+1. **Component Split** ✅
+   - Created BasicResultsTableComponent (pure display)
+   - Created QueryPanelComponent (domain-agnostic filters)
+   - Both components integrate with ResourceManagementService singleton
+   - Pop-out support added for QueryPanelComponent
 
-**Steps**:
-1. Install `angular-oauth2-oidc`.
-2. Configure `AuthConfig` in `app.module.ts`.
-3. Implement Login/Logout buttons in header.
-4. Protect specific routes (e.g., Preferences).
+2. **Autocomplete Filter Type** ✅
+   - New filter type with backend search support
+   - Model field converted from text to autocomplete
+   - PrimeNG p-autoComplete with debounce and min chars
+   - API endpoint for suggestions working
 
----
+3. **Restore Point Created** ✅
+   - Tag `v1.1.0` created and pushed
+   - Version bumped to `1.2.0`
 
-## SESSION 56 COMPLETION SUMMARY
+**Commits This Session**:
+- `ab2e2cf` - chore: Session 60 - Pre-refactor checkpoint
+- `4bb7123` - feat: Add autocomplete filter type with Model field implementation
+- `c8cc89b` - fix: Query Panel pop-out URL-first sync and UI cleanup
 
-**Primary Fixes Completed**:
-1. **Bug #13 (Dropdown Keyboard Navigation)** ✅ FIXED
-   - Arrow keys properly navigate dropdown options
-   - Spacebar and Enter correctly confirm selections
-   - Multiselect dialog search field auto-focuses
-   - Public API compliance verified
-
-2. **Bug #14 (Pop-Out Filter Synchronization)** ✅ FIXED (Critical Discovery)
-   - Identified and resolved race condition in message buffering
-   - Changed `Subject` to `ReplaySubject(10)` for state buffering
-   - Filter chips now appear immediately in pop-out windows (milliseconds)
-   - All multi-window synchronization tests passing
-
-**Additional Fixes**:
-- Pagination error fixed: size=1000 → size=100 in API endpoint
-- Multiselect dialog auto-focus implemented
-
-**Test Results**: All interactive browser tests ✅ PASSED
-- Filter synchronization: IMMEDIATE display (zero latency)
-- Multi-filter scenarios: Working perfectly
-- Console health: Zero errors, zero warnings
-- Build status: 6.84 MB, zero TypeScript errors
-
-**Nice-to-Have Features Documented** in TANGENTS.md:
-- Pop-Out Window Positioning for Multi-Monitor Support (future enhancement, low priority)
+**Current State**:
+- 5 panels visible on Automobile Discovery page
+- Query Panel with autocomplete working
+- Pop-out synchronization functional
+- Build passing, no TypeScript errors

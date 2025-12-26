@@ -1,8 +1,82 @@
 # Project Status
 
-**Version**: 5.67
-**Timestamp**: 2025-12-25T19:15:00Z
-**Updated By**: Session 59 - Highlight Filter Sync Fixed
+**Version**: 5.68
+**Timestamp**: 2025-12-26T06:30:00Z
+**Updated By**: Session 60 - Component Split & Autocomplete
+
+---
+
+## Session 60 Summary: Results Table Component Split & Autocomplete
+
+**Status**: ✅ **COMPONENT SPLIT COMPLETE** - BasicResultsTableComponent and QueryPanelComponent created
+
+### What Was Accomplished
+
+1. ✅ **Created Restore Point**
+   - Tagged `v1.1.0` as pre-refactor checkpoint
+   - Pushed to both github and gitlab
+   - Version bumped to `1.2.0`
+
+2. ✅ **Component Split Completed**
+   - **BasicResultsTableComponent**: Pure display component (table, pagination, sorting, row expansion)
+   - **QueryPanelComponent**: Domain-agnostic filter panel (text, number, range, select, multiselect, date, boolean, autocomplete)
+   - Both subscribe to `ResourceManagementService` singleton for state management
+   - Original `ResultsTableComponent` preserved for reference
+
+3. ✅ **Autocomplete Filter Type Added** (commit `4bb7123`)
+   - New filter type: `autocomplete` with backend search support
+   - Model field converted from text to autocomplete
+   - Uses PrimeNG `p-autoComplete` with:
+     - 2-character minimum before search
+     - 300ms debounce
+     - Backend API endpoint for suggestions
+   - API endpoint: `/api/specs/v1/agg/model?q={query}&size=20`
+
+4. ✅ **Query Panel Pop-out Support** (commit `c8cc89b`)
+   - Added `urlParamsChange` and `clearAllFilters` outputs for pop-out communication
+   - Pop-out Query Panel now properly syncs filter changes to main window URL
+   - Removed redundant collapsible header (outer panel handles collapse)
+   - Hidden Search field (not applicable for this control)
+   - Fixed autocomplete dropdown clipping with `appendTo="body"`
+   - Registered `query-panel` type in `panel-popout.component.ts`
+
+5. ✅ **Updated `/bye` Command**
+   - Now supports both `/monster` and `/monsterwatch` protocols
+   - Properly updates dialog files for monster sessions
+
+### Files Created
+```
+frontend/src/framework/components/
+├── basic-results-table/
+│   ├── basic-results-table.component.ts
+│   ├── basic-results-table.component.html
+│   └── basic-results-table.component.scss
+└── query-panel/
+    ├── query-panel.component.ts
+    ├── query-panel.component.html
+    └── query-panel.component.scss
+```
+
+### Files Modified
+- `framework.module.ts` - Added declarations and exports
+- `components/index.ts` - Added barrel exports
+- `discover.component.ts` - Updated panel order
+- `discover.component.html` - Added new panel sections
+- `automobile.query-control-filters.ts` - Changed Model to autocomplete type
+- `panel-popout.component.ts/html` - Added query-panel support
+- `.claude/commands/bye.md` - Updated for monster protocols
+
+### Current Panel Layout
+The Automobile Discovery page now shows (in order):
+1. Query Control (chip-based filter selection)
+2. Query Panel (traditional filter form with autocomplete)
+3. Manufacturer-Model Picker
+4. Statistics
+5. Basic Results Table (table only, no embedded filters)
+
+### Backend Preferences Updated
+- Added `query-panel` and `basic-results-table` to default panel order for all domains
+- Old preferences overridden via API call
 
 ---
 
