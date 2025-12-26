@@ -16,6 +16,7 @@ Dialog files in `.dialog/` follow a turn-based script format (like a play):
 
 ```
 CLAUDE:<timestamp>
+(Use system time/Thor's time for <timestamp>)
 Claude's output goes here. Can be multiple lines.
 This continues until the next speaker marker.
 

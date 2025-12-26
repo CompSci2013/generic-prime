@@ -16,15 +16,21 @@ Check if `.dialog/` contains an active dialog file:
 
 1.  **Update `docs/claude/PROJECT-STATUS.md`**:
     -   Bump the version number.
-    -   Update the timestamp to the current time.
+    -   Update the timestamp to the current time. **CRITICAL**: Use the current system time (Thor's time). Run `date` to confirm.
     -   Summarize the "Current State" and "Completed Work" for this session.
 
 2.  **Update `docs/claude/NEXT-STEPS.md`**:
     -   Clear out completed tasks.
     -   Define the *exact* starting task for the next session.
 
-3.  **Commit Code Changes**:
-    -   If there are uncommitted changes in the codebase (outside `docs/claude/`), commit them now with a descriptive message.
+3.  **Archive Status**:
+    -   Append the content of `docs/claude/PROJECT-STATUS.md` to `docs/claude/STATUS-HISTORY.md`.
+    -   Add a header with the version and date.
+
+4.  **Commit All Changes**:
+    -   Run `git add .` to stage code and documentation.
+    -   Commit with a descriptive message: `docs: session [Version] summary - [Brief Description]`.
+    -   **CRITICAL**: You are responsible for this commit. Do not leave it for Gemini.
 
 ---
 

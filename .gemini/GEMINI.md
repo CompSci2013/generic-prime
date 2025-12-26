@@ -22,12 +22,12 @@
 
 ### 2. Shutdown: `/bye` or "Shutdown"
 **When triggered, I must:**
-1.  Read `docs/claude/PROJECT-STATUS.md` (to verify Brain's work).
-2.  **Archive**: Append `PROJECT-STATUS.md` content to `docs/claude/STATUS-HISTORY.md` (add a header with version/date).
-3.  **Commit**:
-    -   `git add docs/claude/`
-    -   `git commit -m "docs: session [Version] summary - [Brief Description]"`
-4.  **Respond**: "Monster Hibernating. [Commit Hash]"
+1.  **Detect Session Type**: Check if `.dialog/` has active files (MonsterWatch) or if relying on `MONSTER-LOG.md` (Monster).
+2.  Read `docs/claude/PROJECT-STATUS.md` (Verify Brain's work).
+    -   **CRITICAL**: Verify the timestamp matches the current system time (Thor's time). Run `date` to confirm.
+    -   Verify that the status was archived to `docs/claude/STATUS-HISTORY.md`.
+    -   Verify that changes were committed.
+3.  **Respond**: "Monster Hibernating. [Commit Hash]"
 
 ### 3. Execution: "Execute plan from MONSTER-LOG.md"
 **When triggered, I must:**
