@@ -30,6 +30,34 @@
 
 ---
 
+## Session 61 Summary: Query Panel UX Refinement
+
+**Status**: ✅ **COMPLETED** - Query Panel UX refined with autocomplete, debouncing, and improved keyboard navigation.
+
+### What Was Accomplished
+
+1.  ✅ **Manufacturer Filter Upgrade**
+    *   Changed filter type from `text` to `autocomplete`.
+    *   Configured to use `/api/specs/v1/filters/manufacturers` endpoint.
+    *   Provides progressive search suggestions (type "For" -> see "Ford").
+
+2.  ✅ **Query Panel Refactoring**
+    *   **Debouncing**: Implemented `debounceTime(300)` for all text inputs to prevent excessive API calls.
+    *   **Custom Value Support**: Added `(onBlur)` handler to `p-autoComplete`. Users can now type a partial string (e.g., "Cam") and tab away to apply it as a filter, without needing to select a suggestion.
+    *   **Keyboard Navigation Fix**: Applied `[autofocusFilter]="false"` to all dropdowns, mirroring the fix from `QueryControlComponent` (Session 56) to ensure arrow keys work for navigation.
+
+3.  ✅ **Verification**
+    *   Created `frontend/e2e/regression/query-panel-ux.spec.ts`.
+    *   Verified build passes (6.90 MB bundle).
+
+### Files Modified
+- `frontend/src/framework/components/query-panel/query-panel.component.ts` (Debouncing, onBlur)
+- `frontend/src/framework/components/query-panel/query-panel.component.html` (Template updates)
+- `frontend/src/domain-config/automobile/configs/automobile.filter-definitions.ts` (Config update)
+- `frontend/e2e/regression/query-panel-ux.spec.ts` (New test suite)
+
+---
+
 ## Session 60 Summary: Results Table Component Split & Autocomplete
 
 **Status**: ✅ **COMPONENT SPLIT COMPLETE** - BasicResultsTableComponent and QueryPanelComponent created

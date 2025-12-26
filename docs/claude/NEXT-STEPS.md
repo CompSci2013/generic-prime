@@ -1,36 +1,40 @@
 # Next Steps
 
-**Current Session**: Session 61 - Shutdown Protocol Update
+**Current Session**: Session 61 - Query Panel UX Refinement
 **Previous Session**: Session 60 - Component Split & Autocomplete
-**Status**: Protocols updated ✅. Component split complete ✅.
+**Status**: UX refinements implemented. Ready for testing.
 
 ---
 
-## IMMEDIATE ACTION 1: Query Panel UX Refinement
-
-**Priority**: HIGH (Usability)
-**Scope**: The Model autocomplete field is now functional, but there may be additional UX improvements needed.
-
-**Pending Decisions**:
-1. Should other fields also use autocomplete? (e.g., Manufacturer)
-2. Should the Query Panel filters apply immediately or require a "Search" button?
-3. Any additional filter types needed?
-
----
-
-## IMMEDIATE ACTION 2: Testing New Components
+## IMMEDIATE ACTION 1: Run UX Regression Tests
 
 **Priority**: HIGH (Verification)
-**Scope**: Create e2e tests for the new components
+**Scope**: Execute the newly created regression suite.
 
-**Steps**:
-1. Create `query-panel.spec.ts` - Test filter application, autocomplete behavior
-2. Create `basic-results-table.spec.ts` - Test pagination, sorting, row expansion
-3. Test pop-out synchronization for both new components
+**Command**:
+```bash
+npx playwright test frontend/e2e/regression/query-panel-ux.spec.ts --project=chromium
+```
+
+**What to Watch For**:
+1. **Debounce Timing**: Ensure the 300ms delay isn't too long/short for tests.
+2. **Autocomplete Blur**: Verify custom values are actually applied.
+3. **Dropdown Focus**: Ensure arrow keys work immediately after opening.
 
 ---
 
-## IMMEDIATE ACTION 3: Infrastructure (IdP Phase 1) - RESUME
+## IMMEDIATE ACTION 2: Infrastructure (IdP Phase 1) - RESUME
+
+**Priority**: MEDIUM (Architecture)
+**Scope**: Deploy Keycloak to K3s
+
+This task remains the next major architectural milestone.
+
+**Reference**: `docs/infrastructure/idp/IDENTITY-STRATEGY.md`
+
+---
+
+## SESSION 61 COMPLETION SUMMARY
 
 **Priority**: MEDIUM (Architecture)
 **Scope**: Deploy Keycloak to K3s
