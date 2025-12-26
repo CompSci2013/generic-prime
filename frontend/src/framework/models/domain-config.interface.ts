@@ -517,6 +517,24 @@ export interface FilterDefinition {
   optionsEndpoint?: string;
 
   /**
+   * API endpoint for autocomplete search
+   * Used with type: 'autocomplete' for progressive refinement search
+   * The endpoint should accept ?search= and ?limit= query parameters
+   *
+   * @example
+   * autocompleteEndpoint: 'filters/models'
+   * // Fetches from: {apiBaseUrl}/filters/models?search=cam&limit=10
+   * // Response: { models: ["Camaro", "Camry", "Canyon", ...] }
+   */
+  autocompleteEndpoint?: string;
+
+  /**
+   * Minimum characters required before autocomplete triggers
+   * @default 2
+   */
+  autocompleteMinChars?: number;
+
+  /**
    * Minimum value (for numeric/date filters)
    */
   min?: number | string;
@@ -574,7 +592,8 @@ export type FilterType =
   | 'select'
   | 'multiselect'
   | 'boolean'
-  | 'range';
+  | 'range'
+  | 'autocomplete';
 
 /**
  * Filter operators

@@ -129,9 +129,10 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    */
   panelOrder: string[] = [
     'query-control',
+    'query-panel',
     'manufacturer-model-picker',
     'statistics-panel',
-    'results-table'
+    'basic-results-table'
   ];
 
   /**
@@ -352,9 +353,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   getPanelTitle(panelId: string): string {
     const titleMap: { [key: string]: string } = {
       'query-control': 'Query Control',
+      'query-panel': 'Query Panel',
       'manufacturer-model-picker': 'Manufacturer-Model Picker',
       'statistics-panel': 'Statistics',
-      'results-table': 'Results'
+      'results-table': 'Results',
+      'basic-results-table': 'Results Table'
     };
     return titleMap[panelId] || panelId;
   }
@@ -368,9 +371,11 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   getPanelType(panelId: string): string {
     const typeMap: { [key: string]: string } = {
       'query-control': 'query-control',
+      'query-panel': 'query-panel',
       'manufacturer-model-picker': 'picker',
       'statistics-panel': 'statistics',
-      'results-table': 'results'
+      'results-table': 'results',
+      'basic-results-table': 'basic-results'
     };
     return typeMap[panelId] || panelId;
   }

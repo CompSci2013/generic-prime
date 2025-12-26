@@ -45,12 +45,19 @@ export const AUTOMOBILE_FILTER_DEFINITIONS: FilterDefinition[] = [
 
   /**
    * Model filter
+   *
+   * Uses autocomplete with progressive refinement:
+   * - User types 2+ characters
+   * - Backend returns top 10 matching models
+   * - Results narrow as user types more
    */
   {
     id: 'model',
     label: 'Model',
-    type: 'text',
-    placeholder: 'Enter model name...',
+    type: 'autocomplete',
+    placeholder: 'Type to search models...',
+    autocompleteEndpoint: 'filters/models',
+    autocompleteMinChars: 1,
     operators: ['contains', 'equals', 'startsWith'],
     defaultOperator: 'contains',
     validation: {

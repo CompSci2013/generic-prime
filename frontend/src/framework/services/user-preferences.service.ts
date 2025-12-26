@@ -53,9 +53,10 @@ export class UserPreferencesService {
    */
   private readonly DEFAULT_PANEL_ORDER = [
     'query-control',
+    'query-panel',
     'manufacturer-model-picker',
     'statistics-panel',
-    'results-table'
+    'basic-results-table'
   ];
 
   /**

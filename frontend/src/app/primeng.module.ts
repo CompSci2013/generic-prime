@@ -20,6 +20,7 @@ import { ChipModule } from 'primeng/chip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
 import { TieredMenuModule } from 'primeng/tieredmenu';
+import { AutoCompleteModule } from 'primeng/autocomplete';
 
 /**
  * Centralized PrimeNG UI Component Library Module
@@ -76,7 +77,8 @@ const PRIMENG_MODULES = [
   ChipModule,
   ProgressSpinnerModule,
   TooltipModule,
-  TieredMenuModule
+  TieredMenuModule,
+  AutoCompleteModule
 ];
 
 /**

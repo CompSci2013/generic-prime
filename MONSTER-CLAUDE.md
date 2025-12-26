@@ -2,10 +2,16 @@
 
 ## Session Startup
 - **Branch**: main
-- **Last Commit**: aaaa760 - chore: Session 59 updates - E2E test refinements and highlight regression tests
-- **Status**: ✅ HIGHLIGHT FILTER SYNC FIXED (Session 59)
-- **Next Task**: Exhaustive Query Control Testing (Refine and complete `query-control-exhaustive.spec.ts`)
-- **Dialog Status**: Checked .dialog/2025-12-25_session.dialog
+- **Last Commit**: ab2e2cf - chore: Session 60 - Pre-refactor checkpoint
+- **Status**: ✅ PIVOT TO RESULTS TABLE SPLIT (Session 60)
+- **Next Task**: Create `BasicResultsTableComponent` and `QueryPanelComponent`
+- **Dialog Status**: GEMINI:2025-12-26T11:00:00
 
 ## Reality Check
-- **Git Status**: Clean.
+- **Version**: `1.2.0` (Correct)
+- **Restore Tag**: `v1.1.0` (Verified)
+- **Current State**: `ResultsTableComponent` is a monolithic component handling both filtering and display.
+- **Anomalies**: None. Git working tree is clean.
+
+## Note
+Claude (Brain) is proceeding with the component split. Gemini (Body) has verified the restore point and project configuration.

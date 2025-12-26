@@ -338,5 +338,310 @@ push the new tag to github and gitlab
 
 Then increment the minor sementaic version. It should now be 1.2.0
 
-CLAUDE:2025-12-26T10:30:00
+CLAUDE:2025-12-26T10:35:00
+**Git Operations Complete**
 
+## Completed Tasks
+1. ✅ Committed all changes: `ab2e2cf` - chore: Session 60 - Pre-refactor checkpoint
+2. ✅ Pushed to github and gitlab (19 commits total)
+3. ✅ Created tag `v1.1.0` - Pre-refactor checkpoint
+4. ✅ Pushed tag to github and gitlab
+5. ✅ Updated `frontend/package.json` version to `1.2.0`
+
+## Restore Point
+If refactoring goes wrong, revert with:
+```bash
+git checkout v1.1.0
+```
+
+## Next: Component Creation
+
+Ready to create:
+1. **BasicResultsTableComponent** - Table only (pagination, sorting, row expansion)
+2. **QueryPanelComponent** - Filter panel only (dynamic filters, clear button)
+
+Both will subscribe to `ResourceManagementService` for state.
+
+The existing `ResultsTableComponent` will be preserved as reference.
+
+Shall I proceed with creating the new components?
+
+GEMINI:2025-12-26T11:00:00
+Everything is verified.
+- Git tag `v1.1.0` is present.
+- `package.json` version is `1.2.0`.
+- `ResultsTableComponent` currently combines both concerns.
+
+The architectural intent is clear:
+- `BasicResultsTableComponent`: Pure display and table interactions.
+- `QueryPanelComponent`: Domain-agnostic filter panel logic.
+
+Proceed with creating the new components. I'll be watching for state management implementation to ensure `ResourceManagementService` is used correctly as a singleton across the new components.
+
+CLAUDE:2025-12-26T04:38:00
+**Component Split Complete**
+
+Created two new components extracted from `ResultsTableComponent`:
+
+## 1. BasicResultsTableComponent
+**Location:** `frontend/src/framework/components/basic-results-table/`
+
+**Purpose:** Pure display component for tabular data
+- PrimeNG p-table with lazy loading
+- Pagination and sorting
+- Row expansion
+- Loading/empty states
+- Pop-out window support
+
+**Does NOT include:** Filter controls (use QueryPanelComponent or QueryControlComponent for that)
+
+## 2. QueryPanelComponent
+**Location:** `frontend/src/framework/components/query-panel/`
+
+**Purpose:** Domain-agnostic filter panel
+- Collapsible filter UI
+- Dynamic filter rendering from `domainConfig.filters`
+- Supports: text, number, range, select, multiselect, date, boolean
+- Clear Filters button
+- Dynamic options loading from API
+- Pop-out window support
+
+## Files Created
+```
+frontend/src/framework/components/
+├── basic-results-table/
+│   ├── basic-results-table.component.ts
+│   ├── basic-results-table.component.html
+│   └── basic-results-table.component.scss
+└── query-panel/
+    ├── query-panel.component.ts
+    ├── query-panel.component.html
+    └── query-panel.component.scss
+```
+
+## Updated Files
+- `framework.module.ts` - Added declarations and exports
+- `components/index.ts` - Added barrel exports
+
+## State Management
+Both components subscribe to `ResourceManagementService` (singleton):
+- `BasicResultsTableComponent`: subscribes to `results$`, `totalResults$`, `loading$`, `filters$`
+- `QueryPanelComponent`: subscribes to `filters$`, updates via `updateFilters()`
+
+## Next Steps
+1. Verify build compiles without errors
+2. Update `discover.component.html` to use the new components
+3. Test in browser
+
+Waiting for Gemini to verify the component structure before proceeding.
+
+GEMINI:2025-12-26T04:38:00
+
+GEMINI:2025-12-26T04:45:00
+I have verified that the component split is complete. 
+- **BasicResultsTableComponent**: Created in `frontend/src/framework/components/basic-results-table/`.
+- **QueryPanelComponent**: Created in `frontend/src/framework/components/query-panel/`.
+- **Framework Module**: Updated to include and export the new components.
+- **Index Barrel**: Updated for clean imports.
+
+I have also reviewed the state management implementation in the new components and confirmed they are correctly utilizing the `ResourceManagementService` singleton for synchronization.
+
+The environment is ready for the build verification and the update to `discover.component.html`.
+
+CLAUDE:2025-12-26T04:48:00
+**Build Verified & Discover Component Updated**
+
+## Build Status
+Build successful (2801ms). No errors.
+
+## Changes to DiscoverComponent
+
+### discover.component.ts
+Updated `panelOrder` to include new components:
+```typescript
+panelOrder: string[] = [
+  'query-control',
+  'query-panel',           // NEW
+  'manufacturer-model-picker',
+  'statistics-panel',
+  'basic-results-table'    // NEW (replaces results-table)
+];
+```
+
+Added to `getPanelTitle()`:
+- `'query-panel': 'Query Panel'`
+- `'basic-results-table': 'Results Table'`
+
+Added to `getPanelType()`:
+- `'query-panel': 'query-panel'`
+- `'basic-results-table': 'basic-results'`
+
+### discover.component.html
+Added two new panel sections:
+1. **Query Panel** - `<app-query-panel [domainConfig]="domainConfig">`
+2. **Basic Results Table** - `<app-basic-results-table [domainConfig]="domainConfig">`
+
+The legacy `results-table` panel remains for backwards compatibility but is no longer in the default panelOrder.
+
+## Current Panel Layout
+The Automobile Discovery page now shows (in order):
+1. Query Control (chip-based filter selection)
+2. Query Panel (traditional filter form)
+3. Manufacturer-Model Picker
+4. Statistics
+5. Basic Results Table (table only, no embedded filters)
+
+## Next Step
+User should verify in browser that:
+- Both new panels render
+- Filters from Query Panel update the URL
+- Basic Results Table shows data and responds to filter changes
+
+DEVELOPER:2025-12-26T04:50:00
+Screenshot shows only 4 panels - the new Query Panel and Basic Results Table are not visible.
+
+CLAUDE:2025-12-26T04:51:00
+**Issue Identified: User Preferences Override**
+
+The screenshot shows the OLD panel order (4 panels). The new panels aren't visible because:
+
+**Root Cause:** `UserPreferencesService` saves panel order to localStorage. Your browser has the OLD panel order cached from previous sessions, which doesn't include `query-panel` or `basic-results-table`.
+
+**Fix Options:**
+
+1. **Clear localStorage** (recommended):
+   - Open DevTools (F12)
+   - Go to Application → Local Storage → `http://192.168.0.244:4205`
+   - Delete the `panelOrder` key (or clear all)
+   - Refresh the page
+
+2. **Hard refresh**: Ctrl+Shift+R (may not be enough alone)
+
+3. **Dev server restart**: If the dev container didn't auto-rebuild, restart it
+
+**Alternative Fix:** I can modify the code to merge new panels into existing preferences rather than being fully overridden by saved preferences.
+
+Which approach do you prefer?
+
+DEVELOPER:2025-12-26T04:55:00
+Screenshot shows only 4 panels. User preferences are stored in backend API, not localStorage.
+
+CLAUDE:2025-12-26T04:58:00
+**Fixed: Backend Preferences Updated**
+
+You're right - the `UserPreferencesService` uses a backend API at `/api/preferences/v1/default` for persistence.
+
+## Root Cause
+The backend had saved the OLD panel order:
+```json
+"panelOrder": ["query-control", "manufacturer-model-picker", "statistics-panel", "results-table"]
+```
+
+## Fixes Applied
+
+1. **Updated `UserPreferencesService.DEFAULT_PANEL_ORDER`** to include new panels:
+   ```typescript
+   private readonly DEFAULT_PANEL_ORDER = [
+     'query-control',
+     'query-panel',
+     'manufacturer-model-picker',
+     'statistics-panel',
+     'basic-results-table'
+   ];
+   ```
+
+2. **Updated backend preferences** via API call:
+   ```bash
+   curl -X POST http://localhost:4205/api/preferences/v1/default \
+     -d '{"automobiles":{"panelOrder":["query-control","query-panel",...]}}'
+   ```
+
+## Verification
+Backend now returns correct panel order for all domains (automobiles, physics, agriculture, chemistry, math).
+
+**Please refresh the browser** - the 5 panels should now appear.
+
+DEVELOPER:2025-12-26T04:58:00
+
+5 panels now appear.
+Bug? that needs immediate attention for the  Query Panel.
+The results table shows 0 results until the full model has been entered?
+Do a deep search online for UX to see how industry standards would handle the 'Model' field.
+1. Pre-populated dropdown that reduces visible options as user types?
+2. backend api call to pull wildcard matches for the model input?
+3. Other?
+
+CLAUDE:2025-12-26T05:15:00
+**UX Research: Model Field Autocomplete Best Practices**
+
+## The Problem
+The current text input for "Model" requires exact/full text match. Partial input like "Cam" shows 0 results until the user types the complete "Camry".
+
+## Industry Standard Solutions (Ranked)
+
+### 1. **Autocomplete Dropdown with Backend Search** (Recommended)
+The industry standard for high-cardinality fields (thousands of unique values like car models).
+
+**How it works:**
+- User types 2+ characters
+- Frontend debounces (300ms) then calls backend API
+- Backend returns top 10 matches using wildcard/prefix search
+- Dropdown shows suggestions; user selects or keeps typing
+
+**Implementation:**
+- Change `type: 'text'` → `type: 'autocomplete'` in filter definition
+- Add `optionsEndpoint: 'model'` to fetch from `/api/specs/v1/agg/model?q={query}`
+- Backend returns matches: `["Camry", "Camaro", "Camino", ...]`
+
+**Pros:** Handles unlimited options, progressive filtering, reduces typos
+**Cons:** Requires backend API, slight latency
+
+### 2. **Pre-populated Dropdown with Client-side Filter** (Alternative)
+Works well for medium-cardinality fields (100-1000 unique values).
+
+**How it works:**
+- Load ALL model values on component init
+- PrimeNG dropdown with `[filter]="true"` handles typeahead
+- Client-side filtering as user types
+
+**Implementation:**
+- Change `type: 'text'` → `type: 'select'`
+- Add `optionsEndpoint: 'model'`
+
+**Pros:** No per-keystroke API calls, instant response
+**Cons:** Initial load time, memory usage if thousands of models
+
+### 3. **"Contains" Search with Minimum Characters** (Quick Fix)
+Keep text input but require minimum characters before filtering.
+
+**How it works:**
+- Only trigger search after 3+ characters
+- Backend does `LIKE '%Cam%'` search
+- Results update progressively
+
+**Implementation:**
+- Add `validation.minLength: 3` (already there as 1)
+- Modify QueryPanel to debounce input
+
+**Pros:** Minimal changes
+**Cons:** User still types blindly, no guidance on valid values
+
+## Recommendation
+
+**Option 1 (Autocomplete)** is the industry standard for this exact use case:
+- [Algolia](https://www.algolia.com/blog/ux/auto-suggest-best-practices-for-autocomplete-suggestion) recommends instant suggestions with <1 second delay
+- [Baymard Institute](https://baymard.com/blog/autocomplete-design) found only 19% of sites implement autocomplete correctly
+- [Sparq](https://www.sparq.ai/blogs/type-ahead-search) notes typeahead reduces user effort by 25%
+
+**PrimeNG has `p-autoComplete`** component that supports:
+- Lazy loading (backend search)
+- Minimum character threshold
+- Dropdown suggestions
+- Keyboard navigation
+
+## Quick Win (Interim)
+For now, change Model from `type: 'text'` to `type: 'select'` with `optionsEndpoint: 'model'`. This uses the existing infrastructure and gives immediate typeahead.
+
+Which approach would you like to implement?
+
+DEVELOPER:2025-12-26T05:15:00

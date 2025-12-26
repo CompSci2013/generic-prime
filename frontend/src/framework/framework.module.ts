@@ -6,7 +6,9 @@ import { PrimengModule } from '../app/primeng.module';
 // Components
 import { BasePickerComponent } from './components/base-picker/base-picker.component';
 import { ResultsTableComponent } from './components/results-table/results-table.component';
+import { BasicResultsTableComponent } from './components/basic-results-table/basic-results-table.component';
 import { QueryControlComponent } from './components/query-control/query-control.component';
+import { QueryPanelComponent } from './components/query-panel/query-panel.component';
 import { BaseChartComponent } from './components/base-chart/base-chart.component';
 import { StatisticsPanelComponent } from './components/statistics-panel/statistics-panel.component';
 
@@ -31,7 +33,9 @@ import { StatisticsPanelComponent } from './components/statistics-panel/statisti
   declarations: [
     BasePickerComponent,
     ResultsTableComponent,
+    BasicResultsTableComponent,
     QueryControlComponent,
+    QueryPanelComponent,
     BaseChartComponent,
     StatisticsPanelComponent
   ],
@@ -43,7 +47,9 @@ import { StatisticsPanelComponent } from './components/statistics-panel/statisti
   exports: [
     BasePickerComponent,
     ResultsTableComponent,
+    BasicResultsTableComponent,
     QueryControlComponent,
+    QueryPanelComponent,
     BaseChartComponent,
     StatisticsPanelComponent,
     // Re-export common modules for convenience

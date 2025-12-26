@@ -60,6 +60,19 @@
             </ng-template>
           </ng-container>
 
+          <!-- Query Panel (domain-agnostic filter panel) -->
+          <ng-container *ngIf="panelId === 'query-panel'">
+            <div *ngIf="!isPanelPoppedOut('query-panel'); else queryPanelPlaceholder">
+              <app-query-panel [domainConfig]="domainConfig"></app-query-panel>
+            </div>
+            <ng-template #queryPanelPlaceholder>
+              <div class="popout-placeholder">
+                <i class="pi pi-external-link"></i>
+                <span>Query Panel is open in a separate window</span>
+              </div>
+            </ng-template>
+          </ng-container>
+
           <!-- Manufacturer-Model Picker -->
           <ng-container *ngIf="panelId === 'manufacturer-model-picker'">
             <div *ngIf="!isPanelPoppedOut('manufacturer-model-picker'); else pickerPlaceholder">
@@ -89,12 +102,25 @@
             </ng-template>
           </ng-container>
 
-          <!-- Results Table -->
+          <!-- Results Table (legacy - kept for backwards compatibility) -->
           <ng-container *ngIf="panelId === 'results-table'">
             <div *ngIf="!isPanelPoppedOut('results-table'); else resultsPlaceholder">
               <app-results-table [domainConfig]="domainConfig"></app-results-table>
             </div>
             <ng-template #resultsPlaceholder>
+              <div class="popout-placeholder">
+                <i class="pi pi-external-link"></i>
+                <span>Results Table is open in a separate window</span>
+              </div>
+            </ng-template>
+          </ng-container>
+
+          <!-- Basic Results Table (new - table only, no filters) -->
+          <ng-container *ngIf="panelId === 'basic-results-table'">
+            <div *ngIf="!isPanelPoppedOut('basic-results-table'); else basicResultsPlaceholder">
+              <app-basic-results-table [domainConfig]="domainConfig"></app-basic-results-table>
+            </div>
+            <ng-template #basicResultsPlaceholder>
               <div class="popout-placeholder">
                 <i class="pi pi-external-link"></i>
                 <span>Results Table is open in a separate window</span>
