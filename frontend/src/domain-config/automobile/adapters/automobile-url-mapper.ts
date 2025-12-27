@@ -384,6 +384,41 @@ export class AutomobileUrlMapper implements IFilterUrlMapper<AutoSearchFilters> 
   }
 
   /**
+   * Extract highlight filters from URL parameters
+   *
+   * Automobile-specific strategy: Look for 'h_' prefix.
+   * This enables segmented statistics highlighting (e.g., h_manufacturer=Ford
+   * highlights Ford in charts while showing all data).
+   *
+   * Normalizes separators: Converts pipes (|) to commas (,) for backend compatibility.
+   * Backend expects comma-separated values: h_manufacturer=Ford,Buick
+   *
+   * @param params - URL query parameters
+   * @returns Highlight filters object
+   */
+  extractHighlights(params: Params): Record<string, any> {
+    const highlights: Record<string, any> = {};
+    const prefix = 'h_';
+
+    Object.keys(params).forEach(key => {
+      if (key.startsWith(prefix)) {
+        const highlightKey = key.substring(prefix.length);
+        let value = params[key];
+
+        // Normalize separators: Convert pipes to commas for backend compatibility
+        // Supports both h_manufacturer=Ford,Buick and h_manufacturer=Ford|Buick
+        if (typeof value === 'string' && value.includes('|')) {
+          value = value.replace(/\|/g, ',');
+        }
+
+        highlights[highlightKey] = value;
+      }
+    });
+
+    return highlights;
+  }
+
+  /**
    * Sanitize URL parameters
    *
    * Removes invalid parameters and corrects invalid values.

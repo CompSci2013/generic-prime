@@ -399,15 +399,23 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
 
   /**
    * Extract highlight filters from URL parameters
-   * Extracts parameters with h_ prefix (e.g., h_yearMin, h_manufacturer)
    *
-   * Normalizes separators: Converts pipes (|) to commas (,) for backend compatibility.
-   * Backend expects comma-separated values: h_manufacturer=Ford,Buick
+   * Delegates to the domain-specific IFilterUrlMapper.extractHighlights() method.
+   * This decouples the Framework from domain-specific URL parameter conventions.
+   *
+   * If the mapper doesn't implement extractHighlights(), falls back to legacy
+   * behavior using supportsHighlights/highlightPrefix config (deprecated).
    *
    * @param urlParams - URL parameters
    * @returns Highlight filters object
    */
   private extractHighlights(urlParams: Record<string, any>): any {
+    // Preferred: Use domain-specific mapper strategy
+    if (this.config.filterMapper.extractHighlights) {
+      return this.config.filterMapper.extractHighlights(urlParams);
+    }
+
+    // Fallback: Legacy behavior (deprecated)
     if (!this.config.supportsHighlights) {
       return {};
     }

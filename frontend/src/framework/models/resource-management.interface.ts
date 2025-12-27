@@ -22,6 +22,17 @@ export interface IFilterUrlMapper<TFilters> {
    * @returns Filter object
    */
   fromUrlParams(params: Params): TFilters;
+
+  /**
+   * Extract highlight filters from URL parameters (optional)
+   *
+   * Domain-specific strategy for identifying "highlight" parameters.
+   * If not implemented, the framework assumes no highlights are present.
+   *
+   * @param params - URL query parameters
+   * @returns Highlight filters object (domain-specific structure)
+   */
+  extractHighlights?(params: Params): any;
 }
 
 /**
@@ -118,12 +129,14 @@ export interface ResourceManagementConfig<TFilters, TData, TStatistics = any> {
   cacheTTL?: number;
 
   /**
+   * @deprecated Use IFilterUrlMapper.extractHighlights() instead.
    * Whether to support highlight filters (h_* parameters)
    * Default: false
    */
   supportsHighlights?: boolean;
 
   /**
+   * @deprecated Use IFilterUrlMapper.extractHighlights() instead.
    * Prefix for highlight parameters in URL
    * Default: 'h_'
    */
