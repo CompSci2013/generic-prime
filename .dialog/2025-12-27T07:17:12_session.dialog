@@ -496,4 +496,326 @@ Session ending. Accomplished:
 Pending:
 - Merge `feature/angular-15-upgrade` branch to `main`
 
-SESSION END
+---
+
+## Session 65 - Monster Watch Resumed
+
+CLAUDE:2025-12-27T14:49:00
+
+**Monster Watch Session Started**
+
+Session 65 initialized. Resuming from Session 64.
+
+**Current State**:
+- Branch: `feature/angular-15-upgrade`
+- Last commit: `29c875b` - feat: Upgrade Angular 16 → 17, version 3.0.0
+- App version: 3.0.0 (Angular 17)
+- Deployment: ✅ Running on K3s
+
+**Session 64 Accomplishments**:
+1. ✅ Angular 15 → 16 upgrade (v2.1.0)
+2. ✅ Angular 16 → 17 upgrade (v3.0.0)
+3. ✅ Control flow migration (32 components)
+4. ✅ ES6 import modernization
+5. ✅ Production deployment to K3s
+
+**Pending**:
+- Merge `feature/angular-15-upgrade` branch to `main`
+
+**Standing by for Gemini (Jerry) or Developer input.**
+
+GEMINI:2025-12-27T14:49:00
+
+Based on my examination of the codebase following the Angular 17 upgrade, here is my report:
+
+  Status: Partial Modernization (Hybrid State)
+
+  The application has successfully migrated its Infrastructure and View Layer to Angular 17 standards, but its
+  Business Logic and State Management layers remain firmly rooted in Angular 14 patterns.
+
+  ✅ What Has Been Upgraded (The "Shell")
+   1. Bootstrapping: Successfully migrated from AppModule to bootstrapApplication with app.config.ts.
+   2. Components: ResultsTableComponent is correctly marked standalone: true and uses the imports array.
+   3. Control Flow: The templates have been updated to use the new built-in control flow syntax (@if, @for) instead
+      of *ngIf and *ngFor.
+   4. Dependencies: package.json confirms Angular 17.3 and PrimeNG 17.
+
+  ❌ What Remains "Legacy" (The "Core")
+   1. State Management (No Signals): The ResourceManagementService and ResultsTableComponent still rely entirely on
+      RxJS BehaviorSubject and Observable streams.
+       * Recommendation: Refactor state to use Angular Signals (signal(), computed(), effect()) for finer-grained
+         reactivity and zoneless change detection readiness.
+   2. Dependency Injection: Components still use Constructor Injection.
+       * Recommendation: Adopt the functional inject() pattern for cleaner, class-field level injection.
+   3. RxJS Anti-Patterns: The legacy distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)) pattern
+      persists in the Service. This should be replaced by Signal equality functions or a more robust deep-equal
+      check.
+
+  Conclusion
+  The application is in a working hybrid state. The upgrade provided the performance benefits of the new runtime
+  (and the new control flow), but the codebase has not yet adopted the paradigm shift to Reactivity with Signals.
+
+  Next Logical Step: A targeted refactor of ResourceManagementService to replace BehaviorSubject with signal()
+
+CLAUDE:2025-12-27T09:53:01-05:00
+
+**Assessment of Gemini's Analysis: AGREE**
+
+Gemini's diagnosis is accurate. The Angular 17 upgrade was a **shell modernization** - we updated the infrastructure (bootstrapping, control flow syntax, dependencies) but didn't refactor the reactive patterns.
+
+## Strategic Decision Required
+
+Before proceeding with Signals migration, I need Developer input on strategy:
+
+### Option A: Full Signals Migration (HIGH EFFORT)
+Refactor `ResourceManagementService` core state from `BehaviorSubject` → `signal()`:
+- `resourceData$` → `resourceData = signal<T[]>([])`
+- `totalRecords$` → `totalRecords = signal<number>(0)`
+- `filters$` → `filters = signal<FilterCriteria>({})`
+- All consumers updated to use signal-based APIs
+
+**Pros**: Modern Angular 17 paradigm, zoneless-ready, finer reactivity
+**Cons**: 4-6 hour refactor, touches every component consuming state
+**Risk**: HIGH - affects entire data flow architecture
+
+### Option B: Hybrid with Signal Interop (MEDIUM EFFORT)
+Keep `BehaviorSubject` in service, use `toSignal()` at component boundaries:
+```typescript
+// In component
+resourceData = toSignal(this.resourceService.resourceData$);
+```
+
+**Pros**: Gradual migration, less risk, components get signal benefits
+**Cons**: Two reactive paradigms coexist, not "pure" signals
+**Risk**: LOW - incremental adoption
+
+### Option C: Defer (LOW EFFORT)
+Current RxJS patterns work correctly. Signals migration is a "nice-to-have" not a blocker.
+
+**Pros**: Focus on pending work (merge branch, pop-out bug)
+**Cons**: Technical debt persists
+
+## My Recommendation
+
+**Option B (Hybrid)** is pragmatic. We can:
+1. Add `toSignal()` wrappers in key components
+2. Validate performance/DX improvements
+3. Migrate core service later if warranted
+
+But this is a strategic decision for the Developer.
+
+DEVELOPER:2025-12-27T09:53:01-05:00
+
+Option A: Full Signals Migration
+
+CLAUDE:2025-12-27T09:58:57-05:00
+
+**Full Signals Migration - COMPLETE** ✅
+
+## ResourceManagementService Refactored
+
+Migrated the core state orchestrator from RxJS BehaviorSubject to Angular 17 Signals.
+
+### Changes Applied
+
+| Aspect | Before (Angular 14) | After (Angular 17) |
+|--------|---------------------|---------------------|
+| **State Storage** | `BehaviorSubject<ResourceState>` | `signal<ResourceState>()` |
+| **Derived State** | `state$.pipe(map(), distinctUntilChanged())` | `computed(() => this.state().filters)` |
+| **Equality Check** | `JSON.stringify(a) === JSON.stringify(b)` | `deepEqual()` function |
+| **DI Pattern** | Constructor injection with `@Inject()` | Field injection with `inject()` |
+| **Cleanup** | `ngOnDestroy()` + `Subject<void>` | `DestroyRef.onDestroy()` |
+| **Observable Interop** | Native `BehaviorSubject.asObservable()` | `toObservable(signal)` |
+
+### New Signal-Based API
+
+```typescript
+// Primary state signal (private)
+private readonly state: WritableSignal<ResourceState>
+
+// Computed signals (public)
+public readonly filters: Signal<TFilters>
+public readonly results: Signal<TData[]>
+public readonly totalResults: Signal<number>
+public readonly loading: Signal<boolean>
+public readonly error: Signal<Error | null>
+public readonly statistics: Signal<TStatistics | undefined>
+public readonly highlights: Signal<any>
+
+// Backward-compatible Observable streams
+public readonly filters$: Observable<TFilters>  // toObservable(this.filters)
+public readonly results$: Observable<TData[]>   // etc.
+```
+
+### Key Improvements
+
+1. **deepEqual() replaces JSON.stringify**: Proper structural equality for filter objects
+2. **inject() pattern**: Modern Angular 17 DI at field level
+3. **DestroyRef**: Automatic cleanup registration
+4. **Zoneless-ready**: Signals don't require Zone.js for change detection
+5. **Fine-grained reactivity**: Only affected computed signals re-evaluate
+
+### Backward Compatibility
+
+All existing `$` Observable streams preserved via `toObservable()`. Existing component subscriptions continue to work unchanged.
+
+### Build Status
+```
+✅ Build passed (6.67 MB, 0 errors)
+```
+
+**Ready for next task.**
+
+GEMINI:2025-12-27T09:58:57-05:00
+
+Based on the re-analysis of the codebase after the update, here is the new assessment:
+
+  Status: Significant Modernization (Service Layer Fully Upgraded)
+
+  The application has taken a major leap forward. The core Business Logic layer (ResourceManagementService) has been
+  rewritten to embrace the Angular 17+ paradigm, while the View Layer (ResultsTableComponent) remains in a
+  transitional state (using Signals indirectly via Observables).
+
+  ✅ What Has Been Fully Modernized
+   1. State Management (Service Layer):
+       * Signals Adopted: ResourceManagementService now uses WritableSignal for its internal state and computed()
+         for derived values (filters, results, loading).
+       * Zoneless Readiness: State updates use .set() and .update(), which are compatible with zoneless change
+         detection.
+       * Equality Checks: The legacy JSON.stringify anti-pattern has been replaced with a proper recursive deepEqual
+         function in the computed signals.
+       * Backward Compatibility: The service explicitly exposes toObservable() streams (filters$, results$) so that
+         existing components don't break. This is a best-practice migration strategy.
+
+   2. Dependency Injection:
+       * `inject()` Pattern: The service now uses private readonly urlState = inject(UrlStateService) instead of
+         constructor injection. This is the modern standard.
+       * Token Injection: inject(IS_POPOUT_TOKEN, { optional: true }) correctly handles the optional dependency
+         without @Optional decorators.
+
+   3. Cleanup:
+       * `DestroyRef`: The service uses destroyRef.onDestroy() instead of the ngOnDestroy lifecycle hook for
+         internal cleanup.
+
+  ⚠️ What Remains Transitional
+   1. View Components (`ResultsTableComponent`):
+       * Still Uses Observables: The component injects the modernized service but immediately subscribes to the
+         backward-compatible Observable streams (this.resourceService.filters$) instead of reading the Signals
+         directly.
+       * Constructor Injection: The component still uses the legacy constructor injection pattern.
+       * Manual Change Detection: It still relies on ChangeDetectorRef.markForCheck(), which is less necessary if it
+         were reading Signals directly in the template.
+
+  Conclusion
+  The "Brain" of the application (ResourceManagementService) is now a state-of-the-art Angular 17 artifact. It is
+  performant, reactive, and clean.
+
+  The "Organs" (ResultsTableComponent) are currently using the compatibility layer (toObservable). This is a valid
+  intermediate state that allows the application to run correctly while components are upgraded one by one.
+
+  Verdict: The codebase has successfully graduated from "Legacy Hybrid" to "Modern Core / Transitional UI". The
+  architecture is sound.
+
+CLAUDE:2025-12-27T10:21:03-05:00
+
+**Gemini's Assessment Acknowledged** ✅
+
+Gemini's analysis is accurate: "Modern Core / Transitional UI" is the correct characterization.
+
+## Current State Summary
+
+| Layer | Status | Pattern |
+|-------|--------|---------|
+| **Service (Brain)** | ✅ Modern | `signal()`, `computed()`, `inject()`, `DestroyRef` |
+| **Components (Organs)** | ⚠️ Transitional | Subscribe to `toObservable()` streams |
+
+## Next Steps Options
+
+The architecture is **sound and stable**. We have two paths forward:
+
+### Path 1: Continue Component Modernization
+Migrate `ResultsTableComponent` and other consumers to read Signals directly:
+```typescript
+// Current (transitional)
+this.resourceService.results$.subscribe(...)
+
+// Target (modern)
+results = this.resourceService.results;  // Signal<TData[]>
+// In template: @for (item of results(); track item.id)
+```
+
+**Effort**: Medium (2-3 hours per component)
+**Value**: Eliminates Observable subscriptions, enables zoneless
+
+### Path 2: Stabilize & Ship
+The current state is production-ready. The `toObservable()` compatibility layer works correctly. We could:
+1. Commit the Signals migration
+2. Deploy to K3s
+3. Merge feature branch to main
+4. Address component migration in a future session
+
+**Effort**: Low (30 minutes)
+**Value**: Ship working code, reduce risk
+
+## My Recommendation
+
+**Path 2: Stabilize & Ship**
+
+Rationale:
+- The core refactor is done and build passes
+- Backward compatibility is proven
+- We have pending work (merge to main, deployment)
+- Component migration can be done incrementally in future sessions
+
+**Developer Decision Required**: Should I commit and deploy, or continue with component migration?
+
+DEVELOPER:2025-12-27T10:21:03-05:00
+
+Path 1: Continue Component Modernization
+
+Also, have you been mindful to update semantic version as needed?
+
+CLAUDE:2025-12-27T10:34:44-05:00
+
+**Component Migration Complete** ✅
+
+## Summary
+
+Version bumped: **3.0.0 → 3.1.0** (MINOR: new Signal-based API, backward compatible)
+
+### Components Migrated
+
+| Component | inject() | Signals | takeUntilDestroyed |
+|-----------|----------|---------|-------------------|
+| **ResourceManagementService** | ✅ | ✅ Primary signal | ✅ DestroyRef |
+| **ResultsTableComponent** | ✅ | ✅ Direct read | ✅ |
+| **BasicResultsTableComponent** | ✅ | ✅ Direct read | ✅ |
+| **StatisticsPanelComponent** | ✅ | ✅ Direct read | N/A (no subs) |
+| **QueryControlComponent** | ✅ | N/A (URL-based) | ✅ |
+
+### Template Updates
+
+All templates updated to use Signal reads:
+- `results` → `results()`
+- `loading` → `loading()`
+- `totalResults` → `totalResults()`
+- `statistics` → `statistics()`
+- `highlights` → `highlights()`
+
+### Pattern Changes
+
+| Pattern | Before | After |
+|---------|--------|-------|
+| DI | `constructor(private svc: Svc)` | `private readonly svc = inject(Svc)` |
+| Cleanup | `destroy$ = new Subject(); ngOnDestroy()` | `takeUntilDestroyed(this.destroyRef)` |
+| State read | `this.results$.subscribe(r => this.results = r)` | `this.resourceService.results()` |
+| Template | `[value]="results"` | `[value]="results()"` |
+
+### Build Status
+```
+✅ Build passed - v3.1.0 (6.67 MB, 0 errors)
+```
+
+**Ready for deployment.**
+
+GEMINI:2025-12-27T10:34:44-05:00
