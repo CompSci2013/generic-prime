@@ -373,4 +373,127 @@ Added `allowedCommonJsDependencies` to `angular.json`:
 
 **Ready for next task.**
 
-GEMINI:2025-12-27T14:28:52
+DEVELOPER:2025-12-27T14:30:00
+
+Upgrade to Angular 17. Modernize architecture and patterns to Angular 17 recommendations.
+
+CLAUDE:2025-12-27T14:38:37
+
+**Angular 16 → 17 Upgrade COMPLETE** ✅
+
+## Summary
+
+| Package | Before | After |
+|---------|--------|-------|
+| @angular/core | 16.2.12 | 17.3.12 |
+| @angular/cli | 16.2.16 | 17.3.17 |
+| @angular/cdk | 16.2.14 | 17.3.10 |
+| PrimeNG | 16.9.1 | 17.18.15 |
+| TypeScript | 4.9.5 | **5.4.5** |
+| zone.js | 0.13.3 | 0.14.10 |
+| primeicons | 6.0.1 | 7.0.0 |
+| Frontend version | 2.1.0 | **3.0.0** |
+
+## Major Changes
+
+### 1. Control Flow Migration (Angular 17 Pattern)
+Ran `ng generate @angular/core:control-flow` schematic to migrate all 32 components:
+
+**Before (Structural Directives):**
+```html
+<div *ngIf="condition">...</div>
+<div *ngFor="let item of items">...</div>
+```
+
+**After (Control Flow Syntax):**
+```html
+@if (condition) {
+  <div>...</div>
+}
+@for (item of items; track item) {
+  <div>...</div>
+}
+```
+
+### 2. Components Migrated (32 total)
+- app.component
+- discover.component
+- panel-popout.component
+- query-control.component
+- query-panel.component
+- results-table.component
+- basic-results-table.component
+- base-picker.component
+- base-chart.component
+- statistics-panel.component
+- dependency-graph.component
+- physics.component (+ syllabus, concept-graph, knowledge-graph, classical-mechanics)
+
+### 3. Benefits of Angular 17 Control Flow
+- **Better Type Checking**: Template expressions are fully type-checked
+- **Improved Performance**: No structural directive overhead
+- **Cleaner Syntax**: More readable, less verbose templates
+- **Track Required**: `@for` requires explicit `track` expression (prevents change detection bugs)
+- **Signals Ready**: Foundation for future signals integration
+
+## Build Status
+```
+✅ Build passed (6.67 MB, 0 errors)
+```
+
+## Commits
+- `5ddc789` - chore: Update Angular core to v17.3.12, TypeScript to v5.4.5
+- `33cc2f4` - chore: Update Angular CDK to v17.3.10
+- `bb41658` - chore: Update PrimeNG to v17.18.14, primeicons to v7
+- `29c875b` - feat: Upgrade Angular 16 → 17, version 3.0.0
+
+**Ready for next task.**
+
+DEVELOPER:2025-12-27T14:40:00
+
+Deploy to Kubernetes.
+
+CLAUDE:2025-12-27T14:42:44
+
+**Deployment to Kubernetes COMPLETE** ✅
+
+## Deployment Summary
+
+| Phase | Status |
+|-------|--------|
+| Build production image | ✅ Complete (6.67 MB bundle) |
+| Import into K3s | ✅ Complete |
+| Rollout deployment | ✅ Complete |
+| Verify pods | ✅ Running |
+
+## Pod Status
+```
+NAME                                      READY   STATUS    RESTARTS   AGE
+generic-prime-frontend-69c449fbb6-5n9zr   1/1     Running   0          22s
+```
+
+## Services
+```
+generic-prime-frontend      ClusterIP   10.43.92.39    80/TCP
+generic-prime-backend-api   ClusterIP   10.43.254.90   3000/TCP
+```
+
+## Application Access
+- **URL**: http://generic-prime.minilab/
+- **Version**: 3.0.0 (Angular 17)
+
+**Ready for next task.**
+
+CLAUDE:2025-12-27T09:44:42
+
+Session ending. Accomplished:
+- Angular 15 → 16 upgrade (v2.1.0)
+- Angular 16 → 17 upgrade (v3.0.0)
+- Control flow migration (32 components)
+- ES6 import modernization
+- Production deployment to K3s
+
+Pending:
+- Merge `feature/angular-15-upgrade` branch to `main`
+
+SESSION END

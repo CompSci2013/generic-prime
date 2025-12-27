@@ -1,12 +1,12 @@
 # Next Steps
 
-**Current Session**: Session 63 - Angular 14 → 15 Upgrade
-**Previous Session**: Session 62 - Pop-out BasicResultsTable Debugging
-**Status**: Angular 15 upgrade complete, production deployed, version 2.0.0
+**Current Session**: Session 64 - Angular 14 → 17 Multi-Version Upgrade
+**Previous Session**: Session 63 - Angular 14 → 15 Upgrade
+**Status**: Angular 17 upgrade complete, production deployed, version 3.0.0
 
 ---
 
-## IMMEDIATE ACTION 1: Merge Angular 15 Branch
+## IMMEDIATE ACTION 1: Merge Angular 17 Branch
 
 **Priority**: HIGH
 **Scope**: Merge feature branch to main
@@ -53,24 +53,26 @@ This is the next major architectural milestone.
 
 ---
 
-## SESSION 63 COMPLETION SUMMARY
+## SESSION 64 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Upgraded Angular from 14.3.0 to 15.2.10
-2. ✅ Upgraded PrimeNG from 14.2.3 to 15.4.1
-3. ✅ Upgraded TypeScript from 4.7.4 to 4.9.5
-4. ✅ Converted all 21 components to standalone
-5. ✅ Migrated to standalone bootstrap (bootstrapApplication)
-6. ✅ Created app.config.ts and app.routes.ts
-7. ✅ Deleted legacy AppModule and AppRoutingModule
-8. ✅ Incremented version to 2.0.0
-9. ✅ Built and deployed to production K3s cluster
+1. ✅ Upgraded Angular from 15.2.10 to 16.2.12 (v2.1.0)
+2. ✅ Upgraded Angular from 16.2.12 to 17.3.12 (v3.0.0)
+3. ✅ Upgraded PrimeNG from 15.4.1 to 17.18.15
+4. ✅ Upgraded TypeScript from 4.9.5 to 5.4.5
+5. ✅ Converted `require()` to ES6 imports (Plotly, Cytoscape)
+6. ✅ Migrated all 32 components to Angular 17 control flow syntax
+7. ✅ Built and deployed to production K3s cluster
 
 **Commits This Session**:
-- `32a857c` - feat: Upgrade Angular 14 → 15, version 2.0.0
+- `9065d29` - feat: Upgrade Angular 15 → 16, version 2.1.0
+- `5ddc789` - chore: Update Angular core to v17.3.12, TypeScript to v5.4.5
+- `33cc2f4` - chore: Update Angular CDK to v17.3.10
+- `bb41658` - chore: Update PrimeNG to v17.18.14, primeicons to v7
+- `29c875b` - feat: Upgrade Angular 16 → 17, version 3.0.0
 
 **Current State**:
-- Angular 15.2.10 running in production
-- All standalone components working
-- Standalone bootstrap with provideRouter, provideHttpClient
+- Angular 17.3.12 running in production
+- All 32 components using @if/@for/@switch control flow
+- TypeScript 5.4.5 with improved type checking
 - Production verified at http://generic-prime.minilab
