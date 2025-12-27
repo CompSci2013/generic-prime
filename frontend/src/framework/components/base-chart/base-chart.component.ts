@@ -32,10 +32,8 @@ import { NgIf } from '@angular/common';
  * Provides declarative charting for creating statistical charts with support for
  * interactive features like click events, box selection, lasso selection, and hover tooltips.
  *
- * @constant {Object} Plotly
  * @remarks
  * Using plotly.js-dist-min (minified distribution) for reduced bundle size.
- * Imported via require() to avoid TypeScript module resolution issues.
  * Used in BaseChartComponent for rendering reactive charts based on statistics data.
  *
  * Features:
@@ -48,7 +46,7 @@ import { NgIf } from '@angular/common';
  * @see {@link https://plotly.com/javascript/} Official Plotly.js documentation
  * @see BaseChartComponent - Component that uses Plotly
  */
-const Plotly = require('plotly.js-dist-min');
+import * as Plotly from 'plotly.js-dist-min';
 
 /**
  * Extended HTMLElement interface for Plotly charts

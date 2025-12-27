@@ -68,14 +68,11 @@ import { NgIf } from '@angular/common';
  * Provides the core functionality for rendering interactive node-link diagrams
  * with support for multiple layout algorithms, event handlers, and styling.
  *
- * @constant {Object} cytoscape
  * @see {@link https://js.cytoscape.org} Official Cytoscape.js documentation
  * @remarks
- * Imported via require() to avoid TypeScript module resolution issues.
  * Used in KnowledgeGraphComponent for rendering knowledge graphs and concept relationships.
  */
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const cytoscape = require('cytoscape');
+import cytoscape from 'cytoscape';
 
 /**
  * Cytoscape-Dagre layout plugin
@@ -84,16 +81,13 @@ const cytoscape = require('cytoscape');
  * Provides directed acyclic graph (DAG) layout with automatic node positioning
  * to visualize concept hierarchies (foundational → intermediate → advanced).
  *
- * @constant {Object} dagre
  * @remarks
- * Imported via require() to avoid TypeScript module resolution issues.
  * Must be registered with cytoscape.use(dagre) before use.
  * Provides automatic hierarchical layout positioning for knowledge graphs.
  *
  * @see {@link https://github.com/cytoscape/cytoscape.js-dagre} Cytoscape-Dagre documentation
  */
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const dagre = require('cytoscape-dagre');
+import dagre from 'cytoscape-dagre';
 
 // Register the dagre layout
 cytoscape.use(dagre);
@@ -390,7 +384,7 @@ export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy
         elements: elements,
         style: this.getCytoscapeStyle(),
         layout: {
-          name: 'dagre',
+          name: 'dagre' as const,
           rankDir: 'LR',
           spacingFactor: 1.5,
           nodeSep: 100,
@@ -399,7 +393,7 @@ export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy
           animationDuration: 0,
           fit: true,
           padding: 40
-        },
+        } as cytoscape.LayoutOptions,
         wheelSensitivity: 0.75,
         panningEnabled: true,
         userPanningEnabled: true,
