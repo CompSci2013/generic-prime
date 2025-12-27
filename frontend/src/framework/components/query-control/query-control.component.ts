@@ -3,11 +3,10 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  EventEmitter,
   inject,
-  Input,
+  input,
   OnInit,
-  Output,
+  output,
   ViewChild
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -96,7 +95,6 @@ interface ActiveFilter {
     templateUrl: './query-control.component.html',
     styleUrls: ['./query-control.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [DropdownModule, FormsModule, ButtonModule, ChipModule, TooltipModule, DialogModule, SharedModule, InputTextModule, ProgressSpinnerModule, CheckboxModule, InputNumberModule]
 })
 export class QueryControlComponent<TFilters = any, TData = any, TStatistics = any>
@@ -117,10 +115,10 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
 
   readonly environment = environment;
 
-  @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
+  readonly domainConfig = input.required<DomainConfig<TFilters, TData, TStatistics>>();
 
-  @Output() urlParamsChange = new EventEmitter<{ [key: string]: any }>();
-  @Output() clearAllFilters = new EventEmitter<void>();
+  readonly urlParamsChange = output<{ [key: string]: any }>();
+  readonly clearAllFilters = output<void>();
 
   @ViewChild('searchInput') searchInput: any;
 
@@ -159,8 +157,8 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     // Initialize filter field options from domain config
     // Only include queryControlFilters, NOT highlightFilters
     // (highlightFilters are for highlighting data, not for main filter selection)
-    this.filterFieldOptions = this.domainConfig.queryControlFilters
-      .map(f => ({ label: f.label, value: f }));
+    this.filterFieldOptions = this.domainConfig().queryControlFilters
+      .map((f: FilterDefinition) => ({ label: f.label, value: f }));
 
     // Check if running in pop-out window
     if (this.popOutContext.isInPopOut()) {
@@ -669,14 +667,16 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     this.activeFilters = [];
     this.activeHighlights = [];
 
+    const config = this.domainConfig();
+
     // Sync regular filters
-    for (const filterDef of this.domainConfig.queryControlFilters) {
+    for (const filterDef of config.queryControlFilters) {
       this.syncFilterFromUrl(params, filterDef, this.activeFilters);
     }
 
     // Sync highlight filters
-    if (this.domainConfig.highlightFilters) {
-      for (const filterDef of this.domainConfig.highlightFilters) {
+    if (config.highlightFilters) {
+      for (const filterDef of config.highlightFilters) {
         this.syncFilterFromUrl(params, filterDef, this.activeHighlights);
       }
     }

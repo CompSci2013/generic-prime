@@ -239,7 +239,6 @@ interface CytoscapeEdge {
     selector: 'app-physics-concept-graph',
     templateUrl: './physics-concept-graph.component.html',
     styleUrls: ['./physics-concept-graph.component.scss'],
-    standalone: true,
     imports: []
 })
 export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDestroy {

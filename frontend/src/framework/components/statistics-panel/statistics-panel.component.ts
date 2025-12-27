@@ -11,7 +11,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
-  Input,
+  input,
   OnInit,
   Signal
 } from '@angular/core';
@@ -49,7 +49,6 @@ import { PanelModule } from 'primeng/panel';
     templateUrl: './statistics-panel.component.html',
     styleUrls: ['./statistics-panel.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [PanelModule, SharedModule, BaseChartComponent]
 })
 export class StatisticsPanelComponent implements OnInit {
@@ -67,7 +66,7 @@ export class StatisticsPanelComponent implements OnInit {
 
   readonly environment = environment;
 
-  @Input() domainConfig!: DomainConfig<any, any, any>;
+  readonly domainConfig = input.required<DomainConfig<any, any, any>>();
 
   // ============================================================================
   // Signal-Based State (Direct from ResourceManagementService)
@@ -97,19 +96,16 @@ export class StatisticsPanelComponent implements OnInit {
   // ============================================================================
 
   ngOnInit(): void {
-    if (!this.domainConfig) {
-      console.error('StatisticsPanelComponent: domainConfig is required');
-      return;
-    }
+    const config = this.domainConfig();
 
     // Filter visible charts and map to data sources
-    this.visibleCharts = (this.domainConfig.charts || [])
-      .filter(chart => chart.visible !== false)
-      .map(chart => ({
+    this.visibleCharts = (config.charts || [])
+      .filter((chart: ChartConfig) => chart.visible !== false)
+      .map((chart: ChartConfig) => ({
         config: chart,
         dataSource: this.getDataSource(chart.dataSourceId)
       }))
-      .filter(item => item.dataSource !== null);
+      .filter((item: { config: ChartConfig; dataSource: ChartDataSource }) => item.dataSource !== null);
   }
 
   // ============================================================================
@@ -117,11 +113,12 @@ export class StatisticsPanelComponent implements OnInit {
   // ============================================================================
 
   private getDataSource(dataSourceId: string): ChartDataSource {
-    if (!this.domainConfig.chartDataSources) {
+    const config = this.domainConfig();
+    if (!config.chartDataSources) {
       return null as any;
     }
 
-    const dataSource = this.domainConfig.chartDataSources[dataSourceId];
+    const dataSource = config.chartDataSources[dataSourceId];
     if (!dataSource) {
       return null as any;
     }

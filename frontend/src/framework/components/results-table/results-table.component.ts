@@ -4,7 +4,7 @@ import {
   Component,
   DestroyRef,
   inject,
-  Input,
+  input,
   OnInit,
   Signal
 } from '@angular/core';
@@ -50,7 +50,6 @@ import { NgClass, NgStyle } from '@angular/common';
     templateUrl: './results-table.component.html',
     styleUrls: ['./results-table.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [NgClass, FormsModule, InputTextModule, InputNumberModule, ButtonModule, DropdownModule, MultiSelectModule, CheckboxModule, TableModule, SharedModule, NgStyle, RippleModule, SkeletonModule]
 })
 export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
@@ -77,7 +76,7 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
   /**
    * Domain configuration (required input)
    */
-  @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
+  readonly domainConfig = input.required<DomainConfig<TFilters, TData, TStatistics>>();
 
   // ============================================================================
   // Signal-Based State (Direct from ResourceManagementService)
@@ -175,10 +174,6 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
   // ============================================================================
 
   ngOnInit(): void {
-    if (!this.domainConfig) {
-      throw new Error('ResultsTableComponent requires domainConfig input');
-    }
-
     // Load dynamic options for filters with optionsEndpoint
     this.loadDynamicFilterOptions();
 
@@ -287,7 +282,7 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
       return this.dynamicOptions[filterId];
     }
 
-    const filterDef = this.domainConfig.filters.find(f => f.id === filterId);
+    const filterDef = this.domainConfig().filters.find((f: any) => f.id === filterId);
     return filterDef?.options || [];
   }
 
@@ -299,10 +294,11 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
    * Load dynamic options for filters that specify an optionsEndpoint
    */
   private loadDynamicFilterOptions(): void {
-    const filtersWithEndpoint = this.domainConfig.filters.filter(f => f.optionsEndpoint);
+    const config = this.domainConfig();
+    const filtersWithEndpoint = config.filters.filter((f: any) => f.optionsEndpoint);
 
-    filtersWithEndpoint.forEach(filterDef => {
-      const endpoint = `${this.domainConfig.apiBaseUrl}/agg/${filterDef.optionsEndpoint}`;
+    filtersWithEndpoint.forEach((filterDef: any) => {
+      const endpoint = `${config.apiBaseUrl}/agg/${filterDef.optionsEndpoint}`;
 
       this.http.get<{ field: string; values: Array<{ value: string; count: number }> }>(endpoint)
         .pipe(takeUntilDestroyed(this.destroyRef))

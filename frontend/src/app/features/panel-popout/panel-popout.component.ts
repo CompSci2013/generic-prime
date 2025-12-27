@@ -67,7 +67,6 @@ import { QueryControlComponent } from '../../../framework/components/query-contr
         ResourceManagementService,
         { provide: IS_POPOUT_TOKEN, useValue: true }
     ],
-    standalone: true,
     imports: [QueryControlComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, QueryPanelComponent, BasicResultsTableComponent]
 })
 export class PanelPopoutComponent implements OnInit, OnDestroy {

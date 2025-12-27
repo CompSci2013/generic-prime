@@ -1,8 +1,10 @@
 import { ErrorHandler, importProvidersFrom, Injector } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MessageService } from 'primeng/api';
+import { providePrimeNG } from 'primeng/config';
+import Lara from '@primeng/themes/lara';
 
 import { routes } from './app.routes';
 import { GlobalErrorHandler } from '../framework/services/global-error.handler';
@@ -14,13 +16,18 @@ import { UiKitModule } from '../framework/ui-kit/ui-kit.module';
 /**
  * Application Configuration (Standalone Bootstrap)
  *
- * Configures the Generic-Prime application using Angular 15+ standalone APIs.
- * Replaces the traditional AppModule with functional providers.
+ * Configures the Generic-Prime application using Angular 19+ standalone APIs.
+ *
+ * Angular 19 Updates:
+ * - provideAnimationsAsync: Async animations for better performance
+ * - providePrimeNG: PrimeNG 19 theme configuration with design tokens
+ * - Lara theme with dark preset (matches previous lara-dark-blue)
  *
  * Providers:
  * - provideRouter: Configures application routing
  * - provideHttpClient: Enables HTTP communication
- * - provideAnimations: Enables Angular animations for PrimeNG
+ * - provideAnimationsAsync: Enables async Angular animations for PrimeNG
+ * - providePrimeNG: Configures PrimeNG 19 theming
  * - MessageService: PrimeNG toast/message service
  * - GlobalErrorHandler: Application-wide error handling
  * - DOMAIN_CONFIG: Domain configuration factory for automobile domain
@@ -31,7 +38,19 @@ export const appConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(),
-    provideAnimations(),
+    provideAnimationsAsync(),
+    providePrimeNG({
+      theme: {
+        preset: Lara,
+        options: {
+          darkModeSelector: 'body',  // Always dark mode
+          cssLayer: {
+            name: 'primeng',
+            order: 'tailwind-base, primeng, tailwind-utilities'
+          }
+        }
+      }
+    }),
     importProvidersFrom(FrameworkModule, UiKitModule),
     MessageService,
     {

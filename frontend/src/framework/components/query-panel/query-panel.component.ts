@@ -60,7 +60,6 @@ import { FormsModule } from '@angular/forms';
     templateUrl: './query-panel.component.html',
     styleUrls: ['./query-panel.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [FormsModule, InputTextModule, InputNumberModule, ButtonModule, DropdownModule, MultiSelectModule, AutoCompleteModule, CheckboxModule]
 })
 export class QueryPanelComponent<TFilters = any, TData = any, TStatistics = any>

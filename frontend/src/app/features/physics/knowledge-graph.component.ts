@@ -266,7 +266,6 @@ export interface KnowledgeGraphData {
     selector: 'app-knowledge-graph',
     templateUrl: './knowledge-graph.component.html',
     styleUrls: ['./knowledge-graph.component.scss'],
-    standalone: true,
     imports: []
 })
 export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy {

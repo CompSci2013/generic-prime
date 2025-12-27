@@ -3,11 +3,10 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  EventEmitter,
   inject,
-  Input,
+  input,
   OnInit,
-  Output,
+  output,
   Signal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -44,7 +43,6 @@ import { TableModule } from 'primeng/table';
     templateUrl: './basic-results-table.component.html',
     styleUrls: ['./basic-results-table.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [TableModule, SharedModule, NgStyle, ButtonModule, RippleModule, SkeletonModule]
 })
 export class BasicResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
@@ -64,12 +62,12 @@ export class BasicResultsTableComponent<TFilters = any, TData = any, TStatistics
 
   readonly environment = environment;
 
-  @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
+  readonly domainConfig = input.required<DomainConfig<TFilters, TData, TStatistics>>();
 
   /**
    * Emits when URL parameters should be updated (sort, page, size)
    */
-  @Output() urlParamsChange = new EventEmitter<{ [key: string]: any }>();
+  readonly urlParamsChange = output<{ [key: string]: any }>();
 
   // ============================================================================
   // Signal-Based State (Direct from ResourceManagementService)
@@ -118,10 +116,6 @@ export class BasicResultsTableComponent<TFilters = any, TData = any, TStatistics
   // ============================================================================
 
   ngOnInit(): void {
-    if (!this.domainConfig) {
-      throw new Error('BasicResultsTableComponent requires domainConfig input');
-    }
-
     // Pop-out window support
     if (this.popOutContext.isInPopOut()) {
       this.popOutContext

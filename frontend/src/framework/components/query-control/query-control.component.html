@@ -137,9 +137,9 @@
           <div class="option-item">
             <p-checkbox
               [(ngModel)]="selectedOptions"
-              [label]="option.label"
               [value]="option.value"
               [binary]="false">
+              {{ option.label }}
             </p-checkbox>
           </div>
         }

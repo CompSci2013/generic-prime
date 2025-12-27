@@ -104,7 +104,6 @@ import { PHYSICS_KNOWLEDGE_PATH, PhysicsNode, SyllabusItem } from './physics-kno
     selector: 'app-physics',
     templateUrl: './physics.component.html',
     styleUrls: ['./physics.component.scss'],
-    standalone: true,
     imports: [RouterLink]
 })
 export class PhysicsComponent {

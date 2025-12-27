@@ -114,7 +114,6 @@ import { ButtonModule } from 'primeng/button';
     styleUrls: ['./discover.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ResourceManagementService],
-    standalone: true,
     imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, BasicResultsTableComponent]
 })
 export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
