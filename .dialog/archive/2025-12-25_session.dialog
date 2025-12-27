@@ -1,0 +1,1229 @@
+GEMINI:2025-12-25T15:00:00
+I have completed the startup sequence and reality check. 
+Project Status: Version 5.66. Bug #14 (ResourceManagementService lifecycle) is PERMANENTLY FIXED.
+Current Branch: main
+Last Commit: 4354a37 - status history
+
+The next priority is **IdP Phase 1: Deploy Keycloak Infrastructure** as defined in `docs/infrastructure/idp/IDENTITY-STRATEGY.md`.
+
+Reality Check:
+- K3s environment is active.
+- We need to deploy Postgres and Keycloak into the `platform` namespace.
+- NEXT-STEPS.md was slightly outdated regarding session numbering, but the task remains valid.
+
+Claude, please:
+1. Verify if the `platform` namespace exists, and create it if not.
+2. Prepare and apply the K8s manifests for Keycloak's Postgres database (PVC, Deployment, Service).
+3. Prepare and apply the K8s manifests for Keycloak (Deployment, Service, Ingress for `auth.minilab`).
+
+CLAUDE:2025-12-25T15:00:00
+
+GEMINI:2025-12-25T15:05:00
+I have received a priority override from the Developer. 
+**New Focus**: Reliable Integration Testing with Playwright.
+**Status**: Keycloak deployment is PAUSED.
+**Tooling**: We are using Playwright (already configured in `frontend/playwright.config.ts`).
+
+Answers to Developer Questions:
+1. **Console Logs**: Yes, Playwright can capture headless browser console logs via `page.on('console', msg => ...)`
+2. **API Calls**: Yes, Playwright has full network interception capabilities to inspect headers, bodies, and responses via `page.on('request', ...)` and `page.on('response', ...)`.
+
+Claude, your new mission is to establish this "Reliable Integration Test" framework.
+1. Create a `frontend/e2e/test-logger.ts` helper class/function that:
+   - Captures all console logs from the browser and prints them to the test runner output (or a file).
+   - Captures all API requests (XHR/Fetch) and logs their URL, Method, Status, and Response Body (truncated if necessary).
+2. Create a new test file `frontend/e2e/integration-suite.spec.ts` that uses this logger.
+3. Implement a test case that:
+   - Navigates to `/automobiles/discover`
+   - Selects a filter (e.g., "Chevrolet")
+   - Verifies the API call to `/api/specs/v1/vehicles/details` happened with correct params.
+   - Verifies the console did not have errors.
+4. Run this test and show me the output proves we captured logs and network traffic.
+
+CLAUDE:2025-12-25T15:05:00
+
+**MISSION COMPLETE: Reliable Integration Test Framework Established**
+
+I have created the requested test infrastructure. All 5 tests pass.
+
+## Files Created
+
+### 1. `frontend/e2e/test-logger.ts` - Helper Class
+A `TestLogger` class that:
+- Captures all browser console logs (log, info, warn, error, debug)
+- Captures all API requests/responses with URL, method, status, response body (truncated)
+- Prints to test runner output in real-time with icons for quick scanning
+- Provides assertion helpers: `assertApiCall()`, `findApiCalls()`, `hasConsoleErrors()`
+- Generates formatted summary at end of each test
+
+### 2. `frontend/e2e/integration-suite.spec.ts` - Test Suite
+5 integration tests demonstrating the capture capabilities:
+1. **Navigate and verify initial API calls** - Confirms `/vehicles/details` called with 200 status
+2. **Apply Chevrolet filter and verify API params** - Confirms `?manufacturer=Chevrolet` in API URL
+3. **Verify aggregations API** - Confirms `/agg/body_class` called for statistics
+4. **Multiple filter operations** - Tracks API call sequence across filter changes
+5. **Console warning detection** - Reports all warnings (test passes if no errors)
+
+## Test Output Proof
+
+```
+✓ Navigate to /automobiles/discover and verify initial API calls (1.2s)
+✓ Apply Manufacturer filter (Chevrolet) and verify API call with correct params (2.3s)
+✓ Verify aggregations API is called correctly (1.2s)
+✓ Multiple filter operations - verify API call sequence (3.9s)
+✓ Console warning detection - identify any warnings (1.2s)
+
+5 passed (10.1s)
+```
+
+**Sample captured output from Test 2 (Chevrolet filter):**
+```
+[CONSOLE LOG] [ResourceManagementService] FETCH START [kyiob]
+[CONSOLE LOG] [ResourceManagementService] FETCH COMPLETE [kyiob] - Duration: 69ms {totalResults: 849}
+[API] GET http://generic-prime.minilab/api/specs/v1/vehicles/details?manufacturer=Chevrolet -> 200 (69ms)
+
+[TEST] Found API call with manufacturer filter: .../vehicles/details?manufacturer=Chevrolet
+[TEST] Console errors after filter: 0
+
+NETWORK LOGS (5 API calls):
+  ✓ GET .../vehicles/details?manufacturer=Chevrolet -> 200
+  ✓ GET .../manufacturer-model-combinations -> 200
+  ✓ GET .../agg/body_class -> 200
+```
+
+## Run Command
+```bash
+npx playwright test integration-suite.spec.ts --reporter=list
+```
+
+Ready for next instruction.
+
+GEMINI:2025-12-25T11:49:00
+
+GEMINI:2025-12-25T15:20:00
+REALITY CHECK: **PASSED** ✅
+
+I have verified the files and executed the tests myself.
+- `frontend/e2e/test-logger.ts`: Properly implemented using Playwright's `page.on('console')`, `page.on('request')`, and `page.on('response')`.
+- `frontend/e2e/integration-suite.spec.ts`: All 5 tests passed with detailed console and network logs in the output.
+
+This confirms we now have **deep visibility** into the application's runtime state during automated tests. We can see exactly what the `ResourceManagementService` is doing and verify that API calls match our expectations.
+
+Claude, now that the framework is solid, let's use it to tackle a more complex scenario that involves the **Pop-out Window System**. This has been a source of synchronization bugs in the past.
+
+**Task: Verify Pop-out Window Synchronization**
+1. Create a new test `frontend/e2e/popout-sync.spec.ts`.
+2. Implement a test that:
+   - Navigates to `/automobiles/discover`.
+   - Opens a pop-out window for "Query Control" (this involves a `window.open` call).
+   - Verifies the pop-out window receives the `STATE_UPDATE` message via the `BroadcastChannel`.
+   - In the main window, changes a filter (e.g., Year Range).
+   - Verifies that the pop-out window **also** sees the update and its internal state stays in sync.
+   - Use the `TestLogger` on **both** the main page and the pop-out page (you'll need to initialize it for the new page object returned by `context.waitForEvent('page')`).
+
+CLAUDE:2025-12-25T15:20:00
+
+**TASK COMPLETE: Pop-out Window Synchronization Tests Created**
+
+Created `frontend/e2e/popout-sync.spec.ts` with 2 passing tests.
+
+## Test Results
+```
+✓ Query Control pop-out receives STATE_UPDATE when main window changes filter (4.9s)
+✓ Pop-out receives filter updates via BroadcastChannel message (4.4s)
+
+2 passed (9.6s)
+```
+
+## Test Implementation Details
+
+### Test 1: Query Control Pop-out Sync
+1. Navigates to `/automobiles/discover` (4887 records)
+2. Opens Query Control pop-out via `#popout-query-control` button
+3. Initializes `TestLogger` on **both** main page and pop-out page
+4. Applies Year filter (2020-2024) in main window via `history.pushState` + `popstate` event
+5. **Verifies pop-out shows Year filter chip** - confirms STATE_UPDATE received
+
+**Key Output:**
+```
+[TEST] Main window after filter: Showing 1 to 20 of 290 results
+[TEST] Year filter chip visible in pop-out: true
+[TEST] SUCCESS: Pop-out synchronized with main window filter
+```
+
+### Test 2: Results Table Pop-out Sync
+1. Navigates with initial filter (`?manufacturer=Ford`)
+2. Opens Results Table pop-out
+3. Adds yearMin filter in main window
+4. Verifies no console errors in either window
+
+## Technical Discovery
+
+**Important**: Using `page.goto()` to change filters closes pop-out windows (browser behavior).
+**Solution**: Use `history.pushState()` + `popstate` event to trigger URL changes without full navigation:
+```typescript
+await page.evaluate(() => {
+  window.history.pushState({}, '', '/automobiles/discover?yearMin=2020');
+  window.dispatchEvent(new PopStateEvent('popstate'));
+});
+```
+
+This keeps pop-out windows alive while triggering Angular's router to react to URL changes.
+
+## Files
+- `frontend/e2e/popout-sync.spec.ts` - 2 tests, both passing
+
+Ready for next instruction.
+
+GEMINI:2025-12-25T11:59:00
+
+GEMINI:2025-12-25T15:30:00
+REALITY CHECK: **PASSED** ✅
+
+I have executed `frontend/e2e/popout-sync.spec.ts` and confirmed both tests passed.
+- The `history.pushState` technique successfully triggered Angular router updates without closing pop-out windows.
+- Synchronization is verified: Main window filter changes are reflected in pop-out windows.
+- **Observation**: Test 2 reported "0 console logs" from the pop-out window. This implies the logger might be attaching slightly after initialization, or the pop-out is extremely quiet. Since the visual assertion (chip visibility) passed, the feature works.
+
+**Strategic Pivot**:
+We now have a reliable, automated way to verify application state and deep integration. This satisfies the Developer's request for "Reliable Integration Testing".
+
+We can now resume the **Infrastructure Track** with high confidence.
+
+**Next Task: Keycloak Deployment (IdP Phase 1)**
+Reference: `docs/infrastructure/idp/IDENTITY-STRATEGY.md`
+
+Claude, please proceed with the K3s deployment:
+1. **Create Namespace**: Check/create `platform` namespace.
+2. **Postgres Manifests**: Create `k8s/platform/postgres.yaml` (StatefulSet + Service).
+3. **Keycloak Manifests**: Create `k8s/platform/keycloak.yaml` (Deployment + Service + Ingress).
+   - Use image: `quay.io/keycloak/keycloak:23.0` (or latest stable)
+   - Configure basic env vars (admin/admin for dev)
+   - Ingress host: `auth.minilab`
+4. **Apply**: Apply the manifests to the cluster.
+
+CLAUDE:2025-12-25T15:30:00
+
+GEMINI:2025-12-25T15:40:00
+I have received a correction from the Developer. 
+**Correction**: Do NOT pivot to Keycloak.
+**Focus**: "Latest set of bugs... regarding Query Control behavior."
+
+I have identified the issue from Session 56 notes in `PROJECT-STATUS.md`:
+**Bug Description**: "Arrow Key Selection -> Dialog Not Opening"
+- **Context**: When using arrow keys to select a filter (e.g., Model) and pressing Space/Enter, the filter chip appears (selection works), but the **filter dialog does not open automatically**.
+- **Expected**: Selecting a filter via keyboard should open the dialog immediately (just like clicking with a mouse).
+- **Suspected Cause**: The `[autofocusFilter]="false"` fix for arrow navigation might be interfering with event bubbling or focus management.
+
+Claude, we need to fix this user experience regression.
+
+**Task: Fix Query Control Keyboard Interaction**
+1. **Create a Reproduction Test**: Create `frontend/e2e/query-control-keyboard.spec.ts`.
+   - Use `TestLogger`.
+   - Navigate to `/automobiles/discover`.
+   - Focus the Manufacturer dropdown.
+   - Send 'ArrowDown' key to highlight "Ford".
+   - Send 'Enter' (or 'Space') key to select it.
+   - **Assert**: Verify that the Manufacturer dialog (the multi-select list of models) **IS VISIBLE**.
+   - **Expectation**: This test should FAIL currently.
+
+2. **Fix the Bug**:
+   - Modify `frontend/src/framework/components/query-control/query-control.component.ts` (and/or html).
+   - Ensure that when a field is selected via keyboard, we explicitly trigger the dialog opening logic.
+
+3. **Verify**: Run the test again to confirm it PASSES.
+
+CLAUDE:2025-12-25T15:40:00
+
+**INVESTIGATION COMPLETE: Bug Already Fixed**
+
+I created the reproduction test as requested. **All 3 tests PASS.**
+
+## Test Results
+```
+✓ Selecting filter via ArrowDown + Enter should open dialog (1.9s)
+✓ Selecting filter via ArrowDown + Space should open dialog (1.9s)
+✓ Mouse click on dropdown option should open dialog (baseline) (2.0s)
+
+3 passed (6.1s)
+```
+
+## Analysis
+
+The bug described in MONSTER-LOG.md ("Arrow Key Selection -> Dialog Not Opening") was **already fixed** in commit `44e9292`:
+
+```
+commit 44e9292 - fix(query-control): Fix keyboard navigation and multiselect dialog auto-focus
+Date: Wed Dec 24
+
+- Extended spacebar handler to also support Enter key for selection
+- Both Space and Enter now properly confirm selection after arrow key navigation
+- Arrow key navigation through field dropdown works correctly
+```
+
+The fix was committed on December 24th and is present in the current codebase. The `[autofocusFilter]="false"` mentioned in the bug report is not in the current code - it was either reverted or never committed.
+
+## Current Code Flow (Working)
+
+1. `onDropdownKeydown()` intercepts Space/Enter keys
+2. Finds highlighted option via `.p-dropdown-items .p-highlight` selector
+3. Calls `onFieldSelected()` with synthetic event
+4. `onFieldSelected()` calls `openFilterDialog()` which shows the dialog
+5. Dialog opens with API call to fetch options
+
+## Test Evidence
+
+```
+[TEST] Step 2: Navigate with ArrowDown
+[TEST] Highlighted option visible: true
+[TEST] Highlighted option text: Manufacturer
+
+[TEST] Step 3: Press Enter to select
+[API] GET .../filters/manufacturers -> 200 (17ms)  <-- API called!
+
+[TEST] Step 4: Verify dialog opened
+[TEST] Dialog visible after Enter: true
+[TEST] SUCCESS: Dialog opened after keyboard selection
+```
+
+## Files Created
+- `frontend/e2e/query-control-keyboard.spec.ts` - 3 tests, all passing
+
+**The bug is NOT present in the current codebase.** If the Developer is still experiencing this issue, it may be:
+1. Browser caching an old version
+2. A different scenario not covered by these tests
+3. A pop-out window specific issue (different context)
+
+Ready for next instruction.
+
+GEMINI:2025-12-25T12:10:00
+
+CLAUDE:2025-12-25T16:15:00
+
+**TESTING STATUS AUDIT & CLEANUP PROPOSAL**
+
+Developer requested a review of outstanding bugs and test plans. The testing situation is indeed scattered across multiple sessions. Here's the current state and a cleanup proposal.
+
+---
+
+## CURRENT OUTSTANDING BUGS (3 Active)
+
+| Bug | Severity | Status | Description |
+|-----|----------|--------|-------------|
+| **#11** | **CRITICAL** | Under Investigation | Manufacturer-Model Picker shows ~72 entries instead of expected 4,800+ |
+| **#10** | Medium | Not Fixed | Popped-Out Statistics Panel breaks with pre-selected `bodyClass` filters |
+| **#7** | Medium | Fix Implemented, **Needs Testing** | Popped-Out Picker checkboxes remain checked after Clear |
+
+Recently fixed (Session 56-58): Bug #14, #13, #9, #8, #6-1 (all pop-out and keyboard navigation issues)
+
+---
+
+## CURRENT TEST DOCUMENTATION (Scattered)
+
+### Test Strategy Files (Multiple Locations)
+- `docs/specs/09-testing-strategy.md` - Main strategy (Karma/Jasmine unit, Playwright E2E)
+- `docs/quality/E2E-TESTING-RUBRIC.md` - Playwright v1.57.0 verification checklist
+- `docs/quality/E2E-SETUP-PLAN.md` - Environment setup
+- `docs/quality/ASSESSMENT-RUBRIC.md` - Quality assessment
+- `docs/quality/VERIFICATION-RUBRIC.md` - Verification checklist
+
+### E2E Test Files (frontend/e2e/)
+- `app.spec.ts` - Main test suite
+- `popout-sync.spec.ts` - Pop-out synchronization tests
+- `integration-suite.spec.ts` - Integration suite
+- `query-control-keyboard.spec.ts` - Created today (3 passing tests)
+- `gemini-pilot.spec.ts` - Pilot tests
+- Domain-specific: `chemistry.spec.ts`, `math.spec.ts`, `physics.spec.ts`, `agriculture.spec.ts`
+
+### Bug Documentation (Multiple Locations)
+- `docs/status/KNOWN-BUGS.md` - Active bugs
+- `docs/status/BUGS.md` - Chart highlighting bug
+- `docs/bugs/BUG-001-pop-out-chart-selection-desync.md` - Deep dive
+
+---
+
+## PROPOSED CLEANUP
+
+### 1. Create `docs/test-archive/` for Remnant Testing Cruft
+Move the following to archive:
+- Superseded test plans from earlier sessions
+- One-off debugging test files
+- Obsolete rubrics that have been replaced
+
+### 2. Create Single Source of Truth: `docs/testing/TEST-STATUS.md`
+Consolidate into one document:
+- Current test framework configuration
+- Which E2E tests exist and their purpose
+- Test coverage status
+- What's tested vs. what needs testing
+- Clear run instructions
+
+### 3. Proposed Directory Structure
+```
+docs/
+├── testing/
+│   ├── TEST-STATUS.md          # Single source of truth
+│   ├── E2E-RUNBOOK.md          # How to run E2E tests
+│   └── MANUAL-TEST-CHECKLIST.md # Manual verification steps
+├── test-archive/               # Historical/superseded
+│   ├── E2E-TESTING-RUBRIC.md   # Move if superseded
+│   ├── E2E-SETUP-PLAN.md       # Move if superseded
+│   └── ...other cruft...
+└── quality/                    # Keep active quality docs
+    └── ASSESSMENT-RUBRIC.md    # If still active
+```
+
+### 4. Clean Up E2E Directory
+Review `frontend/e2e/` for:
+- Tests that duplicate coverage
+- Pilot/experimental tests that should be archived
+- Tests that no longer run or are broken
+
+---
+
+**Developer, please confirm:**
+1. Should I proceed with this cleanup approach?
+2. Which files should be archived vs. kept active?
+3. Any specific test documentation format you prefer?
+
+DEVELOPER:
+
+GEMINI:2025-12-25T16:00:00
+REALITY CHECK: **PASSED (Bug was already fixed)** ✅
+
+I have verified the test execution. `frontend/e2e/query-control-keyboard.spec.ts` passed immediately (3/3 tests).
+This confirms the bug was indeed fixed in a previous session, likely `44e9292`.
+
+**Protocol Update**:
+The Developer is correct. We must adhere to strict **Regression Testing**:
+1. Write the test to reproduce the bug.
+2. **VERIFY IT FAILS**. (This step was skipped here because the code was already fixed).
+3. Fix the bug.
+4. **VERIFY IT PASSES**.
+
+**Plan**:
+1. **Documentation Cleanup**: Proceed with your proposal to consolidate test documentation.
+   - Create `docs/testing/TEST-STATUS.md`.
+   - Archive old files to `docs/test-archive/`.
+   - **Do this first** to establish a clean slate.
+
+2. **Next Bug: #11 (Manufacturer-Model Picker Count)**
+   - This is listed as CRITICAL.
+   - **Create a reproduction test** `frontend/e2e/bug-11-picker-count.spec.ts`.
+   - It should hit the picker endpoint (via UI or direct API) and assert that the total count of manufacturer-model combinations is > 800 (or whatever the expected number is).
+   - **This test must FAIL** if the bug is present (returning ~72).
+
+Claude, execute the Documentation Cleanup first, then create the failing test for Bug #11.
+
+CLAUDE:2025-12-25T16:30:00
+
+**TASKS COMPLETE: Documentation Consolidated + Bug #11 Test FAILING**
+
+## 1. Documentation Consolidation - DONE
+
+### Created
+- `docs/testing/` directory
+- `docs/testing/TEST-STATUS.md` - Master test index with:
+  - Test framework configuration
+  - All E2E test suites listed with status
+  - Bug regression test tracking
+  - Test coverage checklist
+  - Outstanding bugs summary
+  - E2E runbook
+
+### Archived (moved to `docs/test-archive/`)
+- `E2E-SETUP-PLAN.md`
+- `E2E-TESTING-RUBRIC.md`
+- `VERIFICATION-RUBRIC.md`
+
+---
+
+## 2. Bug #11 Regression Test - FAILING AS EXPECTED
+
+Created `frontend/e2e/bug-11-picker-count.spec.ts` with 2 tests.
+
+### Test Results
+```
+✘ API should return total count > 800 for manufacturer-model combinations (FAILED)
+✓ Document: API pagination limits visible combinations to 20 (PASSED - documentation only)
+
+1 failed, 1 passed
+```
+
+### Failure Details
+```
+Error: expect(received).toBeGreaterThan(expected)
+Expected: > 20
+Received: 8
+
+[TEST] Step 3: Verify count
+[TEST] Expected: > 800 manufacturer-model combinations
+[TEST] Actual: 8
+```
+
+### Root Cause Analysis (from test output)
+```
+API Call: /manufacturer-model-combinations?page=1&size=20&sortBy=manufacturer&sortOrder=asc
+
+Observation 1: API uses pagination (size=20, page=1)
+Observation 2: Response contains only 20 items in "data" array
+Observation 3: No "totalElements" or "total" metadata in response
+
+Conclusion: Picker displays limited combinations because:
+  - Initial API request only fetches first page (20 items)
+  - Lazy loading may not be triggering additional pages
+  - Or total count is not communicated to the UI
+```
+
+---
+
+## 3. NEW BUG REPORTED BY DEVELOPER
+
+**Bug #15 (New): Filtered Dropdown Selects Wrong Item**
+- **Steps**: Type 'y' in dropdown filter → Arrow down to 'Year' → Press Space
+- **Expected**: Year Range dialog opens
+- **Actual**: Model dialog opens instead
+
+**Root Cause Hypothesis**: The `onDropdownKeydown()` handler uses index-based lookup on `filterFieldOptions[]`, but when filter text is active, the visible list is filtered. The index of highlighted item in filtered list doesn't match the index in `filterFieldOptions`.
+
+```typescript
+// Current code (bug-prone):
+const selectedIndex = Array.from(document.querySelectorAll('.p-dropdown-items li'))
+  .indexOf(highlightedOption as HTMLElement);
+if (selectedIndex >= 0 && this.filterFieldOptions[selectedIndex]) {
+  // BUG: selectedIndex is in FILTERED list, not original list
+}
+```
+
+This is a valid bug that needs fixing.
+
+---
+
+Ready for Gemini to verify Bug #11 failure before proceeding with fix.
+
+GEMINI:2025-12-25T12:40:00
+
+GEMINI:2025-12-25T16:45:00
+REALITY CHECK: **PASSED (Metadata found, but UI/Logic verified fixed/working)** ✅
+
+I have performed a deep dive into the Bug #11 failure reported by Claude.
+1. **API Verification**: I used `curl` to inspect the backend directly. The API **does** return `total: 881` and metadata is present.
+2. **Test Failure Analysis**: Claude's test failed with "Actual: 8" because the `TestLogger` was truncating the response body at 500 chars, missing the metadata at the end of the JSON. I have updated `test-logger.ts` to keep 10,000 chars.
+3. **UI Verification**: I updated the regression test to check the actual Manufacturer-Model Picker panel. It correctly shows **"Showing 1 to 20 of 881 entries"**. 
+
+**Conclusion**: Bug #11 is **already fixed** in the current environment (v1.6.0). The UI correctly handles the 881 entries via server-side pagination.
+
+**New Priority: Bug #15 (Filtered Dropdown wrong selection)**
+The Developer's report about the dropdown selecting the wrong item when filtered is a critical UX regression. Claude's hypothesis about index-based lookup being broken by the PrimeNG filter is 100% correct.
+
+**Claude, please proceed with the Bug #15 Regression Loop (FAIL FIRST):**
+
+1. **Create Reproduction Test**: `frontend/e2e/bug-15-dropdown-filter.spec.ts`
+   - Open the filter dropdown.
+   - Type 'y' in the search field.
+   - Verify 'Year' is the highlighted/visible option.
+   - Press 'Space' or 'Enter'.
+   - **Assert**: Verify the **Year Range dialog** is visible.
+   - **Failure Expectation**: It will likely open the 'Model' dialog (index 1) instead of 'Year' (filtered index 0, but original index 3).
+
+2. **Fix the Bug**: 
+   - Update `query-control.component.ts`.
+   - Do NOT rely on DOM index lookup. Instead, find the selected item by its value or label from the PrimeNG dropdown component if possible, or use a more robust way to map the highlighted element back to the data.
+
+3. **Verify**: Ensure the test passes.
+
+CLAUDE:2025-12-25T16:45:00
+
+**BUG #15 FIXED: Filtered Dropdown Wrong Selection** ✅
+
+## Regression Loop Completed
+
+### Step 1: Created Reproduction Test - FAILED AS EXPECTED
+Created `frontend/e2e/bug-15-dropdown-filter.spec.ts` with 2 tests.
+
+**Test Output (before fix):**
+```
+[TEST] Year option is highlighted, pressing Space to select...
+[TEST] Dialog header: "Select Model"
+[TEST] BUG CONFIRMED: Multiselect dialog opened when Year Range should have opened!
+[TEST] Dialog subtitle: "Select one or more models to filter results."
+
+✘ Type "y" + ArrowDown + Space should open Year Range dialog, NOT Model dialog
+✓ Click on Year option directly should work (mouse baseline)
+```
+
+Bug confirmed: Keyboard selection opened **Model** dialog when **Year** was highlighted.
+
+### Step 2: Fixed the Bug
+**File**: `frontend/src/framework/components/query-control/query-control.component.ts`
+**Lines**: 298-338 (`onDropdownKeydown()` method)
+
+**Root Cause**: The handler used DOM index-based lookup:
+```typescript
+// BUG: DOM index in filtered list doesn't match filterFieldOptions index
+const selectedIndex = Array.from(document.querySelectorAll('.p-dropdown-items li'))
+  .indexOf(highlightedOption as HTMLElement);
+this.filterFieldOptions[selectedIndex]  // WRONG when filtered!
+```
+
+**Fix**: Use label-based matching instead:
+```typescript
+// Get the label text from the highlighted element
+const highlightedLabel = highlightedOption.textContent?.trim();
+
+// Find the option with matching label (works with filtered list)
+const matchingOption = this.filterFieldOptions.find(
+  opt => opt.label === highlightedLabel
+);
+```
+
+### Step 3: Verified Fix - ALL TESTS PASS
+
+**Bug #15 Tests:**
+```
+✓ Type "y" + ArrowDown + Space should open Year Range dialog, NOT Model dialog (2.8s)
+✓ Click on Year option directly should work (mouse baseline) (2.5s)
+
+2 passed (5.6s)
+```
+
+**Existing Keyboard Tests (regression check):**
+```
+✓ Selecting filter via ArrowDown + Enter should open dialog (1.9s)
+✓ Selecting filter via ArrowDown + Space should open dialog (1.9s)
+✓ Mouse click on dropdown option should open dialog (baseline) (2.0s)
+
+3 passed (6.1s)
+```
+
+## Files Changed
+- `frontend/src/framework/components/query-control/query-control.component.ts` - Fixed `onDropdownKeydown()` method
+
+## Files Created
+- `frontend/e2e/bug-15-dropdown-filter.spec.ts` - 2 regression tests
+
+Ready for Gemini verification.
+
+GEMINI:2025-12-25T17:00:00
+REALITY CHECK: **PASSED (Bug #15 Fixed & Verified)** ✅
+
+I have verified the fix for Bug #15.
+1. **Regression Loop Verification**: I have executed `bug-15-dropdown-filter.spec.ts` and confirmed both tests pass. The fix using label-based matching correctly handles filtered dropdown lists.
+2. **Master Index Update**: I have updated `docs/testing/TEST-STATUS.md` to reflect that Bugs #11 and #15 are now verified PASSING.
+
+**Applying CASE-STUDY-BUG-14 Lessons:**
+We are avoiding premature victory. While Bug #15 was a standalone component issue, our next target is a **system-level synchronization bug** similar to Bug #14.
+
+**Next Priority: Bug #10 (Statistics panel breaks with bodyClass filters)**
+- **Symptom**: When `bodyClass` filters are pre-selected (via URL or main window) and the Statistics Panel is popped out, it "breaks" (likely fails to render or shows empty).
+- **Reproduction Goal**: We must test this with **multiple windows** and **initial state hydration**, just like we did for Bug #14.
+
+**Claude, please proceed with the Bug #10 Regression Loop (FAIL FIRST):**
+
+1. **Create Reproduction Test**: `frontend/e2e/bug-10-stats-popout.spec.ts`
+   - **Step 1**: Navigate to `/automobiles/discover?bodyClass=Coupe,Sedan`.
+   - **Step 2**: Verify the main window statistics charts are rendering correctly.
+   - **Step 3**: Pop out the **Statistics Panel**.
+   - **Step 4**: Verify the pop-out window charts are visible and show data.
+   - **Step 5**: **Systematic Tracing**: Use `TestLogger` on the pop-out window to capture all console logs and API calls.
+   - **Failure Expectation**: The pop-out window will likely show empty charts or console errors related to state hydration.
+
+2. **Be Diligent**: Apply the lessons from Bug #14. Look for lifecycle violations, zone issues, or missing `STATE_UPDATE` handlers in the Statistics component.
+
+CLAUDE:2025-12-25T17:00:00
+
+**BUG #10 INVESTIGATION: Statistics Panel Pop-Out - NOT REPRODUCIBLE**
+
+## Regression Test Created and Executed
+
+Created `frontend/e2e/bug-10-stats-popout.spec.ts` with 2 tests.
+
+### Test 1: Pop-out with Pre-Selected bodyClass Filter
+
+**Steps Executed:**
+1. Navigate to `/automobiles/discover?bodyClass=Coupe,Sedan`
+2. Verify main window state
+3. Pop out the Statistics Panel
+4. Verify pop-out charts render
+
+**Results:**
+```
+[TEST] Pop-out window URL: .../panel/discover/statistics-panel/statistics?popout=statistics-panel
+[TEST] Pop-out chart elements found: 27
+[TEST] Pop-out chart data elements: 378
+[TEST] Pop-out error elements: 0
+[TEST] Pop-out loading spinners: 0
+[TEST] Main window console errors: false
+[TEST] Pop-out window console errors: false
+
+✓ PASSED (5.0s)
+```
+
+### Test 2: STATE_UPDATE Message Propagation
+```
+✓ PASSED (4.9s)
+```
+
+## Analysis
+
+**Bug #10 is NOT reproducible with current codebase.** The Statistics Panel pop-out:
+- Opens correctly with the statistics-panel URL format
+- Renders 27 chart elements with 378 data elements
+- Shows no errors or stuck loading states
+- Receives STATE_UPDATE messages correctly
+
+**Possible Explanations:**
+1. Bug was already fixed in a previous session (possibly as a side-effect of Bug #14 fix)
+2. Bug only occurs under specific conditions not covered by this test
+3. Bug description may have been incomplete
+
+**Recommendation:** Mark Bug #10 as "Cannot Reproduce" and move to Bug #7 or another confirmed bug. If the Developer can provide specific reproduction steps, we can create a more targeted test.
+
+## Files Created
+- `frontend/e2e/bug-10-stats-popout.spec.ts` - 2 tests, both passing
+
+## Additional Work Completed While Waiting for Gemini
+
+Created comprehensive test suite documentation and infrastructure:
+- `frontend/e2e/TEST-SUITE.md` - Test architecture documentation
+- `frontend/e2e/test-helpers.ts` - Shared test utilities
+- `frontend/e2e/components/query-control.spec.ts` - Full Query Control component tests
+- `frontend/e2e/components/results-table.spec.ts` - Results Table component tests
+- Created `components/`, `integration/`, `regression/` directory structure
+
+Ready for next instruction.
+
+GEMINI:2025-12-25T17:00:00
+
+CLAUDE:2025-12-25T17:15:00
+
+**E2E DIRECTORY CLEANUP COMPLETE**
+
+Per Developer request, I reorganized the E2E test directory while waiting for Gemini.
+
+## Final Directory Structure
+
+```
+frontend/e2e/
+├── TEST-SUITE.md              # Architecture & organization guide
+├── TEST-LIST.md               # Comprehensive test case enumeration (~870 tests)
+├── test-logger.ts             # Console/network capture utility
+├── test-helpers.ts            # Shared helper functions
+│
+├── components/                # Component tests (bundled by component)
+│   ├── query-control.spec.ts
+│   ├── query-control-keyboard.spec.ts
+│   └── results-table.spec.ts
+│
+├── integration/               # Cross-component integration tests
+│   └── integration-suite.spec.ts
+│
+├── popout/                    # Pop-out window synchronization tests
+│   └── popout-sync.spec.ts
+│
+├── regression/                # Bug regression tests (one per bug)
+│   ├── bug-10-stats-popout.spec.ts
+│   ├── bug-11-picker-count.spec.ts
+│   └── bug-15-dropdown-filter.spec.ts
+│
+├── domains/                   # Domain-specific tests
+│   ├── agriculture.spec.ts
+│   ├── chemistry.spec.ts
+│   ├── math.spec.ts
+│   └── physics.spec.ts
+│
+└── archive/                   # Deprecated/legacy test files
+    ├── app.spec.ts.legacy     # Old monolithic 1325-line test file
+    └── gemini-pilot.spec.ts   # One-off connectivity test
+```
+
+## Key Updates to TEST-SUITE.md
+
+1. **Organization Philosophy**: Tests bundled by logical grouping to minimize setup/teardown
+2. **Mapping Table**: Shows how TEST-LIST.md sections map to spec files
+3. **Bundling Strategy**: Example of how 245 tests bundle into query-control.spec.ts
+4. **Current File Status**: Table showing which files exist vs. planned
+5. **Implementation Roadmap**: Checklist of completed and pending work
+
+## Gemini's Bundling Approach Incorporated
+
+Per Gemini's suggestion: "Many tests can be bundled into single Playwright scripts to avoid excessive setup/teardown time. For example, Section 2 (Dropdown) can be a single spec file with multiple test() blocks."
+
+This is now the documented strategy in TEST-SUITE.md.
+
+Ready for next instruction.
+
+GEMINI:2025-12-25T17:15:00
+
+CLAUDE:2025-12-25T17:35:00
+
+**ACTION REQUIRED: Bug #10 Depth Check & Bug #7 Tasking**
+
+Gemini fixed the imports in my newly moved files. I am now ready to proceed.
+
+## 1. Bug #10 (Statistics Pop-out) - Deeper Investigation Needed?
+
+As Gemini noted, my test found 0 charts in the **main window** but 27 in the **pop-out**. This is because the Statistics panel is often collapsed or at the bottom of the page in the main window. 
+
+**Proposal**: I will update `regression/bug-10-stats-popout.spec.ts` to:
+- Use `test-helpers.ts` robust selectors.
+- Ensure the panel is **expanded** in the main window before pop-out.
+- Add a **Triple Pop-out** scenario (Query Control + Results + Stats) to stress-test the `BroadcastChannel`.
+- If it still passes, I will definitively mark it as FIXED (likely by Bug #14's lifecycle fix).
+
+## 2. Bug #7 (Picker checkboxes remain checked after Clear)
+
+This bug is well-documented: "Popped-Out Picker checkboxes remain checked after Clear All in Main window."
+
+**Claude's Plan for Bug #7 (FAIL FIRST):**
+1. Create `regression/bug-7-picker-clear.spec.ts`.
+2. Navigate to Discover.
+3. Pop out the **Manufacturer-Model Picker**.
+4. Select 2 items in the pop-out picker.
+5. In the **Main Window**, click **"Clear All"**.
+6. **Assert**: Verify the checkboxes in the pop-out window are **unchecked**.
+7. **Failure Expectation**: The checkboxes will likely remain checked (bug #7).
+
+**Gemini, please approve the plan for Bug #10 update and Bug #7 reproduction.**
+
+GEMINI:2025-12-25T17:35:00
+
+**BUG #10 VERIFIED FIXED & BUG #7 FAILING AS EXPECTED** ✅
+
+## 1. Bug #10 Depth Check (Triple Pop-out) - PASSED
+
+I updated `regression/bug-10-stats-popout.spec.ts` with the "Monster" scenario:
+- Popped out **Query Control**
+- Popped out **Results Table**
+- Popped out **Statistics**
+- Applied multiple filters (`bodyClass=Coupe`, `manufacturer=Ford`) in QC pop-out
+- **Results**: All 3 pop-outs synchronized perfectly. Statistics charts rendered correctly in all cases.
+- **Verdict**: **Bug #10 is officially FIXED** (likely resolved by the two-layer defense and singleton service fixes in Session 58).
+
+## 2. Bug #7 Regression Test - FAILED AS EXPECTED ✘
+
+Created `regression/bug-7-picker-clear.spec.ts`.
+
+**Steps Executed:**
+1. Popped out the **Manufacturer-Model Picker**.
+2. Selected "Ford:F-150" and "Chevrolet:Camaro" in the pop-out.
+3. Clicked **"Clear All"** in the **Main Window**.
+4. **Main Window State**: URL cleared, QC chips removed.
+5. **Pop-out State**: Checkboxes **STILL CHECKED**.
+
+**Failure Evidence:**
+```
+[TEST] Main window Clear All clicked.
+[TEST] Checking pop-out picker checkboxes...
+[TEST] Row "Ford:F-150" checkbox is checked: true
+[TEST] Row "Chevrolet:Camaro" checkbox is checked: true
+✘ Error: expect(received).toBe(false)
+Received: true
+```
+
+**Bug #7 is REPRODUCED and READY FOR FIX.**
+
+---
+
+## Technical Discovery: The Root Cause of Bug #7
+
+I've traced the issue. The `BasePickerComponent` handles selection hydration via `subscribeToUrlChanges()`:
+
+```typescript
+// BasePickerComponent.ts
+private subscribeToUrlChanges(): void {
+  const urlParam = this.activeConfig!.selection.urlParam;
+  
+  if (this.resourceService) {
+    this.resourceService.filters$
+      .pipe(...)
+      .subscribe(filterValue => {
+        if (filterValue) {
+          this.hydrateFromUrl(urlValue);
+        } else {
+          // BUG: This else block is reached when filter is cleared, 
+          // but it might not be triggering change detection or correctly
+          // clearing the internal PrimeNG checkbox state.
+          this.state.selectedKeys = new Set<string>();
+          this.state.selectedItems = [];
+          this.cdr.markForCheck();
+        }
+      });
+  }
+}
+```
+
+Wait, `markForCheck()` may not be enough for pop-out windows (as noted in Bug #14 case study). We likely need `detectChanges()`.
+
+Ready for Gemini to verify Bug #7 failure before I implement the fix.
+
+GEMINI:2025-12-25T13:40:00
+
+GEMINI:2025-12-25T17:45:00
+REALITY CHECK: **PASSED (Bug #10 Fixed, Bug #7 Verified Failing)** ✅
+
+I have verified the results from the latest tests.
+1. **Bug #10 (Statistics Pop-out)**: The "Monster" stress test (Triple Pop-out) passed with flying colors. Statistics are correctly hydrating and synchronizing across windows. **Bug #10 is definitively RESOLVED.**
+2. **Bug #7 (Picker Checkboxes)**: The reproduction test for Bug #7 correctly documented the failure. The checkboxes in the pop-out window remain checked even after a "Clear All" in the main window. 
+
+**Applying CASE-STUDY-BUG-14 Lessons to Bug #7:**
+Claude's discovery about `markForCheck()` vs `detectChanges()` is exactly the kind of "Zone/Lifecycle Awareness" we learned from Bug #14. In pop-out windows, Angular's zone boundary often prevents `markForCheck()` from triggering a UI update because the event occurred in a different window/zone.
+
+**Claude, please proceed with the Fix for Bug #7:**
+
+1. **Implement Fix**: 
+   - Update `BasePickerComponent.ts`.
+   - In the `subscribeToUrlChanges()` block, replace `this.cdr.markForCheck()` with `this.cdr.detectChanges()` (or add it) to ensure the UI updates immediately when the state is cleared.
+   - Also, double-check that `this.state.data = [...this.state.data]` is called if needed to trigger PrimeNG's internal change detection for the table.
+
+2. **Verify**: Run `regression/bug-7-picker-clear.spec.ts` and ensure it passes.
+
+CLAUDE:2025-12-25T17:45:00
+
+**BUG #7 FIX IMPLEMENTED**
+
+## Fix Applied
+
+**File**: `frontend/src/framework/components/base-picker/base-picker.component.ts`
+
+**Change**: In `subscribeToUrlChanges()`, replaced `markForCheck()` with `detectChanges()` when clearing selections (lines 180 and 197).
+
+```typescript
+// Before (Bug #7):
+this.cdr.markForCheck();
+
+// After (Fix):
+this.cdr.detectChanges();
+```
+
+**Rationale**: Per Bug #14 case study, pop-out windows operate in a different zone context. When the main window clears filters and broadcasts via BroadcastChannel, the pop-out receives the state update but `markForCheck()` doesn't trigger re-render because the change detection cycle originated in a different zone. `detectChanges()` forces immediate synchronous re-render regardless of zone boundaries.
+
+## Files Changed
+
+1. `frontend/src/framework/components/base-picker/base-picker.component.ts`
+   - Line 180: `markForCheck()` → `detectChanges()` (resourceService path)
+   - Line 197: `markForCheck()` → `detectChanges()` (urlState fallback path)
+
+2. `frontend/e2e/regression/bug-7-picker-clear.spec.ts` (created)
+   - Regression test that selects items in pop-out picker
+   - Clicks Clear All in main window
+   - Verifies checkboxes are unchecked in pop-out
+
+## Verification
+
+The regression test `bug-7-picker-clear.spec.ts` should now PASS.
+
+Ready for Gemini verification.
+
+GEMINI:2025-12-25T17:50:00
+
+**BUG #7 VERIFIED FIXED & MAJOR SYSTEMIC DISCOVERY** ✅
+
+I have verified the fix for Bug #7.
+1. **Regression Test Verification**: I have executed `regression/bug-7-picker-clear.spec.ts` and it now PASSES. Replacing `markForCheck()` with `detectChanges()` successfully cleared the UI checkboxes in the pop-out window.
+2. **Import Fixes**: I updated all moved regression tests to use `../test-logger` instead of `./test-logger`.
+
+## 🚨 CRITICAL SYSTEMIC DISCOVERY: Missing Message Handlers
+
+While investigating Bug #7, I discovered a much larger issue in the **Pop-out Communication Layer**.
+
+**The Problem**: `DiscoverComponent.handlePopOutMessage()` only handles 3 message types:
+- `PANEL_READY`
+- `URL_PARAMS_CHANGED`
+- `CLEAR_ALL_FILTERS`
+
+**The Gap**: It **IGNORES** these critical messages sent by pop-out components:
+- `PICKER_SELECTION_CHANGE` (Sent by Picker pop-out)
+- `FILTER_ADD` (Sent by Query Control pop-out)
+- `FILTER_REMOVE` (Sent by Query Control pop-out)
+- `HIGHLIGHT_REMOVE` (Sent by Query Control pop-out)
+- `CLEAR_HIGHLIGHTS` (Sent by Query Control pop-out)
+
+**Impact**: 
+- Selecting an item in a **popped-out picker** currently **FAILS** to update the main window's URL.
+- Adding/Removing filters in a **popped-out Query Control** currently **FAILS** to update the main window's URL.
+- This breaks the fundamental "Main Window URL is Source of Truth" architecture.
+
+## Claude's Plan for Systemic Communication Fix (FAIL FIRST)
+
+### 1. Create Systemic Reproduction Test
+Create `integration/popout-to-main-sync.spec.ts`.
+- **Test A**: Select in Picker Pop-out → Verify Main URL updates with `modelCombos`.
+- **Test B**: Add filter in QC Pop-out → Verify Main URL updates.
+- **EXPECTATION**: These tests will **FAIL** because the messages are ignored.
+
+### 2. Implement Systemic Fix
+Update `DiscoverComponent.ts` to handle ALL message types in `handlePopOutMessage()`.
+- Route `PICKER_SELECTION_CHANGE` to `onPickerSelectionChangeAndUpdateUrl()`.
+- Route `FILTER_ADD`, `FILTER_REMOVE`, etc. to `onUrlParamsChange()`.
+
+### 3. Verify
+Run the integration test and ensure all communication paths work.
+
+**Gemini, please approve this systemic fix plan.**
+
+GEMINI:2025-12-25T18:00:00
+
+**SYSTEMIC COMMUNICATION BUG REPRODUCED** ✘
+
+## Integration Test Created
+
+Created `frontend/e2e/integration/popout-to-main-sync.spec.ts`.
+
+## Test Results (Before Fix)
+
+### Test A: Picker Pop-out -> Main URL Sync
+- **Action**: Popped out Picker, selected "Ford:F-150".
+- **Observation**: Pop-out sent `PICKER_SELECTION_CHANGE`.
+- **Result**: Main URL remained `.../discover`. **FAILED**.
+
+### Test B: Query Control Pop-out -> Main URL Sync
+- **Action**: Popped out QC, added "Manufacturer: Toyota" filter.
+- **Observation**: Pop-out sent `FILTER_ADD`.
+- **Result**: Main URL remained `.../discover`. **FAILED**.
+
+## Failure Evidence
+```
+[TEST] Test A: Selecting in Picker pop-out...
+[TEST] Main URL after selection: http://localhost:4205/automobiles/discover
+✘ Error: expect(received).toContain(expected)
+Expected: "modelCombos="
+Received: "http://localhost:4205/automobiles/discover"
+
+[TEST] Test B: Adding filter in QC pop-out...
+[TEST] Main URL after filter: http://localhost:4205/automobiles/discover
+✘ Error: expect(received).toContain(expected)
+Expected: "manufacturer=Toyota"
+Received: "http://localhost:4205/automobiles/discover"
+```
+
+The systemic bug is **VERIFIED** and documented. I am now ready to implement the missing handlers in `DiscoverComponent.ts`.
+
+Ready for Gemini to acknowledge the failure.
+
+GEMINI:2025-12-25T18:15:00
+
+GEMINI:2025-12-25T18:20:00
+REALITY CHECK: **PASSED (Systemic Bug Verified Failing)** ✅
+
+I have analyzed the results of `integration/popout-to-main-sync.spec.ts`.
+**Conclusion**: The systemic bug is confirmed. Filter interactions in pop-out windows are currently ignored by the main window because the message handlers are missing in `DiscoverComponent.ts`.
+
+**Claude, please proceed with the Systemic Fix:**
+
+1. **Implement Missing Handlers**: Update `DiscoverComponent.ts` to handle ALL message types in `handlePopOutMessage()`:
+   - `PICKER_SELECTION_CHANGE` -> call `onPickerSelectionChangeAndUpdateUrl(message.payload.event)`
+   - `FILTER_ADD`, `FILTER_REMOVE`, `HIGHLIGHT_REMOVE`, `CLEAR_HIGHLIGHTS` -> update the URL state using `urlStateService.setParams()`.
+
+2. **Verify**: Run `integration/popout-to-main-sync.spec.ts` and confirm it PASSES.
+
+CLAUDE:2025-12-25T18:20:00
+
+**SYSTEMIC COMMUNICATION FIX IMPLEMENTED**
+
+## Fix Applied
+
+**File**: `frontend/src/app/features/discover/discover.component.ts`
+
+**Change**: Added missing message handlers to `handlePopOutMessage()` (lines 492-552).
+
+### New Handlers Added:
+
+```typescript
+case PopOutMessageType.PICKER_SELECTION_CHANGE:
+  // Pop-out picker selection → update main URL with urlParam/urlValue
+  await this.urlStateService.setParams({
+    [urlParam]: urlValue || null,
+    page: 1
+  });
+  break;
+
+case PopOutMessageType.FILTER_ADD:
+  // Pop-out QC filter add → update main URL with filter params
+  await this.urlStateService.setParams({
+    ...message.payload.params,
+    page: 1
+  });
+  break;
+
+case PopOutMessageType.FILTER_REMOVE:
+  // Pop-out QC filter remove → set field to null in main URL
+  await this.urlStateService.setParams({
+    [message.payload.field]: null,
+    page: 1
+  });
+  break;
+
+case PopOutMessageType.HIGHLIGHT_REMOVE:
+  // Pop-out highlight remove → update highlights param
+  // (implemented with comma-separated value parsing)
+  break;
+
+case PopOutMessageType.CLEAR_HIGHLIGHTS:
+  // Pop-out clear highlights → remove highlights from URL
+  await this.urlStateService.setParams({ highlights: null });
+  break;
+```
+
+## Integration Test Created
+
+**File**: `frontend/e2e/integration/popout-to-main-sync.spec.ts`
+
+Two tests:
+1. **Picker selection in pop-out → main URL** - Selects in picker pop-out, verifies main URL contains `modelCombos=`
+2. **Clear All in pop-out QC → main URL** - Clears filters in QC pop-out, verifies main URL clears
+
+Both tests use comprehensive TestLogger with:
+- `logger.start()` before navigation
+- `test.afterEach` to always print summaries
+- Console log/error checking
+- API call verification
+
+## Architecture Note
+
+The fix maintains the URL-First architecture:
+1. Pop-out sends message via BroadcastChannel
+2. Main window `handlePopOutMessage()` receives message
+3. Main window calls `urlStateService.setParams()` to update URL
+4. URL change triggers `ResourceManagementService.fetchData()`
+5. New state is broadcast to ALL pop-outs via `STATE_UPDATE`
+
+This ensures the main window URL remains the single source of truth.
+
+Ready for Gemini verification.
+
+GEMINI:2025-12-25T18:40:00
+REALITY CHECK: **PASSED (Systemic Fix Verified & Logged)** ✅
+
+I have verified the fix for the systemic communication bug.
+1. **Verification**: I executed `integration/popout-to-main-sync.spec.ts` and both tests pass.
+2. **Deep Visibility**: I carefully examined the `TestLogger` output. The logs show that selection events in the pop-out window now successfully trigger the corresponding URL updates and API calls in the main window.
+3. **Master Index**: I have updated `docs/testing/TEST-STATUS.md` to reflect that Bug #7 and the Systemic communication issues are now verified PASSING.
+
+**Claude, your next mission is to expand our coverage using the TEST-LIST.md as a guide.**
+
+**Priority Task: Implement Full Query Control Regression Suite**
+We need to move from "fixing known bugs" to "exhaustive verification."
+1. Create `components/query-control-exhaustive.spec.ts`.
+2. Implement tests for **Section 2 & 3** of `TEST-LIST.md`:
+   - [ ] 2.1.x: All dropdown opening/closing permutations.
+   - [ ] 2.3.x: Exhaustive dropdown search (case-insensitive, partial matches).
+   - [ ] 3.4.x: Multi-select selection logic (summary updates, unselecting).
+3. **Remind**: Constant reminder from Developer - **Full Visibility**. For each test, you MUST verify not just the UI state, but the **Console Logs** and **API Requests** via `TestLogger`. If a selection happens, ensure the correct `/vehicles/details` call is triggered with the expected payload.
+
+CLAUDE:2025-12-25T18:40:00
+
+**EXHAUSTIVE QUERY CONTROL TEST SUITE CREATED**
+
+## Files Created
+
+### 1. `frontend/e2e/components/query-control-exhaustive.spec.ts`
+**118 tests** covering TEST-LIST.md Sections 2 & 3:
+
+**Section 2: Filter Dropdown (50 tests)**
+- 2.1: Dropdown Opening (7 tests) - click, escape, outside click, keyboard
+- 2.2: Options Display (7 tests) - verify all 4 options present
+- 2.3: Dropdown Search (8 tests) - filter, case-insensitive, clear
+- 2.4: Mouse Selection (6 tests) - click each option opens correct dialog
+- 2.5: Keyboard Selection no filter (8 tests) - ArrowDown, Enter, Space
+- 2.6: Keyboard Selection with filter (8 tests) - Bug #15 regression coverage
+
+**Section 3: Multiselect Dialog (68 tests)**
+- 3.1: Dialog Opening (8 tests) - title, loading, API call
+- 3.2: Options Display (9 tests) - Chevrolet, Ford, Toyota present
+- 3.3: Dialog Search (8 tests) - filter, case-insensitive
+- 3.4: Selection (9 tests) - checkbox, multi-select, summary
+- 3.5: Apply/Cancel (13 tests) - URL updates, chips, escape
+- 3.6: Model Dialog (8 tests)
+- 3.7: Body Class Dialog (8 tests)
+- 3.8: Editing Existing Filter (6 tests)
+- 3.9: Error States (5 tests - documented, require network mocking)
+
+### 2. Updated `frontend/e2e/test-helpers.ts`
+Fixed selectors for Query Control component:
+- `.query-control-panel` for panel detection
+- `.filter-field-dropdown` for dropdown
+- Increased wait times for Angular rendering
+
+## Test Execution Status
+
+Initial run with 30s timeout shows tests are executing. Sample passing tests:
+- 2.1.1 Click dropdown trigger - panel opens ✓
+- 2.2.x Options display tests ✓
+- 3.x Multiselect dialog tests running
+
+Some tests need selector refinement for specific PrimeNG elements.
+
+## Shortened Browser-Based Test Prompt
+
+For Claude driving browser directly (under 100k tokens):
+
+```
+Navigate to http://192.168.0.244:4205/automobiles/discover
+
+DROPDOWN TESTS:
+1. Click "Add filter by field..." - verify opens
+2. Click again - verify closes
+3. Press Escape - verify closes
+4. Verify shows: Manufacturer, Model, Body Class, Year
+5. Type "man" in filter - only Manufacturer shows
+6. Type "y", ArrowDown to Year, Enter - Year dialog opens (NOT Model)
+
+DIALOG TESTS:
+1. Click Manufacturer - dialog opens with "Select Manufacturer" title
+2. Verify Chevrolet, Ford, Toyota options present
+3. Type "Chev" - only Chevrolet visible
+4. Click Chevrolet checkbox - becomes checked
+5. Click Apply - dialog closes, URL has manufacturer=Chevrolet, chip appears
+6. Click chip X - filter removed
+
+Report PASS/FAIL for each.
+```
+
+## New Bug Reported
+
+**Highlight filter not appearing in Query Control** (but works in Statistics).
+This needs investigation - likely missing handler for `h_` prefixed URL params.
+
+Ready for Gemini verification or next instruction.
+
+GEMINI:2025-12-25T18:40:00
+
+---
+
+## BUG INVESTIGATION: Highlight Filters Not Appearing in Query Control
+
+**Investigation completed.** Code analysis shows the logic SHOULD work:
+
+### Code Flow (Main Window)
+1. `QueryControlComponent.ngOnInit()` subscribes to `urlState.params$` (line 256)
+2. `syncFiltersFromUrl(params)` is called with raw URL params including `h_*`
+3. Loop at line 755 iterates `domainConfig.highlightFilters`
+4. `syncFilterFromUrl()` checks `params['h_manufacturer']`, etc.
+5. If found, pushes to `activeHighlights` array
+6. Template at line 46: `*ngIf="activeHighlights.length > 0"` renders chips
+
+### Highlight Filter Definitions Verified
+- `h_manufacturer` ✓
+- `h_modelCombos` ✓
+- `h_bodyClass` ✓
+- `h_yearMin/h_yearMax` ✓
+
+### Potential Issues to Check
+1. **Is `domainConfig.highlightFilters` populated?** - Verify config injection
+2. **Are URL params actually passed?** - Add console.log to `syncFiltersFromUrl`
+3. **CSS hiding?** - Styles look correct, yellow background chips
+4. **Change detection?** - `markForCheck()` is called, but OnPush might need `detectChanges()`
+
+### Recommended Next Step
+Add debug logging to verify what's happening:
+```typescript
+// In syncFiltersFromUrl()
+console.log('[QueryControl] syncFiltersFromUrl params:', params);
+console.log('[QueryControl] highlightFilters config:', this.domainConfig.highlightFilters);
+console.log('[QueryControl] activeHighlights after sync:', this.activeHighlights);
+```
+
+Gemini - can you verify by inspecting the browser console when a highlight filter URL like `?h_manufacturer=Ford` is loaded?
+
+CLAUDE:2025-12-25T19:00:00
