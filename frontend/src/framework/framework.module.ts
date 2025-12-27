@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PrimengModule } from '../app/primeng.module';
+import { UiKitModule } from './ui-kit/ui-kit.module';
 
 // Components
 import { BasePickerComponent } from './components/base-picker/base-picker.component';
@@ -42,7 +42,7 @@ import { StatisticsPanelComponent } from './components/statistics-panel/statisti
   imports: [
     CommonModule,
     FormsModule,
-    PrimengModule
+    UiKitModule
   ],
   exports: [
     BasePickerComponent,
@@ -55,7 +55,7 @@ import { StatisticsPanelComponent } from './components/statistics-panel/statisti
     // Re-export common modules for convenience
     CommonModule,
     FormsModule,
-    PrimengModule
+    UiKitModule
   ]
 })
 export class FrameworkModule { }

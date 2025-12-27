@@ -8,7 +8,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { PrimengModule } from './primeng.module';
+import { UiKitModule } from '../framework/ui-kit/ui-kit.module';
 import { FrameworkModule } from '../framework/framework.module';
 import { GlobalErrorHandler } from '../framework/services/global-error.handler';
 import { DOMAIN_CONFIG } from '../framework/services/domain-config-registry.service';
@@ -53,7 +53,7 @@ import { DependencyGraphComponent } from './features/dependency-graph/dependency
  * @class AppModule
  * @see AppComponent - Root component
  * @see FrameworkModule - Core framework services and components
- * @see PrimengModule - UI component library configuration
+ * @see UiKitModule - UI component library facade (Framework Layer)
  * @see GlobalErrorHandler - Global error handling service
  */
 @NgModule({
@@ -81,7 +81,7 @@ import { DependencyGraphComponent } from './features/dependency-graph/dependency
     FormsModule,
     DragDropModule,
     AppRoutingModule,
-    PrimengModule,
+    UiKitModule,
     FrameworkModule
   ],
   providers: [
