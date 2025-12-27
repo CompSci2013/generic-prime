@@ -59,6 +59,7 @@
 
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgIf } from '@angular/common';
 
 /**
  * Cytoscape.js graph visualization library
@@ -268,9 +269,11 @@ export interface KnowledgeGraphData {
  * Supports pan, zoom, node selection, and edge relationship display.
  */
 @Component({
-  selector: 'app-knowledge-graph',
-  templateUrl: './knowledge-graph.component.html',
-  styleUrls: ['./knowledge-graph.component.scss']
+    selector: 'app-knowledge-graph',
+    templateUrl: './knowledge-graph.component.html',
+    styleUrls: ['./knowledge-graph.component.scss'],
+    standalone: true,
+    imports: [NgIf]
 })
 export class KnowledgeGraphComponent implements OnInit, AfterViewInit, OnDestroy {
   /**

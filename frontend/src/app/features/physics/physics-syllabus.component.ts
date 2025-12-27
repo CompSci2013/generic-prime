@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PhysicsNode } from './physics-knowledge-path';
+import { NgIf, NgFor } from '@angular/common';
 
 /**
  * Physics Syllabus Detail Component
@@ -67,9 +68,11 @@ import { PhysicsNode } from './physics-knowledge-path';
  * @since 1.0.0 (Added as part of physics domain implementation)
  */
 @Component({
-  selector: 'app-physics-syllabus',
-  templateUrl: './physics-syllabus.component.html',
-  styleUrls: ['./physics-syllabus.component.scss']
+    selector: 'app-physics-syllabus',
+    templateUrl: './physics-syllabus.component.html',
+    styleUrls: ['./physics-syllabus.component.scss'],
+    standalone: true,
+    imports: [NgIf, NgFor]
 })
 export class PhysicsSyllabusComponent implements OnInit {
   /**

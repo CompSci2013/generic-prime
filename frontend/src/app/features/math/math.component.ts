@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 /**
  * Math Component - Mathematics Domain Page
@@ -14,9 +15,11 @@ import { Component } from '@angular/core';
  * @since 1.0
  */
 @Component({
-  selector: 'app-math',
-  templateUrl: './math.component.html',
-  styleUrls: ['./math.component.scss']
+    selector: 'app-math',
+    templateUrl: './math.component.html',
+    styleUrls: ['./math.component.scss'],
+    standalone: true,
+    imports: [RouterLink]
 })
 export class MathComponent {
 

@@ -1,6 +1,9 @@
-import { Component, Injector, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Injector } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet, RouterLink, ActivatedRoute } from '@angular/router';
 import { MenuItem } from 'primeng/api';
+import { TieredMenuModule } from 'primeng/tieredmenu';
+import { ToastModule } from 'primeng/toast';
 import { DomainConfigRegistry } from '../framework/services';
 import { DOMAIN_PROVIDERS } from '../domain-config/domain-providers';
 import packageJson from '../../package.json';
@@ -42,6 +45,8 @@ import packageJson from '../../package.json';
  */
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, RouterLink, TieredMenuModule, ToastModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

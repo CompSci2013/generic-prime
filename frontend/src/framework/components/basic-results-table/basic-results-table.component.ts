@@ -15,6 +15,12 @@ import { DomainConfig } from '../../models/domain-config.interface';
 import { ResourceManagementService } from '../../services/resource-management.service';
 import { PopOutContextService } from '../../services/popout-context.service';
 import { PopOutMessageType } from '../../models/popout.interface';
+import { SkeletonModule } from 'primeng/skeleton';
+import { RippleModule } from 'primeng/ripple';
+import { ButtonModule } from 'primeng/button';
+import { NgIf, NgFor, NgStyle } from '@angular/common';
+import { SharedModule } from 'primeng/api';
+import { TableModule } from 'primeng/table';
 
 /**
  * Basic Results Table Component
@@ -40,10 +46,12 @@ import { PopOutMessageType } from '../../models/popout.interface';
  * ```
  */
 @Component({
-  selector: 'app-basic-results-table',
-  templateUrl: './basic-results-table.component.html',
-  styleUrls: ['./basic-results-table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-basic-results-table',
+    templateUrl: './basic-results-table.component.html',
+    styleUrls: ['./basic-results-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [TableModule, SharedModule, NgIf, NgFor, NgStyle, ButtonModule, RippleModule, SkeletonModule]
 })
 export class BasicResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

@@ -30,32 +30,30 @@ import { StatisticsPanelComponent } from './components/statistics-panel/statisti
  * ```
  */
 @NgModule({
-  declarations: [
-    BasePickerComponent,
-    ResultsTableComponent,
-    BasicResultsTableComponent,
-    QueryControlComponent,
-    QueryPanelComponent,
-    BaseChartComponent,
-    StatisticsPanelComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    UiKitModule
-  ],
-  exports: [
-    BasePickerComponent,
-    ResultsTableComponent,
-    BasicResultsTableComponent,
-    QueryControlComponent,
-    QueryPanelComponent,
-    BaseChartComponent,
-    StatisticsPanelComponent,
-    // Re-export common modules for convenience
-    CommonModule,
-    FormsModule,
-    UiKitModule
-  ]
+    imports: [
+        CommonModule,
+        FormsModule,
+        UiKitModule,
+        BasePickerComponent,
+        ResultsTableComponent,
+        BasicResultsTableComponent,
+        QueryControlComponent,
+        QueryPanelComponent,
+        BaseChartComponent,
+        StatisticsPanelComponent
+    ],
+    exports: [
+        BasePickerComponent,
+        ResultsTableComponent,
+        BasicResultsTableComponent,
+        QueryControlComponent,
+        QueryPanelComponent,
+        BaseChartComponent,
+        StatisticsPanelComponent,
+        // Re-export common modules for convenience
+        CommonModule,
+        FormsModule,
+        UiKitModule
+    ]
 })
 export class FrameworkModule { }

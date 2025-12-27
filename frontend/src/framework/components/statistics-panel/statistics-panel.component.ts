@@ -25,7 +25,10 @@ import { PopOutMessageType } from '../../models/popout.interface';
 import { PopOutContextService } from '../../services/popout-context.service';
 import { ResourceManagementService } from '../../services/resource-management.service';
 import { UrlStateService } from '../../services/url-state.service';
-import { ChartDataSource } from '../base-chart/base-chart.component';
+import { ChartDataSource, BaseChartComponent } from '../base-chart/base-chart.component';
+import { NgIf, NgFor } from '@angular/common';
+import { SharedModule } from 'primeng/api';
+import { PanelModule } from 'primeng/panel';
 
 /**
  * Statistics Panel Component
@@ -42,10 +45,12 @@ import { ChartDataSource } from '../base-chart/base-chart.component';
  * ```
  */
 @Component({
-  selector: 'app-statistics-panel',
-  templateUrl: './statistics-panel.component.html',
-  styleUrls: ['./statistics-panel.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-statistics-panel',
+    templateUrl: './statistics-panel.component.html',
+    styleUrls: ['./statistics-panel.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [PanelModule, SharedModule, NgIf, NgFor, BaseChartComponent]
 })
 export class StatisticsPanelComponent implements OnInit, OnDestroy {
   /**

@@ -14,6 +14,18 @@ import { DomainConfig, FilterOption } from '../../models/domain-config.interface
 import { ResourceManagementService } from '../../services/resource-management.service';
 import { PopOutContextService } from '../../services/popout-context.service';
 import { PopOutMessageType } from '../../models/popout.interface';
+import { SkeletonModule } from 'primeng/skeleton';
+import { RippleModule } from 'primeng/ripple';
+import { SharedModule } from 'primeng/api';
+import { TableModule } from 'primeng/table';
+import { CheckboxModule } from 'primeng/checkbox';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { DropdownModule } from 'primeng/dropdown';
+import { ButtonModule } from 'primeng/button';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+import { NgClass, NgIf, NgFor, NgStyle } from '@angular/common';
 
 /**
  * Results Table Component
@@ -33,10 +45,12 @@ import { PopOutMessageType } from '../../models/popout.interface';
  * ```
  */
 @Component({
-  selector: 'app-results-table',
-  templateUrl: './results-table.component.html',
-  styleUrls: ['./results-table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-results-table',
+    templateUrl: './results-table.component.html',
+    styleUrls: ['./results-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgClass, NgIf, NgFor, FormsModule, InputTextModule, InputNumberModule, ButtonModule, DropdownModule, MultiSelectModule, CheckboxModule, TableModule, SharedModule, NgStyle, RippleModule, SkeletonModule]
 })
 export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

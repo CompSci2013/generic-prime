@@ -21,6 +21,18 @@ import { ApiService } from '../../services/api.service';
 import { UrlStateService } from '../../services/url-state.service';
 import { PopOutContextService } from '../../services/popout-context.service';
 import { PopOutMessageType } from '../../models/popout.interface';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { InputTextModule } from 'primeng/inputtext';
+import { SharedModule } from 'primeng/api';
+import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
+import { ChipModule } from 'primeng/chip';
+import { NgIf, NgFor } from '@angular/common';
+import { ButtonModule } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { DropdownModule } from 'primeng/dropdown';
 
 /**
  * Active filter representation
@@ -79,10 +91,12 @@ interface ActiveFilter {
  * ```
  */
 @Component({
-  selector: 'app-query-control',
-  templateUrl: './query-control.component.html',
-  styleUrls: ['./query-control.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-query-control',
+    templateUrl: './query-control.component.html',
+    styleUrls: ['./query-control.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [DropdownModule, FormsModule, ButtonModule, NgIf, NgFor, ChipModule, TooltipModule, DialogModule, SharedModule, InputTextModule, ProgressSpinnerModule, CheckboxModule, InputNumberModule]
 })
 export class QueryControlComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

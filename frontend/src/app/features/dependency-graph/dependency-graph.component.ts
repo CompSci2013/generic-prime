@@ -14,6 +14,8 @@ import {
   LAYER_GROUPS,
   DependencyNode
 } from './dependency-graph';
+import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 /**
  * Dependency Graph Component - Application Architecture Visualization
@@ -105,21 +107,23 @@ import {
  * @see https://js.cytoscape.org - Cytoscape.js documentation
  */
 @Component({
-  selector: 'app-dependency-graph',
-  templateUrl: './dependency-graph.component.html',
-  styleUrls: ['./dependency-graph.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [
-    trigger('fadeInOut', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(-10px)' }),
-        animate('300ms ease-in', style({ opacity: 1, transform: 'translateX(0)' }))
-      ]),
-      transition(':leave', [
-        animate('300ms ease-out', style({ opacity: 0, transform: 'translateX(-10px)' }))
-      ])
-    ])
-  ]
+    selector: 'app-dependency-graph',
+    templateUrl: './dependency-graph.component.html',
+    styleUrls: ['./dependency-graph.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    animations: [
+        trigger('fadeInOut', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'translateX(-10px)' }),
+                animate('300ms ease-in', style({ opacity: 1, transform: 'translateX(0)' }))
+            ]),
+            transition(':leave', [
+                animate('300ms ease-out', style({ opacity: 0, transform: 'translateX(-10px)' }))
+            ])
+        ])
+    ],
+    standalone: true,
+    imports: [FormsModule, NgIf, NgFor, DatePipe]
 })
 export class DependencyGraphComponent implements OnInit, AfterViewInit {
   /**

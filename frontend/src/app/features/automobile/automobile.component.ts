@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 /**
  * Automobile Component - Automobile Domain Landing Page
@@ -24,9 +25,11 @@ import { Component } from '@angular/core';
  * Fully implemented with integration to the domain adapter, models, and UI controls.
  */
 @Component({
-  selector: 'app-automobile',
-  templateUrl: './automobile.component.html',
-  styleUrls: ['./automobile.component.scss']
+    selector: 'app-automobile',
+    templateUrl: './automobile.component.html',
+    styleUrls: ['./automobile.component.scss'],
+    standalone: true,
+    imports: [RouterLink]
 })
 export class AutomobileComponent {
 
