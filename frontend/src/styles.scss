@@ -1,4 +1,4 @@
-/* PrimeNG 19 - Styles loaded via providePrimeNG() in app.config.ts */
+/* PrimeNG 20 - Styles loaded via providePrimeNG() in app.config.ts */
 /* Only primeicons CSS needs to be imported here */
 @import "primeicons/primeicons.css";
 
@@ -12,4 +12,40 @@ body {
   font-family: var(--font-family);
   background-color: #3c3c3c; // Dark gray background (VS theme)
   color: #ffffff; // White text for better readability
+}
+
+/* PrimeNG 20 Dark Theme Fixes */
+/* Checkbox - make border visible in dark mode */
+.p-checkbox .p-checkbox-box {
+  border: 2px solid #888888 !important;
+  background: transparent !important;
+}
+
+.p-checkbox .p-checkbox-box.p-highlight,
+.p-checkbox.p-checkbox-checked .p-checkbox-box {
+  border-color: var(--p-primary-color, #64B5F6) !important;
+  background: var(--p-primary-color, #64B5F6) !important;
+}
+
+.p-checkbox .p-checkbox-box:hover {
+  border-color: var(--p-primary-color, #64B5F6) !important;
+}
+
+/* Panel dark theme */
+.p-panel {
+  background: #1e1e1e;
+}
+
+.p-panel .p-panel-header {
+  background: #1e1e1e;
+  border-color: #3c3c3c;
+}
+
+.p-panel .p-panel-content {
+  background: #1e1e1e;
+  border-color: #3c3c3c;
+}
+
+.p-panel .p-panel-content-container {
+  background: #1e1e1e;
 }

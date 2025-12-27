@@ -73,7 +73,7 @@
             }
             <!-- Select Dropdown (single) -->
             @if (filterDef.type === 'select') {
-              <p-dropdown
+              <p-select
                 [id]="filterDef.id"
                 [(ngModel)]="currentFilters[filterDef.id]"
                 (ngModelChange)="onFilterChange(filterDef.id, $event)"
@@ -85,7 +85,7 @@
                 filterBy="label"
                 [autofocusFilter]="false"
                 [placeholder]="filterDef.placeholder || 'Select...'">
-              </p-dropdown>
+              </p-select>
             }
             <!-- Multi-Select Dropdown -->
             @if (filterDef.type === 'multiselect') {

@@ -32,7 +32,7 @@ import { ChipModule } from 'primeng/chip';
 
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 
 /**
  * Active filter representation
@@ -95,7 +95,7 @@ interface ActiveFilter {
     templateUrl: './query-control.component.html',
     styleUrls: ['./query-control.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [DropdownModule, FormsModule, ButtonModule, ChipModule, TooltipModule, DialogModule, SharedModule, InputTextModule, ProgressSpinnerModule, CheckboxModule, InputNumberModule]
+    imports: [SelectModule, FormsModule, ButtonModule, ChipModule, TooltipModule, DialogModule, SharedModule, InputTextModule, ProgressSpinnerModule, CheckboxModule, InputNumberModule]
 })
 export class QueryControlComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit {
@@ -228,7 +228,7 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
 
     // Check if there's a currently highlighted/focused option in the dropdown
     // PrimeNG 14 uses the 'p-highlight' CSS class for highlighted options
-    const highlightedOption = document.querySelector('.p-dropdown-items .p-highlight');
+    const highlightedOption = document.querySelector('.p-select-list .p-select-option-selected, .p-select-list .p-focus');
 
     if (highlightedOption) {
       // Prevent the key from being processed elsewhere

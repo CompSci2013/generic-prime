@@ -1,7 +1,7 @@
 <div class="query-control-panel" [attr.data-testid]="environment.includeTestIds ? 'query-control-panel' : null">
   <!-- Compact Header Bar with Dropdown and Actions -->
   <div class="control-header">
-    <p-dropdown
+    <p-select
       #filterFieldDropdown
       [options]="filterFieldOptions"
       [(ngModel)]="selectedField"
@@ -15,7 +15,7 @@
       optionValue="value"
       styleClass="filter-field-dropdown"
       [attr.data-testid]="environment.includeTestIds ? 'filter-field-dropdown' : null">
-    </p-dropdown>
+    </p-select>
     <p-button
       label="Clear All"
       icon="pi pi-times"
@@ -30,7 +30,7 @@
     <div class="active-filters">
       <label class="active-filters-label">Active Filters:</label>
       <div class="filter-chips">
-        @for (filter of activeFilters; track filter) {
+        @for (filter of activeFilters; track filter.definition.field) {
           <p-chip
             [label]="getChipLabel(filter)"
             [removable]="true"
@@ -58,7 +58,7 @@
         </a>
       </div>
       <div class="highlight-chips">
-        @for (highlight of activeHighlights; track highlight) {
+        @for (highlight of activeHighlights; track highlight.definition.field) {
           <p-chip
             [label]="getChipLabel(highlight)"
             [removable]="true"
@@ -133,14 +133,15 @@
     <!-- Options List -->
     @if (!loadingOptions && !optionsError) {
       <div class="options-list">
-        @for (option of filteredOptions; track option) {
+        @for (option of filteredOptions; track option.value) {
           <div class="option-item">
             <p-checkbox
               [(ngModel)]="selectedOptions"
               [value]="option.value"
-              [binary]="false">
-              {{ option.label }}
+              [binary]="false"
+              [inputId]="'option-' + option.value">
             </p-checkbox>
+            <label [for]="'option-' + option.value">{{ option.label }}</label>
           </div>
         }
         @if (filteredOptions.length === 0) {

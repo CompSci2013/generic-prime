@@ -7,8 +7,10 @@ import {
   input,
   OnInit,
   output,
-  Signal
+  Signal,
+  ViewChild
 } from '@angular/core';
+import { Table } from 'primeng/table';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
@@ -93,7 +95,11 @@ export class BasicResultsTableComponent<TFilters = any, TData = any, TStatistics
   // Component-Local State
   // ============================================================================
 
-  expandedRows: { [key: string]: boolean } = {};
+  /**
+   * Reference to the PrimeNG table for programmatic row toggle
+   */
+  @ViewChild('dt') table!: Table;
+
   Object = Object;
 
   // ============================================================================
@@ -187,5 +193,30 @@ export class BasicResultsTableComponent<TFilters = any, TData = any, TStatistics
    */
   refresh(): void {
     this.resourceService.refresh();
+  }
+
+  /**
+   * Handle row expand event from PrimeNG
+   */
+  onRowExpand(event: any): void {
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Handle row collapse event from PrimeNG
+   */
+  onRowCollapse(event: any): void {
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Toggle row expansion programmatically
+   * Uses PrimeNG Table's toggleRow method directly
+   */
+  toggleRow(row: any): void {
+    if (this.table) {
+      this.table.toggleRow(row);
+      this.cdr.markForCheck();
+    }
   }
 }

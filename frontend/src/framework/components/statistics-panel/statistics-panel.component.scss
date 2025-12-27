@@ -2,6 +2,39 @@
  * Statistics Panel Component Styles
  */
 
+// PrimeNG 20 Panel dark theme override
+// The panel content area needs explicit dark background
+:host ::ng-deep {
+  .p-panel {
+    background: var(--p-surface-800, #1e1e1e);
+    border-color: var(--p-surface-700, #3c3c3c);
+    color: var(--p-text-color, #ffffff);
+
+    .p-panel-header {
+      background: var(--p-surface-800, #1e1e1e);
+      border-color: var(--p-surface-700, #3c3c3c);
+      color: var(--p-text-color, #ffffff);
+    }
+
+    // PrimeNG 20 uses p-panel-content-container for the collapsible area
+    .p-panel-content-container {
+      background: var(--p-surface-800, #1e1e1e);
+      border-color: var(--p-surface-700, #3c3c3c);
+    }
+
+    .p-panel-content {
+      background: var(--p-surface-800, #1e1e1e);
+      border-color: var(--p-surface-700, #3c3c3c);
+      color: var(--p-text-color, #ffffff);
+    }
+
+    // Toggle button styling
+    .p-panel-toggle-button {
+      color: var(--p-text-color, #ffffff);
+    }
+  }
+}
+
 .panel-header {
   display: flex;
   align-items: center;

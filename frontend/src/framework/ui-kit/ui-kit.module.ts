@@ -12,7 +12,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 
@@ -57,7 +57,7 @@ const UI_MODULES = [
   MultiSelectModule,
   InputTextModule,
   InputNumberModule,
-  DropdownModule,
+  SelectModule,
   CheckboxModule,
   AutoCompleteModule,
 

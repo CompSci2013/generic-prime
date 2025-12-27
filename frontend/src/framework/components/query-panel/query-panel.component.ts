@@ -19,7 +19,7 @@ import { PopOutMessageType } from '../../models/popout.interface';
 import { CheckboxModule } from 'primeng/checkbox';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
@@ -60,7 +60,7 @@ import { FormsModule } from '@angular/forms';
     templateUrl: './query-panel.component.html',
     styleUrls: ['./query-panel.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [FormsModule, InputTextModule, InputNumberModule, ButtonModule, DropdownModule, MultiSelectModule, AutoCompleteModule, CheckboxModule]
+    imports: [FormsModule, InputTextModule, InputNumberModule, ButtonModule, SelectModule, MultiSelectModule, AutoCompleteModule, CheckboxModule]
 })
 export class QueryPanelComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

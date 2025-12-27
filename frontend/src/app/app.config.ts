@@ -43,11 +43,7 @@ export const appConfig = {
       theme: {
         preset: Lara,
         options: {
-          darkModeSelector: '.p-dark',
-          cssLayer: {
-            name: 'primeng',
-            order: 'tailwind-base, primeng, tailwind-utilities'
-          }
+          darkModeSelector: '.p-dark'
         }
       },
       ripple: true  // Explicitly set to remove banner message

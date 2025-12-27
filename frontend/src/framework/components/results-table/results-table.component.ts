@@ -3,11 +3,14 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
+  effect,
   inject,
   input,
   OnInit,
-  Signal
+  Signal,
+  ViewChild
 } from '@angular/core';
+import { Table } from 'primeng/table';
 import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs/operators';
@@ -22,7 +25,7 @@ import { SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
@@ -50,7 +53,7 @@ import { NgClass, NgStyle } from '@angular/common';
     templateUrl: './results-table.component.html',
     styleUrls: ['./results-table.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [NgClass, FormsModule, InputTextModule, InputNumberModule, ButtonModule, DropdownModule, MultiSelectModule, CheckboxModule, TableModule, SharedModule, NgStyle, RippleModule, SkeletonModule]
+    imports: [NgClass, FormsModule, InputTextModule, InputNumberModule, ButtonModule, SelectModule, MultiSelectModule, CheckboxModule, TableModule, SharedModule, NgStyle, RippleModule, SkeletonModule]
 })
 export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit {
@@ -129,9 +132,9 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
   // ============================================================================
 
   /**
-   * Map of expanded row IDs for collapsible row details
+   * Reference to the PrimeNG table for programmatic row toggle
    */
-  expandedRows: { [key: string]: boolean } = {};
+  @ViewChild('dt') table!: Table;
 
   /**
    * Whether the filter panel is currently collapsed
@@ -167,6 +170,17 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
    */
   get currentFilters(): Record<string, any> {
     return this.filters() as Record<string, any>;
+  }
+
+  constructor() {
+    effect(() => {
+      const data = this.results();
+      const config = this.domainConfig();
+      if (data && data.length > 0) {
+        console.log('[DEBUG] Results loaded. DataKey:', config.tableConfig.dataKey);
+        console.log('[DEBUG] First row sample:', data[0]);
+      }
+    });
   }
 
   // ============================================================================
@@ -265,6 +279,34 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
   toggleFilterPanel(): void {
     this.filterPanelCollapsed = !this.filterPanelCollapsed;
     this.cdr.markForCheck();
+  }
+
+  /**
+   * Handle row expand event from PrimeNG
+   * Triggers change detection to ensure the expanded row template renders
+   */
+  onRowExpand(event: any): void {
+    // PrimeNG mutates the expandedRowKeys object in place.
+    // We need to trigger change detection for OnPush to pick up the change.
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Handle row collapse event from PrimeNG
+   */
+  onRowCollapse(event: any): void {
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Toggle row expansion programmatically
+   * Uses PrimeNG Table's toggleRow method directly
+   */
+  toggleRow(row: any): void {
+    if (this.table) {
+      this.table.toggleRow(row);
+      this.cdr.markForCheck();
+    }
   }
 
   /**
