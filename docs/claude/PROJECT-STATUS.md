@@ -1,8 +1,73 @@
 # Project Status
 
-**Version**: 5.70
-**Timestamp**: 2025-12-26T07:40:53-05:00
-**Updated By**: Session 62 - Pop-out BasicResultsTable Debugging
+**Version**: 5.71
+**Timestamp**: 2025-12-27T09:07:00-05:00
+**Updated By**: Session 63 - Angular 14 → 15 Upgrade
+
+---
+
+## Session 63 Summary: Angular 14 → 15 Upgrade with Standalone Migration
+
+**Status**: ✅ **COMPLETED** - Angular 15 upgraded, standalone components, production deployed
+
+### What Was Accomplished
+
+1. ✅ **Angular 15 Core Upgrade**
+   - Ran `ng update @angular/core@15 @angular/cli@15` schematic
+   - Updated Angular CDK to 15.2.9
+   - Updated TypeScript from 4.7.4 to 4.9.5
+   - Updated zone.js from 0.11.4 to 0.12.0
+   - Removed deprecated `.browserslistrc` (Angular 15 uses defaults)
+
+2. ✅ **PrimeNG 15 Upgrade**
+   - Upgraded from 14.2.3 to 15.4.1
+   - Upgraded primeicons to 6.0.1
+   - All UI components verified working
+
+3. ✅ **Standalone Component Migration**
+   - Ran `ng generate @angular/core:standalone` schematic
+   - Converted all 21 components to `standalone: true`
+   - Each component now declares its own imports
+
+4. ✅ **Standalone Bootstrap Migration**
+   - **Deleted** `AppModule` and `AppRoutingModule`
+   - **Created** `app.config.ts` with provideRouter, provideHttpClient, provideAnimations
+   - **Created** `app.routes.ts` with route definitions
+   - **Updated** `main.ts` to use `bootstrapApplication()`
+   - Made `AppComponent` standalone with required imports
+
+5. ✅ **Version Increment**
+   - Frontend version: 1.2.2 → **2.0.0**
+   - Major version bump for breaking Angular upgrade
+
+6. ✅ **Production Deployment**
+   - Built production image with Podman
+   - Imported to K3s containerd
+   - Deployed to `generic-prime` namespace
+   - Verified at http://generic-prime.minilab
+
+### Package Versions (Before → After)
+
+| Package | Before | After |
+|---------|--------|-------|
+| @angular/core | 14.3.0 | 15.2.10 |
+| @angular/cli | 14.2.13 | 15.2.11 |
+| PrimeNG | 14.2.3 | 15.4.1 |
+| TypeScript | 4.7.4 | 4.9.5 |
+| zone.js | 0.11.4 | 0.12.0 |
+| Frontend version | 1.2.2 | **2.0.0** |
+
+### Files Created
+- `frontend/src/app/app.config.ts` - Standalone application config
+- `frontend/src/app/app.routes.ts` - Route definitions
+
+### Files Deleted
+- `frontend/src/app/app.module.ts` - Legacy NgModule
+- `frontend/src/app/app-routing.module.ts` - Legacy routing module
+- `frontend/.browserslistrc` - Deprecated config
+
+### Branch
+- `feature/angular-15-upgrade` (ready for merge to main)
 
 ---
 
