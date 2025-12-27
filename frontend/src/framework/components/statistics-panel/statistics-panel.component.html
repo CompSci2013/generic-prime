@@ -2,7 +2,7 @@
 <p-panel
   [toggleable]="true"
   [(collapsed)]="panelCollapsed"
-  [style]="{'margin-bottom': '1rem'}"
+  styleClass="mb-3"
   [attr.data-testid]="environment.includeTestIds ? 'statistics-panel' : null">
 
   <ng-template pTemplate="header">
@@ -16,14 +16,14 @@
   @if (!panelCollapsed) {
     <div class="statistics-content">
       <!-- No data message -->
-      @if (!statistics) {
+      @if (!statistics()) {
         <div class="no-data-message">
           <i class="pi pi-info-circle"></i>
           <p>No statistics available. Add filters or select data to view distributions.</p>
         </div>
       }
       <!-- Charts grid -->
-      @if (statistics) {
+      @if (statistics()) {
         <div class="charts-grid">
           @for (item of visibleCharts; track trackByChartId($index, item)) {
             <div
@@ -32,8 +32,8 @@
               <div class="chart-title">{{ item.config.title }}</div>
               <app-base-chart
                 [dataSource]="item.dataSource"
-                [statistics]="statistics"
-                [highlights]="highlights"
+                [statistics]="statistics()"
+                [highlights]="highlights()"
                 [selectedValue]="null"
                 (chartClick)="onChartClick($event, item.config.id)">
               </app-base-chart>

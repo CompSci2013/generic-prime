@@ -177,15 +177,15 @@
   <!-- Data Table -->
   <div class="table-container">
     <p-table
-      [value]="results"
+      [value]="results()"
       [columns]="domainConfig.tableConfig.columns"
       [dataKey]="$any(domainConfig.tableConfig.dataKey)"
-      [loading]="loading"
+      [loading]="loading()"
       [lazy]="true"
       [paginator]="true"
       [rows]="currentFilters['size'] || 20"
       [first]="paginatorFirst"
-      [totalRecords]="totalResults"
+      [totalRecords]="totalResults()"
       [rowsPerPageOptions]="domainConfig.tableConfig.rowsPerPageOptions || [10, 20, 50]"
       [styleClass]="domainConfig.tableConfig.styleClass || ''"
       [responsiveLayout]="domainConfig.tableConfig.responsiveLayout || 'scroll'"
@@ -193,14 +193,14 @@
       (onPage)="onPageChange($event)"
       (onSort)="onSort($event)"
       [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} results"
+      [currentPageReportTemplate]="'Showing {first} to {last} of {totalRecords} results'"
       [attr.data-testid]="environment.includeTestIds ? 'results-table' : null">
 
       <!-- Caption with result count -->
       <ng-template pTemplate="caption">
         <div class="table-caption">
           <span class="caption-count">
-            {{ totalResults }} result(s)
+            {{ totalResults() }} result(s)
           </span>
         </div>
       </ng-template>
