@@ -28,7 +28,7 @@ import { ResultsTableComponent } from '../../../framework/components/results-tab
 import { StatisticsPanelComponent } from '../../../framework/components/statistics-panel/statistics-panel.component';
 import { BasePickerComponent } from '../../../framework/components/base-picker/base-picker.component';
 import { QueryControlComponent } from '../../../framework/components/query-control/query-control.component';
-import { NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+
 
 /**
  * Panel Popout Component
@@ -68,7 +68,7 @@ import { NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
         { provide: IS_POPOUT_TOKEN, useValue: true }
     ],
     standalone: true,
-    imports: [NgSwitch, NgSwitchCase, QueryControlComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, QueryPanelComponent, BasicResultsTableComponent, NgSwitchDefault]
+    imports: [QueryControlComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, QueryPanelComponent, BasicResultsTableComponent]
 })
 export class PanelPopoutComponent implements OnInit, OnDestroy {
   /**

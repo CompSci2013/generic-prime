@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { PHYSICS_KNOWLEDGE_PATH, PhysicsNode, SyllabusItem } from './physics-knowledge-path';
-import { NgFor } from '@angular/common';
+
 
 /**
  * Physics Domain Landing Component
@@ -105,7 +105,7 @@ import { NgFor } from '@angular/common';
     templateUrl: './physics.component.html',
     styleUrls: ['./physics.component.scss'],
     standalone: true,
-    imports: [NgFor, RouterLink]
+    imports: [RouterLink]
 })
 export class PhysicsComponent {
   /**

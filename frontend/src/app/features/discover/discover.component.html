@@ -6,7 +6,7 @@
 
   <!-- Draggable Panels Container -->
   <div cdkDropList (cdkDropListDropped)="onPanelDrop($event)" class="panels-container">
-    <ng-container *ngFor="let panelId of panelOrder">
+    @for (panelId of panelOrder; track panelId) {
       <!-- Panel Wrapper -->
       <div class="panel-wrapper" cdkDrag [attr.id]="'panel-' + panelId">
         <!-- Drag Handle -->
@@ -27,108 +27,111 @@
               [pTooltip]="isPanelCollapsed(panelId) ? 'Expand' : 'Collapse'"
               tooltipPosition="left">
             </button>
-            <button
-              *ngIf="!isPanelPoppedOut(panelId)"
-              pButton
-              type="button"
-              icon="pi pi-external-link"
-              class="p-button-sm p-button-text"
-              [attr.id]="'popout-' + panelId"
-              (click)="popOutPanel(panelId, getPanelType(panelId))"
-              pTooltip="Pop out to separate window"
-              tooltipPosition="left">
-            </button>
+            @if (!isPanelPoppedOut(panelId)) {
+              <button
+                pButton
+                type="button"
+                icon="pi pi-external-link"
+                class="p-button-sm p-button-text"
+                [attr.id]="'popout-' + panelId"
+                (click)="popOutPanel(panelId, getPanelType(panelId))"
+                pTooltip="Pop out to separate window"
+                tooltipPosition="left">
+              </button>
+            }
           </div>
         </div>
-
         <!-- Panel Content -->
-        <div *ngIf="!isPanelCollapsed(panelId)">
-          <!-- Query Control -->
-          <ng-container *ngIf="panelId === 'query-control'">
-            <div *ngIf="!isPanelPoppedOut('query-control'); else queryControlPlaceholder">
-              <app-query-control
-                [domainConfig]="domainConfig"
-                (urlParamsChange)="onUrlParamsChange($event)"
-                (clearAllFilters)="onClearAllFilters()">
-              </app-query-control>
-            </div>
-            <ng-template #queryControlPlaceholder>
-              <div class="popout-placeholder">
-                <i class="pi pi-external-link"></i>
-                <span>Query Control is open in a separate window</span>
-              </div>
-            </ng-template>
-          </ng-container>
-
-          <!-- Query Panel (domain-agnostic filter panel) -->
-          <ng-container *ngIf="panelId === 'query-panel'">
-            <div *ngIf="!isPanelPoppedOut('query-panel'); else queryPanelPlaceholder">
-              <app-query-panel [domainConfig]="domainConfig"></app-query-panel>
-            </div>
-            <ng-template #queryPanelPlaceholder>
-              <div class="popout-placeholder">
-                <i class="pi pi-external-link"></i>
-                <span>Query Panel is open in a separate window</span>
-              </div>
-            </ng-template>
-          </ng-container>
-
-          <!-- Manufacturer-Model Picker -->
-          <ng-container *ngIf="panelId === 'manufacturer-model-picker'">
-            <div *ngIf="!isPanelPoppedOut('manufacturer-model-picker'); else pickerPlaceholder">
-              <app-base-picker
-                [configId]="'manufacturer-model-picker'"
-                (selectionChange)="onPickerSelectionChangeAndUpdateUrl($event)">
-              </app-base-picker>
-            </div>
-            <ng-template #pickerPlaceholder>
-              <div class="popout-placeholder">
-                <i class="pi pi-external-link"></i>
-                <span>Manufacturer-Model Picker is open in a separate window</span>
-              </div>
-            </ng-template>
-          </ng-container>
-
-          <!-- Statistics Panel -->
-          <ng-container *ngIf="panelId === 'statistics-panel'">
-            <div *ngIf="!isPanelPoppedOut('statistics-panel'); else statsPlaceholder">
-              <app-statistics-panel [domainConfig]="domainConfig"></app-statistics-panel>
-            </div>
-            <ng-template #statsPlaceholder>
-              <div class="popout-placeholder">
-                <i class="pi pi-external-link"></i>
-                <span>Statistics Panel is open in a separate window</span>
-              </div>
-            </ng-template>
-          </ng-container>
-
-          <!-- Results Table (legacy - kept for backwards compatibility) -->
-          <ng-container *ngIf="panelId === 'results-table'">
-            <div *ngIf="!isPanelPoppedOut('results-table'); else resultsPlaceholder">
-              <app-results-table [domainConfig]="domainConfig"></app-results-table>
-            </div>
-            <ng-template #resultsPlaceholder>
-              <div class="popout-placeholder">
-                <i class="pi pi-external-link"></i>
-                <span>Results Table is open in a separate window</span>
-              </div>
-            </ng-template>
-          </ng-container>
-
-          <!-- Basic Results Table (new - table only, no filters) -->
-          <ng-container *ngIf="panelId === 'basic-results-table'">
-            <div *ngIf="!isPanelPoppedOut('basic-results-table'); else basicResultsPlaceholder">
-              <app-basic-results-table [domainConfig]="domainConfig"></app-basic-results-table>
-            </div>
-            <ng-template #basicResultsPlaceholder>
-              <div class="popout-placeholder">
-                <i class="pi pi-external-link"></i>
-                <span>Results Table is open in a separate window</span>
-              </div>
-            </ng-template>
-          </ng-container>
-        </div>
+        @if (!isPanelCollapsed(panelId)) {
+          <div>
+            <!-- Query Control -->
+            @if (panelId === 'query-control') {
+              @if (!isPanelPoppedOut('query-control')) {
+                <div>
+                  <app-query-control
+                    [domainConfig]="domainConfig"
+                    (urlParamsChange)="onUrlParamsChange($event)"
+                    (clearAllFilters)="onClearAllFilters()">
+                  </app-query-control>
+                </div>
+              } @else {
+                <div class="popout-placeholder">
+                  <i class="pi pi-external-link"></i>
+                  <span>Query Control is open in a separate window</span>
+                </div>
+              }
+            }
+            <!-- Query Panel (domain-agnostic filter panel) -->
+            @if (panelId === 'query-panel') {
+              @if (!isPanelPoppedOut('query-panel')) {
+                <div>
+                  <app-query-panel [domainConfig]="domainConfig"></app-query-panel>
+                </div>
+              } @else {
+                <div class="popout-placeholder">
+                  <i class="pi pi-external-link"></i>
+                  <span>Query Panel is open in a separate window</span>
+                </div>
+              }
+            }
+            <!-- Manufacturer-Model Picker -->
+            @if (panelId === 'manufacturer-model-picker') {
+              @if (!isPanelPoppedOut('manufacturer-model-picker')) {
+                <div>
+                  <app-base-picker
+                    [configId]="'manufacturer-model-picker'"
+                    (selectionChange)="onPickerSelectionChangeAndUpdateUrl($event)">
+                  </app-base-picker>
+                </div>
+              } @else {
+                <div class="popout-placeholder">
+                  <i class="pi pi-external-link"></i>
+                  <span>Manufacturer-Model Picker is open in a separate window</span>
+                </div>
+              }
+            }
+            <!-- Statistics Panel -->
+            @if (panelId === 'statistics-panel') {
+              @if (!isPanelPoppedOut('statistics-panel')) {
+                <div>
+                  <app-statistics-panel [domainConfig]="domainConfig"></app-statistics-panel>
+                </div>
+              } @else {
+                <div class="popout-placeholder">
+                  <i class="pi pi-external-link"></i>
+                  <span>Statistics Panel is open in a separate window</span>
+                </div>
+              }
+            }
+            <!-- Results Table (legacy - kept for backwards compatibility) -->
+            @if (panelId === 'results-table') {
+              @if (!isPanelPoppedOut('results-table')) {
+                <div>
+                  <app-results-table [domainConfig]="domainConfig"></app-results-table>
+                </div>
+              } @else {
+                <div class="popout-placeholder">
+                  <i class="pi pi-external-link"></i>
+                  <span>Results Table is open in a separate window</span>
+                </div>
+              }
+            }
+            <!-- Basic Results Table (new - table only, no filters) -->
+            @if (panelId === 'basic-results-table') {
+              @if (!isPanelPoppedOut('basic-results-table')) {
+                <div>
+                  <app-basic-results-table [domainConfig]="domainConfig"></app-basic-results-table>
+                </div>
+              } @else {
+                <div class="popout-placeholder">
+                  <i class="pi pi-external-link"></i>
+                  <span>Results Table is open in a separate window</span>
+                </div>
+              }
+            }
+          </div>
+        }
       </div>
-    </ng-container>
+    }
   </div>
 </div>

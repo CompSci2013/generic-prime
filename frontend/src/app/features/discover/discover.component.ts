@@ -34,7 +34,7 @@ import { QueryPanelComponent } from '../../../framework/components/query-panel/q
 import { QueryControlComponent } from '../../../framework/components/query-control/query-control.component';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
-import { NgFor, NgIf } from '@angular/common';
+
 
 /**
  * Discover Component - Core discovery interface orchestrator
@@ -115,7 +115,7 @@ import { NgFor, NgIf } from '@angular/common';
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ResourceManagementService],
     standalone: true,
-    imports: [CdkDropList, NgFor, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, NgIf, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, BasicResultsTableComponent]
+    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, BasicResultsTableComponent]
 })
 export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

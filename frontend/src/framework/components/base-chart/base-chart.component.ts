@@ -23,7 +23,7 @@ import {
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
-import { NgIf } from '@angular/common';
+
 
 /**
  * Plotly.js graph visualization library
@@ -186,7 +186,7 @@ export abstract class ChartDataSource<TStatistics = any> {
     styleUrls: ['./base-chart.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgIf, ButtonModule]
+    imports: [ButtonModule]
 })
 export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
   /**

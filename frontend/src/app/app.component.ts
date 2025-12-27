@@ -1,5 +1,5 @@
 import { Component, Injector } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterOutlet, RouterLink, ActivatedRoute } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { TieredMenuModule } from 'primeng/tieredmenu';
@@ -46,7 +46,7 @@ import packageJson from '../../package.json';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, TieredMenuModule, ToastModule],
+  imports: [RouterOutlet, RouterLink, TieredMenuModule, ToastModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

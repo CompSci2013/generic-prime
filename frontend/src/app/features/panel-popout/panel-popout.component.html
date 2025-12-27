@@ -6,53 +6,57 @@
 
 
   <!-- Panel Content - Render based on type -->
-  <div class="popout-content" [ngSwitch]="panelType">
-    <!-- Query Control -->
-    <app-query-control
-      *ngSwitchCase="'query-control'"
-      [domainConfig]="domainConfig"
-      (urlParamsChange)="onUrlParamsChange($event)"
-      (clearAllFilters)="onClearAllFilters()">
-    </app-query-control>
-
-    <!-- Picker (Manufacturer-Model Picker) -->
-    <app-base-picker
-      *ngSwitchCase="'picker'"
-      [configId]="getPickerConfigId()"
-      (selectionChange)="onPickerSelectionChange($event)">
-    </app-base-picker>
-
-    <!-- Statistics Panel -->
-    <app-statistics-panel
-      *ngSwitchCase="'statistics'"
-      [domainConfig]="domainConfig">
-    </app-statistics-panel>
-
-    <!-- Results Table -->
-    <app-results-table
-      *ngSwitchCase="'results'"
-      [domainConfig]="domainConfig">
-    </app-results-table>
-
-    <!-- Query Panel (filters only) -->
-    <app-query-panel
-      *ngSwitchCase="'query-panel'"
-      [domainConfig]="domainConfig"
-      (urlParamsChange)="onUrlParamsChange($event)"
-      (clearAllFilters)="onClearAllFilters()">
-    </app-query-panel>
-
-    <!-- Basic Results Table (table only, no embedded filters) -->
-    <app-basic-results-table
-      *ngSwitchCase="'basic-results'"
-      [domainConfig]="domainConfig"
-      (urlParamsChange)="onUrlParamsChange($event)">
-    </app-basic-results-table>
-
-    <!-- Unknown panel type -->
-    <div *ngSwitchDefault class="unknown-panel">
-      <p>Unknown panel type: {{ panelType }}</p>
-      <p>Panel ID: {{ panelId }}</p>
-    </div>
+  <div class="popout-content">
+    @switch (panelType) {
+      <!-- Query Control -->
+      @case ('query-control') {
+        <app-query-control
+          [domainConfig]="domainConfig"
+          (urlParamsChange)="onUrlParamsChange($event)"
+          (clearAllFilters)="onClearAllFilters()">
+        </app-query-control>
+      }
+      <!-- Picker (Manufacturer-Model Picker) -->
+      @case ('picker') {
+        <app-base-picker
+          [configId]="getPickerConfigId()"
+          (selectionChange)="onPickerSelectionChange($event)">
+        </app-base-picker>
+      }
+      <!-- Statistics Panel -->
+      @case ('statistics') {
+        <app-statistics-panel
+          [domainConfig]="domainConfig">
+        </app-statistics-panel>
+      }
+      <!-- Results Table -->
+      @case ('results') {
+        <app-results-table
+          [domainConfig]="domainConfig">
+        </app-results-table>
+      }
+      <!-- Query Panel (filters only) -->
+      @case ('query-panel') {
+        <app-query-panel
+          [domainConfig]="domainConfig"
+          (urlParamsChange)="onUrlParamsChange($event)"
+          (clearAllFilters)="onClearAllFilters()">
+        </app-query-panel>
+      }
+      <!-- Basic Results Table (table only, no embedded filters) -->
+      @case ('basic-results') {
+        <app-basic-results-table
+          [domainConfig]="domainConfig"
+          (urlParamsChange)="onUrlParamsChange($event)">
+        </app-basic-results-table>
+      }
+      <!-- Unknown panel type -->
+      @default {
+        <div class="unknown-panel">
+          <p>Unknown panel type: {{ panelType }}</p>
+          <p>Panel ID: {{ panelId }}</p>
+        </div>
+      }
+    }
   </div>
 </div>

@@ -40,7 +40,7 @@
         (ngModelChange)="filterBySearch()"
         placeholder="Search dependencies..."
         class="search-input"
-      />
+        />
       <button (click)="clearSearch()" class="btn btn-clear">Clear</button>
     </div>
 
@@ -58,7 +58,7 @@
         [class.active]="showLegend"
         class="btn btn-toggle"
         title="Toggle Legend"
-      >
+        >
         ◆ Legend
       </button>
       <button
@@ -66,7 +66,7 @@
         [class.active]="showFilters"
         class="btn btn-toggle"
         title="Toggle Filters"
-      >
+        >
         ⊞ Filters
       </button>
     </div>
@@ -81,30 +81,33 @@
   <!-- Main Content Area -->
   <div class="content-wrapper">
     <!-- Left Sidebar - Filters -->
-    <div class="sidebar" *ngIf="showFilters" [@fadeInOut]>
-      <div class="sidebar-header">
-        <h3>Category Filters</h3>
-      </div>
-      <div class="filter-list">
-        <div
-          *ngFor="let filter of categoryFilters"
-          class="filter-item"
-          (click)="toggleCategory(filter.category)"
-        >
-          <div class="filter-checkbox">
-            <input
-              type="checkbox"
-              [checked]="filter.visible"
-              (change)="toggleCategory(filter.category)"
-              [id]="'filter-' + filter.category"
-            />
-            <label [for]="'filter-' + filter.category"></label>
-          </div>
-          <span class="filter-color" [style.background-color]="filter.color"></span>
-          <span class="filter-label">{{ filter.label }}</span>
+    @if (showFilters) {
+      <div class="sidebar" [@fadeInOut]>
+        <div class="sidebar-header">
+          <h3>Category Filters</h3>
+        </div>
+        <div class="filter-list">
+          @for (filter of categoryFilters; track filter) {
+            <div
+              class="filter-item"
+              (click)="toggleCategory(filter.category)"
+              >
+              <div class="filter-checkbox">
+                <input
+                  type="checkbox"
+                  [checked]="filter.visible"
+                  (change)="toggleCategory(filter.category)"
+                  [id]="'filter-' + filter.category"
+                  />
+                <label [for]="'filter-' + filter.category"></label>
+              </div>
+              <span class="filter-color" [style.background-color]="filter.color"></span>
+              <span class="filter-label">{{ filter.label }}</span>
+            </div>
+          }
         </div>
       </div>
-    </div>
+    }
 
     <!-- Graph Canvas -->
     <div class="graph-wrapper">
@@ -113,157 +116,194 @@
 
     <!-- Right Sidebar - Node Details -->
     <div class="sidebar info-panel" [class.has-content]="selectedNode" [@fadeInOut]>
-      <div *ngIf="selectedNode; else noSelection" class="node-details">
-        <h3>{{ selectedNode.label }}</h3>
-        <div class="detail-row">
-          <strong>ID:</strong>
-          <span class="code">{{ selectedNode.id }}</span>
+      @if (selectedNode) {
+        <div class="node-details">
+          <h3>{{ selectedNode.label }}</h3>
+          <div class="detail-row">
+            <strong>ID:</strong>
+            <span class="code">{{ selectedNode.id }}</span>
+          </div>
+          <div class="detail-row">
+            <strong>Category:</strong>
+            <span class="category-badge" [style.background-color]="getNodeColor(selectedNode.category)">
+              {{ selectedNode.category }}
+            </span>
+          </div>
+          @if (selectedNode.version) {
+            <div class="detail-row">
+              <strong>Version:</strong>
+              <span class="code">{{ selectedNode.version }}</span>
+            </div>
+          }
+          @if (selectedNode.description) {
+            <div class="detail-row description">
+              <strong>Description:</strong>
+              <p>{{ selectedNode.description }}</p>
+            </div>
+          }
         </div>
-        <div class="detail-row">
-          <strong>Category:</strong>
-          <span class="category-badge" [style.background-color]="getNodeColor(selectedNode.category)">
-            {{ selectedNode.category }}
-          </span>
-        </div>
-        <div *ngIf="selectedNode.version" class="detail-row">
-          <strong>Version:</strong>
-          <span class="code">{{ selectedNode.version }}</span>
-        </div>
-        <div *ngIf="selectedNode.description" class="detail-row description">
-          <strong>Description:</strong>
-          <p>{{ selectedNode.description }}</p>
-        </div>
-      </div>
-      <ng-template #noSelection>
+      } @else {
         <div class="no-selection">
           <p>👆 Click on a node to view details</p>
         </div>
-      </ng-template>
+      }
     </div>
   </div>
 
   <!-- Legend -->
-  <div class="legend-compact" *ngIf="showLegend" [@fadeInOut]>
-    <div class="legend-header" (click)="toggleLegendExpanded()">
-      <h4>📋 Legend <span class="toggle-icon">{{ legendExpanded ? '▼' : '▶' }}</span></h4>
-    </div>
-
-    <div class="legend-content" *ngIf="legendExpanded">
-      <div class="legend-section compact">
-        <h5>Node Types (12)</h5>
-        <div class="legend-grid compact">
-          <div class="legend-item"><div class="legend-color" style="background-color: #DD0031"></div><span>Angular</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: #3776AB"></div><span>Prod Deps</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: #C7CEEA"></div><span>Services</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: #F8B195"></div><span>Components</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: #B4A7D6"></div><span>Features</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: #95E1D3"></div><span>Models</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: #FFD93D"></div><span>Config</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: #6BCB77"></div><span>Adapters</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: #A8E6CF"></div><span>Charts</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: #E8DAEF"></div><span>Build</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: #D7BDE2"></div><span>Testing</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: #F5B7B1"></div><span>External</span></div>
+  @if (showLegend) {
+    <div class="legend-compact" [@fadeInOut]>
+      <div class="legend-header" (click)="toggleLegendExpanded()">
+        <h4>📋 Legend <span class="toggle-icon">{{ legendExpanded ? '▼' : '▶' }}</span></h4>
+      </div>
+      @if (legendExpanded) {
+        <div class="legend-content">
+          <div class="legend-section compact">
+            <h5>Node Types (12)</h5>
+            <div class="legend-grid compact">
+              <div class="legend-item"><div class="legend-color" style="background-color: #DD0031"></div><span>Angular</span></div>
+              <div class="legend-item"><div class="legend-color" style="background-color: #3776AB"></div><span>Prod Deps</span></div>
+              <div class="legend-item"><div class="legend-color" style="background-color: #C7CEEA"></div><span>Services</span></div>
+              <div class="legend-item"><div class="legend-color" style="background-color: #F8B195"></div><span>Components</span></div>
+              <div class="legend-item"><div class="legend-color" style="background-color: #B4A7D6"></div><span>Features</span></div>
+              <div class="legend-item"><div class="legend-color" style="background-color: #95E1D3"></div><span>Models</span></div>
+              <div class="legend-item"><div class="legend-color" style="background-color: #FFD93D"></div><span>Config</span></div>
+              <div class="legend-item"><div class="legend-color" style="background-color: #6BCB77"></div><span>Adapters</span></div>
+              <div class="legend-item"><div class="legend-color" style="background-color: #A8E6CF"></div><span>Charts</span></div>
+              <div class="legend-item"><div class="legend-color" style="background-color: #E8DAEF"></div><span>Build</span></div>
+              <div class="legend-item"><div class="legend-color" style="background-color: #D7BDE2"></div><span>Testing</span></div>
+              <div class="legend-item"><div class="legend-color" style="background-color: #F5B7B1"></div><span>External</span></div>
+            </div>
+          </div>
+          <div class="legend-section compact">
+            <h5>Edges (5)</h5>
+            <div class="legend-items compact">
+              <div><span class="edge-sample uses"></span><span>Uses</span></div>
+              <div><span class="edge-sample implements"></span><span>Impl</span></div>
+              <div><span class="edge-sample extends"></span><span>Ext</span></div>
+              <div><span class="edge-sample provides"></span><span>Prov</span></div>
+              <div><span class="edge-sample injects"></span><span>Inj</span></div>
+            </div>
+          </div>
+          <div class="legend-section compact">
+            <h5>Keyboard</h5>
+            <ul class="legend-help compact">
+              <li><strong>Click:</strong> Select node</li>
+              <li><strong>Drag:</strong> Pan graph</li>
+              <li><strong>Scroll:</strong> Zoom</li>
+            </ul>
+          </div>
         </div>
-      </div>
-
-      <div class="legend-section compact">
-        <h5>Edges (5)</h5>
-        <div class="legend-items compact">
-          <div><span class="edge-sample uses"></span><span>Uses</span></div>
-          <div><span class="edge-sample implements"></span><span>Impl</span></div>
-          <div><span class="edge-sample extends"></span><span>Ext</span></div>
-          <div><span class="edge-sample provides"></span><span>Prov</span></div>
-          <div><span class="edge-sample injects"></span><span>Inj</span></div>
-        </div>
-      </div>
-
-      <div class="legend-section compact">
-        <h5>Keyboard</h5>
-        <ul class="legend-help compact">
-          <li><strong>Click:</strong> Select node</li>
-          <li><strong>Drag:</strong> Pan graph</li>
-          <li><strong>Scroll:</strong> Zoom</li>
-        </ul>
-      </div>
+      }
     </div>
-  </div>
+  }
 
   <!-- Node Details Modal/Popover -->
-  <div class="node-modal" *ngIf="selectedNode" [@fadeInOut]
-       (mousemove)="onModalMouseMove($event)"
-       (mouseleave)="onModalMouseUp()"
-       (mouseup)="onModalMouseUp()">
-    <div class="modal-backdrop" (click)="selectedNode = null"></div>
-    <div class="modal-content" [style]="getModalStyle()"
-         (mousedown)="onModalMouseDown($event)">
-      <button class="modal-close" (click)="selectedNode = null">&times;</button>
-      <div class="modal-header" (mousedown)="onModalMouseDown($event)">
-        <div class="drag-handle" title="Drag to move window">⋮⋮</div>
-        <div class="header-content">
-          <h2>{{ selectedNode.label }}</h2>
-          <span class="modal-category" [style.background-color]="getNodeColor(selectedNode.category)">
-            {{ selectedNode.category }}
-          </span>
+  @if (selectedNode) {
+    <div class="node-modal" [@fadeInOut]
+      (mousemove)="onModalMouseMove($event)"
+      (mouseleave)="onModalMouseUp()"
+      (mouseup)="onModalMouseUp()">
+      <div class="modal-backdrop" (click)="selectedNode = null"></div>
+      <div class="modal-content" [style]="getModalStyle()"
+        (mousedown)="onModalMouseDown($event)">
+        <button class="modal-close" (click)="selectedNode = null">&times;</button>
+        <div class="modal-header" (mousedown)="onModalMouseDown($event)">
+          <div class="drag-handle" title="Drag to move window">⋮⋮</div>
+          <div class="header-content">
+            <h2>{{ selectedNode.label }}</h2>
+            <span class="modal-category" [style.background-color]="getNodeColor(selectedNode.category)">
+              {{ selectedNode.category }}
+            </span>
+          </div>
         </div>
-      </div>
-      <div class="modal-body">
-        <div class="modal-section">
-          <h4>Overview</h4>
-          <p *ngIf="selectedNode.description; else noDescription">{{ selectedNode.description }}</p>
-          <ng-template #noDescription>
-            <p class="no-info">No description available</p>
-          </ng-template>
-        </div>
-
-        <div class="modal-section" *ngIf="selectedNode.detailedDescription">
-          <h4>Details</h4>
-          <p class="detailed-text">{{ selectedNode.detailedDescription }}</p>
-        </div>
-
-        <div class="modal-section" *ngIf="selectedNode.methods && selectedNode.methods.length > 0">
-          <h4>Public Methods</h4>
-          <ul class="methods-list">
-            <li *ngFor="let method of selectedNode.methods">{{ method }}</li>
-          </ul>
-        </div>
-
-        <div class="modal-section" *ngIf="selectedNode.observables && selectedNode.observables.length > 0">
-          <h4>Observable Streams</h4>
-          <ul class="observables-list">
-            <li *ngFor="let obs of selectedNode.observables"><code>{{ obs }}</code></li>
-          </ul>
-        </div>
-
-        <div class="modal-section" *ngIf="selectedNode.version">
-          <h4>Version</h4>
-          <code>{{ selectedNode.version }}</code>
-        </div>
-
-        <div class="modal-section">
-          <h4>Technical ID</h4>
-          <code>{{ selectedNode.id }}</code>
-        </div>
-
-        <div class="modal-section">
-          <h4>Category Details</h4>
-          <p class="category-info">
-            <span *ngIf="selectedNode.category.includes('npm')">📦 NPM Package</span>
-            <span *ngIf="selectedNode.category.includes('Service')">⚙️ Framework Service</span>
-            <span *ngIf="selectedNode.category.includes('Component')">🎨 UI Component</span>
-            <span *ngIf="selectedNode.category.includes('Feature')">✨ Feature Component</span>
-            <span *ngIf="selectedNode.category.includes('Model')">📋 Model/Interface</span>
-            <span *ngIf="selectedNode.category.includes('Domain')">🔧 Domain Configuration</span>
-            <span *ngIf="selectedNode.category.includes('Adapter')">🔌 Domain Adapter</span>
-            <span *ngIf="selectedNode.category.includes('Chart')">📊 Chart Data Source</span>
-            <span *ngIf="selectedNode.category.includes('Build')">🏗️ Build Tool</span>
-            <span *ngIf="selectedNode.category.includes('Test')">🧪 Testing/Linting Tool</span>
-            <span *ngIf="selectedNode.category.includes('External')">🌐 External Library</span>
-          </p>
+        <div class="modal-body">
+          <div class="modal-section">
+            <h4>Overview</h4>
+            @if (selectedNode.description) {
+              <p>{{ selectedNode.description }}</p>
+            } @else {
+              <p class="no-info">No description available</p>
+            }
+          </div>
+          @if (selectedNode.detailedDescription) {
+            <div class="modal-section">
+              <h4>Details</h4>
+              <p class="detailed-text">{{ selectedNode.detailedDescription }}</p>
+            </div>
+          }
+          @if (selectedNode.methods && selectedNode.methods.length > 0) {
+            <div class="modal-section">
+              <h4>Public Methods</h4>
+              <ul class="methods-list">
+                @for (method of selectedNode.methods; track method) {
+                  <li>{{ method }}</li>
+                }
+              </ul>
+            </div>
+          }
+          @if (selectedNode.observables && selectedNode.observables.length > 0) {
+            <div class="modal-section">
+              <h4>Observable Streams</h4>
+              <ul class="observables-list">
+                @for (obs of selectedNode.observables; track obs) {
+                  <li><code>{{ obs }}</code></li>
+                }
+              </ul>
+            </div>
+          }
+          @if (selectedNode.version) {
+            <div class="modal-section">
+              <h4>Version</h4>
+              <code>{{ selectedNode.version }}</code>
+            </div>
+          }
+          <div class="modal-section">
+            <h4>Technical ID</h4>
+            <code>{{ selectedNode.id }}</code>
+          </div>
+          <div class="modal-section">
+            <h4>Category Details</h4>
+            <p class="category-info">
+              @if (selectedNode.category.includes('npm')) {
+                <span>📦 NPM Package</span>
+              }
+              @if (selectedNode.category.includes('Service')) {
+                <span>⚙️ Framework Service</span>
+              }
+              @if (selectedNode.category.includes('Component')) {
+                <span>🎨 UI Component</span>
+              }
+              @if (selectedNode.category.includes('Feature')) {
+                <span>✨ Feature Component</span>
+              }
+              @if (selectedNode.category.includes('Model')) {
+                <span>📋 Model/Interface</span>
+              }
+              @if (selectedNode.category.includes('Domain')) {
+                <span>🔧 Domain Configuration</span>
+              }
+              @if (selectedNode.category.includes('Adapter')) {
+                <span>🔌 Domain Adapter</span>
+              }
+              @if (selectedNode.category.includes('Chart')) {
+                <span>📊 Chart Data Source</span>
+              }
+              @if (selectedNode.category.includes('Build')) {
+                <span>🏗️ Build Tool</span>
+              }
+              @if (selectedNode.category.includes('Test')) {
+                <span>🧪 Testing/Linting Tool</span>
+              }
+              @if (selectedNode.category.includes('External')) {
+                <span>🌐 External Library</span>
+              }
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Footer -->
   <div class="footer">

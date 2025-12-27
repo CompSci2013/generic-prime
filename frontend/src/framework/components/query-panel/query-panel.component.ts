@@ -24,7 +24,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
+
 
 /**
  * Query Panel Component
@@ -61,7 +61,7 @@ import { NgFor, NgIf } from '@angular/common';
     styleUrls: ['./query-panel.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgFor, NgIf, FormsModule, InputTextModule, InputNumberModule, ButtonModule, DropdownModule, MultiSelectModule, AutoCompleteModule, CheckboxModule]
+    imports: [FormsModule, InputTextModule, InputNumberModule, ButtonModule, DropdownModule, MultiSelectModule, AutoCompleteModule, CheckboxModule]
 })
 export class QueryPanelComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

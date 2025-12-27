@@ -29,7 +29,7 @@ import { SharedModule } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { ChipModule } from 'primeng/chip';
-import { NgIf, NgFor } from '@angular/common';
+
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
@@ -96,7 +96,7 @@ interface ActiveFilter {
     styleUrls: ['./query-control.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [DropdownModule, FormsModule, ButtonModule, NgIf, NgFor, ChipModule, TooltipModule, DialogModule, SharedModule, InputTextModule, ProgressSpinnerModule, CheckboxModule, InputNumberModule]
+    imports: [DropdownModule, FormsModule, ButtonModule, ChipModule, TooltipModule, DialogModule, SharedModule, InputTextModule, ProgressSpinnerModule, CheckboxModule, InputNumberModule]
 })
 export class QueryControlComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

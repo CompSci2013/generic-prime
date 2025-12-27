@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PHYSICS_CONCEPT_GRAPH, ConceptNode, ConceptEdge } from './physics-concept-graph';
-import { NgIf } from '@angular/common';
+
 
 /**
  * Cytoscape.js graph visualization library
@@ -240,7 +240,7 @@ interface CytoscapeEdge {
     templateUrl: './physics-concept-graph.component.html',
     styleUrls: ['./physics-concept-graph.component.scss'],
     standalone: true,
-    imports: [NgIf]
+    imports: []
 })
 export class PhysicsConceptGraphComponent implements OnInit, AfterViewInit, OnDestroy {
   /**

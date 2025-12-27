@@ -25,7 +25,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
-import { NgClass, NgIf, NgFor, NgStyle } from '@angular/common';
+import { NgClass, NgStyle } from '@angular/common';
 
 /**
  * Results Table Component
@@ -50,7 +50,7 @@ import { NgClass, NgIf, NgFor, NgStyle } from '@angular/common';
     styleUrls: ['./results-table.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgClass, NgIf, NgFor, FormsModule, InputTextModule, InputNumberModule, ButtonModule, DropdownModule, MultiSelectModule, CheckboxModule, TableModule, SharedModule, NgStyle, RippleModule, SkeletonModule]
+    imports: [NgClass, FormsModule, InputTextModule, InputNumberModule, ButtonModule, DropdownModule, MultiSelectModule, CheckboxModule, TableModule, SharedModule, NgStyle, RippleModule, SkeletonModule]
 })
 export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

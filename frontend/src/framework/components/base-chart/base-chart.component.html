@@ -1,35 +1,43 @@
 <!-- Base Chart Component Template -->
 <div class="chart-wrapper">
   <!-- Chart title -->
-  <div class="chart-header" *ngIf="chartTitle">
-    <h3 class="chart-title">{{ chartTitle }}</h3>
-    <span class="highlight-indicator" *ngIf="isHighlightModeActive">
-      Highlight Mode Active
-    </span>
-  </div>
+  @if (chartTitle) {
+    <div class="chart-header">
+      <h3 class="chart-title">{{ chartTitle }}</h3>
+      @if (isHighlightModeActive) {
+        <span class="highlight-indicator">
+          Highlight Mode Active
+        </span>
+      }
+    </div>
+  }
 
   <!-- Error boundary fallback -->
-  <div class="chart-error" *ngIf="hasError">
-    <div class="error-content">
-      <i class="pi pi-exclamation-triangle"></i>
-      <p class="error-title">Chart failed to render</p>
-      <p class="error-message">{{ errorMessage }}</p>
-      <button
-        pButton
-        type="button"
-        label="Retry"
-        icon="pi pi-refresh"
-        class="p-button-outlined p-button-sm"
-        (click)="retryRender()">
-      </button>
+  @if (hasError) {
+    <div class="chart-error">
+      <div class="error-content">
+        <i class="pi pi-exclamation-triangle"></i>
+        <p class="error-title">Chart failed to render</p>
+        <p class="error-message">{{ errorMessage }}</p>
+        <button
+          pButton
+          type="button"
+          label="Retry"
+          icon="pi pi-refresh"
+          class="p-button-outlined p-button-sm"
+          (click)="retryRender()">
+        </button>
+      </div>
     </div>
-  </div>
+  }
 
   <!-- Plotly chart container (hidden when error) -->
   <div #chartContainer class="chart-container" [hidden]="hasError"></div>
 
   <!-- No data message -->
-  <div class="no-data-message" *ngIf="!statistics && !hasError">
-    <p>No data available</p>
-  </div>
+  @if (!statistics && !hasError) {
+    <div class="no-data-message">
+      <p>No data available</p>
+    </div>
+  }
 </div>

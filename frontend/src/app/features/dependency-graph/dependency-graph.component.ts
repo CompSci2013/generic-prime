@@ -14,7 +14,7 @@ import {
   LAYER_GROUPS,
   DependencyNode
 } from './dependency-graph';
-import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 /**
@@ -123,7 +123,7 @@ import { FormsModule } from '@angular/forms';
         ])
     ],
     standalone: true,
-    imports: [FormsModule, NgIf, NgFor, DatePipe]
+    imports: [FormsModule, DatePipe]
 })
 export class DependencyGraphComponent implements OnInit, AfterViewInit {
   /**
