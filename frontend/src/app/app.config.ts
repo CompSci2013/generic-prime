@@ -43,13 +43,14 @@ export const appConfig = {
       theme: {
         preset: Lara,
         options: {
-          darkModeSelector: 'body',  // Always dark mode
+          darkModeSelector: '.p-dark',
           cssLayer: {
             name: 'primeng',
             order: 'tailwind-base, primeng, tailwind-utilities'
           }
         }
-      }
+      },
+      ripple: true  // Explicitly set to remove banner message
     }),
     importProvidersFrom(FrameworkModule, UiKitModule),
     MessageService,

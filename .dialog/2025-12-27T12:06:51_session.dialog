@@ -1,0 +1,103 @@
+## SESSION CONTEXT (Compacted from 2025-12-27T07:17:12_session.dialog)
+
+**Session 65 Summary**: Angular Multi-Version Upgrade Marathon
+
+**DEVELOPER:07:40** - Fix Highlight Leak (Remediation-1)
+**CLAUDE:07:40** - ✅ Added `extractHighlights()` to IFilterUrlMapper, refactored service to delegate to mapper
+
+**DEVELOPER:08:00** - Create UiKitModule (Remediation-3)
+**CLAUDE:08:00** - ✅ Created PrimeNG facade module, deleted legacy primeng.module.ts
+
+**DEVELOPER:08:30** - Remove Karma/Jasmine testing infrastructure
+**CLAUDE:08:45** - ✅ Deleted karma.conf.js, all *.spec.ts files, updated npm test to Playwright
+
+**DEVELOPER:09:00** - Upgrade Angular 14 → 15
+**CLAUDE:09:07** - ✅ Angular 15.2.10, standalone components, app.config.ts, v2.0.0
+
+**DEVELOPER:14:12** - Upgrade to Angular 16
+**CLAUDE:14:28** - ✅ Angular 16.2.12, ES6 imports for Plotly/Cytoscape, v2.1.0
+
+**DEVELOPER:14:30** - Upgrade to Angular 17
+**CLAUDE:14:38** - ✅ Angular 17.3.12, control flow migration (@if/@for), TypeScript 5.4.5, v3.0.0
+
+**DEVELOPER:09:53** - Full Signals Migration (Option A)
+**CLAUDE:09:58** - ✅ ResourceManagementService: BehaviorSubject → signal(), computed(), inject()
+
+**DEVELOPER:10:21** - Continue Component Modernization (Path 1)
+**CLAUDE:10:34** - ✅ ResultsTable, BasicResultsTable, StatisticsPanel, QueryControl migrated to Signals, v3.1.0
+
+**DEVELOPER:10:57** - Signal Inputs Migration
+**CLAUDE:10:57** - ✅ @Input() → input(), @Output() → output(), 100% Signal coverage
+
+**DEVELOPER:11:03** - Upgrade to Angular 18
+**CLAUDE:11:17** - ✅ Angular 18.2.14, kept PrimeNG 17.18.15 (compatible), v4.0.0, deployed to K3s
+
+**GEMINI:11:17** - Research PrimeNG Angular 20 compatibility
+**CLAUDE:11:31** - ✅ PrimeNG 20.x for Angular 20, documented migration path
+
+**GEMINI:11:38** - Noted "Modern Engine (Angular 18) inside Legacy Chassis (PrimeNG 17)"
+**CLAUDE:11:38** - Recommended waiting for Angular 19 to do combined migration
+
+**DEVELOPER:11:38** - Upgrade to Angular 19 (full upgrade with paradigms)
+**CLAUDE:11:55** - ✅ Angular 19.2.17, PrimeNG 19.1.7-lts, new theming system (providePrimeNG + @primeng/themes), v5.0.0
+
+**DEVELOPER:12:00** - Fix ripple banner and dark mode
+**CLAUDE:12:06** - ✅ Added `ripple: true` to providePrimeNG, added `class="p-dark"` to body
+
+---
+
+## CURRENT STATE
+
+- **Branch**: `feature/angular-15-upgrade`
+- **Version**: 5.0.0
+- **Angular**: 19.2.17
+- **PrimeNG**: 19.1.7-lts
+- **TypeScript**: 5.8.3
+- **Theming**: Lara preset with `.p-dark` selector
+- **Build**: ✅ Passing (7.20 MB)
+- **Deployment**: Pending (v4.0.0 still running on K3s)
+
+## PENDING TASKS
+
+1. Deploy v5.0.0 to K3s
+2. Commit Angular 19 + PrimeNG 19 changes
+3. Merge `feature/angular-15-upgrade` to `main`
+
+---
+
+## CURRENT SESSION
+
+CLAUDE:2025-12-27T12:06:51-05:00
+
+Session rotated from previous dialog (1108 lines → compacted). Context preserved above.
+
+Ready to continue with deployment and remaining tasks.
+
+GEMINI:2025-12-27T12:06:51-05:00
+
+CLAUDE:2025-12-27T12:07:41-05:00
+
+**Session Ending** - MonsterWatch Shutdown Protocol
+
+## Accomplished This Session
+
+1. ✅ Angular 18 → 19 upgrade (19.2.17)
+2. ✅ PrimeNG 17 → 19 migration (19.1.7-lts)
+3. ✅ New theming system (providePrimeNG + Lara preset)
+4. ✅ Dark mode fix (.p-dark class)
+5. ✅ Ripple banner fix (ripple: true)
+6. ✅ p-checkbox API fix ([label] → content projection)
+7. ✅ Version bumped to 5.0.0
+8. ✅ Build passing (7.20 MB)
+
+## Pending
+
+- Deploy v5.0.0 to K3s (v4.0.0 still running)
+- Merge feature/angular-15-upgrade to main
+
+## Notes for Next Session
+
+The Angular 14 → 19 migration marathon is complete. All framework upgrades done.
+Next session should deploy to K3s and merge to main.
+
+SESSION END
