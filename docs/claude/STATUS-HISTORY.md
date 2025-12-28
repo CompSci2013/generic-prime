@@ -10,6 +10,35 @@
 
 ## Most Recent Status
 
+**Version**: 5.75
+**Timestamp**: 2025-12-27T15:09:00-05:00
+**Session**: Session 66 - Angular 20 + PrimeNG 20 Upgrade
+
+### Current State
+
+- **Branch**: feature/angular-15-upgrade (includes Angular 14→20, pushed to GitHub)
+- **Build Status**: ✅ PASSING (7.17 MB, no TypeScript errors)
+- **Production**: Pending deployment (v6.0.0)
+- **Frontend Version**: 6.0.0
+
+### Session 66 Achievements
+
+1. ✅ Upgraded Angular from 19.2.17 to 20.3.15
+2. ✅ Upgraded Angular CDK from 19.2.19 to 20.2.14
+3. ✅ Upgraded PrimeNG from 19.1.7-lts to 20.4.0
+4. ✅ Fixed PrimeNG 20 breaking changes:
+   - DropdownModule → SelectModule (p-dropdown → p-select)
+   - Row expansion template: pTemplate="rowexpansion" → #expandedrow
+   - pRowToggler directive replaced with table.toggleRow()
+   - Checkbox dark theme visibility CSS fix
+   - Panel dark theme CSS overrides
+5. ✅ Fixed NG0956 track expression warnings
+6. ✅ Pushed to GitHub (commit cc3e66e)
+
+---
+
+## Previous Status
+
 **Version**: 5.72
 **Timestamp**: 2025-12-27T09:44:42-05:00
 **Session**: Session 64 - Angular 14 → 17 Multi-Version Upgrade

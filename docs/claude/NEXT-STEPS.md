@@ -1,32 +1,32 @@
 # Next Steps
 
-**Current Session**: Session 65b - Angular 14 → 19 Multi-Version Upgrade Marathon
-**Status**: ✅ COMPLETED - Angular 19 + PrimeNG 19 ready, pending deployment
+**Current Session**: Session 66 - Angular 20 + PrimeNG 20 Upgrade
+**Status**: ✅ COMPLETED - Angular 20 + PrimeNG 20 ready, pending deployment
 
 ---
 
-## IMMEDIATE ACTION 1: Deploy v5.0.0 to K3s
+## IMMEDIATE ACTION 1: Deploy v6.0.0 to K3s
 
 **Priority**: HIGH
-**Scope**: Build and deploy Angular 19 production image
+**Scope**: Build and deploy Angular 20 production image
 
 **Steps**:
 1. Build production Docker image:
    ```bash
    cd /home/odin/projects/generic-prime/frontend
-   podman build -t localhost/generic-prime-frontend:v5.0.0 -f Dockerfile.prod .
+   podman build -t localhost/generic-prime-frontend:v6.0.0 -f Dockerfile.prod .
    ```
 2. Import into K3s:
    ```bash
-   podman save localhost/generic-prime-frontend:v5.0.0 -o /tmp/frontend-v5.0.0.tar
-   sudo k3s ctr images import /tmp/frontend-v5.0.0.tar
+   podman save localhost/generic-prime-frontend:v6.0.0 -o /tmp/frontend-v6.0.0.tar
+   sudo k3s ctr images import /tmp/frontend-v6.0.0.tar
    ```
 3. Deploy:
    ```bash
-   kubectl -n generic-prime set image deployment/generic-prime-frontend frontend=localhost/generic-prime-frontend:v5.0.0
+   kubectl -n generic-prime set image deployment/generic-prime-frontend frontend=localhost/generic-prime-frontend:v6.0.0
    kubectl -n generic-prime rollout status deployment/generic-prime-frontend
    ```
-4. Verify at http://generic-prime.minilab (should show v5.0.0)
+4. Verify at http://generic-prime.minilab (should show v6.0.0)
 
 ---
 
@@ -58,21 +58,25 @@
 
 ---
 
-## SESSION 65b COMPLETION SUMMARY
+## SESSION 66 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-- ✅ Architecture Audit Remediations (Highlight Leak, UiKitModule, Karma removal)
-- ✅ Angular 14 → 15 → 16 → 17 → 18 → 19 complete upgrade path
-- ✅ PrimeNG 17 → 19 migration with new theming system
-- ✅ 100% Signals coverage (state, input, output)
-- ✅ Fixed PrimeNG 19 ripple banner and dark mode configuration
-- ✅ Version bumped to 5.0.0
+- ✅ Angular 19 → 20 upgrade (20.3.15)
+- ✅ PrimeNG 19 → 20 upgrade (20.4.0)
+- ✅ Fixed PrimeNG 20 breaking changes:
+  - DropdownModule → SelectModule
+  - Row expansion template syntax (#expandedrow)
+  - pRowToggler replaced with table.toggleRow()
+  - Checkbox dark theme visibility
+  - Panel dark theme CSS
+- ✅ Version bumped to 6.0.0
 
 **Current State**:
-- Angular 19.2.17 + PrimeNG 19.1.7-lts
-- Build passing (7.20 MB)
-- K3s deployment pending (v4.0.0 still running)
+- Angular 20.3.15 + PrimeNG 20.4.0
+- Build passing (7.17 MB)
+- Pushed to GitHub (cc3e66e)
+- K3s deployment pending
 
 ---
 
-**Last Updated**: 2025-12-27T12:07:41-05:00 (Session 65b)
+**Last Updated**: 2025-12-27T15:09:00-05:00 (Session 66)

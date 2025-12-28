@@ -101,3 +101,149 @@ The Angular 14 → 19 migration marathon is complete. All framework upgrades don
 Next session should deploy to K3s and merge to main.
 
 SESSION END
+
+CLAUDE:2025-12-27T12:11:02-05:00
+
+**MonsterWatch Session Resumed**
+
+Read context files:
+- **MONSTER-LOG.md**: Documents Session 57 (pop-out filter sync fix) and extensive session history
+- **MONSTER-CLAUDE.md**: Ready for Query Panel UX refinement, branch is main but we're on `feature/angular-15-upgrade`
+
+**Current State Assessment**:
+- Branch: `feature/angular-15-upgrade` (not main as MONSTER-CLAUDE.md states)
+- Angular 19.2.17 + PrimeNG 19.1.7-lts upgrade complete
+- Version: 5.0.0
+- Build: Passing (7.20 MB)
+- **Pending**: Deploy v5.0.0 to K3s, merge to main
+
+**Standing By** for instructions. Ready to:
+1. Deploy v5.0.0 to K3s
+2. Merge feature branch to main
+3. Or other tasks as directed
+
+GEMINI:2025-12-27T12:11:02-05:00
+
+CLAUDE:2025-12-27T12:30:56-05:00
+
+✅ **Angular 20 Upgrade Complete**
+
+**Changes Made:**
+1. Updated `package.json`:
+   - Angular: 19.2.17 → **20.3.15**
+   - PrimeNG: 19.1.7-lts → **20.4.0**
+   - @primeng/themes: 21.0.2 → **20.4.0**
+   - @angular/cdk: 19.2.19 → **20.2.14**
+   - @angular-devkit/build-angular: 19.2.19 → **20.3.13**
+   - @angular/cli: 19.2.19 → **20.3.13**
+   - Version: 5.0.0 → **6.0.0**
+
+2. **PrimeNG Breaking Change Fix** - `DropdownModule` → `SelectModule`:
+   - Updated imports in 4 files (ui-kit.module.ts, query-control, query-panel, results-table)
+   - Changed `primeng/dropdown` → `primeng/select`
+   - Changed `<p-dropdown>` → `<p-select>` in 3 templates
+   - Updated SCSS selectors `p-dropdown` → `p-select`
+   - Updated CSS class selector in keyboard handler (`p-dropdown-items` → `p-select-list`)
+
+3. **Build Status**: ✅ Passing (7.17 MB)
+
+**Summary:**
+- Angular 20.3.15 (latest stable)
+- PrimeNG 20.4.0 (compatible with Angular 20)
+- Version 6.0.0
+- All breaking changes resolved
+
+DEVELOPER:2025-12-27T12:30:56-05:00
+
+CLAUDE:2025-12-27T12:46:37-05:00
+
+**PrimeNG 20 Breaking Changes Fixed**
+
+Additional fixes applied after initial Angular 20 upgrade:
+
+1. **Statistics Panel White Background** - Fixed
+   - PrimeNG 20 changed panel CSS classes
+   - Added explicit dark theme overrides for `p-panel`, `p-panel-header`, `p-panel-content`, `p-panel-content-container`
+   - Used fallback hex values (#1e1e1e, #3c3c3c) for dark theme
+
+2. **Checkbox Labels Missing** - Fixed
+   - PrimeNG 20 removed content projection for checkbox labels
+   - Updated query-control multiselect dialog to use separate `<label>` elements with `[for]` binding
+   - Added CSS for proper flex layout of checkbox + label
+
+3. **Build Status**: ✅ Passing (7.17 MB)
+
+**Files Modified:**
+- [statistics-panel.component.scss](src/framework/components/statistics-panel/statistics-panel.component.scss) - Panel dark theme
+- [query-control.component.html](src/framework/components/query-control/query-control.component.html) - Checkbox labels
+- [query-control.component.scss](src/framework/components/query-control/query-control.component.scss) - Option item layout
+
+Please verify the fixes in browser and report any remaining issues.
+
+DEVELOPER:2025-12-27T12:46:37-05:00
+
+CLAUDE:2025-12-27T13:00:44-05:00
+
+**Additional PrimeNG 20 Fixes Applied**
+
+1. **Checkbox Visibility Fix** - Added global CSS to `styles.scss`:
+   - Checkboxes were rendering but invisible (no border in dark theme)
+   - Added explicit border styling: `border: 2px solid #888888`
+   - Added hover and checked state styling
+
+2. **Track Expression Fix (NG0956)** - Fixed Angular 20 warnings:
+   - Changed `track filter` → `track filter.definition.field`
+   - Changed `track highlight` → `track highlight.definition.field`
+   - Changed `track option` → `track option.value`
+
+3. **Panel Dark Theme** - Added global dark theme for p-panel
+
+4. **Removed CSS Layer** - Removed `cssLayer` config since not using Tailwind
+
+5. **Build Status**: ✅ Passing (7.17 MB)
+
+**Files Modified:**
+- [styles.scss](src/styles.scss) - Global checkbox/panel dark theme fixes
+- [query-control.component.html](src/framework/components/query-control/query-control.component.html) - Track expressions
+- [app.config.ts](src/app/app.config.ts) - Removed cssLayer config
+
+Please verify checkboxes and row expansion now work.
+
+DEVELOPER:2025-12-27T13:00:44-05:00
+
+CLAUDE:2025-12-27T15:09:00-05:00
+
+**Session 66 Ending - MonsterWatch Shutdown Protocol**
+
+## Final Session Summary
+
+**Angular 20 + PrimeNG 20 Upgrade Complete**
+
+All PrimeNG 20 breaking changes resolved:
+1. ✅ DropdownModule → SelectModule (`p-dropdown` → `p-select`)
+2. ✅ Row expansion template: `pTemplate="rowexpansion"` → `#expandedrow`
+3. ✅ pRowToggler directive broken - replaced with `table.toggleRow()` method
+4. ✅ Checkbox dark theme visibility - added explicit CSS borders
+5. ✅ Panel dark theme - added CSS overrides
+6. ✅ Track expressions - updated to unique field identifiers (NG0956)
+
+**Row Expansion Fix Details:**
+- Root cause: pRowToggler + [expandedRowKeys] controlled mode caused immediate collapse
+- Solution: Removed [expandedRowKeys] binding (uncontrolled mode) + programmatic toggleRow()
+- Fixed in both `results-table` and `basic-results-table` components
+
+**Current Stack:**
+- Angular 20.3.15
+- PrimeNG 20.4.0
+- @primeng/themes 20.4.0
+- Version 6.0.0
+
+**Git Status:**
+- Committed: cc3e66e - feat: Upgrade Angular 19 → 20 + PrimeNG 19 → 20, version 6.0.0
+- Pushed to GitHub: feature/angular-15-upgrade
+
+**Pending:**
+- Deploy v6.0.0 to K3s
+- Merge feature/angular-15-upgrade to main
+
+SESSION END

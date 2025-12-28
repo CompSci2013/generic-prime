@@ -1,57 +1,59 @@
 # Project Status
 
-**Version**: 5.74
-**Timestamp**: 2025-12-27T12:07:41-05:00
-**Updated By**: Session 65b - Angular 14 → 19 Multi-Version Upgrade Marathon
+**Version**: 5.75
+**Timestamp**: 2025-12-27T15:09:00-05:00
+**Updated By**: Session 66 - Angular 20 + PrimeNG 20 Upgrade
 
 ---
 
-## Session 65b Summary: Angular 14 → 19 Complete Migration
+## Session 66 Summary: Angular 20 + PrimeNG 20 Upgrade
 
-**Status**: ✅ **COMPLETED** - Full Angular 19 + PrimeNG 19, production ready
+**Status**: ✅ **COMPLETED** - Full Angular 20 + PrimeNG 20, production ready
 
 ### What Was Accomplished
 
-**Architecture Audit Remediations**:
-1. ✅ Highlight Leak Fix - Added `extractHighlights()` to IFilterUrlMapper interface
-2. ✅ UiKitModule Created - PrimeNG facade module, deleted legacy primeng.module.ts
-3. ✅ Karma/Jasmine Removed - Switched to Playwright-only testing
+**Angular 20 Upgrade**:
+1. ✅ Angular 19.2.17 → 20.3.15
+2. ✅ Angular CDK 19.2.19 → 20.2.14
+3. ✅ PrimeNG 19.1.7-lts → 20.4.0
+4. ✅ @primeng/themes 21.0.2 → 20.4.0
+5. ✅ Build tools updated to v20
+6. ✅ Version bumped to 6.0.0
 
-**Angular Multi-Version Upgrades**:
-1. ✅ Angular 14 → 15: Standalone components, app.config.ts, v2.0.0
-2. ✅ Angular 15 → 16: ES6 imports for Plotly/Cytoscape, v2.1.0
-3. ✅ Angular 16 → 17: Control flow migration (@if/@for), TypeScript 5.4.5, v3.0.0
-4. ✅ Angular 17 → 18: Kept PrimeNG 17.18.15 (compatible), v4.0.0
-5. ✅ Angular 18 → 19: PrimeNG 19.1.7-lts, new theming system, v5.0.0
+**PrimeNG 20 Breaking Changes Fixed**:
+1. ✅ DropdownModule renamed to SelectModule (`p-dropdown` → `p-select`)
+2. ✅ Row expansion template: `pTemplate="rowexpansion"` → `#expandedrow`
+3. ✅ pRowToggler directive broken in controlled mode - replaced with programmatic `table.toggleRow()`
+4. ✅ Checkbox dark theme visibility - added explicit CSS borders
+5. ✅ Panel dark theme - added CSS overrides for statistics panel
+6. ✅ Track expressions updated to use unique fields (NG0956 warning)
 
-**Signals Migration (100% coverage)**:
-- ResourceManagementService: BehaviorSubject → signal(), computed()
-- 4 components migrated to direct Signal reads
-- @Input() → input(), @Output() → output()
-- inject() pattern, takeUntilDestroyed() cleanup
-
-**PrimeNG 19 Theming Migration**:
-- Removed legacy CSS imports (resources/primeng.css)
-- Added providePrimeNG() with Lara preset
-- Configured dark mode with `.p-dark` selector
-- Fixed ripple banner by explicitly setting `ripple: true`
-- Fixed p-checkbox API change ([label] → content projection)
+**Components Updated**:
+- results-table.component (html, ts, scss)
+- basic-results-table.component (html, ts)
+- query-control.component (html, ts, scss)
+- query-panel.component (html, ts, scss)
+- statistics-panel.component (scss)
+- ui-kit.module.ts
+- styles.scss
+- app.config.ts
 
 ### Current Stack
 
 | Component | Version |
 |-----------|---------|
-| Angular | 19.2.17 |
-| Angular CDK | 19.2.19 |
-| PrimeNG | 19.1.7-lts |
+| Angular | 20.3.15 |
+| Angular CDK | 20.2.14 |
+| PrimeNG | 20.4.0 |
 | TypeScript | 5.8.3 |
-| zone.js | 0.15.1 |
-| Frontend | **5.0.0** |
+| zone.js | 0.15.0 |
+| Frontend | **6.0.0** |
 
 ### Branch
 
-- `feature/angular-15-upgrade` (contains all Angular 14→19 upgrades)
-- **Pending**: Merge to main, deploy v5.0.0 to K3s
+- `feature/angular-15-upgrade` (contains all Angular 14→20 upgrades)
+- **Pushed to GitHub**: cc3e66e
+- **Pending**: Merge to main, deploy v6.0.0 to K3s
 
 ---
 
@@ -70,7 +72,7 @@
 
 | Phase | Work | Priority | Status |
 |-------|------|----------|--------|
-| **1** | **Deploy v5.0.0 to K3s** | **HIGH** | **Pending** |
+| **1** | **Deploy v6.0.0 to K3s** | **HIGH** | **Pending** |
 | **2** | **Merge feature/angular-15-upgrade to main** | **HIGH** | **Ready** |
 | **3** | **IdP Phase 1: Deploy Keycloak Infrastructure** | **HIGH** | Pending |
 | 4 | Fix pop-out re-render bug | Medium | Deferred |
@@ -78,4 +80,4 @@
 
 ---
 
-**Last Updated**: 2025-12-27T12:07:41-05:00 (Session 65b - Angular 14 → 19 Migration)
+**Last Updated**: 2025-12-27T15:09:00-05:00 (Session 66 - Angular 20 Upgrade)
