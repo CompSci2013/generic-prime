@@ -1,0 +1,157 @@
+# Cline Rules for generic-prime
+
+## Project Overview
+
+This is an Angular 20 application (Generic Discovery Framework) for browsing automobile data.
+The frontend uses PrimeNG components and Playwright for E2E testing.
+
+---
+
+## Critical Constraints
+
+### DO NOT
+- Run `ng build` or `ng serve` - the dev server runs in a separate SSH session
+- Modify frontend code without understanding the full data flow
+- Use `router.navigate()` directly - use `UrlStateService` instead
+- Create unit tests - testing is E2E only (Playwright)
+
+### ALWAYS
+- Ask the user if the dev server is running before executing tests
+- Use the correct routes (see below)
+- Use the correct data-testid selectors (see below)
+
+---
+
+## Routes
+
+- **Main Discover Page**: `/automobiles/discover`
+- **With Filters**: `/automobiles/discover?manufacturer=Chevrolet`
+- **Base URL**: `http://localhost:4205`
+
+**WRONG**: `/discover/automobile` (this route does not exist)
+**CORRECT**: `/automobiles/discover`
+
+---
+
+## Data Test IDs
+
+These `data-testid` attributes are available in development mode:
+
+| Component | Test ID |
+|-----------|---------|
+| Query Panel | `query-panel` |
+| Query Control | `query-control-panel` |
+| Filter Dropdown | `filter-field-dropdown` |
+| Results Table Panel | `results-table-panel` |
+| Results Table | `results-table` |
+| Basic Results Table Panel | `basic-results-table-panel` |
+| Basic Results Table | `basic-results-table` |
+| Picker Panel | `picker-panel` |
+| Picker Table | `picker-table` |
+| Statistics Panel | `statistics-panel` |
+| Charts | `chart-{id}` |
+
+---
+
+## Playwright Testing
+
+### Location
+- E2E tests: `frontend/e2e/`
+- Temporary tests: `frontend/e2e/tests/tmp/` (clean up after use)
+- Screenshots: `frontend/screenshots/`
+
+### Running Tests
+```bash
+cd frontend
+npm run test:e2e                    # Run all tests
+npx playwright test path/to/test.ts # Run specific test
+npm run test:report                 # View results at port 9323
+```
+
+### Test Pattern
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.describe('My Test Suite', () => {
+  test('test name', async ({ page }) => {
+    await page.goto('/automobiles/discover');
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('[data-testid="results-table"]')).toBeVisible({ timeout: 10000 });
+  });
+});
+```
+
+### Screenshot with URL Bar (Headless)
+```typescript
+const injectUrlBar = async (p: typeof page) => {
+  await p.evaluate((url) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'background: #333; color: white; padding: 5px; font-family: monospace; font-size: 14px; position: fixed; top: 0; left: 0; width: 100%; z-index: 999999;';
+    div.innerText = `URL: ${url}`;
+    document.body.style.marginTop = '30px';
+    document.body.appendChild(div);
+  }, p.url());
+};
+
+await injectUrlBar(page);
+await page.screenshot({ path: 'screenshots/my-screenshot.png', fullPage: true });
+```
+
+---
+
+## Pop-out Windows
+
+The app has pop-out functionality. To test:
+
+```typescript
+const popoutButton = page.locator('button').filter({ has: page.locator('.pi-external-link') }).first();
+if (await popoutButton.isVisible()) {
+  const [popup] = await Promise.all([
+    context.waitForEvent('page'),
+    popoutButton.click()
+  ]);
+  await popup.waitForLoadState('networkidle');
+}
+```
+
+---
+
+## Project Structure
+
+```
+frontend/
+├── src/
+│   ├── app/                    # App bootstrap, routing
+│   ├── framework/              # Domain-agnostic components
+│   │   ├── components/         # BasePicker, ResultsTable, etc.
+│   │   └── services/           # UrlState, API, etc.
+│   └── domain-config/
+│       └── automobile/         # Automobile domain config
+├── e2e/                        # Playwright tests
+│   ├── components/             # Component-specific tests
+│   ├── integration/            # Integration tests
+│   ├── regression/             # Bug regression tests
+│   └── tests/tmp/              # Temporary test scripts
+└── playwright.config.ts        # Playwright configuration
+```
+
+---
+
+## Documentation
+
+- `CLAUDE.md` - Main instructions for Claude Code
+- `docs/claude/PROJECT-STATUS.md` - Current project state
+- `docs/claude/NEXT-STEPS.md` - Immediate action items
+- `docs/claude/ORIENTATION.md` - Architecture overview
+- `docs/guides/UI_Testing_Verification.md` - UI testing guidelines
+
+---
+
+## Technology Stack
+
+| Component | Version |
+|-----------|---------|
+| Angular | 20.3.15 |
+| PrimeNG | 20.4.0 |
+| TypeScript | 5.8.3 |
+| Playwright | 1.57.0 |
