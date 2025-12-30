@@ -1,42 +1,46 @@
 # Project Status
 
-**Version**: 5.75
-**Timestamp**: 2025-12-27T15:09:00-05:00
-**Updated By**: Session 66 - Angular 20 + PrimeNG 20 Upgrade
+**Version**: 5.76
+**Timestamp**: 2025-12-30T08:09:00-05:00
+**Updated By**: Session 67 - Cline Integration & E2E Test Suite
 
 ---
 
-## Session 66 Summary: Angular 20 + PrimeNG 20 Upgrade
+## Session 67 Summary: Cline AI Integration & E2E Test Suite
 
-**Status**: ✅ **COMPLETED** - Full Angular 20 + PrimeNG 20, production ready
+**Status**: ✅ **COMPLETED** - Cline configured, E2E tests created
 
 ### What Was Accomplished
 
-**Angular 20 Upgrade**:
-1. ✅ Angular 19.2.17 → 20.3.15
-2. ✅ Angular CDK 19.2.19 → 20.2.14
-3. ✅ PrimeNG 19.1.7-lts → 20.4.0
-4. ✅ @primeng/themes 21.0.2 → 20.4.0
-5. ✅ Build tools updated to v20
-6. ✅ Version bumped to 6.0.0
+**Git Branch Cleanup**:
+1. ✅ Created missing upgrade branches from correct commit points:
+   - `feature/angular-16-upgrade` at commit 9065d29
+   - `feature/angular-17-upgrade` at commit 29c875b
+   - `feature/angular-18-upgrade` at commit c933fe7
+   - `feature/angular-19-upgrade` at commit f30bd4a
+   - `feature/angular-20-upgrade` at commit cc3e66e
 
-**PrimeNG 20 Breaking Changes Fixed**:
-1. ✅ DropdownModule renamed to SelectModule (`p-dropdown` → `p-select`)
-2. ✅ Row expansion template: `pTemplate="rowexpansion"` → `#expandedrow`
-3. ✅ pRowToggler directive broken in controlled mode - replaced with programmatic `table.toggleRow()`
-4. ✅ Checkbox dark theme visibility - added explicit CSS borders
-5. ✅ Panel dark theme - added CSS overrides for statistics panel
-6. ✅ Track expressions updated to use unique fields (NG0956 warning)
+**Cline AI Integration**:
+1. ✅ Created `.clinerules` - Project-specific configuration for Cline VS Code extension
+2. ✅ Updated `docs/guides/UI_Testing_Verification.md` with correct routes and selectors
+3. ✅ Created `docs/guides/CLINE-TROUBLESHOOTING-GUIDE.md` for self-diagnosis
+4. ✅ Fixed Cline's test failures (wrong route, wrong selectors)
 
-**Components Updated**:
-- results-table.component (html, ts, scss)
-- basic-results-table.component (html, ts)
-- query-control.component (html, ts, scss)
-- query-panel.component (html, ts, scss)
-- statistics-panel.component (scss)
-- ui-kit.module.ts
-- styles.scss
-- app.config.ts
+**E2E Test Suite**:
+1. ✅ Created `frontend/e2e/domains/automobile.spec.ts` - 15 tests across 6 phases
+2. ✅ Tests use correct `basic-results-table` selectors (not `results-table`)
+3. ✅ All tests passing (verified)
+4. ✅ Screenshot capture added to each test with URL bar injection
+
+**Vision Helper Script**:
+1. ✅ Created `scripts/describe-image.sh` - Uses Llama 4 Scout for image analysis
+2. ✅ Enables vision-to-code workflow (Scout describes → Qwen3 codes)
+
+### Key Learnings
+
+- Main discover page uses `BasicResultsTable` (data-testid=`basic-results-table`)
+- Pop-out windows use `ResultsTable` (data-testid=`results-table`)
+- Correct route: `/automobiles/discover` (NOT `/discover/automobile`)
 
 ### Current Stack
 
@@ -46,14 +50,14 @@
 | Angular CDK | 20.2.14 |
 | PrimeNG | 20.4.0 |
 | TypeScript | 5.8.3 |
-| zone.js | 0.15.0 |
+| Playwright | 1.57.0 |
 | Frontend | **6.0.0** |
 
 ### Branch
 
-- `feature/angular-15-upgrade` (contains all Angular 14→20 upgrades)
-- **Pushed to GitHub**: cc3e66e
-- **Pending**: Merge to main, deploy v6.0.0 to K3s
+- `feature/cline-experiment` (Cline integration work)
+- Based on `feature/angular-15-upgrade`
+- **Pushed to GitHub and GitLab**
 
 ---
 
@@ -61,8 +65,6 @@
 
 | Bug | Component | Severity | Status |
 |-----|-----------|----------|--------|
-| #13 | p-dropdown (Query Control) | Medium | ✅ **FIXED - Session 56** |
-| #14 | Pop-Out Filter Sync | Medium | ✅ **FIXED - Session 56** |
 | #7 | p-multiSelect (Body Class) | Low | Pending |
 | Pop-out re-render | BasicResultsTable | Medium | Deferred |
 
@@ -80,4 +82,4 @@
 
 ---
 
-**Last Updated**: 2025-12-27T15:09:00-05:00 (Session 66 - Angular 20 Upgrade)
+**Last Updated**: 2025-12-30T08:09:00-05:00 (Session 67 - Cline Integration)

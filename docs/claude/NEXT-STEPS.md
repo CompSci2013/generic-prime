@@ -1,7 +1,7 @@
 # Next Steps
 
-**Current Session**: Session 66 - Angular 20 + PrimeNG 20 Upgrade
-**Status**: ✅ COMPLETED - Angular 20 + PrimeNG 20 ready, pending deployment
+**Current Session**: Session 67 - Cline Integration & E2E Test Suite
+**Status**: ✅ COMPLETED - Cline configured, E2E tests created
 
 ---
 
@@ -58,25 +58,27 @@
 
 ---
 
-## SESSION 66 COMPLETION SUMMARY
+## SESSION 67 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-- ✅ Angular 19 → 20 upgrade (20.3.15)
-- ✅ PrimeNG 19 → 20 upgrade (20.4.0)
-- ✅ Fixed PrimeNG 20 breaking changes:
-  - DropdownModule → SelectModule
-  - Row expansion template syntax (#expandedrow)
-  - pRowToggler replaced with table.toggleRow()
-  - Checkbox dark theme visibility
-  - Panel dark theme CSS
-- ✅ Version bumped to 6.0.0
+- ✅ Created missing Git branches for Angular upgrade path
+- ✅ Created `.clinerules` for Cline AI configuration
+- ✅ Created E2E test suite (15 tests, all passing)
+- ✅ Fixed Cline's selector/route issues
+- ✅ Created troubleshooting guide for Cline self-diagnosis
+- ✅ Created vision helper script (describe-image.sh)
+
+**Key Files Created**:
+- `.clinerules` - Cline project rules
+- `docs/guides/CLINE-TROUBLESHOOTING-GUIDE.md` - Self-diagnosis guide
+- `frontend/e2e/domains/automobile.spec.ts` - 15 E2E tests
+- `scripts/describe-image.sh` - Vision helper script
 
 **Current State**:
-- Angular 20.3.15 + PrimeNG 20.4.0
-- Build passing (7.17 MB)
-- Pushed to GitHub (cc3e66e)
-- K3s deployment pending
+- Branch: feature/cline-experiment (pushed to GitHub/GitLab)
+- E2E tests: 15/15 passing
+- Screenshots directory empty (tests need to run to generate)
 
 ---
 
-**Last Updated**: 2025-12-27T15:09:00-05:00 (Session 66)
+**Last Updated**: 2025-12-30T08:09:00-05:00 (Session 67)

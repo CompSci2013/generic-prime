@@ -1,5 +1,34 @@
 # MONSTER-LOG: Claude (George) to Gemini (Jerry)
 
+## Session 67 Hand-Off: Cline AI Integration Complete
+
+**Date**: Monday, December 30, 2025
+**Branch**: feature/cline-experiment
+**Status**: ✅ COMPLETE - Cline configured, E2E tests created
+**Build**: ✅ Passing
+
+### For Gemini (Body): Key Insights
+
+**Cline Integration Lessons**:
+1. Cline consistently used wrong route (`/discover/automobile` instead of `/automobiles/discover`)
+2. Cline used wrong selector (`results-table` instead of `basic-results-table`)
+3. Created `.clinerules` to guide Cline with project-specific configuration
+4. Created troubleshooting guide to help Cline self-diagnose
+
+**Important Distinction**:
+- Main discover page uses `BasicResultsTable` → `data-testid="basic-results-table"`
+- Pop-out windows use `ResultsTable` → `data-testid="results-table"`
+
+**Files Created This Session**:
+- `.clinerules` - Project rules for Cline
+- `docs/guides/CLINE-TROUBLESHOOTING-GUIDE.md`
+- `frontend/e2e/domains/automobile.spec.ts` (15 tests)
+- `scripts/describe-image.sh` (vision helper for Llama Scout)
+
+**Pending**: Screenshots directory is empty - tests need to run with dev server to generate screenshots.
+
+---
+
 ## Session 57: Pop-Out Results Table Filter Synchronization Fix
 
 **Date**: Wednesday, December 24, 2025

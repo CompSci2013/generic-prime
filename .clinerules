@@ -35,21 +35,24 @@ The frontend uses PrimeNG components and Playwright for E2E testing.
 
 ## Data Test IDs
 
-These `data-testid` attributes are available in development mode:
+These `data-testid` attributes are available in development mode.
 
-| Component | Test ID |
-|-----------|---------|
-| Query Panel | `query-panel` |
-| Query Control | `query-control-panel` |
-| Filter Dropdown | `filter-field-dropdown` |
-| Results Table Panel | `results-table-panel` |
-| Results Table | `results-table` |
-| Basic Results Table Panel | `basic-results-table-panel` |
-| Basic Results Table | `basic-results-table` |
-| Picker Panel | `picker-panel` |
-| Picker Table | `picker-table` |
-| Statistics Panel | `statistics-panel` |
-| Charts | `chart-{id}` |
+**IMPORTANT**: The main discover page uses `BasicResultsTable`, NOT `ResultsTable`.
+Use `basic-results-table` and `basic-results-table-panel` for the main data table.
+
+| Component | Test ID | Notes |
+|-----------|---------|-------|
+| Query Panel | `query-panel` | Main filter container |
+| Query Control | `query-control-panel` | Filter controls |
+| Filter Dropdown | `filter-field-dropdown` | Field selector |
+| **Basic Results Table Panel** | `basic-results-table-panel` | **USE THIS for main table container** |
+| **Basic Results Table** | `basic-results-table` | **USE THIS for main p-table** |
+| Results Table Panel | `results-table-panel` | Only in pop-out windows |
+| Results Table | `results-table` | Only in pop-out windows |
+| Picker Panel | `picker-panel` | Manufacturer/Model picker |
+| Picker Table | `picker-table` | Picker p-table |
+| Statistics Panel | `statistics-panel` | Stats/charts panel |
+| Charts | `chart-{id}` | e.g., `chart-manufacturer-distribution` |
 
 ---
 
@@ -76,7 +79,8 @@ test.describe('My Test Suite', () => {
   test('test name', async ({ page }) => {
     await page.goto('/automobiles/discover');
     await page.waitForLoadState('networkidle');
-    await expect(page.locator('[data-testid="results-table"]')).toBeVisible({ timeout: 10000 });
+    // Use basic-results-table for the main page (NOT results-table)
+    await expect(page.locator('[data-testid="basic-results-table"]')).toBeVisible({ timeout: 10000 });
   });
 });
 ```
@@ -144,6 +148,7 @@ frontend/
 - `docs/claude/NEXT-STEPS.md` - Immediate action items
 - `docs/claude/ORIENTATION.md` - Architecture overview
 - `docs/guides/UI_Testing_Verification.md` - UI testing guidelines
+- `docs/guides/CLINE-TROUBLESHOOTING-GUIDE.md` - **Read this when tests fail**
 
 ---
 
