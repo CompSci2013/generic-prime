@@ -1,57 +1,40 @@
 # Project Status
 
-**Version**: 5.77
-**Timestamp**: 2026-01-01T01:49:00-05:00
-**Updated By**: Session 68 - Visual Testing Pipeline Implementation
+**Version**: 5.78
+**Timestamp**: 2026-01-01T09:35:00-05:00
+**Updated By**: Session 69 - Mimir Models & Cleanup
 
 ---
 
-## Session 68 Summary: Visual Testing & Self-Healing Pipeline
+## Session 69 Summary: Mimir Model Documentation & Session Cleanup
 
-**Status**: ✅ **COMPLETED** - Two parallel pipeline implementations created
+**Status**: ✅ **COMPLETED** - Model tooling fixed, documentation updated
 
 ### What Was Accomplished
 
-**MonsterWatch Protocol Update**:
-1. ✅ Updated `/monsterwatch` command (v3.0):
-   - Removed Gemini from dialog (now DEVELOPER ↔ CLAUDE only)
-   - Removed polling behavior
-   - Added ORIENTATION.md reading for Minilab infrastructure context
+**mimir-models Bash Function Fixed**:
+1. ✅ Methodically inspected all 14 Ollama models on Mimir
+2. ✅ Fixed SIZE column - now pulls from `/api/tags` correctly
+3. ✅ Fixed CONTEXT column - checks `.parameters` for custom `num_ctx` first, falls back to `{family}.context_length`
+4. ✅ Handles scientific notation (e.g., `1.024e+06`)
+5. ✅ Formats output with K/M suffixes
 
-**Mimir Model Documentation**:
-1. ✅ Updated `docs/claude/ORIENTATION.md` with current model inventory (14 models)
-2. ✅ Documented model differences (instruct, MoE, vision vs coder)
-3. ✅ Ranked coding models: qwen3-coder > qwen2.5-coder > qwen3-vl > llama4-scout
+**RoPE Scaling Documentation**:
+1. ✅ Updated `~/ollama-model-variants.md` with RoPE frequency scaling guidance
+2. ✅ Documented when `rope_frequency_base` IS needed (LLaMA-2 extending beyond 4K)
+3. ✅ Documented when it's NOT needed (Qwen3-Coder has built-in high freq_base of 10M)
 
-**Visual Testing Pipeline (Claude's Implementation)**:
-1. ✅ Created `frontend/scripts/visual-pipeline/` with 8 TypeScript modules:
-   - `types.ts` - Bug, BugReport, PipelineState interfaces
-   - `config.ts` - Configuration, selectors, 13 screenshot steps, LLM prompts
-   - `screenshot-collector.ts` - Playwright automation for 13 steps
-   - `vision-analyzer.ts` - Real Ollama API integration with qwen3-vl
-   - `bug-report-generator.ts` - JSON + Markdown report generation
-   - `verification-runner.ts` - Selective re-testing of fixed bugs
-   - `orchestrator.ts` - Main pipeline coordinator
-   - `index.ts` - Module exports
-2. ✅ Created `.claude/commands/fix-visual-bugs.md` - Cline slash command for fixes
-3. ✅ Added npm scripts: `visual-pipeline`, `visual-collect`, `visual-analyze`, `visual-report`, `visual-verify`
-4. ✅ Added dependencies: `tsx`, `uuid`, `@types/uuid`
+**Session Cleanup**:
+1. ✅ Removed 15 old screenshots from `frontend/screenshots/captures/`
+2. ✅ Removed old pipeline reports from `frontend/reports/`
+3. ✅ Preserved valuable artifacts: REQUIREMENTS.md, QA-TEST-MANUAL.md, pipeline scripts
 
-**Cline's Parallel Implementation**:
-- Cline created `frontend/e2e/pipeline/` with 11 files (scaffold with stub AI)
-- Added `npm run pipeline` script
-- Both implementations coexist without conflict
-
-### Key Technical Details
-
-**Pipeline Architecture**:
-- Vision Model: `qwen3-vl:235b-a22b-instruct-q4_K_M` on Mimir
-- Coder Model: `qwen3-coder:30b-a3b-q8_0` on Mimir
-- 13 screenshot steps covering all UI controls
-- Max 3 fix attempts per bug, 5 pipeline cycles
-- JSON + Markdown bug reports
-
-**Difference**: Claude's pipeline has real Ollama integration; Cline's is stubbed.
+**Bug Investigation (NOT Fixed)**:
+- 4 bugs identified during QA testing but NOT fixed this session:
+  - BUG #1: Autocomplete serializes as [object Object]
+  - BUG #2: Model filter same [object Object] issue
+  - BUG #3: Year range filters don't apply from UI
+  - BUG #4: Year range fields don't populate from URL
 
 ### Current Stack
 
@@ -64,10 +47,20 @@
 | Playwright | 1.57.0 |
 | Frontend | **6.0.0** |
 
+### Mimir Model Inventory (14 models)
+
+| Model | Params | Quant | Size | Context |
+|-------|--------|-------|------|---------|
+| qwen3-coder-q8-1Mk | 30B | Q8_0 | 32 GB | 1.0 M |
+| qwen3-coder-q8-500k | 30B | Q8_0 | 32 GB | 512 K |
+| qwen3-coder-q8-250k | 30B | Q8_0 | 32 GB | 262 K |
+| qwen3-coder:30b-a3b-q8_0 | 30B | Q8_0 | 32 GB | 40 K |
+| qwen3-vl:235b-a22b-instruct-q4_K_M | 235B | Q4_K_M | 133 GB | 128 K |
+| llama4-scout:17b-16e-instruct-ud-q4_K_M | 109B | Q4_K_M | 59 GB | 10 M |
+
 ### Branch
 
 - `feature/cline-experiment`
-- Contains both Claude and Cline pipeline implementations
 
 ---
 
@@ -75,6 +68,8 @@
 
 | Bug | Component | Severity | Status |
 |-----|-----------|----------|--------|
+| Autocomplete [object Object] | query-panel autocomplete | Medium | Pending |
+| Year range UI not applying | query-panel range inputs | Medium | Pending |
 | #7 | p-multiSelect (Body Class) | Low | Pending |
 | Pop-out re-render | BasicResultsTable | Medium | Deferred |
 
@@ -84,12 +79,12 @@
 
 | Phase | Work | Priority | Status |
 |-------|------|----------|--------|
-| **1** | **Deploy v6.0.0 to K3s** | **HIGH** | **Pending** |
-| **2** | **Merge feature/angular-15-upgrade to main** | **HIGH** | **Ready** |
-| **3** | **Test Visual Pipeline on Mimir** | **MEDIUM** | Pending |
-| 4 | Fix pop-out re-render bug | Medium | Deferred |
+| **1** | **Fix Autocomplete/Year Range Bugs** | **HIGH** | **Pending** |
+| **2** | **Deploy v6.0.0 to K3s** | **HIGH** | **Pending** |
+| **3** | **Merge feature/angular-15-upgrade to main** | **HIGH** | **Ready** |
+| 4 | Test Visual Pipeline on Mimir | Medium | Pending |
 | 5 | Fix Bug #7 (multiselect visual state) | Low | Pending |
 
 ---
 
-**Last Updated**: 2026-01-01T01:49:00-05:00 (Session 68 - Visual Pipeline)
+**Last Updated**: 2026-01-01T09:35:00-05:00 (Session 69 - Mimir Models & Cleanup)

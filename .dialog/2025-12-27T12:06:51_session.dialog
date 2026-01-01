@@ -312,3 +312,125 @@ CLAUDE:2026-01-01T01:49:00-05:00
 The visual testing pipeline is implementation-ready. Run `npm run visual-collect` first to verify Playwright screenshots work, then `npm run visual-pipeline` for full pipeline with Mimir's qwen3-vl.
 
 SESSION END
+
+CLAUDE:2026-01-01T01:51:37-05:00
+
+**MonsterWatch Session Started**
+
+**Context Loaded**:
+- **MONSTER-LOG.md**: Session 67 complete (Cline AI Integration + E2E Tests)
+- **MONSTER-CLAUDE.md**: Ready for Query Panel UX refinement
+- **ORIENTATION.md**: Minilab infrastructure understood
+
+**Minilab Infrastructure**:
+- **Mimir** (192.168.0.100): Mac Studio M3 Ultra, LLM inference (Ollama API :11434)
+- **Thor** (192.168.0.244): K3s worker node, development host
+- **Loki** (192.168.0.110): K3s control plane, Traefik ingress
+
+**Current State**:
+- Branch: `feature/cline-experiment`
+- Version: 6.0.0 (Angular 20.3.15 + PrimeNG 20.4.0)
+- Build: Passing
+- Last Session (68): Visual Testing Pipeline implementation
+
+**Pending Tasks**:
+1. Deploy v6.0.0 to K3s
+2. Merge to main
+3. Query Panel UX Refinement (per MONSTER-CLAUDE.md)
+
+Awaiting instructions.
+
+DEVELOPER:2026-01-01T01:51:37-05:00
+
+CLAUDE:2026-01-01T02:00:53-05:00
+
+## Pipeline Analysis - Critical Finding
+
+**Problem**: There are TWO pipelines, NEITHER is truly unattended:
+
+### 1. Cline's Pipeline (`frontend/e2e/pipeline/`)
+- **`ai-fixer.ts`** - AI integration is **STUBBED** (lines 51-74 are comments, returns simulated data)
+- Does NOT call Mimir - just pretends to
+
+### 2. Claude's Pipeline (`frontend/scripts/visual-pipeline/`)
+- **`vision-analyzer.ts`** - REAL Ollama integration with Mimir (line 194-248)
+- **BUT** `orchestrator.ts:197-233` has a **BLOCKING mechanism**
+- Waits for `fixes-applied.flag` file (polls every 5 sec, 5 min timeout)
+- Designed for human-in-the-loop: Cline applies fixes, creates flag file
+
+### Why This Happened
+The original prompt said "Cline extension for VS Code will be doing the work" - so Claude designed a pipeline that:
+1. Collects screenshots (automated)
+2. Analyzes with qwen3-vl on Mimir (automated)
+3. Generates bug reports (automated)
+4. **WAITS** for Cline to apply fixes (BLOCKING)
+5. Verifies fixes (automated)
+
+**Mimir Connection**: ✅ Working
+```
+Vision model: qwen3-vl:235b-a22b-instruct-q4_K_M (133GB)
+Coder model: qwen3-coder:30b-a3b-q8_0 (32GB)
+```
+
+## What You Can Run Unattended NOW
+
+**Screenshot collection only**:
+```bash
+cd ~/projects/generic-prime/frontend
+npm run visual-collect
+```
+
+**Full pipeline (will block at fix phase)**:
+```bash
+npm run visual-pipeline
+```
+
+## To Make It Fully Unattended
+
+The pipeline needs modification to call Mimir's coder model directly instead of waiting for Cline. The vision analysis works, but the code-fixing loop requires Cline interaction.
+
+**Options**:
+1. Modify `orchestrator.ts` to call coder model directly and apply fixes
+2. Accept the current design: screenshot + analysis runs, generates bug reports, human applies fixes later
+
+Which approach do you want?
+
+DEVELOPER:2026-01-01T02:00:53-05:00
+
+CLAUDE:2026-01-01T09:35:00-05:00
+
+**Session 69 Ending - MonsterWatch Shutdown Protocol**
+
+## Accomplished This Session
+
+**mimir-models Bash Function Fixed**:
+1. ✅ Methodically inspected all 14 Ollama models on Mimir (load/unload cycle)
+2. ✅ Fixed SIZE column - pulls from `/api/tags`
+3. ✅ Fixed CONTEXT column - checks `.parameters` for custom `num_ctx`, falls back to `{family}.context_length`
+4. ✅ Handles scientific notation (e.g., `1.024e+06`)
+5. ✅ Output formatted with K/M suffixes
+
+**RoPE Scaling Documentation**:
+1. ✅ Updated `~/ollama-model-variants.md` with RoPE frequency guidance
+2. ✅ Documented: Qwen3-Coder needs NO extra params (built-in high freq_base 10M)
+3. ✅ Documented: LLaMA-2 DOES need `rope_frequency_base` when extending beyond 4K
+
+**Session Cleanup**:
+1. ✅ Removed 15 screenshots from `frontend/screenshots/captures/`
+2. ✅ Removed old pipeline reports
+3. ✅ Preserved: REQUIREMENTS.md, QA-TEST-MANUAL.md, pipeline scripts
+
+**Bug Investigation (NOT Fixed)**:
+- User requested undo of code changes
+- 4 bugs documented for next session:
+  - Autocomplete [object Object] serialization
+  - Year range filters don't apply from UI
+  - Year range doesn't populate from URL
+
+## Pending
+
+- Fix Query Panel bugs (autocomplete, year range)
+- Deploy v6.0.0 to K3s
+- Merge to main
+
+SESSION END

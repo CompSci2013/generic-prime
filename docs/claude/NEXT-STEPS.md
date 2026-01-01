@@ -1,29 +1,28 @@
 # Next Steps
 
-**Current Session**: Session 68 - Visual Testing Pipeline Implementation
-**Status**: ✅ COMPLETED - Pipeline created
+**Current Session**: Session 69 - Mimir Models & Cleanup
+**Status**: ✅ COMPLETED - Model tooling fixed, session cruft cleaned
 
 ---
 
-## IMMEDIATE ACTION 1: Test Visual Pipeline
+## IMMEDIATE ACTION 1: Fix Query Panel Bugs
 
-**Priority**: MEDIUM
-**Scope**: Run the pipeline against Mimir to verify Ollama integration
+**Priority**: HIGH
+**Scope**: Fix 4 bugs identified during QA testing
 
-**Prerequisites**:
-1. Dev server running: `npm run dev:server`
-2. Mimir accessible: `http://mimir:11434`
+**Bugs to Fix**:
+1. **Autocomplete [object Object]** - Manufacturer/Model autocomplete values serialize incorrectly
+2. **Year range filters don't apply** - UI inputs don't trigger filter updates
+3. **Year range doesn't populate from URL** - URL params don't populate the inputs
 
-**Steps**:
-1. Run screenshot collector only:
-   ```bash
-   cd frontend
-   npm run visual-collect
-   ```
-2. If screenshots captured, run full pipeline:
-   ```bash
-   npm run visual-pipeline
-   ```
+**Investigation Notes**:
+- The autocomplete `onSelect` event emits `$event` which may be an object, not a string
+- Need to check if `$event.value` or `$event` is the correct value to use
+- Year range inputs may not be bound correctly in query-panel.component.html
+
+**Files to Investigate**:
+- `frontend/src/framework/components/query-panel/query-panel.component.html` (lines 106-129 for autocomplete, 50-73 for range)
+- `frontend/src/framework/components/query-panel/query-panel.component.ts` (onFilterChange, onAutocompleteSearch)
 
 ---
 
@@ -52,37 +51,28 @@
 
 ---
 
-## IMMEDIATE ACTION 3: Merge to Main
-
-**Priority**: HIGH
-**Scope**: Merge feature branch after deployment verification
-
-**Steps**:
-1. Verify production is stable
-2. Merge `feature/angular-15-upgrade` to `main`
-3. Push to origin
-
----
-
-## SESSION 68 COMPLETION SUMMARY
+## SESSION 69 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-- ✅ Updated `/monsterwatch` command (v3.0) - Removed Gemini, removed polling
-- ✅ Updated ORIENTATION.md with Mimir model inventory (14 models)
-- ✅ Created visual testing pipeline in `frontend/scripts/visual-pipeline/`
-- ✅ 8 TypeScript modules with real Ollama API integration
-- ✅ Created Cline slash command `/fix-visual-bugs`
-- ✅ Added npm scripts and dependencies
+- ✅ Fixed `mimir-models` bash function - SIZE and CONTEXT columns now accurate
+- ✅ Methodically inspected all 14 Ollama models on Mimir
+- ✅ Updated `~/ollama-model-variants.md` with RoPE scaling documentation
+- ✅ Cleaned up session cruft (15 screenshots, old reports)
+- ✅ Preserved valuable artifacts (REQUIREMENTS.md, QA-TEST-MANUAL.md, pipelines)
 
-**Key Files Created**:
-- `frontend/scripts/visual-pipeline/*.ts` (8 files)
-- `.claude/commands/fix-visual-bugs.md`
+**Key Files Modified**:
+- `~/.bashrc` - mimir-models function rewritten
+- `~/ollama-model-variants.md` - RoPE scaling guidance added
+
+**Not Fixed (Documented)**:
+- 4 QA bugs identified but not fixed (per user request to undo code changes)
 
 **Current State**:
 - Branch: feature/cline-experiment
-- Two pipeline implementations (Claude + Cline) coexist
-- Pipeline ready for testing with Mimir
+- Version: 6.0.0
+- Build: Passing
+- Mimir models: All 14 models documented with accurate metrics
 
 ---
 
-**Last Updated**: 2026-01-01T01:49:00-05:00 (Session 68)
+**Last Updated**: 2026-01-01T09:35:00-05:00 (Session 69)
