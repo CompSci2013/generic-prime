@@ -16,18 +16,19 @@ import { UiKitModule } from '../framework/ui-kit/ui-kit.module';
 /**
  * Application Configuration (Standalone Bootstrap)
  *
- * Configures the Generic-Prime application using Angular 20+ standalone APIs.
+ * Configures the Generic-Prime application using Angular 21+ standalone APIs.
  *
- * Angular 20 Updates:
- * - provideAnimationsAsync: Async animations for better performance
- * - providePrimeNG: PrimeNG 20 theme configuration with design tokens
- * - Lara theme from @primeuix/themes (PrimeNG 20 unified theming)
+ * Angular 21 Updates:
+ * - provideAnimationsAsync: Deprecated in Angular 20.2, will be removed in v23.
+ *   PrimeNG 21 uses CSS-based animations but still requires this for compatibility.
+ * - providePrimeNG: PrimeNG 21 theme configuration with design tokens
+ * - Lara theme from @primeuix/themes (PrimeNG unified theming)
  *
  * Providers:
  * - provideRouter: Configures application routing
  * - provideHttpClient: Enables HTTP communication
  * - provideAnimationsAsync: Enables async Angular animations for PrimeNG
- * - providePrimeNG: Configures PrimeNG 20 theming
+ * - providePrimeNG: Configures PrimeNG 21 theming
  * - MessageService: PrimeNG toast/message service
  * - GlobalErrorHandler: Application-wide error handling
  * - DOMAIN_CONFIG: Domain configuration factory for automobile domain
