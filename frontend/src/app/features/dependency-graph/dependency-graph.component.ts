@@ -122,7 +122,6 @@ import { FormsModule } from '@angular/forms';
             ])
         ])
     ],
-    standalone: true,
     imports: [FormsModule, DatePipe]
 })
 export class DependencyGraphComponent implements OnInit, AfterViewInit {

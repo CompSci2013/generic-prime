@@ -76,7 +76,6 @@ import { RouterLink } from '@angular/router';
     selector: 'app-chemistry',
     templateUrl: './chemistry.component.html',
     styleUrls: ['./chemistry.component.scss'],
-    standalone: true,
     imports: [RouterLink]
 })
 export class ChemistryComponent {

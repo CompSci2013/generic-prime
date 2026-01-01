@@ -22,7 +22,6 @@ import { RouterLink } from '@angular/router';
     selector: 'app-agriculture',
     templateUrl: './agriculture.component.html',
     styleUrls: ['./agriculture.component.scss'],
-    standalone: true,
     imports: [RouterLink]
 })
 export class AgricultureComponent {

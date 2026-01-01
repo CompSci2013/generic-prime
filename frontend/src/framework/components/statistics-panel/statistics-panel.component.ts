@@ -49,7 +49,6 @@ import { PanelModule } from 'primeng/panel';
     templateUrl: './statistics-panel.component.html',
     styleUrls: ['./statistics-panel.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [PanelModule, SharedModule, BaseChartComponent]
 })
 export class StatisticsPanelComponent implements OnInit {

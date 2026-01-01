@@ -61,7 +61,6 @@ import { NgStyle } from '@angular/common';
     templateUrl: './base-picker.component.html',
     styleUrls: ['./base-picker.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [TableModule, SharedModule, InputTextModule, ButtonModule, CheckboxModule, FormsModule, NgStyle, SkeletonModule, MessageModule]
 })
 export class BasePickerComponent<T> implements OnInit, OnDestroy {

@@ -133,14 +133,15 @@
     <!-- Options List -->
     @if (!loadingOptions && !optionsError) {
       <div class="options-list">
-        @for (option of filteredOptions; track option) {
+        @for (option of filteredOptions; track option; let i = $index) {
           <div class="option-item">
             <p-checkbox
               [(ngModel)]="selectedOptions"
-              [label]="option.label"
               [value]="option.value"
-              [binary]="false">
+              [binary]="false"
+              [inputId]="'option-' + i">
             </p-checkbox>
+            <label [for]="'option-' + i">{{ option.label }}</label>
           </div>
         }
         @if (filteredOptions.length === 0) {

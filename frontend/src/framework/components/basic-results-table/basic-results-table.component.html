@@ -75,7 +75,7 @@
       </ng-template>
 
       <!-- Row Expansion -->
-      <ng-template pTemplate="rowexpansion" let-row>
+      <ng-template #expandedrow let-row>
         <tr>
           <td [attr.colspan]="domainConfig.tableConfig.columns.length + 1">
             <div class="row-expansion">

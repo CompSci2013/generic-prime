@@ -96,7 +96,6 @@ interface ActiveFilter {
     templateUrl: './query-control.component.html',
     styleUrls: ['./query-control.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [DropdownModule, FormsModule, ButtonModule, ChipModule, TooltipModule, DialogModule, SharedModule, InputTextModule, ProgressSpinnerModule, CheckboxModule, InputNumberModule]
 })
 export class QueryControlComponent<TFilters = any, TData = any, TStatistics = any>

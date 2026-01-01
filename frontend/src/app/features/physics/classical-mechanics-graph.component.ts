@@ -64,7 +64,6 @@ import { KnowledgeGraphData, KnowledgeGraphComponent as KnowledgeGraphComponent_
       </app-knowledge-graph>
     }
     `,
-    standalone: true,
     imports: [KnowledgeGraphComponent_1]
 })
 export class ClassicalMechanicsGraphComponent implements OnInit {

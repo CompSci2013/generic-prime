@@ -71,7 +71,6 @@ import { PhysicsNode } from './physics-knowledge-path';
     selector: 'app-physics-syllabus',
     templateUrl: './physics-syllabus.component.html',
     styleUrls: ['./physics-syllabus.component.scss'],
-    standalone: true,
     imports: []
 })
 export class PhysicsSyllabusComponent implements OnInit {

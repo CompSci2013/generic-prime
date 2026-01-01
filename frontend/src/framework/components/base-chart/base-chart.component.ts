@@ -185,7 +185,6 @@ export abstract class ChartDataSource<TStatistics = any> {
     templateUrl: './base-chart.component.html',
     styleUrls: ['./base-chart.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [ButtonModule]
 })
 export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {

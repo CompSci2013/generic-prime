@@ -44,7 +44,6 @@ import { TableModule } from 'primeng/table';
     templateUrl: './basic-results-table.component.html',
     styleUrls: ['./basic-results-table.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [TableModule, SharedModule, NgStyle, ButtonModule, RippleModule, SkeletonModule]
 })
 export class BasicResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
