@@ -23,7 +23,8 @@
     "visual-collect": "tsx scripts/visual-pipeline/screenshot-collector.ts",
     "visual-analyze": "tsx scripts/visual-pipeline/vision-analyzer.ts",
     "visual-report": "tsx scripts/visual-pipeline/bug-report-generator.ts",
-    "visual-verify": "tsx scripts/visual-pipeline/verification-runner.ts"
+    "visual-verify": "tsx scripts/visual-pipeline/verification-runner.ts",
+    "auto-pipeline": "python3 scripts/autonomous-pipeline.py"
   },
   "private": true,
   "dependencies": {

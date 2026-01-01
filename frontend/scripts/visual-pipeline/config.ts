@@ -14,8 +14,8 @@ export const CONFIG = {
   // Timeouts (milliseconds)
   ollamaTimeout: 120000,      // 2 min per LLM call
   clineWaitTimeout: 300000,   // 5 min for Cline to apply fixes
-  screenshotTimeout: 10000,   // 10 sec per screenshot
-  networkIdleTimeout: 5000,   // 5 sec network idle wait
+  screenshotTimeout: 30000,   // 30 sec per screenshot (increased for slow dev server)
+  networkIdleTimeout: 10000,  // 10 sec network idle wait
 
   // LLM Models
   visionModel: 'qwen3-vl:235b-a22b-instruct-q4_K_M',
@@ -62,10 +62,10 @@ export const SELECTORS = {
   resultsTablePanel: '[data-testid="basic-results-table-panel"]',
   resultsTable: '[data-testid="basic-results-table"]',
 
-  // Query Control
+  // Query Control (PrimeNG 20: Dropdown → Select)
   filterDropdown: '.filter-field-dropdown',
-  dropdownPanel: '.p-dropdown-panel',
-  dropdownItems: '.p-dropdown-items li',
+  dropdownPanel: '.p-select-overlay',
+  dropdownItems: '.p-select-list .p-select-option',
   filterChips: '.filter-chip',
   activeFilters: '.active-filters .p-chip',
 

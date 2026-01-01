@@ -166,18 +166,59 @@ frontend/
 ## Slash Commands
 
 ### `/bootstrap`
-Start a fresh cline chat session with project context. This command reads all project documentation files and provides a comprehensive overview of the Generic Discovery Framework.
+Start a fresh cline chat session with project context.
 
-**For VS Code users:** 
-- Open the VS Code Cline panel (usually in the sidebar or bottom panel)
-- Type `/bootstrap` in the chat input field
-- Press Enter to execute the command
+### `/visual-pipeline`
+**AUTONOMOUS MODE** - Run the visual testing pipeline without user interaction.
 
-When you type `/bootstrap`, cline will:
-1. Load the complete project documentation
-2. Provide a summary of the architecture and key components
-3. Explain the development workflow and testing procedures
-4. Show you how to access the frontend and backend services
-5. Give you guidance on running E2E tests
+Read `.cline/commands/visual-pipeline.md` for the full workflow, then execute it.
 
-This is the recommended starting point for any new session to ensure you have the most up-to-date project context.
+---
+
+## Autonomous Visual Pipeline
+
+When running `/visual-pipeline`, execute these phases WITHOUT asking for user confirmation:
+
+### Phase 1: Screenshot Collection
+```bash
+cd /home/odin/projects/generic-prime/frontend && npm run visual-collect
+```
+
+### Phase 2: Vision Analysis
+For each PNG in `frontend/screenshots/captures/`, call Mimir:
+```bash
+BASE64=$(base64 -w 0 <screenshot.png>)
+curl -s http://mimir:11434/api/generate -d '{
+  "model": "qwen3-vl:235b-a22b-instruct-q4_K_M",
+  "prompt": "Analyze this UI for bugs. Output JSON: {bugs: [{bug_id, severity, component, description, expected, actual, suggested_fix}]}",
+  "images": ["'"$BASE64"'"],
+  "stream": false
+}'
+```
+
+### Phase 3: Code Fixes
+For each bug, call the coder model:
+```bash
+curl -s http://mimir:11434/api/generate -d '{
+  "model": "qwen3-coder:30b-a3b-q8_0",
+  "prompt": "Fix this Angular bug: [bug details]. Provide file path and exact code.",
+  "stream": false
+}'
+```
+Then apply the fix by editing the file.
+
+### Phase 4: Verification
+Re-run `npm run visual-collect` and re-analyze. If bug persists after 3 attempts, mark unresolved.
+
+### Phase 5: Report
+Write results to `frontend/reports/pipeline-report.md`.
+
+**IMPORTANT**: Do NOT ask for confirmation. Execute all phases autonomously.
+
+---
+
+## Mimir LLM Configuration
+
+- **Host**: http://mimir:11434
+- **Vision Model**: qwen3-vl:235b-a22b-instruct-q4_K_M (for screenshot analysis)
+- **Coder Model**: qwen3-coder:30b-a3b-q8_0 (for code fixes)
