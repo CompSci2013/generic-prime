@@ -10,9 +10,23 @@
     padding: 1rem;
 
     ::ng-deep .p-datatable {
+      // Use a more visible border color for dark theme
+      --table-border-color: #4b5563; // Tailwind gray-600, visible on dark backgrounds
+
       .p-datatable-thead > tr > th,
       .p-datatable-tbody > tr > td {
         padding: 0rem 0.5rem;
+        border: 1px solid var(--table-border-color);
+      }
+
+      // Ensure header row has bottom border
+      .p-datatable-thead > tr > th {
+        border-bottom-width: 2px;
+      }
+
+      // Table outer border
+      .p-datatable-table {
+        border: 1px solid var(--table-border-color);
       }
     }
 
@@ -53,29 +67,35 @@
 
     .row-expansion {
       padding: 1.5rem;
-      background: var(--surface-ground);
-      border-left: 3px solid var(--primary-color);
+      background: #1f1f23; // Dark surface for expansion (explicit dark color)
+      border-left: 3px solid var(--p-primary-color, #34d399);
 
       h3 {
         margin: 0 0 1rem;
         font-size: 1.125rem;
-        color: var(--text-color);
+        color: #ffffff;
       }
 
       .expansion-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0; // No gap - borders provide separation
 
         .expansion-field {
           display: flex;
-          gap: 0.5rem;
+          flex-direction: column;
+          gap: 0.25rem;
+          padding: 0.75rem;
+          border: 1px solid #4b5563; // Match table border color
 
           strong {
-            color: var(--text-color-secondary);
-            font-size: 0.875rem;
-            min-width: 120px;
+            color: #a1a1aa; // Muted gray for labels
+            font-size: 0.75rem;
+            text-transform: uppercase;
           }
+
+          // Value text (after the strong label)
+          color: #ffffff;
         }
       }
     }

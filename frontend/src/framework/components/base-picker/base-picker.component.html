@@ -61,7 +61,7 @@
           <th style="width: 3rem">
             <p-checkbox
               [ngModel]="allVisibleSelected"
-              (ngModelChange)="onSelectAll($any($event))"
+              (onChange)="onSelectAll($any($event).checked)"
               [binary]="true"
               [disabled]="state.data.length === 0"
             ></p-checkbox>
@@ -92,7 +92,7 @@
           <td>
             <p-checkbox
               [ngModel]="isRowSelected(row)"
-              (ngModelChange)="onRowSelectionChange(row, $any($event))"
+              (onChange)="onRowSelectionChange(row, $any($event).checked)"
               [binary]="true"
             ></p-checkbox>
           </td>

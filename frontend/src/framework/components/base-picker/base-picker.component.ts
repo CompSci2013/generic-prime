@@ -347,7 +347,8 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
     }
 
     this.cdr.markForCheck();
-    this.emitSelectionChange();
+    // Don't emit on every checkbox click - wait for "Apply" button
+    // This prevents layout shifts from Query Control expanding with Active Filters
   }
 
   /**
@@ -378,7 +379,8 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
     }
 
     this.cdr.markForCheck();
-    this.emitSelectionChange();
+    // Don't emit on every checkbox click - wait for "Apply" button
+    // This prevents layout shifts from Query Control expanding with Active Filters
   }
 
   /**
