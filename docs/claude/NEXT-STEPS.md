@@ -1,11 +1,33 @@
 # Next Steps
 
-**Current Session**: Session 67 - Cline Integration & E2E Test Suite
-**Status**: ✅ COMPLETED - Cline configured, E2E tests created
+**Current Session**: Session 68 - Visual Testing Pipeline Implementation
+**Status**: ✅ COMPLETED - Pipeline created
 
 ---
 
-## IMMEDIATE ACTION 1: Deploy v6.0.0 to K3s
+## IMMEDIATE ACTION 1: Test Visual Pipeline
+
+**Priority**: MEDIUM
+**Scope**: Run the pipeline against Mimir to verify Ollama integration
+
+**Prerequisites**:
+1. Dev server running: `npm run dev:server`
+2. Mimir accessible: `http://mimir:11434`
+
+**Steps**:
+1. Run screenshot collector only:
+   ```bash
+   cd frontend
+   npm run visual-collect
+   ```
+2. If screenshots captured, run full pipeline:
+   ```bash
+   npm run visual-pipeline
+   ```
+
+---
+
+## IMMEDIATE ACTION 2: Deploy v6.0.0 to K3s
 
 **Priority**: HIGH
 **Scope**: Build and deploy Angular 20 production image
@@ -30,7 +52,7 @@
 
 ---
 
-## IMMEDIATE ACTION 2: Merge to Main
+## IMMEDIATE ACTION 3: Merge to Main
 
 **Priority**: HIGH
 **Scope**: Merge feature branch after deployment verification
@@ -42,43 +64,25 @@
 
 ---
 
-## IMMEDIATE ACTION 3: Infrastructure (IdP Phase 1)
-
-**Priority**: HIGH (Architecture)
-**Scope**: Deploy Keycloak to K3s
-
-**Reference**: `docs/infrastructure/idp/IDENTITY-STRATEGY.md`
-
----
-
-## DEFERRED: Pop-out Re-rendering Bug
-
-**Priority**: MEDIUM
-**Scope**: Pop-out BasicResultsTable doesn't re-render after STATE_UPDATE
-
----
-
-## SESSION 67 COMPLETION SUMMARY
+## SESSION 68 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-- ✅ Created missing Git branches for Angular upgrade path
-- ✅ Created `.clinerules` for Cline AI configuration
-- ✅ Created E2E test suite (15 tests, all passing)
-- ✅ Fixed Cline's selector/route issues
-- ✅ Created troubleshooting guide for Cline self-diagnosis
-- ✅ Created vision helper script (describe-image.sh)
+- ✅ Updated `/monsterwatch` command (v3.0) - Removed Gemini, removed polling
+- ✅ Updated ORIENTATION.md with Mimir model inventory (14 models)
+- ✅ Created visual testing pipeline in `frontend/scripts/visual-pipeline/`
+- ✅ 8 TypeScript modules with real Ollama API integration
+- ✅ Created Cline slash command `/fix-visual-bugs`
+- ✅ Added npm scripts and dependencies
 
 **Key Files Created**:
-- `.clinerules` - Cline project rules
-- `docs/guides/CLINE-TROUBLESHOOTING-GUIDE.md` - Self-diagnosis guide
-- `frontend/e2e/domains/automobile.spec.ts` - 15 E2E tests
-- `scripts/describe-image.sh` - Vision helper script
+- `frontend/scripts/visual-pipeline/*.ts` (8 files)
+- `.claude/commands/fix-visual-bugs.md`
 
 **Current State**:
-- Branch: feature/cline-experiment (pushed to GitHub/GitLab)
-- E2E tests: 15/15 passing
-- Screenshots directory empty (tests need to run to generate)
+- Branch: feature/cline-experiment
+- Two pipeline implementations (Claude + Cline) coexist
+- Pipeline ready for testing with Mimir
 
 ---
 
-**Last Updated**: 2025-12-30T08:09:00-05:00 (Session 67)
+**Last Updated**: 2026-01-01T01:49:00-05:00 (Session 68)

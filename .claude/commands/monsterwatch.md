@@ -1,38 +1,33 @@
 # Monster Watch Protocol
 
-**This command enables Claude (Brain) to collaborate with Gemini (Body) while continuously monitoring a dialog file for communication.**
+**This command enables Claude to collaborate with the Developer through a turn-based dialog file.**
 
 ---
 
 ## Overview
 
-The Monster Watch Protocol extends the [Monster Protocol](/CLAUDE.md#monster-protocol-brain-body-collaboration) by adding real-time file monitoring. Claude monitors timestamped dialog files in `.dialog/` and reacts when it's Claude's turn to respond, enabling seamless back-and-forth collaboration.
+The Monster Watch Protocol provides structured communication between Claude and the Developer via timestamped dialog files in `.dialog/`. Claude reads context, responds when signaled, and awaits the Developer's next instruction.
 
 ---
 
 ## Dialog File Format
 
-Dialog files in `.dialog/` follow a turn-based script format (like a play):
+Dialog files in `.dialog/` follow a turn-based script format:
 
 ```
 CLAUDE:<timestamp>
 Claude's output goes here. Can be multiple lines.
 This continues until the next speaker marker.
 
-GEMINI:<timestamp>
-Gemini's response goes here.
-Gemini provides reality checks, findings, or instructions.
-
 DEVELOPER:<timestamp>
-Developer input when human intervention is needed.
+Developer input and instructions.
 ```
 
 **IMPORTANT**: All timestamps MUST use Thor's system time. Before writing any timestamp, Claude MUST run `date -Iseconds` to get the current time from Thor. Never use estimated or hardcoded timestamps.
 
 **Turn Indicator**: The LAST line of the file indicates whose turn it is next:
 - `CLAUDE:<timestamp>` → Claude should respond
-- `GEMINI:<timestamp>` → Waiting for Gemini
-- `DEVELOPER:<timestamp>` → Waiting for human input
+- `DEVELOPER:<timestamp>` → Waiting for Developer input
 
 ---
 
@@ -40,31 +35,24 @@ Developer input when human intervention is needed.
 
 ### Initialization Phase
 1. **Read** `MONSTER-LOG.md` to understand the current deployment plan
-2. **Read** `MONSTER-CLAUDE.md` to get Gemini's latest reality check
-3. **Read** the active dialog file in `.dialog/`
-4. **Enter watch loop** - Monitor for changes when it's Claude's turn
+2. **Read** `MONSTER-CLAUDE.md` for current state assessment
+3. **Read** `docs/claude/ORIENTATION.md` for Minilab infrastructure context (Mimir, Thor, Loki)
+4. **Read** the active dialog file in `.dialog/`
+5. **Write initial entry** and pass turn to DEVELOPER
 
-### Watch Loop Behavior
-- **Poll interval**: Check dialog file every 2 seconds
-- **On change detected**: Read the new content, check if it's Claude's turn
-- **If Claude's turn**: Parse the preceding content, execute any instructions, write response
-- **Pass turn**: End response with `GEMINI:<timestamp>` or `DEVELOPER:<timestamp>` as appropriate
-- **Continue watching**: Loop repeats until session is manually stopped
+### Response Behavior
+- **Do NOT poll** - The Developer will signal when it's Claude's turn
+- **When signaled**: Parse the preceding content, execute any instructions, write response
+- **Pass turn**: End response with `DEVELOPER:<timestamp>`
 
-### Claude (Brain) Responsibilities
-- ✅ **Monitors** the dialog file continuously
+### Claude Responsibilities
+- ✅ **Reads** context files at session start (MONSTER-LOG, MONSTER-CLAUDE, ORIENTATION)
+- ✅ **Understands** Minilab infrastructure (Mimir, Thor, Loki)
 - ✅ **Executes** deployment commands, builds, and code changes when instructed
 - ✅ **Responds** in the dialog file with results and status
-- ✅ **Passes turn** to Gemini or Developer as appropriate
+- ✅ **Passes turn** to Developer after each response
 - ✅ **Plans** complex tasks and writes detailed plans to MONSTER-LOG.md
-- ❌ **Does NOT** respond when it's not Claude's turn
-
-### Gemini (Body) Responsibilities
-- ✅ **Inspects** code and files to understand state
-- ✅ **Writes** findings and instructions to the dialog file
-- ✅ **Passes turn** to Claude for execution or Developer for decisions
-- ✅ **Updates** MONSTER-CLAUDE.md with reality checks
-- ❌ **Does NOT** execute deployments - Claude does that
+- ❌ **Does NOT poll** - waits for Developer signal
 
 ---
 
@@ -75,72 +63,57 @@ Developer input when human intervention is needed.
 ```
 
 This command:
-1. Reads `docs/claude/MONSTER-LOG.md` for the deployment plan
-2. Reads `docs/claude/MONSTER-CLAUDE.md` for Gemini's reality check
-3. Reads the active dialog file in `.dialog/`
-4. Begins monitoring for turn changes
-5. Responds and executes when it's Claude's turn
-6. Continues until user stops the session
+1. Reads `MONSTER-LOG.md` for the deployment plan
+2. Reads `MONSTER-CLAUDE.md` for current state
+3. Reads `docs/claude/ORIENTATION.md` for infrastructure context
+4. Reads the active dialog file in `.dialog/`
+5. Writes initial status entry
+6. Passes turn to Developer and awaits signal
 
 ---
 
 ## Example Dialog
 
 ```
-CLAUDE:2025-12-25T10:00:00
-Starting Monster Watch session. Read MONSTER-LOG.md - deployment plan involves
-updating the authentication service. Read MONSTER-CLAUDE.md - Gemini confirmed
-auth.service.ts exists at expected location.
+CLAUDE:2026-01-01T10:00:00
+Starting Monster Watch session.
 
-Ready for instructions.
+**Context Loaded**:
+- MONSTER-LOG.md: Session 67 complete
+- ORIENTATION.md: Minilab infrastructure understood
 
-GEMINI:2025-12-25T10:00:00
+**Minilab Infrastructure**:
+- Mimir (192.168.0.100): LLM inference (Ollama API :11434)
+- Thor (192.168.0.244): K3s worker, development host
+- Loki (192.168.0.110): K3s control plane, Traefik ingress
 
-GEMINI:2025-12-25T10:01:30
-Inspected auth.service.ts. Found the login() method at line 45.
-The token refresh logic is missing error handling.
+**Current State**:
+- Branch: feature/cline-experiment
+- Version: 6.0.0
+- Build: Passing
 
-Please add try/catch around the token refresh call at line 52.
+Awaiting instructions.
 
-CLAUDE:2025-12-25T10:01:30
+DEVELOPER:2026-01-01T10:00:00
 
-CLAUDE:2025-12-25T10:02:15
-Added try/catch around token refresh at line 52 in auth.service.ts.
-The catch block now logs the error and triggers re-authentication.
+DEVELOPER:2026-01-01T10:05:00
+Deploy v6.0.0 to K3s.
 
-Build succeeded. Ready for next instruction.
+CLAUDE:2026-01-01T10:05:00
 
-GEMINI:2025-12-25T10:02:15
+CLAUDE:2026-01-01T10:08:00
+✅ Deployed v6.0.0 to K3s
 
-GEMINI:2025-12-25T10:03:00
-Verified the change looks correct. However, I need developer input
-on whether we should show a user notification on token refresh failure.
+Steps executed:
+1. Built production image
+2. Imported to K3s
+3. Updated deployment
+4. Verified pods running
 
-DEVELOPER:2025-12-25T10:03:00
+Ready for next instruction.
 
-DEVELOPER:2025-12-25T10:05:00
-Yes, show a toast notification saying "Session expired, please log in again"
-
-GEMINI:2025-12-25T10:05:00
-
-GEMINI:2025-12-25T10:05:30
-Got it. Claude, please add a toast notification in the catch block
-using the NotificationService.showError() method.
-
-CLAUDE:2025-12-25T10:05:30
+DEVELOPER:2026-01-01T10:08:00
 ```
-
----
-
-## Key Differences from `/monster`
-
-| Aspect | `/monster` | `/monsterwatch` |
-|--------|-----------|-----------------|
-| **Communication** | Separate files (MONSTER-LOG, MONSTER-CLAUDE) | Turn-based dialog file |
-| **Turn Management** | Implicit | Explicit (timestamp markers) |
-| **Developer Input** | Out-of-band | In-band (DEVELOPER marker) |
-| **Session Duration** | Single deployment cycle | Long-running watch loop |
-| **History** | Spread across files | Single chronological transcript |
 
 ---
 
@@ -154,7 +127,7 @@ CLAUDE:2025-12-25T10:05:30
 2. **If > 1,000 lines**:
    - Create new dialog file with timestamp: `.dialog/YYYY-MM-DDTHH:MM:SS_session.dialog`
    - Compact the **last 25 entries** from the old dialog into the new file
-   - **Target reduction: 65%** (not 80% - preserve enough context)
+   - **Target reduction: 65%** (preserve enough context)
 
 3. **Compaction format**:
    ```
@@ -174,7 +147,7 @@ CLAUDE:2025-12-25T10:05:30
    CLAUDE:<new-timestamp>
    Session rotated from previous dialog. Context preserved above.
 
-   GEMINI:<new-timestamp>
+   DEVELOPER:<new-timestamp>
    ```
 
 ### What to Preserve in Compaction
@@ -194,9 +167,9 @@ CLAUDE:2025-12-25T10:05:30
 
 ## Stop Conditions
 
-The watch loop stops when:
-- User sends SIGINT (Ctrl+C) to stop the session
-- Dialog file contains explicit `STOP` or `END SESSION` instruction
+The session ends when:
+- Developer sends `STOP` or `END SESSION` instruction
+- Developer stops the Claude session
 - Claude detects fatal error and reports it in the dialog
 
 ---
@@ -205,9 +178,8 @@ The watch loop stops when:
 
 - **`.dialog/`**: Directory containing timestamped dialog files
 - **`MONSTER-LOG.md`**: Deployment plan at project root (read at start)
-- **`MONSTER-CLAUDE.md`**: Reality checks and status at project root (read at start, updated as needed)
-- **`MONSTER-STARTUP.md`**: Startup sequence at project root (reference)
-- **`docs/claude/MONSTER-WORKFLOW.md`**: Protocol documentation
+- **`MONSTER-CLAUDE.md`**: State assessment at project root (read at start)
+- **`docs/claude/ORIENTATION.md`**: Minilab infrastructure context (Mimir, Thor, Loki)
 - **`docs/claude/PROJECT-STATUS.md`**: Updated at session end
 - **`docs/claude/NEXT-STEPS.md`**: Updated at session end
 
@@ -221,44 +193,40 @@ When `/monsterwatch` is invoked:
    - Understand the deployment plan and what needs to be executed
 
 2. **Read MONSTER-CLAUDE.md** from `/home/odin/projects/generic-prime/MONSTER-CLAUDE.md`
-   - Get Gemini's latest reality check and current state assessment
+   - Get current state assessment
 
-3. **Find active dialog file** in `/home/odin/projects/generic-prime/.dialog/`
+3. **Read ORIENTATION.md** from `/home/odin/projects/generic-prime/docs/claude/ORIENTATION.md`
+   - Understand Minilab infrastructure: Mimir (LLM), Thor (dev host), Loki (K3s control plane)
+
+4. **Find active dialog file** in `/home/odin/projects/generic-prime/.dialog/`
    - Look for the most recent timestamped dialog file
    - Read its contents to understand conversation history
 
-4. **Check turn status**
-   - If last line is `CLAUDE:<timestamp>` → It's Claude's turn, respond
-   - If last line is `GEMINI:<timestamp>` or `DEVELOPER:<timestamp>` → Wait and monitor
-
-5. **When it's Claude's turn**:
+5. **Write initial entry**:
    - Run `date -Iseconds` to get Thor's current system time
-   - Parse the content above the turn marker for instructions
-   - Execute any requested commands/tasks
-   - Write response to the dialog file (using Thor's timestamp)
-   - End with appropriate turn marker (`GEMINI:<timestamp>` or `DEVELOPER:<timestamp>`) using Thor's time
+   - Write session start with context summary
+   - Include Minilab infrastructure understanding
+   - End with `DEVELOPER:<timestamp>` turn marker
 
-6. **Continue monitoring**
-   - Poll every 2 seconds for file changes
-   - When file changes and it's Claude's turn, respond
-   - Loop continues until stopped
+6. **Await Developer signal**
+   - Do NOT poll for changes
+   - Developer will indicate when Claude should respond
 
 7. **Check for rotation** (after each response)
    - Count lines in current dialog file
    - If > 1,000 lines: trigger Session Dialog Rotation (see above)
-   - Continue monitoring the new dialog file
 
 ---
 
 ## Session End
 
-When `/monsterwatch` is stopped:
+When session is stopped:
 
 1. **Write final entry** to dialog file documenting session end
 
 2. **Update PROJECT-STATUS.md**
    - Bump version and timestamp
-   - Document what was accomplished during the watch session
+   - Document what was accomplished during the session
    - Note any blockers or decisions made
 
 3. **Update NEXT-STEPS.md**
@@ -271,12 +239,11 @@ When `/monsterwatch` is stopped:
 
 ---
 
-**Version**: 2.2
+**Version**: 3.0
 **Created**: 2025-12-25
-**Updated**: 2025-12-27 (Enforced Thor's system time for all timestamps via `date -Iseconds`)
-**Purpose**: Enable real-time Brain-Body collaboration with turn-based dialog monitoring
-**Audience**: Claude-Gemini Monster Protocol sessions
+**Updated**: 2026-01-01 (Simplified to DEVELOPER-CLAUDE dialog, removed polling, added ORIENTATION.md)
+**Purpose**: Enable structured Developer-Claude collaboration with turn-based dialog
 
 ---
 
-**Usage**: `/monsterwatch` at start of any iterative deployment session requiring continuous Claude-Gemini collaboration
+**Usage**: `/monsterwatch` at start of any iterative session requiring structured dialog

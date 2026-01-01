@@ -66,13 +66,30 @@
 
 ---
 
-## Infrastructure Overview
+## Infrastructure Overview (Halo Labs)
 
 ```
 ┌───────────────────────────────────────────────────────────────────┐
-│  Development Host: Thor (192.168.0.244)                           │
-│  Working Directory: ~/projects/generic-prime (frontend)           │
-│  Backend Source: ~/projects/data-broker/generic-prime             │
+│  HALO LABS NETWORK                                                 │
+├───────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  Mimir (192.168.0.100) - Mac Studio M3 Ultra                      │
+│  ├── Role: LLM Inference Node                                     │
+│  ├── Hardware: 28-core CPU, 60-core GPU, 256GB Unified Memory     │
+│  ├── Ollama API: http://mimir:11434                               │
+│  ├── Open WebUI: http://mimir:3000                                │
+│  └── Models: Llama 4 Scout, DeepSeek R1 70B, Qwen3-Coder 30B     │
+│                                                                    │
+│  Thor (192.168.0.244) - Development Workstation                   │
+│  ├── Role: K3s Worker Node + Development Host                     │
+│  ├── Working Directory: ~/projects/generic-prime                  │
+│  └── Container Runtime: Podman                                    │
+│                                                                    │
+│  Loki (192.168.0.110) - K3s Control Plane                         │
+│  ├── Role: Kubernetes Control Plane                               │
+│  ├── Traefik Ingress Controller (port 80)                         │
+│  └── Persistent Storage: /srv/k3s                                 │
+│                                                                    │
 └───────────────────────────────────────────────────────────────────┘
          │
          ├── Kubernetes Cluster (K3s)
@@ -91,6 +108,11 @@
          │   │       └── elasticsearch (autos-unified, autos-vins indices)
          │   │
          │   └── Pod distribution: May run on either node
+         │
+         ├── LLM Inference: Mimir (192.168.0.100)
+         │   ├── Ollama API: http://mimir:11434 (all models)
+         │   ├── Open WebUI: http://mimir:3000 (chat interface)
+         │   └── VS Code Extensions: Cline, Continue, Roo Code → Mimir
          │
          └── Development Container (Podman on Thor)
              └── generic-prime-frontend-dev (port 4205)
@@ -250,11 +272,13 @@ kubectl rollout restart deployment/generic-prime-backend-api -n generic-prime
 Add these lines to `C:\Windows\System32\drivers\etc\hosts`:
 
 ```
+192.168.0.100   mimir mimir.minilab
 192.168.0.244   thor thor.minilab
 192.168.0.110   loki loki.minilab generic-prime.minilab generic-prime-dockview.minilab
 ```
 
 **Explanation**:
+- `192.168.0.100 mimir` - LLM inference node (Ollama API, Open WebUI)
 - `192.168.0.244 thor` - Direct access to Thor for development server (port 4205)
 - `192.168.0.110 generic-prime.minilab` - **CRITICAL**: Points to Loki control plane where Traefik ingress runs
   - Routes both development and production API requests through Traefik
@@ -266,6 +290,7 @@ Add these lines to `C:\Windows\System32\drivers\etc\hosts`:
 Thor should have these entries in `/etc/hosts`:
 
 ```
+192.168.0.100   mimir mimir.minilab
 192.168.0.110   loki loki.minilab
 192.168.0.244   thor thor.minilab
 192.168.0.110   generic-prime.minilab generic-prime-dockview.minilab
@@ -820,7 +845,134 @@ curl http://localhost:4205
 
 ---
 
-**Last Updated**: 2025-12-20
+## Local LLM Infrastructure (Mimir)
+
+Halo Labs runs local LLM inference on **Mimir**, a Mac Studio M3 Ultra with 256GB unified memory. This enables private, fast AI coding assistance without cloud API costs.
+
+### Hardware Specifications
+
+| Spec | Value |
+|------|-------|
+| **Model** | Mac Studio M3 Ultra (2024) |
+| **CPU** | 28-core (24 performance + 4 efficiency) |
+| **GPU** | 60-core integrated (Metal) |
+| **Memory** | 256GB Unified (~240GB usable for models, 16GB reserved for OS) |
+| **Storage** | 2TB SSD |
+| **Network** | 10 Gigabit Ethernet |
+
+### Models Installed on Mimir (January 2026)
+
+| Model | Params | Quant |
+|-------|--------|-------|
+| **qwen3-vl:235b-a22b-instruct-q8_0** | 235.7B | Q8_0 |
+| **qwen3-vl:235b-a22b-instruct-q4_K_M** | 235.7B | Q4_K_M |
+| **deepseek-r1-0528-iq2** | 671.0B | IQ2 |
+| **llama4:17b-scout-16e-instruct-q8_0** | 108.6B | Q8_0 |
+| **deepseek-r1:70b-llama-distill-q8_0** | 70.6B | Q8_0 |
+| **llama4:scout** | 108.6B | Q4_K_M |
+| **llama3.1:70b** | 70.6B | Q4_K_M |
+| **qwen2.5-coder:32b-instruct-q8_0** | 32.8B | Q8_0 |
+| **qwen3-coder-q8-1Mk** | 30.5B | Q8_0 |
+| **qwen3-coder-q8-500k** | 30.5B | Q8_0 |
+| **qwen3-coder-q8-250k** | 30.5B | Q8_0 |
+| **qwen3-coder:30b-a3b-q8_0** | 30.5B | Q8_0 |
+| **qwen2.5-coder:14b** | 14.8B | Q4_K_M |
+| **nomic-embed-text** | 137M | F16 |
+
+### Recommended Models by Use Case
+
+| Use Case | Model | Notes |
+|----------|-------|-------|
+| **Vision + screenshots** | `qwen3-vl:235b-a22b-instruct-q8_0` | Best quality, 233GB |
+| **Vision (memory-constrained)** | `qwen3-vl:235b-a22b-instruct-q4_K_M` | Good quality, 133GB |
+| **Complex reasoning** | `deepseek-r1-0528-iq2` | 671B params, best reasoning |
+| **Large context coding (500K)** | `qwen3-coder-q8-500k` | 512K context window |
+| **Large context coding (250K)** | `qwen3-coder-q8-250k` | 262K context window |
+| **Daily coding driver** | `qwen3-coder:30b-a3b-q8_0` | Default context, fast |
+| **Quick coding tasks** | `qwen2.5-coder:14b` | 8GB, fastest |
+| **Multimodal + huge context** | `llama4:17b-scout-16e-instruct-q8_0` | 108GB, 10M token context |
+
+### VS Code Extension Configuration
+
+**Cline** (`.clinerules` already configured in project root):
+```json
+{
+  "apiProvider": "ollama",
+  "ollamaBaseUrl": "http://mimir:11434",
+  "ollamaModelId": "qwen3-coder:30b-a3b-q8_0"
+}
+```
+
+**Continue** (`~/.continue/config.yaml`):
+```yaml
+models:
+  - name: Ollama (Mimir)
+    provider: ollama
+    model: AUTODETECT
+    apiBase: http://mimir:11434
+    roles: [chat, edit, apply, summarize]
+
+embeddingsProvider:
+  provider: ollama
+  model: nomic-embed-text
+  apiBase: http://mimir:11434
+```
+
+**Roo Code**:
+```json
+{
+  "models": [{
+    "title": "Qwen 2.5 Coder 14B (Mimir)",
+    "provider": "ollama",
+    "model": "qwen2.5-coder:14b",
+    "apiBase": "http://mimir:11434"
+  }]
+}
+```
+
+### Quick Reference
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| Ollama API | http://mimir:11434 | LLM inference endpoint |
+| Open WebUI | http://mimir:3000 | Browser chat interface |
+
+**Test connectivity from Thor:**
+```bash
+curl -s http://mimir:11434/api/tags | jq '.models[].name'
+```
+
+**Check loaded model:**
+```bash
+curl -s http://mimir:11434/api/ps | jq '.models[0].name'
+```
+
+### /etc/hosts Entry
+
+Add to Windows, Thor, and Loki:
+```
+192.168.0.100 mimir mimir.minilab
+```
+
+### Known Limitations
+
+- **Cline/Roo Code**: Designed for Claude; local models may have limited tool call support
+- **After Mimir reboot**: Run `spinup` from Thor or manually start Ollama and Podman
+- **Memory budget**: 240GB usable (16GB reserved for macOS). Qwen3-VL-235B uses ~237GB loaded.
+- **Context vs Memory**: Larger context windows require more KV cache memory. 500K context may be tight.
+
+**Full documentation**: `~/projects/infrastructure/docs/Mimir.md` and `Mimir-Operations.md`
+
+---
+
+**Last Updated**: 2025-12-31
+
+**Session 68 Update**: Installed Qwen3-VL-235B vision model for browser automation
+- Downloaded `qwen3-vl:235b-a22b-instruct-q8_0` (251GB, Q8 quantization)
+- Created context variants: `qwen3-vl-256k` (256K) and `qwen3-vl-500k` (500K)
+- Updated model inventory table with all installed models
+- Improved `mimir-watch` to show real GPU metrics (Active%, Power, Frequency)
+- Vision model supports screenshot analysis, GUI automation (96% success rate)
 
 **Session 34 Update**: Added comprehensive E2E testing documentation
 - Documented three execution methods: host, dev container, E2E container

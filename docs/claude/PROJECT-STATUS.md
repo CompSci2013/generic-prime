@@ -1,46 +1,57 @@
 # Project Status
 
-**Version**: 5.76
-**Timestamp**: 2025-12-30T08:09:00-05:00
-**Updated By**: Session 67 - Cline Integration & E2E Test Suite
+**Version**: 5.77
+**Timestamp**: 2026-01-01T01:49:00-05:00
+**Updated By**: Session 68 - Visual Testing Pipeline Implementation
 
 ---
 
-## Session 67 Summary: Cline AI Integration & E2E Test Suite
+## Session 68 Summary: Visual Testing & Self-Healing Pipeline
 
-**Status**: ✅ **COMPLETED** - Cline configured, E2E tests created
+**Status**: ✅ **COMPLETED** - Two parallel pipeline implementations created
 
 ### What Was Accomplished
 
-**Git Branch Cleanup**:
-1. ✅ Created missing upgrade branches from correct commit points:
-   - `feature/angular-16-upgrade` at commit 9065d29
-   - `feature/angular-17-upgrade` at commit 29c875b
-   - `feature/angular-18-upgrade` at commit c933fe7
-   - `feature/angular-19-upgrade` at commit f30bd4a
-   - `feature/angular-20-upgrade` at commit cc3e66e
+**MonsterWatch Protocol Update**:
+1. ✅ Updated `/monsterwatch` command (v3.0):
+   - Removed Gemini from dialog (now DEVELOPER ↔ CLAUDE only)
+   - Removed polling behavior
+   - Added ORIENTATION.md reading for Minilab infrastructure context
 
-**Cline AI Integration**:
-1. ✅ Created `.clinerules` - Project-specific configuration for Cline VS Code extension
-2. ✅ Updated `docs/guides/UI_Testing_Verification.md` with correct routes and selectors
-3. ✅ Created `docs/guides/CLINE-TROUBLESHOOTING-GUIDE.md` for self-diagnosis
-4. ✅ Fixed Cline's test failures (wrong route, wrong selectors)
+**Mimir Model Documentation**:
+1. ✅ Updated `docs/claude/ORIENTATION.md` with current model inventory (14 models)
+2. ✅ Documented model differences (instruct, MoE, vision vs coder)
+3. ✅ Ranked coding models: qwen3-coder > qwen2.5-coder > qwen3-vl > llama4-scout
 
-**E2E Test Suite**:
-1. ✅ Created `frontend/e2e/domains/automobile.spec.ts` - 15 tests across 6 phases
-2. ✅ Tests use correct `basic-results-table` selectors (not `results-table`)
-3. ✅ All tests passing (verified)
-4. ✅ Screenshot capture added to each test with URL bar injection
+**Visual Testing Pipeline (Claude's Implementation)**:
+1. ✅ Created `frontend/scripts/visual-pipeline/` with 8 TypeScript modules:
+   - `types.ts` - Bug, BugReport, PipelineState interfaces
+   - `config.ts` - Configuration, selectors, 13 screenshot steps, LLM prompts
+   - `screenshot-collector.ts` - Playwright automation for 13 steps
+   - `vision-analyzer.ts` - Real Ollama API integration with qwen3-vl
+   - `bug-report-generator.ts` - JSON + Markdown report generation
+   - `verification-runner.ts` - Selective re-testing of fixed bugs
+   - `orchestrator.ts` - Main pipeline coordinator
+   - `index.ts` - Module exports
+2. ✅ Created `.claude/commands/fix-visual-bugs.md` - Cline slash command for fixes
+3. ✅ Added npm scripts: `visual-pipeline`, `visual-collect`, `visual-analyze`, `visual-report`, `visual-verify`
+4. ✅ Added dependencies: `tsx`, `uuid`, `@types/uuid`
 
-**Vision Helper Script**:
-1. ✅ Created `scripts/describe-image.sh` - Uses Llama 4 Scout for image analysis
-2. ✅ Enables vision-to-code workflow (Scout describes → Qwen3 codes)
+**Cline's Parallel Implementation**:
+- Cline created `frontend/e2e/pipeline/` with 11 files (scaffold with stub AI)
+- Added `npm run pipeline` script
+- Both implementations coexist without conflict
 
-### Key Learnings
+### Key Technical Details
 
-- Main discover page uses `BasicResultsTable` (data-testid=`basic-results-table`)
-- Pop-out windows use `ResultsTable` (data-testid=`results-table`)
-- Correct route: `/automobiles/discover` (NOT `/discover/automobile`)
+**Pipeline Architecture**:
+- Vision Model: `qwen3-vl:235b-a22b-instruct-q4_K_M` on Mimir
+- Coder Model: `qwen3-coder:30b-a3b-q8_0` on Mimir
+- 13 screenshot steps covering all UI controls
+- Max 3 fix attempts per bug, 5 pipeline cycles
+- JSON + Markdown bug reports
+
+**Difference**: Claude's pipeline has real Ollama integration; Cline's is stubbed.
 
 ### Current Stack
 
@@ -55,9 +66,8 @@
 
 ### Branch
 
-- `feature/cline-experiment` (Cline integration work)
-- Based on `feature/angular-15-upgrade`
-- **Pushed to GitHub and GitLab**
+- `feature/cline-experiment`
+- Contains both Claude and Cline pipeline implementations
 
 ---
 
@@ -76,10 +86,10 @@
 |-------|------|----------|--------|
 | **1** | **Deploy v6.0.0 to K3s** | **HIGH** | **Pending** |
 | **2** | **Merge feature/angular-15-upgrade to main** | **HIGH** | **Ready** |
-| **3** | **IdP Phase 1: Deploy Keycloak Infrastructure** | **HIGH** | Pending |
+| **3** | **Test Visual Pipeline on Mimir** | **MEDIUM** | Pending |
 | 4 | Fix pop-out re-render bug | Medium | Deferred |
 | 5 | Fix Bug #7 (multiselect visual state) | Low | Pending |
 
 ---
 
-**Last Updated**: 2025-12-30T08:09:00-05:00 (Session 67 - Cline Integration)
+**Last Updated**: 2026-01-01T01:49:00-05:00 (Session 68 - Visual Pipeline)

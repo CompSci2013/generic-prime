@@ -247,3 +247,68 @@ All PrimeNG 20 breaking changes resolved:
 - Merge feature/angular-15-upgrade to main
 
 SESSION END
+
+CLAUDE:2026-01-01T00:32:44-05:00
+
+**MonsterWatch Session Started - Happy New Year 2026!**
+
+**Context Loaded**:
+- **MONSTER-LOG.md**: Session 67 complete (Cline AI Integration)
+- **MONSTER-CLAUDE.md**: Ready for next task
+- **ORIENTATION.md**: Minilab infrastructure understood
+- **Dialog History**: Session 66 ended with Angular 20 + PrimeNG 20 upgrade (v6.0.0)
+
+**Minilab Infrastructure**:
+- **Mimir** (192.168.0.100): Mac Studio M3 Ultra, LLM inference (Ollama API :11434, Open WebUI :3000)
+- **Thor** (192.168.0.244): K3s worker node, development host, working directory
+- **Loki** (192.168.0.110): K3s control plane, Traefik ingress
+
+**Current State**:
+- Branch: `feature/cline-experiment`
+- Version: 6.0.0 (Angular 20.3.15 + PrimeNG 20.4.0)
+- Build: Passing
+- Pending: Deploy v6.0.0 to K3s, merge to main
+
+**Awaiting instructions.**
+
+DEVELOPER:2026-01-01T00:34:16-05:00
+
+CLAUDE:2026-01-01T01:49:00-05:00
+
+**Session 68 Ending - MonsterWatch Shutdown Protocol**
+
+## Accomplished This Session
+
+**MonsterWatch Protocol Update**:
+1. ✅ Updated `/monsterwatch` command (v3.0) - Removed Gemini, removed polling
+2. ✅ Added ORIENTATION.md reading for Minilab infrastructure context
+
+**Mimir Model Documentation**:
+1. ✅ Updated ORIENTATION.md with current model inventory (14 models)
+2. ✅ Explained model differences (instruct, MoE, vision vs coder)
+3. ✅ Ranked coding models: qwen3-coder > qwen2.5-coder > qwen3-vl > llama4-scout
+
+**Visual Testing Pipeline (Claude's Implementation)**:
+1. ✅ Created `frontend/scripts/visual-pipeline/` with 8 TypeScript modules
+2. ✅ Real Ollama API integration with qwen3-vl vision model
+3. ✅ 13 screenshot steps covering all UI controls
+4. ✅ JSON + Markdown bug report generation
+5. ✅ Created `/fix-visual-bugs` Cline slash command
+6. ✅ Added npm scripts and dependencies
+
+**Comparison with Cline's Pipeline**:
+- Cline created parallel implementation in `frontend/e2e/pipeline/` (11 files)
+- Cline's AI integration is stubbed; Claude's has real Ollama calls
+- Both coexist: `npm run pipeline` (Cline) vs `npm run visual-pipeline` (Claude)
+
+## Pending
+
+- Test visual pipeline with Mimir
+- Deploy v6.0.0 to K3s
+- Merge feature/angular-15-upgrade to main
+
+## Notes for Next Session
+
+The visual testing pipeline is implementation-ready. Run `npm run visual-collect` first to verify Playwright screenshots work, then `npm run visual-pipeline` for full pipeline with Mimir's qwen3-vl.
+
+SESSION END

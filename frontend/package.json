@@ -17,7 +17,13 @@
     "lint:framework": "eslint \"src/framework/**/*.ts\"",
     "build:doc": "compodoc -p ./tsconfig.app.json -d documents",
     "compodoc": "http-server documents -p 4242 -c-1",
-    "dev": "concurrently \"ng serve --host 0.0.0.0 --port 4205\" \"npm run compodoc\""
+    "dev": "concurrently \"ng serve --host 0.0.0.0 --port 4205\" \"npm run compodoc\"",
+    "pipeline": "tsx scripts/run-pipeline.ts",
+    "visual-pipeline": "tsx scripts/visual-pipeline/orchestrator.ts",
+    "visual-collect": "tsx scripts/visual-pipeline/screenshot-collector.ts",
+    "visual-analyze": "tsx scripts/visual-pipeline/vision-analyzer.ts",
+    "visual-report": "tsx scripts/visual-pipeline/bug-report-generator.ts",
+    "visual-verify": "tsx scripts/visual-pipeline/verification-runner.ts"
   },
   "private": true,
   "dependencies": {
@@ -54,6 +60,9 @@
     "eslint": "^8.57.0",
     "http-server": "^14.1.1",
     "playwright": "^1.57.0",
-    "typescript": "~5.8.3"
+    "tsx": "^4.7.0",
+    "typescript": "~5.8.3",
+    "uuid": "^9.0.0",
+    "@types/uuid": "^9.0.0"
   }
 }

@@ -160,24 +160,3 @@ frontend/
 | PrimeNG | 20.4.0 |
 | TypeScript | 5.8.3 |
 | Playwright | 1.57.0 |
-
----
-
-## Slash Commands
-
-### `/bootstrap`
-Start a fresh cline chat session with project context. This command reads all project documentation files and provides a comprehensive overview of the Generic Discovery Framework.
-
-**For VS Code users:** 
-- Open the VS Code Cline panel (usually in the sidebar or bottom panel)
-- Type `/bootstrap` in the chat input field
-- Press Enter to execute the command
-
-When you type `/bootstrap`, cline will:
-1. Load the complete project documentation
-2. Provide a summary of the architecture and key components
-3. Explain the development workflow and testing procedures
-4. Show you how to access the frontend and backend services
-5. Give you guidance on running E2E tests
-
-This is the recommended starting point for any new session to ensure you have the most up-to-date project context.
