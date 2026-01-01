@@ -22,7 +22,7 @@ import { SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
@@ -50,7 +50,8 @@ import { NgClass, NgStyle } from '@angular/common';
     templateUrl: './results-table.component.html',
     styleUrls: ['./results-table.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [NgClass, FormsModule, InputTextModule, InputNumberModule, ButtonModule, DropdownModule, MultiSelectModule, CheckboxModule, TableModule, SharedModule, NgStyle, RippleModule, SkeletonModule]
+    standalone: true,
+    imports: [NgClass, FormsModule, InputTextModule, InputNumberModule, ButtonModule, SelectModule, MultiSelectModule, CheckboxModule, TableModule, SharedModule, NgStyle, RippleModule, SkeletonModule]
 })
 export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit {

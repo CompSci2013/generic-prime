@@ -1,7 +1,7 @@
 <div class="query-control-panel" [attr.data-testid]="environment.includeTestIds ? 'query-control-panel' : null">
   <!-- Compact Header Bar with Dropdown and Actions -->
   <div class="control-header">
-    <p-dropdown
+    <p-select
       #filterFieldDropdown
       [options]="filterFieldOptions"
       [(ngModel)]="selectedField"
@@ -15,7 +15,7 @@
       optionValue="value"
       styleClass="filter-field-dropdown"
       [attr.data-testid]="environment.includeTestIds ? 'filter-field-dropdown' : null">
-    </p-dropdown>
+    </p-select>
     <p-button
       label="Clear All"
       icon="pi pi-times"

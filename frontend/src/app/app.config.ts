@@ -4,7 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
-import Lara from '@primeng/themes/lara';
+import Lara from '@primeuix/themes/lara';
 
 import { routes } from './app.routes';
 import { GlobalErrorHandler } from '../framework/services/global-error.handler';
@@ -16,18 +16,18 @@ import { UiKitModule } from '../framework/ui-kit/ui-kit.module';
 /**
  * Application Configuration (Standalone Bootstrap)
  *
- * Configures the Generic-Prime application using Angular 19+ standalone APIs.
+ * Configures the Generic-Prime application using Angular 20+ standalone APIs.
  *
- * Angular 19 Updates:
+ * Angular 20 Updates:
  * - provideAnimationsAsync: Async animations for better performance
- * - providePrimeNG: PrimeNG 19 theme configuration with design tokens
- * - Lara theme with dark preset (matches previous lara-dark-blue)
+ * - providePrimeNG: PrimeNG 20 theme configuration with design tokens
+ * - Lara theme from @primeuix/themes (PrimeNG 20 unified theming)
  *
  * Providers:
  * - provideRouter: Configures application routing
  * - provideHttpClient: Enables HTTP communication
  * - provideAnimationsAsync: Enables async Angular animations for PrimeNG
- * - providePrimeNG: Configures PrimeNG 19 theming
+ * - providePrimeNG: Configures PrimeNG 20 theming
  * - MessageService: PrimeNG toast/message service
  * - GlobalErrorHandler: Application-wide error handling
  * - DOMAIN_CONFIG: Domain configuration factory for automobile domain
