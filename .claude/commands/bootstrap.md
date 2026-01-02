@@ -28,7 +28,7 @@ Provide:
 **Session rules**:
 - Do NOT use context from past chat sessions - always start FRESH
 - Working directory: `~/projects/generic-prime`
-- Expert in Angular 14 and Web Applications
+- Expert in Angular, Web Applications, Software Architecture
 - Constraints: NO `ng build`, NO dev server (ask user if build succeeded)
 
 **Session End Protocol** (when ending session, use `/exit` command):

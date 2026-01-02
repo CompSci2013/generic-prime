@@ -6,32 +6,44 @@
 
 ## Directive
 
-Execute the following 3 steps to properly end the session:
+Execute the following steps to properly end the session:
 
-1. **Update PROJECT-STATUS.md**
-   - Bump version number (increment decimal)
-   - Update timestamp to current session time
-   - Document what was accomplished
+### 1. Update Documentation
+
+1. **Update `docs/claude/PROJECT-STATUS.md`**
+   - Bump the version number
+   - Update the timestamp to the current time. **CRITICAL**: Use `date -Iseconds` to get the timestamp.
+   - Summarize the "Current State" and "Completed Work" for this session
    - Note any new blockers or decisions
 
-2. **Update NEXT-STEPS.md**
-   - Document the ONE immediate action for the next session
+2. **Update `docs/claude/NEXT-STEPS.md`**
+   - Clear out completed tasks
+   - Define the *exact* starting task for the next session
    - Include reproduction steps if it's a bug
    - Reference related files
 
-3. **Commit all changes to `docs/claude/` directory**
-   - Use descriptive commit message
-   - Example: `git commit -m "docs: session summary - Added agriculture domain"`
-   - Git history serves as the historical record (use `git log` to view past versions)
+---
+
+### 2. Commit Changes (Two Commits)
+
+3. **First commit** - Documentation updates:
+   - Run `git add docs/claude/`
+   - Commit: `docs: session [Version] summary - [Brief Description]`
+
+4. **Second commit** - Remaining changes (if any):
+   - Run `git add .`
+   - Review staged files with `git status`
+   - Commit with appropriate message based on changes (e.g., `feat:`, `fix:`, `chore:`)
+   - Skip if no remaining changes
 
 ---
 
-## After All 3 Steps Complete
+### 3. Final Message
 
-Provide:
-1. **Summary** of what was accomplished this session
-2. **Next session action**: What immediate work is needed?
-3. **Confirmation**: All changes committed to git
+5. **Provide**:
+   - Summary of what was accomplished this session
+   - Next session action: What immediate work is needed?
+   - Confirmation: All changes committed to git
 
 ---
 
