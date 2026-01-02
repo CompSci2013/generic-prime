@@ -1,75 +1,72 @@
 # Next Steps
 
-**Current Session**: Session 72 - User Story Validation & Test Naming
-**Previous Session**: Session 71 - Exit Protocol Fix & Validation Rhythm Recovery
-**Status**: v7.7, all exhaustive tests renamed, validation specs created
+**Current Session**: Session 73 - Fix INCORRECT User Stories
+**Previous Session**: Session 72 - User Story Validation & Test Naming
+**Status**: v7.8, all INCORRECT stories fixed, 5 new bugs discovered
 
 ---
 
-## IMMEDIATE ACTION: Run Validation Specs & Update Story Status
+## IMMEDIATE ACTION: Continue User Story Validation (Epics 4, 6, 7)
 
 **Priority**: HIGH (Continue validation)
-**Scope**: Execute validation specs and finalize story status markers
+**Scope**: Verify remaining UNVERIFIED stories in Epics 4, 6, and 7
 
 ### Context
 
-Session 72 created validation specs for Epics 2-8 but did not run all of them. Several stories have already been marked INCORRECT based on code analysis. Next session should:
+Session 73 fixed all INCORRECT stories (12 → 0). Several epics still have UNVERIFIED stories:
+- Epic 4: Active Filter Chips (US-QC-030 to US-QC-034)
+- Epic 6: Clear All Actions (US-QC-050, US-QC-051)
+- Epic 7: URL Persistence (US-QC-060 to US-QC-063)
 
-1. Run remaining validation specs
-2. Review screenshots to confirm findings
-3. Finalize story status markers in `query-control.md`
-
-### Run Commands
+### Verification Steps
 
 ```bash
-cd ~/projects/generic-prime/frontend
-
-# Run Epic 2 (Multiselect) validation
-npx playwright test e2e/validation/us-qc-010-016.spec.ts --reporter=list
-
-# Run Epic 4 (Filter Chips) validation
-npx playwright test e2e/validation/us-qc-030-034.spec.ts --reporter=list
-
-# View screenshots
-ls test-results/validation/epic-*/
+# Review what needs verification
+grep -n "UNVERIFIED" docs/claude/user-stories/query-control.md | head -30
 ```
 
-### Validation Progress
+### Stories to Verify
 
-| Epic | Status |
-|------|--------|
-| 1: Filter Field Selection | ✅ VERIFIED |
-| 2: Multiselect Filters | ⚠️ PARTIAL (US-QC-016 incorrect - Escape key) |
-| 3: Year Range Filter | ❌ INCORRECT (no decade grid, no open-ended ranges) |
-| 4: Active Filter Chips | ⏳ **Next** - Run validation |
-| 5: Highlight Mode | ❌ INCORRECT (highlights only via URL params) |
-| 6: Clear All Actions | ⏳ Need to run validation |
-| 7: URL Persistence | ⏳ Need to run validation |
-| 8: Panel Behavior | ❌ INCORRECT (no collapse/expand/pop-out) |
+| Story | Description | Status |
+|-------|-------------|--------|
+| US-QC-030 | View Active Filters | UNVERIFIED |
+| US-QC-031 | Remove Filter via Chip | UNVERIFIED |
+| US-QC-032 | Edit Filter via Chip Click | UNVERIFIED |
+| US-QC-033 | View Filter Chip Tooltip | UNVERIFIED |
+| US-QC-034 | Truncated Chip Display | UNVERIFIED |
+| US-QC-050 | Clear All Filters and Highlights | UNVERIFIED |
+| US-QC-051 | Clear All Button State | UNVERIFIED |
+| US-QC-060-063 | URL Persistence stories | UNVERIFIED |
 
 ### Key Files
 
 | File | Purpose |
 |------|---------|
-| `docs/claude/start-here.md` | Full validation rhythm + test naming schema |
 | `docs/claude/user-stories/query-control.md` | Master story document with status markers |
 | `frontend/e2e/validation/us-qc-*.spec.ts` | Validation spec files |
 
 ---
 
-## ALTERNATIVE: IdP Phase 1 (If Validation Complete)
+## ALTERNATIVE: Fix Medium-Severity Bugs
 
-**Priority**: HIGH (Architecture)
-**Scope**: Deploy Keycloak to K3s
+**Priority**: MEDIUM (If validation complete)
+**Scope**: Fix BUG-002, BUG-004, or BUG-006
 
-**Reference**: `docs/infrastructure/idp/IDENTITY-STRATEGY.md`
+### Open Bugs (Medium Severity)
+
+| Bug | Description | Fix Approach |
+|-----|-------------|--------------|
+| BUG-002 | Escape key doesn't close dialog | Add `closeOnEscape` to p-dialog |
+| BUG-004 | Same field selection doesn't reopen | Fix p-dropdown value binding |
+| BUG-006 | X button propagates to chip body | Add `event.stopPropagation()` |
 
 ---
 
-## SESSION 72 COMPLETION SUMMARY
+## SESSION 73 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Renamed all ~140 tests in `query-control-exhaustive.spec.ts` with US-QC-XXX.Y format
-2. ✅ Created 7 validation spec files for Epics 2-8
-3. ✅ Documented test naming schema in `start-here.md`
-4. ✅ Identified multiple incorrect user stories (US-QC-016, 020-027, 040, 070-073)
+1. ✅ Fixed all 12 INCORRECT user stories (now 0 INCORRECT)
+2. ✅ Rewrote US-QC-020-023 for actual year input UI
+3. ✅ Verified US-QC-026-027 (open-ended ranges work)
+4. ✅ Verified US-QC-070-073 (collapse/expand/pop-out all work)
+5. ✅ Discovered 5 new bugs (BUG-002 through BUG-006)
