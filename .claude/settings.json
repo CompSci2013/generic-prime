@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch",
+      "Edit(frontend/src/**)",
+      "Read(frontend/src/**)",
+      "Grep",
+      "Glob"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/scripts/fix-check.sh",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}
