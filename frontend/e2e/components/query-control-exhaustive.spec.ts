@@ -48,12 +48,12 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 2.1 Dropdown Opening (7 tests)
+  // 2.1 Dropdown Opening (7 tests) → US-QC-001: View Available Filter Fields
   // ---------------------------------------------------------------------------
 
-  test.describe('2.1 Dropdown Opening', () => {
-    test('2.1.1 Click dropdown trigger - panel opens', async ({ page }) => {
-      console.log('[TEST] 2.1.1: Click dropdown trigger');
+  test.describe('US-QC-001: Dropdown Opening', () => {
+    test('US-QC-001.1 Click dropdown trigger - panel opens', async ({ page }) => {
+      console.log('[TEST] US-QC-001.1: Click dropdown trigger');
 
       const dropdown = page.locator('.query-control-panel .p-dropdown').first();
       await dropdown.click();
@@ -63,8 +63,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Dropdown panel opened');
     });
 
-    test('2.1.2 Click dropdown when open - panel closes', async ({ page }) => {
-      console.log('[TEST] 2.1.2: Click dropdown when open to close');
+    test('US-QC-001.2 Click dropdown when open - panel closes', async ({ page }) => {
+      console.log('[TEST] US-QC-001.2: Click dropdown when open to close');
 
       // Open dropdown
       await openFilterDropdown(page);
@@ -80,8 +80,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Dropdown panel closed on second click');
     });
 
-    test('2.1.3 Press Escape when dropdown open - panel closes', async ({ page }) => {
-      console.log('[TEST] 2.1.3: Press Escape to close dropdown');
+    test('US-QC-001.3 Press Escape when dropdown open - panel closes', async ({ page }) => {
+      console.log('[TEST] US-QC-001.3: Press Escape to close dropdown');
 
       await openFilterDropdown(page);
       const panel = page.locator('.p-dropdown-panel:visible .p-dropdown-items').first();
@@ -94,8 +94,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Dropdown closed on Escape');
     });
 
-    test('2.1.4 Click outside dropdown when open - panel closes', async ({ page }) => {
-      console.log('[TEST] 2.1.4: Click outside dropdown to close');
+    test('US-QC-001.4 Click outside dropdown when open - panel closes', async ({ page }) => {
+      console.log('[TEST] US-QC-001.4: Click outside dropdown to close');
 
       await openFilterDropdown(page);
       const panel = page.locator('.p-dropdown-panel:visible .p-dropdown-items').first();
@@ -118,8 +118,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Dropdown closed on outside click');
     });
 
-    test('2.1.5 Tab to dropdown and press Enter - panel opens', async ({ page }) => {
-      console.log('[TEST] 2.1.5: Tab to dropdown + Enter to open');
+    test('US-QC-001.5 Tab to dropdown and press Enter - panel opens', async ({ page }) => {
+      console.log('[TEST] US-QC-001.5: Tab to dropdown + Enter to open');
 
       // Try to find and focus the dropdown directly
       const dropdown = page.locator('.query-control-panel .p-dropdown').first();
@@ -136,8 +136,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       }
     });
 
-    test('2.1.6 Tab to dropdown and press Space - panel opens', async ({ page }) => {
-      console.log('[TEST] 2.1.6: Tab to dropdown + Space to open');
+    test('US-QC-001.6 Tab to dropdown and press Space - panel opens', async ({ page }) => {
+      console.log('[TEST] US-QC-001.6: Tab to dropdown + Space to open');
 
       const dropdown = page.locator('.query-control-panel .p-dropdown').first();
       await dropdown.focus();
@@ -150,8 +150,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log(`[TEST] Dropdown visible after Space: ${isVisible}`);
     });
 
-    test('2.1.7 Tab to dropdown and press ArrowDown - panel opens', async ({ page }) => {
-      console.log('[TEST] 2.1.7: Tab to dropdown + ArrowDown to open');
+    test('US-QC-001.7 Tab to dropdown and press ArrowDown - panel opens', async ({ page }) => {
+      console.log('[TEST] US-QC-001.7: Tab to dropdown + ArrowDown to open');
 
       const dropdown = page.locator('.query-control-panel .p-dropdown').first();
       await dropdown.focus();
@@ -165,12 +165,12 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 2.2 Dropdown Options Display (7 tests)
+  // 2.2 Dropdown Options Display (7 tests) → US-QC-001: View Available Filter Fields
   // ---------------------------------------------------------------------------
 
-  test.describe('2.2 Dropdown Options Display', () => {
-    test('2.2.1 Dropdown shows "Manufacturer" option', async ({ page }) => {
-      console.log('[TEST] 2.2.1: Verify Manufacturer option exists');
+  test.describe('US-QC-001: Dropdown Options Display', () => {
+    test('US-QC-001.8 Dropdown shows "Manufacturer" option', async ({ page }) => {
+      console.log('[TEST] US-QC-001.8: Verify Manufacturer option exists');
 
       await openFilterDropdown(page);
       const options = await getDropdownOptions(page);
@@ -179,8 +179,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log(`[TEST] SUCCESS: Found Manufacturer in options: ${options.join(', ')}`);
     });
 
-    test('2.2.2 Dropdown shows "Model" option', async ({ page }) => {
-      console.log('[TEST] 2.2.2: Verify Model option exists');
+    test('US-QC-001.9 Dropdown shows "Model" option', async ({ page }) => {
+      console.log('[TEST] US-QC-001.9: Verify Model option exists');
 
       await openFilterDropdown(page);
       const options = await getDropdownOptions(page);
@@ -189,8 +189,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Found Model option');
     });
 
-    test('2.2.3 Dropdown shows "Body Class" option', async ({ page }) => {
-      console.log('[TEST] 2.2.3: Verify Body Class option exists');
+    test('US-QC-001.10 Dropdown shows "Body Class" option', async ({ page }) => {
+      console.log('[TEST] US-QC-001.10: Verify Body Class option exists');
 
       await openFilterDropdown(page);
       const options = await getDropdownOptions(page);
@@ -199,8 +199,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Found Body Class option');
     });
 
-    test('2.2.4 Dropdown shows "Year" option (or "Year Range")', async ({ page }) => {
-      console.log('[TEST] 2.2.4: Verify Year option exists');
+    test('US-QC-001.11 Dropdown shows "Year" option (or "Year Range")', async ({ page }) => {
+      console.log('[TEST] US-QC-001.11: Verify Year option exists');
 
       await openFilterDropdown(page);
       const options = await getDropdownOptions(page);
@@ -209,8 +209,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Found Year option');
     });
 
-    test('2.2.5 Options appear in expected order', async ({ page }) => {
-      console.log('[TEST] 2.2.5: Verify options order');
+    test('US-QC-001.12 Options appear in expected order', async ({ page }) => {
+      console.log('[TEST] US-QC-001.12: Verify options order');
 
       await openFilterDropdown(page);
       const options = await getDropdownOptions(page);
@@ -221,8 +221,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       expect(options.length).toBeGreaterThanOrEqual(4);
     });
 
-    test('2.2.6 Each option has correct label text', async ({ page }) => {
-      console.log('[TEST] 2.2.6: Verify option labels');
+    test('US-QC-001.13 Each option has correct label text', async ({ page }) => {
+      console.log('[TEST] US-QC-001.13: Verify option labels');
 
       await openFilterDropdown(page);
       const options = await getDropdownOptions(page);
@@ -234,8 +234,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: All options have valid label text');
     });
 
-    test('2.2.7 No duplicate options appear', async ({ page }) => {
-      console.log('[TEST] 2.2.7: Verify no duplicate options');
+    test('US-QC-001.14 No duplicate options appear', async ({ page }) => {
+      console.log('[TEST] US-QC-001.14: Verify no duplicate options');
 
       await openFilterDropdown(page);
       const options = await getDropdownOptions(page);
@@ -247,12 +247,12 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 2.3 Dropdown Filtering/Search (8 tests)
+  // 2.3 Dropdown Filtering/Search (8 tests) → US-QC-002: Search for Filter Field
   // ---------------------------------------------------------------------------
 
-  test.describe('2.3 Dropdown Filtering (Search)', () => {
-    test('2.3.1 Type "man" - shows Manufacturer, hides others without "man"', async ({ page }) => {
-      console.log('[TEST] 2.3.1: Filter dropdown with "man"');
+  test.describe('US-QC-002: Dropdown Search', () => {
+    test('US-QC-002.1 Type "man" - shows Manufacturer, hides others without "man"', async ({ page }) => {
+      console.log('[TEST] US-QC-002.1: Filter dropdown with "man"');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -270,8 +270,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Manufacturer visible after filter');
     });
 
-    test('2.3.2 Type "mod" - shows Model, hides others', async ({ page }) => {
-      console.log('[TEST] 2.3.2: Filter dropdown with "mod"');
+    test('US-QC-002.2 Type "mod" - shows Model, hides others', async ({ page }) => {
+      console.log('[TEST] US-QC-002.2: Filter dropdown with "mod"');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -283,8 +283,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Model visible after filter');
     });
 
-    test('2.3.3 Type "bod" - shows Body Class', async ({ page }) => {
-      console.log('[TEST] 2.3.3: Filter dropdown with "bod"');
+    test('US-QC-002.3 Type "bod" - shows Body Class', async ({ page }) => {
+      console.log('[TEST] US-QC-002.3: Filter dropdown with "bod"');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -296,8 +296,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Body Class visible after filter');
     });
 
-    test('2.3.4 Type "year" - shows Year option', async ({ page }) => {
-      console.log('[TEST] 2.3.4: Filter dropdown with "year"');
+    test('US-QC-002.4 Type "year" - shows Year option', async ({ page }) => {
+      console.log('[TEST] US-QC-002.4: Filter dropdown with "year"');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -309,8 +309,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Year visible after filter');
     });
 
-    test('2.3.5 Type "xyz" (no match) - shows empty or "no results"', async ({ page }) => {
-      console.log('[TEST] 2.3.5: Filter with non-matching "xyz"');
+    test('US-QC-002.5 Type "xyz" (no match) - shows empty or "no results"', async ({ page }) => {
+      console.log('[TEST] US-QC-002.5: Filter with non-matching "xyz"');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -325,8 +325,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       // May be 0 or show "no results" message
     });
 
-    test('2.3.6 Clear filter text - all options reappear', async ({ page }) => {
-      console.log('[TEST] 2.3.6: Clear filter to restore options');
+    test('US-QC-002.6 Clear filter text - all options reappear', async ({ page }) => {
+      console.log('[TEST] US-QC-002.6: Clear filter to restore options');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -344,8 +344,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log(`[TEST] SUCCESS: All ${options.length} options restored`);
     });
 
-    test('2.3.7 Type uppercase "MANUFACTURER" - case-insensitive match', async ({ page }) => {
-      console.log('[TEST] 2.3.7: Case-insensitive filter');
+    test('US-QC-002.7 Type uppercase "MANUFACTURER" - case-insensitive match', async ({ page }) => {
+      console.log('[TEST] US-QC-002.7: Case-insensitive filter');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -357,8 +357,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Case-insensitive match works');
     });
 
-    test('2.3.8 Type with leading/trailing spaces - still matches', async ({ page }) => {
-      console.log('[TEST] 2.3.8: Filter with spaces');
+    test('US-QC-002.8 Type with leading/trailing spaces - still matches', async ({ page }) => {
+      console.log('[TEST] US-QC-002.8: Filter with spaces');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -373,12 +373,12 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 2.4 Dropdown Selection - Mouse (6 tests)
+  // 2.4 Dropdown Selection - Mouse (6 tests) → US-QC-003: Select Field to Open Dialog
   // ---------------------------------------------------------------------------
 
-  test.describe('2.4 Dropdown Selection - Mouse', () => {
-    test('2.4.1 Click "Manufacturer" option - opens Manufacturer dialog', async ({ page, logger }) => {
-      console.log('[TEST] 2.4.1: Click Manufacturer opens dialog');
+  test.describe('US-QC-003: Dropdown Selection - Mouse', () => {
+    test('US-QC-003.1 Click "Manufacturer" option - opens Manufacturer dialog', async ({ page, logger }) => {
+      console.log('[TEST] US-QC-003.1: Click Manufacturer opens dialog');
 
       await selectFilterByClick(page, 'Manufacturer');
 
@@ -391,8 +391,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Manufacturer dialog opened');
     });
 
-    test('2.4.2 Click "Model" option - opens Model dialog', async ({ page }) => {
-      console.log('[TEST] 2.4.2: Click Model opens dialog');
+    test('US-QC-003.2 Click "Model" option - opens Model dialog', async ({ page }) => {
+      console.log('[TEST] US-QC-003.2: Click Model opens dialog');
 
       await selectFilterByClick(page, 'Model');
 
@@ -401,8 +401,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Model dialog opened');
     });
 
-    test('2.4.3 Click "Body Class" option - opens Body Class dialog', async ({ page }) => {
-      console.log('[TEST] 2.4.3: Click Body Class opens dialog');
+    test('US-QC-003.3 Click "Body Class" option - opens Body Class dialog', async ({ page }) => {
+      console.log('[TEST] US-QC-003.3: Click Body Class opens dialog');
 
       await openFilterDropdown(page);
       const bodyOption = page.locator('.query-control-panel .p-dropdown-items li').filter({ hasText: /Body/i });
@@ -414,8 +414,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Body Class dialog opened');
     });
 
-    test('2.4.4 Click "Year" option - opens Year Range dialog', async ({ page }) => {
-      console.log('[TEST] 2.4.4: Click Year opens year range dialog');
+    test('US-QC-003.4 Click "Year" option - opens Year Range dialog', async ({ page }) => {
+      console.log('[TEST] US-QC-003.4: Click Year opens year range dialog');
 
       await openFilterDropdown(page);
       const yearOption = page.locator('.query-control-panel .p-dropdown-items li').filter({ hasText: /Year/i });
@@ -429,8 +429,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Year dialog opened');
     });
 
-    test('2.4.5 After selection, dropdown closes', async ({ page }) => {
-      console.log('[TEST] 2.4.5: Dropdown closes after selection');
+    test('US-QC-003.5 After selection, dropdown closes', async ({ page }) => {
+      console.log('[TEST] US-QC-003.5: Dropdown closes after selection');
 
       await selectFilterByClick(page, 'Manufacturer');
 
@@ -441,8 +441,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Dropdown closed after selection');
     });
 
-    test('2.4.6 After selection, dropdown placeholder resets', async ({ page }) => {
-      console.log('[TEST] 2.4.6: Dropdown placeholder resets');
+    test('US-QC-003.6 After selection, dropdown placeholder resets', async ({ page }) => {
+      console.log('[TEST] US-QC-003.6: Dropdown placeholder resets');
 
       await selectFilterByClick(page, 'Manufacturer');
 
@@ -459,12 +459,12 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 2.5 Dropdown Selection - Keyboard (no filter) (8 tests)
+  // 2.5 Dropdown Selection - Keyboard (no filter) (8 tests) → US-QC-003: Select Field to Open Dialog
   // ---------------------------------------------------------------------------
 
-  test.describe('2.5 Dropdown Selection - Keyboard (no filter)', () => {
-    test('2.5.1 ArrowDown once - first option highlighted', async ({ page }) => {
-      console.log('[TEST] 2.5.1: ArrowDown highlights first option');
+  test.describe('US-QC-003: Dropdown Selection - Keyboard (no filter)', () => {
+    test('US-QC-003.7 ArrowDown once - first option highlighted', async ({ page }) => {
+      console.log('[TEST] US-QC-003.7: ArrowDown highlights first option');
 
       await openFilterDropdown(page);
       await page.keyboard.press('ArrowDown');
@@ -475,8 +475,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: First option highlighted');
     });
 
-    test('2.5.2 ArrowDown twice - second option highlighted', async ({ page }) => {
-      console.log('[TEST] 2.5.2: Two ArrowDown presses');
+    test('US-QC-003.8 ArrowDown twice - second option highlighted', async ({ page }) => {
+      console.log('[TEST] US-QC-003.8: Two ArrowDown presses');
 
       await openFilterDropdown(page);
       await page.keyboard.press('ArrowDown');
@@ -488,8 +488,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log(`[TEST] Highlighted after 2 ArrowDown: ${text?.trim()}`);
     });
 
-    test('2.5.3 ArrowUp after ArrowDown - previous option highlighted', async ({ page }) => {
-      console.log('[TEST] 2.5.3: ArrowUp after ArrowDown');
+    test('US-QC-003.9 ArrowUp after ArrowDown - previous option highlighted', async ({ page }) => {
+      console.log('[TEST] US-QC-003.9: ArrowUp after ArrowDown');
 
       await openFilterDropdown(page);
       await page.keyboard.press('ArrowDown');
@@ -503,8 +503,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       expect(firstText).not.toBe(secondText);
     });
 
-    test('2.5.4 ArrowDown at last option - stays on last (or wraps)', async ({ page }) => {
-      console.log('[TEST] 2.5.4: ArrowDown at last option');
+    test('US-QC-003.10 ArrowDown at last option - stays on last (or wraps)', async ({ page }) => {
+      console.log('[TEST] US-QC-003.10: ArrowDown at last option');
 
       await openFilterDropdown(page);
       const options = await getDropdownOptions(page);
@@ -519,8 +519,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log(`[TEST] Highlighted after max ArrowDown: ${highlighted?.trim()}`);
     });
 
-    test('2.5.5 ArrowUp at first option - stays on first (or wraps)', async ({ page }) => {
-      console.log('[TEST] 2.5.5: ArrowUp at first option');
+    test('US-QC-003.11 ArrowUp at first option - stays on first (or wraps)', async ({ page }) => {
+      console.log('[TEST] US-QC-003.11: ArrowUp at first option');
 
       await openFilterDropdown(page);
       await page.keyboard.press('ArrowDown'); // Go to first
@@ -530,8 +530,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log(`[TEST] Highlighted after ArrowUp at first: ${highlighted?.trim()}`);
     });
 
-    test('2.5.6 Enter on highlighted option - opens correct dialog', async ({ page }) => {
-      console.log('[TEST] 2.5.6: Enter on highlighted option');
+    test('US-QC-003.12 Enter on highlighted option - opens correct dialog', async ({ page }) => {
+      console.log('[TEST] US-QC-003.12: Enter on highlighted option');
 
       await selectFilterByKeyboard(page, 'Manufacturer');
 
@@ -544,8 +544,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log(`[TEST] SUCCESS: Dialog opened with title "${title}"`);
     });
 
-    test('2.5.7 Space on highlighted option - opens correct dialog', async ({ page }) => {
-      console.log('[TEST] 2.5.7: Space on highlighted option');
+    test('US-QC-003.13 Space on highlighted option - opens correct dialog', async ({ page }) => {
+      console.log('[TEST] US-QC-003.13: Space on highlighted option');
 
       await openFilterDropdown(page);
       await page.keyboard.press('ArrowDown'); // Highlight first option
@@ -557,8 +557,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Dialog opened via Space key');
     });
 
-    test('2.5.8 Escape during navigation - closes dropdown without selection', async ({ page }) => {
-      console.log('[TEST] 2.5.8: Escape during navigation');
+    test('US-QC-003.14 Escape during navigation - closes dropdown without selection', async ({ page }) => {
+      console.log('[TEST] US-QC-003.14: Escape during navigation');
 
       await openFilterDropdown(page);
       await page.keyboard.press('ArrowDown');
@@ -577,12 +577,12 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 2.6 Dropdown Selection - Keyboard (with filter active) [Bug #15 Regression]
+  // 2.6 Dropdown Selection - Keyboard (with filter active) [BUG-001 Regression] → US-QC-003: Select Field to Open Dialog
   // ---------------------------------------------------------------------------
 
-  test.describe('2.6 Dropdown Selection - Keyboard (with filter) [Bug #15]', () => {
-    test('2.6.1 [R] Type "y" + ArrowDown to "Year" + Enter - opens Year dialog (not Model)', async ({ page }) => {
-      console.log('[TEST] 2.6.1: Bug #15 regression - "y" filter + Year selection');
+  test.describe('US-QC-003: Dropdown Selection - Keyboard (with filter) [BUG-001]', () => {
+    test('US-QC-003.15 [R] Type "y" + ArrowDown to "Year" + Enter - opens Year dialog (not Model)', async ({ page }) => {
+      console.log('[TEST] US-QC-003.15: BUG-001 regression - "y" filter + Year selection');
 
       await openFilterDropdown(page);
 
@@ -607,8 +607,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Year dialog opened (not Model)');
     });
 
-    test('2.6.2 [R] Type "y" + ArrowDown to "Year" + Space - opens Year dialog', async ({ page }) => {
-      console.log('[TEST] 2.6.2: Bug #15 - "y" filter + Space');
+    test('US-QC-003.16 [R] Type "y" + ArrowDown to "Year" + Space - opens Year dialog', async ({ page }) => {
+      console.log('[TEST] US-QC-003.16: BUG-001 - "y" filter + Space');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -624,8 +624,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log(`[TEST] SUCCESS: Dialog "${dialogTitle}" opened via Space`);
     });
 
-    test('2.6.3 [R] Type "b" + ArrowDown to "Body Class" + Enter - opens Body Class dialog', async ({ page }) => {
-      console.log('[TEST] 2.6.3: "b" filter + Body Class selection');
+    test('US-QC-003.17 [R] Type "b" + ArrowDown to "Body Class" + Enter - opens Body Class dialog', async ({ page }) => {
+      console.log('[TEST] US-QC-003.17: "b" filter + Body Class selection');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -643,8 +643,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log(`[TEST] SUCCESS: Dialog "${dialogTitle}" opened`);
     });
 
-    test('2.6.4 [R] Type "m" + ArrowDown to "Manufacturer" + Enter - opens Manufacturer dialog', async ({ page }) => {
-      console.log('[TEST] 2.6.4: "m" filter + Manufacturer selection');
+    test('US-QC-003.18 [R] Type "m" + ArrowDown to "Manufacturer" + Enter - opens Manufacturer dialog', async ({ page }) => {
+      console.log('[TEST] US-QC-003.18: "m" filter + Manufacturer selection');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -668,8 +668,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log(`[TEST] Dialog opened: "${dialogTitle}"`);
     });
 
-    test('2.6.5 [R] Type "m" + ArrowDown to "Model" + Enter - opens Model dialog', async ({ page }) => {
-      console.log('[TEST] 2.6.5: "m" filter + Model selection');
+    test('US-QC-003.19 [R] Type "m" + ArrowDown to "Model" + Enter - opens Model dialog', async ({ page }) => {
+      console.log('[TEST] US-QC-003.19: "m" filter + Model selection');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -685,8 +685,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log(`[TEST] SUCCESS: Model dialog opened`);
     });
 
-    test('2.6.6 Filter then clear, keyboard nav still works', async ({ page }) => {
-      console.log('[TEST] 2.6.6: Filter, clear, then keyboard nav');
+    test('US-QC-003.20 Filter then clear, keyboard nav still works', async ({ page }) => {
+      console.log('[TEST] US-QC-003.20: Filter, clear, then keyboard nav');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -708,8 +708,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Keyboard nav works after filter clear');
     });
 
-    test('2.6.7 Rapid typing + immediate Enter - correct option selected', async ({ page }) => {
-      console.log('[TEST] 2.6.7: Rapid typing test');
+    test('US-QC-003.21 Rapid typing + immediate Enter - correct option selected', async ({ page }) => {
+      console.log('[TEST] US-QC-003.21: Rapid typing test');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -725,8 +725,8 @@ test.describe('Section 2: Query Control - Filter Dropdown', () => {
       console.log('[TEST] SUCCESS: Rapid typing handled correctly');
     });
 
-    test('2.6.8 Backspace to clear filter during nav - options restore correctly', async ({ page }) => {
-      console.log('[TEST] 2.6.8: Backspace to clear filter');
+    test('US-QC-003.22 Backspace to clear filter during nav - options restore correctly', async ({ page }) => {
+      console.log('[TEST] US-QC-003.22: Backspace to clear filter');
 
       await openFilterDropdown(page);
       const filterInput = page.locator('.query-control-panel .p-dropdown-filter');
@@ -757,12 +757,12 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 3.1 Manufacturer Dialog - Opening (8 tests)
+  // 3.1 Manufacturer Dialog - Opening (8 tests) → US-QC-010: View Multiselect Options
   // ---------------------------------------------------------------------------
 
-  test.describe('3.1 Manufacturer Dialog - Opening', () => {
-    test('3.1.1 Dialog opens when Manufacturer selected from dropdown', async ({ page }) => {
-      console.log('[TEST] 3.1.1: Manufacturer dialog opens');
+  test.describe('US-QC-010: Manufacturer Dialog - Opening', () => {
+    test('US-QC-010.1 Dialog opens when Manufacturer selected from dropdown', async ({ page }) => {
+      console.log('[TEST] US-QC-010.1: Manufacturer dialog opens');
 
       await selectFilterByClick(page, 'Manufacturer');
 
@@ -771,8 +771,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Dialog opened');
     });
 
-    test('3.1.2 Dialog has correct title "Select Manufacturer"', async ({ page }) => {
-      console.log('[TEST] 3.1.2: Verify dialog title');
+    test('US-QC-010.2 Dialog has correct title "Select Manufacturer"', async ({ page }) => {
+      console.log('[TEST] US-QC-010.2: Verify dialog title');
 
       await selectFilterByClick(page, 'Manufacturer');
 
@@ -781,8 +781,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] SUCCESS: Dialog title is "${title}"`);
     });
 
-    test('3.1.3 Dialog has subtitle explaining selection', async ({ page }) => {
-      console.log('[TEST] 3.1.3: Verify dialog subtitle');
+    test('US-QC-010.3 Dialog has subtitle explaining selection', async ({ page }) => {
+      console.log('[TEST] US-QC-010.3: Verify dialog subtitle');
 
       await selectFilterByClick(page, 'Manufacturer');
 
@@ -790,8 +790,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] Dialog subtitle: "${subtitle?.trim()}"`);
     });
 
-    test('3.1.4 Dialog shows loading spinner initially', async ({ page }) => {
-      console.log('[TEST] 3.1.4: Check for loading spinner');
+    test('US-QC-010.4 Dialog shows loading spinner initially', async ({ page }) => {
+      console.log('[TEST] US-QC-010.4: Check for loading spinner');
 
       // Open dialog and immediately check for spinner
       const dropdown = page.locator('.query-control-panel .p-dropdown').first();
@@ -805,8 +805,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] Loading spinner visible: ${wasVisible}`);
     });
 
-    test('3.1.5 Loading spinner disappears after API completes', async ({ page }) => {
-      console.log('[TEST] 3.1.5: Spinner disappears after load');
+    test('US-QC-010.5 Loading spinner disappears after API completes', async ({ page }) => {
+      console.log('[TEST] US-QC-010.5: Spinner disappears after load');
 
       await selectFilterByClick(page, 'Manufacturer');
       await waitForDialogOptionsLoaded(page);
@@ -817,8 +817,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Spinner not visible after load');
     });
 
-    test('3.1.6 Dialog shows options after loading', async ({ page }) => {
-      console.log('[TEST] 3.1.6: Options visible after loading');
+    test('US-QC-010.6 Dialog shows options after loading', async ({ page }) => {
+      console.log('[TEST] US-QC-010.6: Options visible after loading');
 
       await selectFilterByClick(page, 'Manufacturer');
       await waitForDialogOptionsLoaded(page);
@@ -829,8 +829,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] SUCCESS: ${count} options visible`);
     });
 
-    test('3.1.7 API call made to correct endpoint', async ({ page, logger }) => {
-      console.log('[TEST] 3.1.7: Verify API endpoint called');
+    test('US-QC-010.7 API call made to correct endpoint', async ({ page, logger }) => {
+      console.log('[TEST] US-QC-010.7: Verify API endpoint called');
 
       await selectFilterByClick(page, 'Manufacturer');
       await page.waitForTimeout(1000);
@@ -840,8 +840,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] SUCCESS: ${apiCalls.length} API calls to /filters/manufacturers`);
     });
 
-    test('3.1.8 Focus automatically goes to search input', async ({ page }) => {
-      console.log('[TEST] 3.1.8: Check auto-focus on search');
+    test('US-QC-010.8 Focus automatically goes to search input', async ({ page }) => {
+      console.log('[TEST] US-QC-010.8: Check auto-focus on search');
 
       await selectFilterByClick(page, 'Manufacturer');
       await waitForDialogOptionsLoaded(page);
@@ -853,17 +853,17 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 3.2 Manufacturer Dialog - Options Display (9 tests)
+  // 3.2 Manufacturer Dialog - Options Display (9 tests) → US-QC-010: View Multiselect Options
   // ---------------------------------------------------------------------------
 
-  test.describe('3.2 Manufacturer Dialog - Options Display', () => {
+  test.describe('US-QC-010: Manufacturer Dialog - Options Display', () => {
     test.beforeEach(async ({ page }) => {
       await selectFilterByClick(page, 'Manufacturer');
       await waitForDialogOptionsLoaded(page);
     });
 
-    test('3.2.1 Shows list of manufacturer options', async ({ page }) => {
-      console.log('[TEST] 3.2.1: Verify options list');
+    test('US-QC-010.9 Shows list of manufacturer options', async ({ page }) => {
+      console.log('[TEST] US-QC-010.9: Verify options list');
 
       const options = page.locator('.p-dialog .p-checkbox');
       const count = await options.count();
@@ -871,8 +871,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] SUCCESS: ${count} manufacturer options displayed`);
     });
 
-    test('3.2.2 Each option has checkbox', async ({ page }) => {
-      console.log('[TEST] 3.2.2: Verify checkboxes');
+    test('US-QC-010.10 Each option has checkbox', async ({ page }) => {
+      console.log('[TEST] US-QC-010.10: Verify checkboxes');
 
       const checkboxes = page.locator('.p-dialog .p-checkbox-box');
       const count = await checkboxes.count();
@@ -880,8 +880,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] SUCCESS: ${count} checkboxes found`);
     });
 
-    test('3.2.3 Each option has label with manufacturer name', async ({ page }) => {
-      console.log('[TEST] 3.2.3: Verify option labels');
+    test('US-QC-010.11 Each option has label with manufacturer name', async ({ page }) => {
+      console.log('[TEST] US-QC-010.11: Verify option labels');
 
       const labels = page.locator('.p-dialog .p-checkbox-label, .p-dialog .option-label');
       const count = await labels.count();
@@ -893,8 +893,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       }
     });
 
-    test('3.2.4 Options are alphabetically sorted', async ({ page }) => {
-      console.log('[TEST] 3.2.4: Verify alphabetical sorting');
+    test('US-QC-010.12 Options are alphabetically sorted', async ({ page }) => {
+      console.log('[TEST] US-QC-010.12: Verify alphabetical sorting');
 
       const labels = page.locator('.p-dialog .p-checkbox-label, .p-dialog label');
       const count = await labels.count();
@@ -910,8 +910,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       // Note: May not be strictly alphabetical depending on implementation
     });
 
-    test('3.2.5 "Chevrolet" option is present', async ({ page }) => {
-      console.log('[TEST] 3.2.5: Find Chevrolet option');
+    test('US-QC-010.13 "Chevrolet" option is present', async ({ page }) => {
+      console.log('[TEST] US-QC-010.13: Find Chevrolet option');
 
       const chevrolet = page.locator('.p-dialog').filter({ hasText: 'Chevrolet' });
       const isPresent = await chevrolet.isVisible();
@@ -919,8 +919,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Chevrolet option found');
     });
 
-    test('3.2.6 "Ford" option is present', async ({ page }) => {
-      console.log('[TEST] 3.2.6: Find Ford option');
+    test('US-QC-010.14 "Ford" option is present', async ({ page }) => {
+      console.log('[TEST] US-QC-010.14: Find Ford option');
 
       const ford = page.locator('.p-dialog').filter({ hasText: 'Ford' });
       const isPresent = await ford.isVisible();
@@ -928,8 +928,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Ford option found');
     });
 
-    test('3.2.7 "Toyota" option is present', async ({ page }) => {
-      console.log('[TEST] 3.2.7: Find Toyota option');
+    test('US-QC-010.15 "Toyota" option is present', async ({ page }) => {
+      console.log('[TEST] US-QC-010.15: Find Toyota option');
 
       const toyota = page.locator('.p-dialog').filter({ hasText: 'Toyota' });
       const isPresent = await toyota.isVisible();
@@ -937,8 +937,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Toyota option found');
     });
 
-    test('3.2.8 "Brammo" option is present', async ({ page }) => {
-      console.log('[TEST] 3.2.8: Find Brammo option');
+    test('US-QC-010.16 "Brammo" option is present', async ({ page }) => {
+      console.log('[TEST] US-QC-010.16: Find Brammo option');
 
       // Brammo may require scrolling or searching
       await searchInDialog(page, 'Brammo');
@@ -949,8 +949,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] Brammo option found: ${isPresent}`);
     });
 
-    test('3.2.9 Multiple manufacturers are available (>10)', async ({ page }) => {
-      console.log('[TEST] 3.2.9: Verify multiple manufacturers');
+    test('US-QC-010.17 Multiple manufacturers are available (>10)', async ({ page }) => {
+      console.log('[TEST] US-QC-010.17: Verify multiple manufacturers');
 
       const options = page.locator('.p-dialog .p-checkbox');
       const count = await options.count();
@@ -960,17 +960,17 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 3.3 Manufacturer Dialog - Search (8 tests)
+  // 3.3 Manufacturer Dialog - Search (8 tests) → US-QC-011: Search Within Options
   // ---------------------------------------------------------------------------
 
-  test.describe('3.3 Manufacturer Dialog - Search', () => {
+  test.describe('US-QC-011: Manufacturer Dialog - Search', () => {
     test.beforeEach(async ({ page }) => {
       await selectFilterByClick(page, 'Manufacturer');
       await waitForDialogOptionsLoaded(page);
     });
 
-    test('3.3.1 Type "Chev" - shows Chevrolet', async ({ page }) => {
-      console.log('[TEST] 3.3.1: Search for "Chev"');
+    test('US-QC-011.1 Type "Chev" - shows Chevrolet', async ({ page }) => {
+      console.log('[TEST] US-QC-011.1: Search for "Chev"');
 
       await searchInDialog(page, 'Chev');
 
@@ -979,8 +979,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Chevrolet visible after search');
     });
 
-    test('3.3.2 Type "Chev" - hides non-matching options', async ({ page }) => {
-      console.log('[TEST] 3.3.2: Non-matching hidden');
+    test('US-QC-011.2 Type "Chev" - hides non-matching options', async ({ page }) => {
+      console.log('[TEST] US-QC-011.2: Non-matching hidden');
 
       await searchInDialog(page, 'Chev');
 
@@ -991,8 +991,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Non-matching options hidden');
     });
 
-    test('3.3.3 Type "Ford" - shows Ford', async ({ page }) => {
-      console.log('[TEST] 3.3.3: Search for "Ford"');
+    test('US-QC-011.3 Type "Ford" - shows Ford', async ({ page }) => {
+      console.log('[TEST] US-QC-011.3: Search for "Ford"');
 
       await searchInDialog(page, 'Ford');
 
@@ -1001,8 +1001,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Ford visible after search');
     });
 
-    test('3.3.4 Type "xyz" - shows "No options found" or empty', async ({ page }) => {
-      console.log('[TEST] 3.3.4: Search non-existing');
+    test('US-QC-011.4 Type "xyz" - shows "No options found" or empty', async ({ page }) => {
+      console.log('[TEST] US-QC-011.4: Search non-existing');
 
       await searchInDialog(page, 'xyz');
 
@@ -1013,8 +1013,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       // Expect 0 or "no results" message
     });
 
-    test('3.3.5 Clear search - all options reappear', async ({ page }) => {
-      console.log('[TEST] 3.3.5: Clear search');
+    test('US-QC-011.5 Clear search - all options reappear', async ({ page }) => {
+      console.log('[TEST] US-QC-011.5: Clear search');
 
       await searchInDialog(page, 'Chev');
       await page.waitForTimeout(300);
@@ -1029,8 +1029,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] SUCCESS: ${count} options after clearing search`);
     });
 
-    test('3.3.6 Search is case-insensitive', async ({ page }) => {
-      console.log('[TEST] 3.3.6: Case-insensitive search');
+    test('US-QC-011.6 Search is case-insensitive', async ({ page }) => {
+      console.log('[TEST] US-QC-011.6: Case-insensitive search');
 
       await searchInDialog(page, 'CHEVROLET');
 
@@ -1040,8 +1040,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Case-insensitive search works');
     });
 
-    test('3.3.7 Partial match works ("che" matches "Chevrolet")', async ({ page }) => {
-      console.log('[TEST] 3.3.7: Partial match');
+    test('US-QC-011.7 Partial match works ("che" matches "Chevrolet")', async ({ page }) => {
+      console.log('[TEST] US-QC-011.7: Partial match');
 
       await searchInDialog(page, 'che');
 
@@ -1051,8 +1051,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Partial match works');
     });
 
-    test('3.3.8 Search with spaces handled correctly', async ({ page }) => {
-      console.log('[TEST] 3.3.8: Search with spaces');
+    test('US-QC-011.8 Search with spaces handled correctly', async ({ page }) => {
+      console.log('[TEST] US-QC-011.8: Search with spaces');
 
       await searchInDialog(page, '  ford  ');
 
@@ -1064,17 +1064,17 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 3.4 Manufacturer Dialog - Selection (9 tests)
+  // 3.4 Manufacturer Dialog - Selection (9 tests) → US-QC-012: Select Multiple Options
   // ---------------------------------------------------------------------------
 
-  test.describe('3.4 Manufacturer Dialog - Selection', () => {
+  test.describe('US-QC-012: Manufacturer Dialog - Selection', () => {
     test.beforeEach(async ({ page }) => {
       await selectFilterByClick(page, 'Manufacturer');
       await waitForDialogOptionsLoaded(page);
     });
 
-    test('3.4.1 Click checkbox - checkbox becomes checked', async ({ page }) => {
-      console.log('[TEST] 3.4.1: Click to check');
+    test('US-QC-012.1 Click checkbox - checkbox becomes checked', async ({ page }) => {
+      console.log('[TEST] US-QC-012.1: Click to check');
 
       const chevroletRow = page.locator('.p-dialog').filter({ hasText: 'Chevrolet' });
       const checkbox = chevroletRow.locator('.p-checkbox').first();
@@ -1084,8 +1084,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] Chevrolet checkbox checked: ${isChecked}`);
     });
 
-    test('3.4.2 Click checked checkbox - checkbox unchecks', async ({ page }) => {
-      console.log('[TEST] 3.4.2: Click to uncheck');
+    test('US-QC-012.2 Click checked checkbox - checkbox unchecks', async ({ page }) => {
+      console.log('[TEST] US-QC-012.2: Click to uncheck');
 
       const chevroletRow = page.locator('.p-dialog').filter({ hasText: 'Chevrolet' });
       const checkbox = chevroletRow.locator('.p-checkbox').first();
@@ -1105,8 +1105,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] After toggle: aria-checked=${ariaChecked}, hasIcon=${hasCheckIcon}`);
     });
 
-    test('3.4.3 Click label - toggles checkbox', async ({ page }) => {
-      console.log('[TEST] 3.4.3: Click label to toggle');
+    test('US-QC-012.3 Click label - toggles checkbox', async ({ page }) => {
+      console.log('[TEST] US-QC-012.3: Click label to toggle');
 
       const chevroletLabel = page.locator('.p-dialog label, .p-dialog .p-checkbox-label').filter({ hasText: 'Chevrolet' }).first();
       await chevroletLabel.click();
@@ -1115,8 +1115,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] Label clicked');
     });
 
-    test('3.4.4 Select multiple - all remain checked', async ({ page }) => {
-      console.log('[TEST] 3.4.4: Multi-select');
+    test('US-QC-012.4 Select multiple - all remain checked', async ({ page }) => {
+      console.log('[TEST] US-QC-012.4: Multi-select');
 
       // Select Chevrolet
       await searchInDialog(page, 'Chevrolet');
@@ -1135,8 +1135,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Multiple items selected');
     });
 
-    test('3.4.5 Selection summary updates "Selected (2)"', async ({ page }) => {
-      console.log('[TEST] 3.4.5: Selection summary');
+    test('US-QC-012.5 Selection summary updates "Selected (2)"', async ({ page }) => {
+      console.log('[TEST] US-QC-012.5: Selection summary');
 
       // Select two items
       const checkboxes = page.locator('.p-dialog .p-checkbox');
@@ -1149,8 +1149,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] Selection summary: ${summaryText}`);
     });
 
-    test('3.4.6 Unselect one - summary updates "Selected (1)"', async ({ page }) => {
-      console.log('[TEST] 3.4.6: Unselect one');
+    test('US-QC-012.6 Unselect one - summary updates "Selected (1)"', async ({ page }) => {
+      console.log('[TEST] US-QC-012.6: Unselect one');
 
       const checkboxes = page.locator('.p-dialog .p-checkbox');
       await checkboxes.nth(0).click();
@@ -1164,8 +1164,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] After unselect: ${summaryText}`);
     });
 
-    test('3.4.7 Keyboard Space on focused checkbox - toggles', async ({ page }) => {
-      console.log('[TEST] 3.4.7: Space key toggle');
+    test('US-QC-012.7 Keyboard Space on focused checkbox - toggles', async ({ page }) => {
+      console.log('[TEST] US-QC-012.7: Space key toggle');
 
       const checkbox = page.locator('.p-dialog .p-checkbox').first();
       await checkbox.focus();
@@ -1174,8 +1174,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] Space pressed on checkbox');
     });
 
-    test('3.4.8 Keyboard Tab moves through checkboxes', async ({ page }) => {
-      console.log('[TEST] 3.4.8: Tab navigation');
+    test('US-QC-012.8 Keyboard Tab moves through checkboxes', async ({ page }) => {
+      console.log('[TEST] US-QC-012.8: Tab navigation');
 
       await page.keyboard.press('Tab');
       await page.keyboard.press('Tab');
@@ -1185,8 +1185,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] Focused element after tabs: ${focusedElement}`);
     });
 
-    test('3.4.9 Select all visible (if feature exists)', async ({ page }) => {
-      console.log('[TEST] 3.4.9: Select all');
+    test('US-QC-012.9 Select all visible (if feature exists)', async ({ page }) => {
+      console.log('[TEST] US-QC-012.9: Select all');
 
       const selectAllButton = page.locator('.p-dialog button').filter({ hasText: /select all/i });
       const exists = await selectAllButton.isVisible().catch(() => false);
@@ -1201,33 +1201,33 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 3.5 Manufacturer Dialog - Apply/Cancel (13 tests)
+  // 3.5 Manufacturer Dialog - Apply/Cancel (13 tests) → US-QC-013/014/015/016
   // ---------------------------------------------------------------------------
 
-  test.describe('3.5 Manufacturer Dialog - Apply/Cancel', () => {
+  test.describe('US-QC-013/014/015/016: Manufacturer Dialog - Apply/Cancel', () => {
     test.beforeEach(async ({ page }) => {
       await selectFilterByClick(page, 'Manufacturer');
       await waitForDialogOptionsLoaded(page);
     });
 
-    test('3.5.1 Apply button visible', async ({ page }) => {
-      console.log('[TEST] 3.5.1: Apply button visible');
+    test('US-QC-013.1 Apply button visible', async ({ page }) => {
+      console.log('[TEST] US-QC-013.1: Apply button visible');
 
       const applyButton = page.locator('.p-dialog button').filter({ hasText: /apply/i });
       await expect(applyButton).toBeVisible();
       console.log('[TEST] SUCCESS: Apply button visible');
     });
 
-    test('3.5.2 Cancel button visible', async ({ page }) => {
-      console.log('[TEST] 3.5.2: Cancel button visible');
+    test('US-QC-014.1 Cancel button visible', async ({ page }) => {
+      console.log('[TEST] US-QC-014.1: Cancel button visible');
 
       const cancelButton = page.locator('.p-dialog button').filter({ hasText: /cancel/i });
       await expect(cancelButton).toBeVisible();
       console.log('[TEST] SUCCESS: Cancel button visible');
     });
 
-    test('3.5.3 Apply disabled when no selection', async ({ page }) => {
-      console.log('[TEST] 3.5.3: Apply disabled without selection');
+    test('US-QC-013.2 Apply disabled when no selection', async ({ page }) => {
+      console.log('[TEST] US-QC-013.2: Apply disabled without selection');
 
       const applyButton = page.locator('.p-dialog button').filter({ hasText: /apply/i });
       const isDisabled = await applyButton.isDisabled();
@@ -1235,8 +1235,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] Apply button disabled: ${isDisabled}`);
     });
 
-    test('3.5.4 Apply enabled when selection made', async ({ page }) => {
-      console.log('[TEST] 3.5.4: Apply enabled with selection');
+    test('US-QC-013.3 Apply enabled when selection made', async ({ page }) => {
+      console.log('[TEST] US-QC-013.3: Apply enabled with selection');
 
       // Make a selection
       const checkbox = page.locator('.p-dialog .p-checkbox').first();
@@ -1250,8 +1250,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Apply button enabled after selection');
     });
 
-    test('3.5.5 Click Apply - dialog closes', async ({ page }) => {
-      console.log('[TEST] 3.5.5: Apply closes dialog');
+    test('US-QC-013.4 Click Apply - dialog closes', async ({ page }) => {
+      console.log('[TEST] US-QC-013.4: Apply closes dialog');
 
       // Select and apply
       const checkbox = page.locator('.p-dialog .p-checkbox').first();
@@ -1263,8 +1263,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Dialog closed after Apply');
     });
 
-    test('3.5.6 Click Apply - URL updates with manufacturer=', async ({ page }) => {
-      console.log('[TEST] 3.5.6: Apply updates URL');
+    test('US-QC-013.5 Click Apply - URL updates with manufacturer=', async ({ page }) => {
+      console.log('[TEST] US-QC-013.5: Apply updates URL');
 
       // Select Chevrolet
       await searchInDialog(page, 'Chevrolet');
@@ -1278,8 +1278,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: URL contains manufacturer param');
     });
 
-    test('3.5.7 Click Apply - filter chip appears', async ({ page }) => {
-      console.log('[TEST] 3.5.7: Apply creates filter chip');
+    test('US-QC-013.6 Click Apply - filter chip appears', async ({ page }) => {
+      console.log('[TEST] US-QC-013.6: Apply creates filter chip');
 
       await searchInDialog(page, 'Chevrolet');
       const checkbox = page.locator('.p-dialog .p-checkbox').first();
@@ -1292,8 +1292,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Chevrolet chip appeared');
     });
 
-    test('3.5.8 Click Cancel - dialog closes', async ({ page }) => {
-      console.log('[TEST] 3.5.8: Cancel closes dialog');
+    test('US-QC-014.2 Click Cancel - dialog closes', async ({ page }) => {
+      console.log('[TEST] US-QC-014.2: Cancel closes dialog');
 
       await clickDialogCancel(page);
 
@@ -1302,8 +1302,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Dialog closed on Cancel');
     });
 
-    test('3.5.9 Click Cancel - URL unchanged', async ({ page }) => {
-      console.log('[TEST] 3.5.9: Cancel preserves URL');
+    test('US-QC-014.3 Click Cancel - URL unchanged', async ({ page }) => {
+      console.log('[TEST] US-QC-014.3: Cancel preserves URL');
 
       const urlBefore = page.url();
 
@@ -1317,8 +1317,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: URL unchanged after Cancel');
     });
 
-    test('3.5.10 Click Cancel - no chip added', async ({ page }) => {
-      console.log('[TEST] 3.5.10: Cancel adds no chip');
+    test('US-QC-014.4 Click Cancel - no chip added', async ({ page }) => {
+      console.log('[TEST] US-QC-014.4: Cancel adds no chip');
 
       const checkbox = page.locator('.p-dialog .p-checkbox').first();
       await checkbox.click();
@@ -1330,8 +1330,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: No chips added after Cancel');
     });
 
-    test('3.5.11 Click X button - same as Cancel', async ({ page }) => {
-      console.log('[TEST] 3.5.11: X button same as Cancel');
+    test('US-QC-015.1 Click X button - same as Cancel', async ({ page }) => {
+      console.log('[TEST] US-QC-015.1: X button same as Cancel');
 
       const checkbox = page.locator('.p-dialog .p-checkbox').first();
       await checkbox.click();
@@ -1349,8 +1349,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: X button behaves like Cancel');
     });
 
-    test('3.5.12 Press Escape - same as Cancel', async ({ page }) => {
-      console.log('[TEST] 3.5.12: Escape same as Cancel');
+    test('US-QC-016.1 Press Escape - same as Cancel', async ({ page }) => {
+      console.log('[TEST] US-QC-016.1: Escape same as Cancel');
 
       const checkbox = page.locator('.p-dialog .p-checkbox').first();
       await checkbox.click();
@@ -1366,8 +1366,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Escape behaves like Cancel');
     });
 
-    test('3.5.13 Click outside dialog - same as Cancel', async ({ page }) => {
-      console.log('[TEST] 3.5.13: Click outside same as Cancel');
+    test('US-QC-014.5 Click outside dialog - same as Cancel', async ({ page }) => {
+      console.log('[TEST] US-QC-014.5: Click outside same as Cancel');
 
       const checkbox = page.locator('.p-dialog .p-checkbox').first();
       await checkbox.click();
@@ -1385,12 +1385,12 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 3.6 Model Dialog (8 tests)
+  // 3.6 Model Dialog (8 tests) → US-QC-010 through US-QC-014 (Model variant)
   // ---------------------------------------------------------------------------
 
-  test.describe('3.6 Model Dialog', () => {
-    test('3.6.1 Dialog opens when Model selected', async ({ page }) => {
-      console.log('[TEST] 3.6.1: Model dialog opens');
+  test.describe('US-QC-010: Model Dialog', () => {
+    test('US-QC-010.18 Dialog opens when Model selected', async ({ page }) => {
+      console.log('[TEST] US-QC-010.18: Model dialog opens');
 
       await selectFilterByClick(page, 'Model');
       const dialogVisible = await isMultiselectDialogVisible(page);
@@ -1398,8 +1398,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Model dialog opened');
     });
 
-    test('3.6.2 Dialog has correct title', async ({ page }) => {
-      console.log('[TEST] 3.6.2: Model dialog title');
+    test('US-QC-010.19 Dialog has correct title', async ({ page }) => {
+      console.log('[TEST] US-QC-010.19: Model dialog title');
 
       await selectFilterByClick(page, 'Model');
       const title = await getDialogTitle(page);
@@ -1407,8 +1407,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] SUCCESS: Dialog title is "${title}"`);
     });
 
-    test('3.6.3 Shows model options', async ({ page }) => {
-      console.log('[TEST] 3.6.3: Model options visible');
+    test('US-QC-010.20 Shows model options', async ({ page }) => {
+      console.log('[TEST] US-QC-010.20: Model options visible');
 
       await selectFilterByClick(page, 'Model');
       await waitForDialogOptionsLoaded(page);
@@ -1419,8 +1419,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] SUCCESS: ${count} model options`);
     });
 
-    test('3.6.4 Search works for models', async ({ page }) => {
-      console.log('[TEST] 3.6.4: Model search');
+    test('US-QC-011.9 Search works for models', async ({ page }) => {
+      console.log('[TEST] US-QC-011.9: Model search');
 
       await selectFilterByClick(page, 'Model');
       await waitForDialogOptionsLoaded(page);
@@ -1432,8 +1432,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Camaro found via search');
     });
 
-    test('3.6.5 Selection works', async ({ page }) => {
-      console.log('[TEST] 3.6.5: Model selection');
+    test('US-QC-012.10 Selection works', async ({ page }) => {
+      console.log('[TEST] US-QC-012.10: Model selection');
 
       await selectFilterByClick(page, 'Model');
       await waitForDialogOptionsLoaded(page);
@@ -1443,8 +1443,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Model selection works');
     });
 
-    test('3.6.6 Apply updates URL with model=', async ({ page }) => {
-      console.log('[TEST] 3.6.6: Model Apply updates URL');
+    test('US-QC-013.7 Apply updates URL with model=', async ({ page }) => {
+      console.log('[TEST] US-QC-013.7: Model Apply updates URL');
 
       await selectFilterByClick(page, 'Model');
       await waitForDialogOptionsLoaded(page);
@@ -1459,8 +1459,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: URL contains model param');
     });
 
-    test('3.6.7 Cancel preserves state', async ({ page }) => {
-      console.log('[TEST] 3.6.7: Model Cancel');
+    test('US-QC-014.6 Cancel preserves state', async ({ page }) => {
+      console.log('[TEST] US-QC-014.6: Model Cancel');
 
       await selectFilterByClick(page, 'Model');
       await waitForDialogOptionsLoaded(page);
@@ -1474,8 +1474,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: URL unchanged after Model Cancel');
     });
 
-    test('3.6.8 Model filter combined with Manufacturer in URL', async ({ page }) => {
-      console.log('[TEST] 3.6.8: Combined filters');
+    test('US-QC-013.8 Model filter combined with Manufacturer in URL', async ({ page }) => {
+      console.log('[TEST] US-QC-013.8: Combined filters');
 
       // Apply Manufacturer filter first
       await selectFilterByClick(page, 'Manufacturer');
@@ -1504,12 +1504,12 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 3.7 Body Class Dialog (8 tests)
+  // 3.7 Body Class Dialog (8 tests) → US-QC-010 through US-QC-014 (Body Class variant)
   // ---------------------------------------------------------------------------
 
-  test.describe('3.7 Body Class Dialog', () => {
-    test('3.7.1 Dialog opens when Body Class selected', async ({ page }) => {
-      console.log('[TEST] 3.7.1: Body Class dialog opens');
+  test.describe('US-QC-010: Body Class Dialog', () => {
+    test('US-QC-010.21 Dialog opens when Body Class selected', async ({ page }) => {
+      console.log('[TEST] US-QC-010.21: Body Class dialog opens');
 
       await openFilterDropdown(page);
       const bodyOption = page.locator('.query-control-panel .p-dropdown-items li').filter({ hasText: /Body/i });
@@ -1521,8 +1521,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Body Class dialog opened');
     });
 
-    test('3.7.2 Dialog has correct title', async ({ page }) => {
-      console.log('[TEST] 3.7.2: Body Class title');
+    test('US-QC-010.22 Dialog has correct title', async ({ page }) => {
+      console.log('[TEST] US-QC-010.22: Body Class title');
 
       await openFilterDropdown(page);
       const bodyOption = page.locator('.query-control-panel .p-dropdown-items li').filter({ hasText: /Body/i });
@@ -1534,8 +1534,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] SUCCESS: Title is "${title}"`);
     });
 
-    test('3.7.3 Shows body class options (Sedan, Coupe, SUV, etc.)', async ({ page }) => {
-      console.log('[TEST] 3.7.3: Body class options');
+    test('US-QC-010.23 Shows body class options (Sedan, Coupe, SUV, etc.)', async ({ page }) => {
+      console.log('[TEST] US-QC-010.23: Body class options');
 
       await openFilterDropdown(page);
       const bodyOption = page.locator('.query-control-panel .p-dropdown-items li').filter({ hasText: /Body/i });
@@ -1548,8 +1548,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Body class options present');
     });
 
-    test('3.7.4 Search works for body classes', async ({ page }) => {
-      console.log('[TEST] 3.7.4: Body class search');
+    test('US-QC-011.10 Search works for body classes', async ({ page }) => {
+      console.log('[TEST] US-QC-011.10: Body class search');
 
       await openFilterDropdown(page);
       const bodyOption = page.locator('.query-control-panel .p-dropdown-items li').filter({ hasText: /Body/i });
@@ -1562,8 +1562,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Sedan found via search');
     });
 
-    test('3.7.5 Selection works', async ({ page }) => {
-      console.log('[TEST] 3.7.5: Body class selection');
+    test('US-QC-012.11 Selection works', async ({ page }) => {
+      console.log('[TEST] US-QC-012.11: Body class selection');
 
       await openFilterDropdown(page);
       const bodyOption = page.locator('.query-control-panel .p-dropdown-items li').filter({ hasText: /Body/i });
@@ -1575,8 +1575,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Body class selection works');
     });
 
-    test('3.7.6 Apply updates URL with bodyClass=', async ({ page }) => {
-      console.log('[TEST] 3.7.6: Body class Apply');
+    test('US-QC-013.9 Apply updates URL with bodyClass=', async ({ page }) => {
+      console.log('[TEST] US-QC-013.9: Body class Apply');
 
       await openFilterDropdown(page);
       const bodyOption = page.locator('.query-control-panel .p-dropdown-items li').filter({ hasText: /Body/i });
@@ -1593,8 +1593,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: URL contains bodyClass');
     });
 
-    test('3.7.7 Multiple body classes comma-separated in URL', async ({ page }) => {
-      console.log('[TEST] 3.7.7: Multiple body classes');
+    test('US-QC-013.10 Multiple body classes comma-separated in URL', async ({ page }) => {
+      console.log('[TEST] US-QC-013.10: Multiple body classes');
 
       await openFilterDropdown(page);
       const bodyOption = page.locator('.query-control-panel .p-dropdown-items li').filter({ hasText: /Body/i });
@@ -1613,8 +1613,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] Multiple values (comma): ${hasComma}`);
     });
 
-    test('3.7.8 Cancel preserves state', async ({ page }) => {
-      console.log('[TEST] 3.7.8: Body class Cancel');
+    test('US-QC-014.7 Cancel preserves state', async ({ page }) => {
+      console.log('[TEST] US-QC-014.7: Body class Cancel');
 
       await openFilterDropdown(page);
       const bodyOption = page.locator('.query-control-panel .p-dropdown-items li').filter({ hasText: /Body/i });
@@ -1632,12 +1632,12 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 3.8 Editing Existing Filter (6 tests)
+  // 3.8 Editing Existing Filter (6 tests) → US-QC-031: Click Chip to Edit Filter
   // ---------------------------------------------------------------------------
 
-  test.describe('3.8 Editing Existing Filter', () => {
-    test('3.8.1 Click Manufacturer chip - dialog opens', async ({ page }) => {
-      console.log('[TEST] 3.8.1: Click chip to edit');
+  test.describe('US-QC-031: Editing Existing Filter', () => {
+    test('US-QC-031.1 Click Manufacturer chip - dialog opens', async ({ page }) => {
+      console.log('[TEST] US-QC-031.1: Click chip to edit');
 
       // First create a filter
       await selectFilterByClick(page, 'Manufacturer');
@@ -1658,8 +1658,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log('[TEST] SUCCESS: Edit dialog opened');
     });
 
-    test('3.8.2 Dialog shows previous selection checked', async ({ page }) => {
-      console.log('[TEST] 3.8.2: Previous selection checked');
+    test('US-QC-031.2 Dialog shows previous selection checked', async ({ page }) => {
+      console.log('[TEST] US-QC-031.2: Previous selection checked');
 
       // Create filter
       await selectFilterByClick(page, 'Manufacturer');
@@ -1684,8 +1684,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] Chevrolet checked in edit dialog: ${isChecked}`);
     });
 
-    test('3.8.3 Uncheck previous, check new - Apply updates URL', async ({ page }) => {
-      console.log('[TEST] 3.8.3: Change selection');
+    test('US-QC-031.3 Uncheck previous, check new - Apply updates URL', async ({ page }) => {
+      console.log('[TEST] US-QC-031.3: Change selection');
 
       // Create filter
       await selectFilterByClick(page, 'Manufacturer');
@@ -1711,8 +1711,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] URL after edit: ${url}`);
     });
 
-    test('3.8.4 Add to selection (multi-select) - URL shows all', async ({ page }) => {
-      console.log('[TEST] 3.8.4: Add to existing selection');
+    test('US-QC-031.4 Add to selection (multi-select) - URL shows all', async ({ page }) => {
+      console.log('[TEST] US-QC-031.4: Add to existing selection');
 
       // Create initial filter
       await selectFilterByClick(page, 'Manufacturer');
@@ -1735,8 +1735,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] URL with multiple: ${url}`);
     });
 
-    test('3.8.5 Uncheck all - Apply removes filter', async ({ page }) => {
-      console.log('[TEST] 3.8.5: Uncheck all removes filter');
+    test('US-QC-031.5 Uncheck all - Apply removes filter', async ({ page }) => {
+      console.log('[TEST] US-QC-031.5: Uncheck all removes filter');
 
       // Create filter
       await selectFilterByClick(page, 'Manufacturer');
@@ -1761,8 +1761,8 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
       console.log(`[TEST] Manufacturer in URL after uncheck: ${hasManufacturer}`);
     });
 
-    test('3.8.6 Cancel preserves original selection', async ({ page }) => {
-      console.log('[TEST] 3.8.6: Cancel preserves original');
+    test('US-QC-031.6 Cancel preserves original selection', async ({ page }) => {
+      console.log('[TEST] US-QC-031.6: Cancel preserves original');
 
       // Create filter
       await selectFilterByClick(page, 'Manufacturer');
@@ -1793,35 +1793,35 @@ test.describe('Section 3: Query Control - Multiselect Dialog', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 3.9 Dialog Error States (5 tests)
+  // 3.9 Dialog Error States (5 tests) → US-QC-050: Error Handling (placeholder)
   // ---------------------------------------------------------------------------
 
-  test.describe('3.9 Dialog Error States', () => {
-    test('3.9.1 API failure - shows error message', async ({ page }) => {
-      console.log('[TEST] 3.9.1: API failure handling');
+  test.describe('US-QC-050: Dialog Error States', () => {
+    test('US-QC-050.1 API failure - shows error message', async ({ page }) => {
+      console.log('[TEST] US-QC-050.1: API failure handling');
 
       // This would require network interception to test properly
       // Documenting expected behavior
       console.log('[TEST] NOTE: API failure test requires network mocking');
     });
 
-    test('3.9.2 API failure - shows Retry button', async ({ page }) => {
-      console.log('[TEST] 3.9.2: Retry button on failure');
+    test('US-QC-050.2 API failure - shows Retry button', async ({ page }) => {
+      console.log('[TEST] US-QC-050.2: Retry button on failure');
       console.log('[TEST] NOTE: API failure test requires network mocking');
     });
 
-    test('3.9.3 Click Retry - API called again', async ({ page }) => {
-      console.log('[TEST] 3.9.3: Retry calls API');
+    test('US-QC-050.3 Click Retry - API called again', async ({ page }) => {
+      console.log('[TEST] US-QC-050.3: Retry calls API');
       console.log('[TEST] NOTE: API failure test requires network mocking');
     });
 
-    test('3.9.4 API timeout - shows appropriate error', async ({ page }) => {
-      console.log('[TEST] 3.9.4: API timeout');
+    test('US-QC-050.4 API timeout - shows appropriate error', async ({ page }) => {
+      console.log('[TEST] US-QC-050.4: API timeout');
       console.log('[TEST] NOTE: Timeout test requires network delay mocking');
     });
 
-    test('3.9.5 Network offline - shows offline message', async ({ page }) => {
-      console.log('[TEST] 3.9.5: Offline handling');
+    test('US-QC-050.5 Network offline - shows offline message', async ({ page }) => {
+      console.log('[TEST] US-QC-050.5: Offline handling');
       console.log('[TEST] NOTE: Offline test requires network state mocking');
     });
   });
