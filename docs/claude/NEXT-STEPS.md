@@ -1,71 +1,64 @@
 # Next Steps
 
-**Current Session**: Session 74 - Autonomous Bug Fix Loop
-**Previous Session**: Session 73 - Fix INCORRECT User Stories
-**Status**: v7.9, all 5 bugs fixed (BUG-002 through BUG-006)
+**Current Session**: Session 75 - Query Panel User Stories & Validation
+**Previous Session**: Session 74 - Autonomous Bug Fix Loop
+**Status**: v7.10, Query Panel user stories verified with 38 passing tests
 
 ---
 
-## IMMEDIATE ACTION: Verify User Stories for Query Panel
+## IMMEDIATE ACTION: Continue User Story Validation
 
-**Priority**: HIGH (User requested)
-**Scope**: Generate and verify user stories for the Query Panel component
+**Priority**: HIGH
+**Scope**: Verify user stories for remaining components
 
 ### Context
 
-Query Control user stories are now validated. Next task is to create and verify user stories for the Query Panel component (the panel on the right side that shows year range inputs and other filters).
+Query Panel user stories are now documented and validated with 38 Playwright tests. All tests pass with `--workers=1`.
+
+### Next Components to Verify
+
+1. **Results Table** - Display of query results
+2. **Statistics Panel** - Aggregation displays
+3. **Manufacturer-Model Picker** - Hierarchical selection UI
 
 ### Steps
 
-1. **Generate User Stories for Query Panel**
-   ```bash
-   /user-stories query-panel
-   ```
-   This will create `docs/claude/user-stories/query-panel.md`
+1. **Generate User Stories**
+   - Create `docs/claude/user-stories/results-table.md`
+   - Follow same format as query-panel.md
 
-2. **Review Generated Stories**
-   - Check that stories cover all Query Panel functionality
-   - Verify year range inputs, filter state display, URL sync
+2. **Create Validation Tests**
+   - Create `frontend/e2e/validation/us-rt-*.spec.ts` files
+   - Use same beforeEach pattern (goto, clear localStorage, reload)
 
-3. **Create Validation Tests**
-   - Create `frontend/e2e/validation/us-qp-*.spec.ts` files
-   - Run tests to capture screenshots for manual review
-
-4. **Verify Each Story**
+3. **Verify Each Story**
+   - Run tests with `--workers=1` to avoid race conditions
    - Mark as VERIFIED, PARTIAL, INCORRECT, or BUG
-   - Document any new bugs discovered
 
 ### Key Files
 
 | File | Purpose |
 |------|---------|
-| `frontend/src/framework/components/query-panel/` | Query Panel component source |
-| `docs/claude/user-stories/query-panel.md` | Will be created |
-| `frontend/e2e/validation/us-qp-*.spec.ts` | Will be created |
+| `frontend/src/framework/components/results-table/` | Results Table source |
+| `docs/claude/user-stories/query-panel.md` | Reference format |
+| `frontend/e2e/validation/us-qp-*.spec.ts` | Reference test structure |
 
 ---
 
-## ALTERNATIVE: Continue Query Control Validation (Epics 4, 6, 7)
-
-**Priority**: MEDIUM
-**Scope**: Verify remaining UNVERIFIED stories
-
-### Stories Still UNVERIFIED
-
-| Story | Description |
-|-------|-------------|
-| US-QC-030 to US-QC-034 | Epic 4: Active Filter Chips |
-| US-QC-050, US-QC-051 | Epic 6: Clear All Actions |
-| US-QC-060 to US-QC-063 | Epic 7: URL Persistence |
-
----
-
-## SESSION 74 COMPLETION SUMMARY
+## SESSION 75 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Created regression tests for all 5 open bugs (14 tests total)
-2. ✅ Enhanced fix loop to support 5 attempts with new strategies
-3. ✅ Ran autonomous fix loop - **all 5 bugs FIXED**
-4. ✅ Verified fixes follow Angular 21 architecture rubric
-5. ✅ Ran programmatic verification - 14/14 tests pass
-6. ✅ User confirmed manual verification passed
+1. ✅ Created Query Panel user stories (48 stories, 8 epics)
+2. ✅ Created 38 Playwright validation tests
+3. ✅ Fixed test infrastructure issues (parallelization, localStorage persistence)
+4. ✅ All 38 tests passing with `--workers=1`
+5. ✅ Bumped version to 7.10
+
+---
+
+## Alternative Tasks
+
+| Task | Priority | Notes |
+|------|----------|-------|
+| Fix Bug #7 (multiselect visual state) | Medium | Low priority |
+| IdP Phase 1 (Keycloak) | HIGH | Next major milestone |
