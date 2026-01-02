@@ -1,54 +1,51 @@
 # Next Steps
 
-**Current Session**: Session 70 - Fix Loop YOLO Mode Integration
-**Previous Session**: Session 69 - Autonomous Fix Loop Implementation
-**Status**: v7.4, YOLO mode integrated for fully unattended operation
+**Current Session**: Session 71 - Exit Protocol Fix
+**Previous Session**: Session 70 - Fix Loop YOLO Mode Integration
+**Status**: v7.5, BUG-001 committed, /exit updated
 
 ---
 
-## IMMEDIATE ACTION: Test Fix Loop with YOLO Mode
+## IMMEDIATE ACTION: Continue User Story Validation
 
-**Priority**: HIGH (Validate unattended operation)
-**Scope**: Run fully autonomous bug fix session
+**Priority**: HIGH (Resume interrupted work)
+**Scope**: Validate Query Control user stories from US-QC-010 onward
+
+### Context
+
+User story validation was interrupted when BUG-001 was discovered. The bug is now fixed and committed. Resume validation at **US-QC-010: View Multiselect Options** (Epic 2).
+
+### Files
+
+- **User Stories**: `docs/claude/user-stories/query-control.md`
+- **Test Suite**: `frontend/e2e/components/query-control-exhaustive.spec.ts`
+- **Session Summary**: `docs/claude/start-here.md`
 
 ### Steps
 
-1. **Revert the bug fix** (if not already reverted):
+1. **Run multiselect dialog tests**:
    ```bash
-   git checkout frontend/src/framework/components/query-control/query-control.component.ts
+   cd ~/projects/generic-prime/frontend
+   npx playwright test e2e/components/query-control-exhaustive.spec.ts -g "3.1|3.2" --reporter=list
    ```
 
-2. **Initialize the fix session**:
-   ```bash
-   cd ~/projects/generic-prime
-   .claude/scripts/init-fix.sh BUG-001 e2e/regression/bug-001-keyboard-selection.spec.ts
-   ```
+2. **Map test results to acceptance criteria** in US-QC-010 through US-QC-016
 
-3. **Run the YOLO mode command** (output by init-fix.sh):
-   ```bash
-   cd /home/odin/projects/generic-prime && claude --dangerously-skip-permissions -p "Fix the bug described in .claude/fix-state.json. The regression test at frontend/e2e/regression/bug-001-keyboard-selection.spec.ts must pass. Use strategy: local (attempt 1)."
-   ```
+3. **Update user story document** with VERIFIED/BUG/INCORRECT markers
 
-4. **Walk away** - No permission prompts, fully autonomous
+4. **Continue through remaining Epics** (3-12)
 
-### Expected Behavior
+### Validation Progress
 
-- Claude runs without any permission prompts
-- Stop hook runs tests after each attempt
-- Loop continues through 3 attempts (local → web_search → deep_investigation)
-- Ends with status FIXED or DEFERRED
-
-### Verifying Results
-
-```bash
-cat .claude/fix-state.json   # Check final status
-cat .claude/fix-log.txt      # View attempt history
-ls .claude/fix-archive/      # View archived sessions
-```
+| Epic | Status |
+|------|--------|
+| 1: Filter Field Selection | ✅ Validated (US-QC-001 to US-QC-003) |
+| 2: Multiselect Filters | **Next** (start at US-QC-010) |
+| 3-12: Remaining | Pending |
 
 ---
 
-## ALTERNATIVE: IdP Phase 1 (If Fix Loop Validated)
+## ALTERNATIVE: IdP Phase 1 (If Validation Complete)
 
 **Priority**: HIGH (Architecture)
 **Scope**: Deploy Keycloak to K3s
@@ -63,11 +60,11 @@ ls .claude/fix-archive/      # View archived sessions
 
 ---
 
-## SESSION 70 COMPLETION SUMMARY
+## SESSION 71 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Debugged fix loop infrastructure (dev server, directory, permissions)
-2. ✅ Enhanced init-fix.sh with dev server management
-3. ✅ Enhanced end-fix.sh with cleanup
-4. ✅ Discovered and integrated YOLO mode (`--dangerously-skip-permissions`)
-5. ✅ Updated permissions in settings.json for comprehensive coverage
+1. ✅ Committed BUG-001 fix that was missed by Session 70's /exit
+2. ✅ Updated /exit command to check fix loop results before ending
+3. ✅ Added fix loop runtime artifacts to .gitignore
+4. ✅ Created start-here.md session summary
+5. ✅ Reviewed QA documentation for context
