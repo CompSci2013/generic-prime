@@ -8,7 +8,7 @@
 
 ## Project Summary
 
-**Generic Discovery Framework** - A domain-agnostic Angular 14 application for browsing and analyzing data. Currently configured for automobile data, designed to work with any domain (agriculture, real estate, etc.).
+**Generic Discovery Framework** - A domain-agnostic Angular 21 application for browsing and analyzing data. Currently configured for automobile data, designed to work with any domain (agriculture, real estate, etc.).
 
 **Architecture**: PrimeNG-First + URL-First State Management + Configuration-Driven
 
@@ -56,17 +56,33 @@
 
 | Component | Version | Purpose |
 |-----------|---------|---------|
-| **Angular** | 14.2.0 | Core framework |
-| **PrimeNG** | 14.2.3 | UI components (table, dropdown, multiselect, panel, etc.) |
-| **RxJS** | 7.5.0 | Reactive programming |
-| **Angular CDK** | 14.2.7 | Drag-drop, virtual scroll |
-| **TypeScript** | 4.7.2 | Language |
+| **Angular** | 21.0.0 | Core framework |
+| **PrimeNG** | 21.0.0 | UI components (table, dropdown, multiselect, panel, etc.) |
+| **RxJS** | 7.8.1 | Reactive programming |
+| **Angular CDK** | 21.0.0 | Drag-drop, virtual scroll |
+| **TypeScript** | 5.9.0 | Language |
+| **zone.js** | 0.15.0 | Change detection |
 | **Plotly.js** | Latest | Charts for statistics panel |
 | **Playwright** | 1.57.0 | E2E testing |
 
 ---
 
 ## Infrastructure Overview
+
+> **Canonical Source**: For complete Halo Labs hardware specs, network topology, and lab-wide infrastructure, see:
+> - `~/projects/infrastructure/docs/HARDWARE.md` - Physical hardware inventory (Thor, Loki, Mimir nodes)
+> - `~/projects/infrastructure/docs/LAB-CONFIGURATION-V2.md` - Complete lab configuration
+> - `~/projects/infrastructure/docs/halo-labs.md` - Executive overview
+
+### Halo Labs Network
+
+| Node | IP Address | Role |
+|------|------------|------|
+| **Loki** | 192.168.0.110 | K3s control plane, Traefik ingress |
+| **Thor** | 192.168.0.244 | K3s worker node, development host |
+| **Mimir** | 192.168.0.100 | GPU/LLM inference (Mac Studio M3 Ultra) |
+
+### generic-prime Deployment Context
 
 ```
 ┌───────────────────────────────────────────────────────────────────┐
@@ -91,6 +107,9 @@
          │   │       └── elasticsearch (autos-unified, autos-vins indices)
          │   │
          │   └── Pod distribution: May run on either node
+         │
+         ├── LLM Inference: Mimir (192.168.0.100)
+         │   └── Ollama serving on port 11434
          │
          └── Development Container (Podman on Thor)
              └── generic-prime-frontend-dev (port 4205)
@@ -820,7 +839,12 @@ curl http://localhost:4205
 
 ---
 
-**Last Updated**: 2025-12-20
+**Last Updated**: 2026-01-01
+
+**Session 66 Update**: Updated for Angular 21 and added infrastructure references
+- Updated Technology Stack to reflect Angular 21.0.0, PrimeNG 21.0.0, TypeScript 5.9.0
+- Added canonical reference to `~/projects/infrastructure/docs/` for lab-wide hardware documentation
+- Avoids duplicating hardware specs across multiple projects
 
 **Session 34 Update**: Added comprehensive E2E testing documentation
 - Documented three execution methods: host, dev container, E2E container

@@ -1,6 +1,7 @@
-import { ErrorHandler, importProvidersFrom, Injector } from '@angular/core';
+import { ErrorHandler, Injector } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { httpErrorInterceptor } from '../framework/services/http-error.interceptor';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
@@ -10,8 +11,6 @@ import { routes } from './app.routes';
 import { GlobalErrorHandler } from '../framework/services/global-error.handler';
 import { DOMAIN_CONFIG } from '../framework/services/domain-config-registry.service';
 import { createAutomobileDomainConfig } from '../domain-config/automobile';
-import { FrameworkModule } from '../framework/framework.module';
-import { UiKitModule } from '../framework/ui-kit/ui-kit.module';
 
 /**
  * Application Configuration (Standalone Bootstrap)
@@ -26,19 +25,18 @@ import { UiKitModule } from '../framework/ui-kit/ui-kit.module';
  *
  * Providers:
  * - provideRouter: Configures application routing
- * - provideHttpClient: Enables HTTP communication
+ * - provideHttpClient: Enables HTTP communication with error interceptor
+ * - httpErrorInterceptor: Global HTTP error handling with retries
  * - provideAnimationsAsync: Enables async Angular animations for PrimeNG
  * - providePrimeNG: Configures PrimeNG 21 theming
  * - MessageService: PrimeNG toast/message service
  * - GlobalErrorHandler: Application-wide error handling
  * - DOMAIN_CONFIG: Domain configuration factory for automobile domain
- * - FrameworkModule: Framework components and services (imported via importProvidersFrom)
- * - UiKitModule: UI component library facade (imported via importProvidersFrom)
  */
 export const appConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([httpErrorInterceptor])),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
@@ -49,7 +47,6 @@ export const appConfig = {
       },
       ripple: true
     }),
-    importProvidersFrom(FrameworkModule, UiKitModule),
     MessageService,
     {
       provide: ErrorHandler,

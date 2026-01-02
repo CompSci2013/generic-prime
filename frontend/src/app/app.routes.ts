@@ -1,24 +1,11 @@
 import { Routes } from '@angular/router';
-import { DiscoverComponent } from './features/discover/discover.component';
-import { PanelPopoutComponent } from './features/panel-popout/panel-popout.component';
-import { ReportComponent } from './features/report/report.component';
-import { HomeComponent } from './features/home/home.component';
-import { AutomobileComponent } from './features/automobile/automobile.component';
-import { AgricultureComponent } from './features/agriculture/agriculture.component';
-import { PhysicsComponent } from './features/physics/physics.component';
-import { PhysicsSyllabusComponent } from './features/physics/physics-syllabus.component';
-import { PhysicsConceptGraphComponent } from './features/physics/physics-concept-graph.component';
-import { ClassicalMechanicsGraphComponent } from './features/physics/classical-mechanics-graph.component';
-import { ChemistryComponent } from './features/chemistry/chemistry.component';
-import { MathComponent } from './features/math/math.component';
-import { DependencyGraphComponent } from './features/dependency-graph/dependency-graph.component';
 
 /**
- * Application Routes Configuration
+ * Application Routes Configuration (Angular 21 Lazy Loading)
  *
  * Defines all routes and navigation paths for the Generic-Prime application.
- * Implements a multi-domain architecture where each domain (automobile, agriculture,
- * physics, chemistry, math) has its own entry point and discovery interface.
+ * Uses `loadComponent` for lazy loading to improve initial bundle size and
+ * enable route-based code splitting.
  *
  * Route Structure:
  * - Root & Home: '', 'home' -> HomeComponent (domain selector landing page)
@@ -34,18 +21,60 @@ import { DependencyGraphComponent } from './features/dependency-graph/dependency
  * - Reporting: 'report' -> ReportComponent (test results)
  */
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
-  { path: 'home', component: HomeComponent },
-  { path: 'automobiles', component: AutomobileComponent },
-  { path: 'automobiles/discover', component: DiscoverComponent },
-  { path: 'agriculture', component: AgricultureComponent },
-  { path: 'physics', component: PhysicsComponent },
-  { path: 'physics/syllabus/:nodeId', component: PhysicsSyllabusComponent },
-  { path: 'physics/concept-graph', component: PhysicsConceptGraphComponent },
-  { path: 'physics/classical-mechanics-graph', component: ClassicalMechanicsGraphComponent },
-  { path: 'chemistry', component: ChemistryComponent },
-  { path: 'math', component: MathComponent },
-  { path: 'dependencies', component: DependencyGraphComponent },
-  { path: 'report', component: ReportComponent },
-  { path: 'panel/:gridId/:panelId/:type', component: PanelPopoutComponent }
+  {
+    path: '',
+    loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent)
+  },
+  {
+    path: 'home',
+    loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent)
+  },
+  {
+    path: 'automobiles',
+    loadComponent: () => import('./features/automobile/automobile.component').then(m => m.AutomobileComponent)
+  },
+  {
+    path: 'automobiles/discover',
+    loadComponent: () => import('./features/discover/discover.component').then(m => m.DiscoverComponent)
+  },
+  {
+    path: 'agriculture',
+    loadComponent: () => import('./features/agriculture/agriculture.component').then(m => m.AgricultureComponent)
+  },
+  {
+    path: 'physics',
+    loadComponent: () => import('./features/physics/physics.component').then(m => m.PhysicsComponent)
+  },
+  {
+    path: 'physics/syllabus/:nodeId',
+    loadComponent: () => import('./features/physics/physics-syllabus.component').then(m => m.PhysicsSyllabusComponent)
+  },
+  {
+    path: 'physics/concept-graph',
+    loadComponent: () => import('./features/physics/physics-concept-graph.component').then(m => m.PhysicsConceptGraphComponent)
+  },
+  {
+    path: 'physics/classical-mechanics-graph',
+    loadComponent: () => import('./features/physics/classical-mechanics-graph.component').then(m => m.ClassicalMechanicsGraphComponent)
+  },
+  {
+    path: 'chemistry',
+    loadComponent: () => import('./features/chemistry/chemistry.component').then(m => m.ChemistryComponent)
+  },
+  {
+    path: 'math',
+    loadComponent: () => import('./features/math/math.component').then(m => m.MathComponent)
+  },
+  {
+    path: 'dependencies',
+    loadComponent: () => import('./features/dependency-graph/dependency-graph.component').then(m => m.DependencyGraphComponent)
+  },
+  {
+    path: 'report',
+    loadComponent: () => import('./features/report/report.component').then(m => m.ReportComponent)
+  },
+  {
+    path: 'panel/:gridId/:panelId/:type',
+    loadComponent: () => import('./features/panel-popout/panel-popout.component').then(m => m.PanelPopoutComponent)
+  }
 ];
