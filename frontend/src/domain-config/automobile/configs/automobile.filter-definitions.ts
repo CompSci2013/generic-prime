@@ -73,9 +73,12 @@ export const AUTOMOBILE_FILTER_DEFINITIONS: FilterDefinition[] = [
    *
    * Uses format.number.useGrouping: false to prevent thousand separators
    * (displays "1980" instead of "1,980")
+   *
+   * Note: id is 'year' so Query Panel looks for 'yearMin'/'yearMax' in currentFilters,
+   * which matches the actual filter model field names (AutoSearchFilters.yearMin/yearMax)
    */
   {
-    id: 'yearRange',
+    id: 'year',
     label: 'Year Range',
     type: 'range',
     min: 1900,
@@ -235,7 +238,7 @@ export const AUTOMOBILE_FILTER_GROUPS = {
    */
   temporal: {
     label: 'Year',
-    filters: ['yearRange']
+    filters: ['year']
   },
 
   /**

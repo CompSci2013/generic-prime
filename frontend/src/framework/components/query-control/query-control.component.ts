@@ -33,7 +33,7 @@ import { ChipModule } from 'primeng/chip';
 
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
-import { SelectModule } from 'primeng/select';
+import { Select, SelectModule } from 'primeng/select';
 
 /**
  * Active filter representation
@@ -123,12 +123,20 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   @Output() clearAllFilters = new EventEmitter<void>();
 
   @ViewChild('searchInput') searchInput: any;
+  @ViewChild('filterFieldDropdown') filterFieldDropdown!: Select;
 
   // ==================== Dropdown State ====================
 
   filterFieldOptions: { label: string; value: FilterDefinition }[] = [];
   selectedField: FilterDefinition | null = null;
   isHighlightFilter = false;
+
+  /**
+   * Tracks the field that was pending selection when dropdown opens.
+   * Used to detect same-field reselection which doesn't trigger onChange.
+   * BUG-004 Fix: PrimeNG doesn't fire onChange when selecting the same value.
+   */
+  private pendingFieldSelection: FilterDefinition | null = null;
 
   // ==================== Active Filters ====================
 
@@ -191,14 +199,18 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   /**
    * Reset dropdown to its placeholder state.
    *
-   * This is a workaround for a PrimeNG issue where setting ngModel to null
-   * doesn't clear the displayed value if an option was previously selected
-   * via keyboard.
+   * BUG-004 Fix: PrimeNG Select maintains internal state that doesn't reset
+   * when just setting ngModel to null. We must call clear() on the component
+   * to ensure both the visual display and internal state are reset.
+   * This allows the same option to be selected again and trigger onChange.
    */
   private resetFilterDropdown(): void {
     this.selectedField = null;
-    // We might need to access the dropdown component instance if the above is not enough
-    // For now, this seems to work with markForCheck()
+    // BUG-004 Fix: Call clear() to reset PrimeNG's internal selection state
+    // This ensures clicking the same option will trigger onChange next time
+    if (this.filterFieldDropdown) {
+      this.filterFieldDropdown.clear();
+    }
     this.cdr.markForCheck();
   }
 
@@ -306,12 +318,28 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
       // If it was an arrow key, this is just navigation - don't open dialog
       // Users are just browsing the dropdown, not making a selection
       if (['ArrowUp', 'ArrowDown'].includes(key)) {
+        // BUG-004 Fix: Track the pending selection for onDropdownHide
+        this.pendingFieldSelection = filterDef;
         return;
       }
     }
 
+    // Clear pending selection since onChange fired for actual selection
+    this.pendingFieldSelection = null;
+
     // This was a click, Enter, or Space - open the dialog
     this.openFilterDialog(filterDef);
+  }
+
+  /**
+   * Handle dropdown panel hide event
+   *
+   * BUG-004 Fix: When dropdown closes without triggering onChange (e.g., clicking
+   * away or pressing Escape), clear the pending selection state.
+   */
+  onDropdownHide(): void {
+    // Clear pending selection when dropdown closes
+    this.pendingFieldSelection = null;
   }
 
   /**
@@ -554,8 +582,19 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
 
   /**
    * Handle dialog hide event
+   *
+   * Called by PrimeNG's (onHide) when dialog closes for any reason:
+   * - User clicks X button
+   * - User presses Escape (with closeOnEscape="true")
+   * - User clicks modal backdrop (with dismissableMask="true")
+   *
+   * IMPORTANT: Must reset both visibility flags to prevent dialog reopening.
+   * PrimeNG closes the dialog visually but Angular's [visible] binding must
+   * also be set to false, otherwise the dialog reopens on next change detection.
    */
   onDialogHide(): void {
+    this.showMultiselectDialog = false;
+    this.showYearRangeDialog = false;
     this.currentFilterDef = null;
     this.optionsError = null;
     this.resetFilterDropdown();
@@ -583,6 +622,62 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
         page: 1 // Reset to first page when filter removed (1-indexed)
       } as any);
     }
+  }
+
+  /**
+   * Handle click on filter chip
+   *
+   * BUG-006 Fix: Check if click originated from the remove button.
+   * If so, don't open the edit dialog - the onRemove handler already
+   * handled it.
+   */
+  onChipClick(event: MouseEvent, filter: ActiveFilter): void {
+    // Check if the click came from the remove button (X icon)
+    const target = event.target as HTMLElement;
+    if (this.isRemoveButtonClick(target)) {
+      // Don't open edit dialog - let onRemove handle it
+      return;
+    }
+    this.editFilter(filter);
+  }
+
+  /**
+   * Handle click on highlight chip
+   *
+   * BUG-006 Fix: Same logic as onChipClick for highlight chips.
+   */
+  onHighlightChipClick(event: MouseEvent, filter: ActiveFilter): void {
+    // Check if the click came from the remove button (X icon)
+    const target = event.target as HTMLElement;
+    if (this.isRemoveButtonClick(target)) {
+      // Don't open edit dialog - let onRemove handle it
+      return;
+    }
+    this.editHighlight(filter);
+  }
+
+  /**
+   * Check if an element or its parent is the remove button
+   *
+   * PrimeNG chip remove button has class 'p-chip-remove-icon' or 'pi-times-circle'.
+   * We check the element and its parents up to the chip container.
+   */
+  private isRemoveButtonClick(element: HTMLElement): boolean {
+    let current: HTMLElement | null = element;
+    while (current) {
+      // Check for PrimeNG chip remove icon classes
+      if (current.classList.contains('p-chip-remove-icon') ||
+          current.classList.contains('pi-times-circle') ||
+          current.classList.contains('pi-times')) {
+        return true;
+      }
+      // Stop if we've reached the chip container
+      if (current.classList.contains('p-chip')) {
+        break;
+      }
+      current = current.parentElement;
+    }
+    return false;
   }
 
   /**

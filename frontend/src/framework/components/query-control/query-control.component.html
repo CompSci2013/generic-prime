@@ -9,6 +9,7 @@
       [filter]="true"
       filterPlaceholder="Search fields..."
       (onChange)="onFieldSelected($event)"
+      (onHide)="onDropdownHide()"
       (keydown)="onDropdownKeydown($event)"
       [showClear]="false"
       optionLabel="label"
@@ -34,8 +35,8 @@
           <p-chip
             [label]="getChipLabel(filter)"
             [removable]="true"
-            (onRemove)="removeFilter(filter)"
-            (click)="editFilter(filter)"
+            (onRemove)="removeFilter(filter); $event.stopPropagation()"
+            (click)="onChipClick($event, filter)"
             styleClass="filter-chip"
             [pTooltip]="getChipTooltip(filter)"
             tooltipPosition="top">
@@ -62,8 +63,8 @@
           <p-chip
             [label]="getChipLabel(highlight)"
             [removable]="true"
-            (onRemove)="removeHighlight(highlight)"
-            (click)="editHighlight(highlight)"
+            (onRemove)="removeHighlight(highlight); $event.stopPropagation()"
+            (click)="onHighlightChipClick($event, highlight)"
             styleClass="highlight-chip"
             [pTooltip]="getChipTooltip(highlight)"
             tooltipPosition="top">
@@ -76,11 +77,12 @@
   <!-- Multiselect Filter Dialog -->
   <p-dialog
     #multiselectDialog
-    [visible]="showMultiselectDialog"
+    [(visible)]="showMultiselectDialog"
     [header]="multiselectDialogTitle"
     [modal]="true"
     [style]="{width: '50vw', minWidth: '400px'}"
     [closable]="true"
+    [closeOnEscape]="true"
     [draggable]="false"
     [resizable]="false"
     (onShow)="onMultiselectDialogShow()"
@@ -177,11 +179,12 @@
   <!-- Year Range Filter Dialog -->
   <p-dialog
     #yearRangeDialog
-    [visible]="showYearRangeDialog"
+    [(visible)]="showYearRangeDialog"
     header="Select Year Range"
     [modal]="true"
     [style]="{width: '500px'}"
     [closable]="true"
+    [closeOnEscape]="true"
     [draggable]="false"
     [resizable]="false"
     (onShow)="onYearRangeDialogShow()"
