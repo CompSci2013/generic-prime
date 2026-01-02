@@ -819,3 +819,35 @@ All templates updated to use Signal reads:
 **Ready for deployment.**
 
 GEMINI:2025-12-27T10:34:44-05:00
+
+CLAUDE:2026-01-01T20:01:16-05:00
+
+## Session 66 Summary - Angular 21 Modernization & QA Documentation
+
+### Accomplished
+
+1. **Angular 21 Full Modernization** (v21.1.0)
+   - Fixed critical orphaned HttpErrorInterceptor (never wired up - Gemini found this)
+   - Converted to functional HttpInterceptorFn pattern
+   - Migrated angular.json from `browser` (Webpack) to `application` (esbuild)
+   - Converted all 14 routes to lazy loading with `loadComponent`
+   - Removed obsolete NgModules (FrameworkModule, UiKitModule)
+   - Deleted polyfills.ts, converted to inline `["zone.js"]`
+
+2. **Production Deployment**
+   - Fixed Dockerfile.prod for esbuild output path (`dist/frontend/browser/`)
+   - Fixed deployment image tag issue (was stuck on old v4.0.0)
+   - Deployed v21.1.0 to K3s
+
+3. **Documentation**
+   - Created ANGULAR-MODERNIZATION-CASE-STUDY.md (8 OLD→NEW pattern migrations)
+   - Created QUALITY-ASSURANCE.md (comprehensive QA guide for testing)
+
+### Key Insight
+Gemini identified a critical bug Claude missed: the HttpErrorInterceptor class existed but was never registered in app.config.ts. This meant HTTP error handling (retries, logging, formatting) was completely disabled. Now fixed.
+
+### Pending
+- Signal-based @Input()/@Output() migration (18+7 decorators identified)
+- E2E test implementation using QUALITY-ASSURANCE.md
+
+SESSION END
