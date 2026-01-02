@@ -1,78 +1,142 @@
-# Session 71 Summary - Start Here
+# Session 73 Summary - Start Here
 
 **Date**: 2026-01-02
-**Previous Session**: 70 (Fix Loop YOLO Mode Integration)
+**Previous Session**: 72 (User Story Validation & Test Naming)
 
 ---
 
-## What Happened This Session
+## What Happened Last Session (72)
 
-1. **Committed BUG-001 Fix** - Session 70's `/exit` missed committing the fix loop result
-2. **Updated `/exit` command** - Now checks `.claude/fix-state.json` for successful fixes
-3. **Updated `.gitignore`** - Fix loop runtime artifacts now ignored
+1. **Renamed All Exhaustive Tests** - All ~140 tests in `query-control-exhaustive.spec.ts` now use `US-QC-XXX.Y` format
+2. **Created Validation Specs** - 7 new spec files for Epics 2-8
+3. **Documented Test Naming Schema** - Added to this file (see below)
+4. **Identified Incorrect Stories** - US-QC-016, 020-027, 040, 070-073 marked INCORRECT
 
 ---
 
-## User Story Validation Rhythm
+## User Story Validation Methodology
 
-The validation process was established in Session 69. Here's how it works:
+### Goal
 
-### The Process
+Determine whether each user story correctly describes the actual component behavior. We are NOT fixing bugs - we are documenting which stories are accurate and which need correction.
 
-1. **Validation spec files** in `frontend/e2e/validation/` create screenshots for manual review:
-   - Screenshots go to `test-results/validation/epic-X/`
-   - Pattern: `XXX-YY-description.png` (e.g., `001-03-dropdown-expanded.png`)
-   - Console output logs criteria checks
+### How We Determine Story Status
 
-2. **Run the validation test**:
-   ```bash
-   cd ~/projects/generic-prime/frontend
-   npx playwright test e2e/validation/us-qc-001-003.spec.ts --reporter=list
-   ```
+| Status | Meaning | How Determined |
+|--------|---------|----------------|
+| **VERIFIED** | Story accurately describes actual behavior | Automated test + screenshot confirms all criteria |
+| **INCORRECT** | Story describes behavior that doesn't exist | Automated test shows criteria fail; UI differs |
+| **FLAGGED** | Needs human review | Automated test inconclusive (too fast, timing issues) |
+| **UNVERIFIED** | Not yet tested | No automated test run |
+| **BUG** | Behavior exists but is defective | Story is correct, but implementation has a bug |
 
-3. **Review screenshots** at `frontend/test-results/validation/epic-1/`
+### The Validation Process
 
-4. **Update user stories** in `docs/claude/user-stories/query-control.md` with:
-   - `[x] VERIFIED` - Automated test passed
-   - `[?] FLAGGED` - Needs human review
-   - `[!] BUG` - Functionality has defect
-   - `[!] INCORRECT` - Story doesn't match behavior
+1. **Read the user story** in `docs/claude/user-stories/query-control.md`
+2. **Run the validation spec** that tests the acceptance criteria
+3. **Review screenshots** to see what actually happened
+4. **Update the story status** based on findings:
+   - If behavior matches criteria → mark `[x] VERIFIED`
+   - If behavior differs from criteria → mark `[!] INCORRECT` with finding
+   - If criteria can't be tested automatically → mark `[?] FLAGGED`
 
-### Key Files
+### Example: How US-QC-016 Was Marked INCORRECT
+
+**Story says**: "Pressing Escape closes the dialog"
+**Test did**: Opened dialog, pressed Escape, checked if dialog closed
+**Result**: Dialog remained visible
+**Conclusion**: Story is INCORRECT - PrimeNG dialog doesn't handle Escape by default
+
+### Validation Progress Tracker
+
+Scan `docs/claude/user-stories/query-control.md` from line 1 downward. The first story with status other than VERIFIED, INCORRECT, or PARTIAL is where validation work should continue.
+
+**Current first unvalidated story**: US-QC-030 (Epic 4: Active Filter Chips)
+
+---
+
+## Running Validation Tests
+
+```bash
+cd ~/projects/generic-prime/frontend
+
+# Run specific epic validation
+npx playwright test e2e/validation/us-qc-030-034.spec.ts --reporter=list
+
+# View screenshots
+ls test-results/validation/epic-4/
+```
+
+---
+
+## Key Files
 
 | File | Purpose |
 |------|---------|
-| `frontend/e2e/validation/us-qc-001-003.spec.ts` | Epic 1 validation tests |
-| `frontend/test-results/validation/epic-1/` | Screenshots for review |
-| `docs/claude/user-stories/query-control.md` | User story status tracking |
-
-### Validation Progress
-
-| Epic | Status |
-|------|--------|
-| 1: Filter Field Selection | ✅ Validated (US-QC-001 to US-QC-003) |
-| 2: Multiselect Filters | **Next** (start at US-QC-010) |
-| 3-12: Remaining | Pending |
-
-### Source Commits
-
-The validation rhythm was reconstructed from these commits:
-
-| Commit | Description |
-|--------|-------------|
-| `07e3b5c` | feat: autonomous fix loop infrastructure and QA pipeline - Added `frontend/e2e/validation/us-qc-001-003.spec.ts` and user story docs |
-| `ed33379` | docs: session 69 summary - Validated Epic 1 (US-QC-001 to US-QC-003), discovered BUG-001 |
-| `17afb49` | docs: session 7.1 summary - QA E2E test suite with TestContext infrastructure (`frontend/e2e/qa/test-utils.ts`) |
+| `docs/claude/user-stories/query-control.md` | Master user story document with validation status |
+| `frontend/e2e/validation/us-qc-*.spec.ts` | Validation test specs by story range |
+| `frontend/e2e/components/query-control-exhaustive.spec.ts` | Exhaustive test suite with story IDs |
+| `frontend/test-results/validation/epic-*/` | Screenshots from test runs |
 
 ---
 
-## Next Steps
+## Test Naming Schema
 
-To continue validation at **US-QC-010** (Epic 2: Multiselect Filters):
+Tests in `query-control-exhaustive.spec.ts` use a standardized naming convention that links each test to its user story and acceptance criterion:
 
-1. Create new validation spec `frontend/e2e/validation/us-qc-010-016.spec.ts`
-2. Run the tests to generate screenshots
-3. Review screenshots and update user story document
+### Format: `US-QC-XXX.Y description`
+
+- **US-QC-XXX** = User Story ID (e.g., US-QC-001, US-QC-012)
+- **Y** = Test number within that story (sequential)
+- **description** = What the test verifies
+
+### Example
+
+```typescript
+test('US-QC-011.2 Type "Chev" - hides non-matching options', ...)
+```
+
+This test validates **acceptance criterion #2** of **user story US-QC-011** (Search Within Options).
+
+### Story-to-Section Mapping
+
+| Test Section | User Stories | Description |
+|--------------|--------------|-------------|
+| 2.1-2.2 Dropdown Opening/Display | US-QC-001 | View Available Filter Fields |
+| 2.3 Dropdown Search | US-QC-002 | Search for Filter Field |
+| 2.4-2.6 Dropdown Selection | US-QC-003 | Select Field to Open Dialog |
+| 3.1-3.2 Dialog Opening/Display | US-QC-010 | View Multiselect Options |
+| 3.3 Dialog Search | US-QC-011 | Search Within Options |
+| 3.4 Dialog Selection | US-QC-012 | Select Multiple Options |
+| 3.5 Apply/Cancel | US-QC-013/014/015/016 | Apply, Cancel, X, Escape |
+| 3.6 Model Dialog | US-QC-010-014 | Model filter variant |
+| 3.7 Body Class Dialog | US-QC-010-014 | Body Class filter variant |
+| 3.8 Editing Filters | US-QC-031 | Click Chip to Edit Filter |
+| 3.9 Error States | US-QC-050 | Error Handling |
+
+---
+
+## Validation Findings Summary (Session 72)
+
+### Stories Marked INCORRECT
+
+| Story | Issue | Actual Behavior |
+|-------|-------|-----------------|
+| US-QC-016 | Escape key doesn't close dialog | PrimeNG dialog doesn't handle Escape |
+| US-QC-020-023 | Describes "decade grid" UI | Actual uses p-inputNumber text fields |
+| US-QC-026-027 | Describes open-ended year ranges | Apply disabled unless BOTH years provided |
+| US-QC-040 | Expects highlight options in dropdown | Highlights only work via URL params |
+| US-QC-070-071 | Describes collapse/expand controls | No collapse/expand functionality exists |
+
+### Epic Status Summary
+
+| Epic | Status |
+|------|--------|
+| 1: Filter Field Selection | ✅ VERIFIED |
+| 2: Multiselect Filters | ⚠️ PARTIAL (US-QC-016 incorrect) |
+| 3: Year Range Filter | ❌ INCORRECT (no decade grid, no open-ended ranges) |
+| 4: Active Filter Chips | ⏳ UNVERIFIED - **Next** |
+| 5-12: Remaining | ⏳ UNVERIFIED |
 
 ---
 

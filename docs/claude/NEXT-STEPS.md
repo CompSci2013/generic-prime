@@ -1,42 +1,59 @@
 # Next Steps
 
-**Current Session**: Session 71 - Exit Protocol Fix & Validation Rhythm Recovery
-**Previous Session**: Session 70 - Fix Loop YOLO Mode Integration
-**Status**: v7.6, BUG-001 committed, validation rhythm documented
+**Current Session**: Session 72 - User Story Validation & Test Naming
+**Previous Session**: Session 71 - Exit Protocol Fix & Validation Rhythm Recovery
+**Status**: v7.7, all exhaustive tests renamed, validation specs created
 
 ---
 
-## IMMEDIATE ACTION: Continue User Story Validation
+## IMMEDIATE ACTION: Run Validation Specs & Update Story Status
 
-**Priority**: HIGH (Resume interrupted work)
-**Scope**: Validate Query Control user stories from US-QC-010 onward
+**Priority**: HIGH (Continue validation)
+**Scope**: Execute validation specs and finalize story status markers
 
 ### Context
 
-User story validation was interrupted when BUG-001 was discovered. The bug is now fixed and committed. Resume validation at **US-QC-010: View Multiselect Options** (Epic 2).
+Session 72 created validation specs for Epics 2-8 but did not run all of them. Several stories have already been marked INCORRECT based on code analysis. Next session should:
 
-### Validation Rhythm (from Session 69)
+1. Run remaining validation specs
+2. Review screenshots to confirm findings
+3. Finalize story status markers in `query-control.md`
 
-1. Create validation spec in `frontend/e2e/validation/us-qc-010-016.spec.ts`
-2. Run: `npx playwright test e2e/validation/us-qc-010-016.spec.ts --reporter=list`
-3. Review screenshots at `frontend/test-results/validation/epic-2/`
-4. Update `docs/claude/user-stories/query-control.md` with markers
+### Run Commands
 
-### Key Files
+```bash
+cd ~/projects/generic-prime/frontend
 
-| File | Purpose |
-|------|---------|
-| `docs/claude/start-here.md` | Full validation rhythm documentation |
-| `frontend/e2e/validation/us-qc-001-003.spec.ts` | Epic 1 validation (reference) |
-| `docs/claude/user-stories/query-control.md` | User story status tracking |
+# Run Epic 2 (Multiselect) validation
+npx playwright test e2e/validation/us-qc-010-016.spec.ts --reporter=list
+
+# Run Epic 4 (Filter Chips) validation
+npx playwright test e2e/validation/us-qc-030-034.spec.ts --reporter=list
+
+# View screenshots
+ls test-results/validation/epic-*/
+```
 
 ### Validation Progress
 
 | Epic | Status |
 |------|--------|
-| 1: Filter Field Selection | ✅ Validated (US-QC-001 to US-QC-003) |
-| 2: Multiselect Filters | **Next** (start at US-QC-010) |
-| 3-12: Remaining | Pending |
+| 1: Filter Field Selection | ✅ VERIFIED |
+| 2: Multiselect Filters | ⚠️ PARTIAL (US-QC-016 incorrect - Escape key) |
+| 3: Year Range Filter | ❌ INCORRECT (no decade grid, no open-ended ranges) |
+| 4: Active Filter Chips | ⏳ **Next** - Run validation |
+| 5: Highlight Mode | ❌ INCORRECT (highlights only via URL params) |
+| 6: Clear All Actions | ⏳ Need to run validation |
+| 7: URL Persistence | ⏳ Need to run validation |
+| 8: Panel Behavior | ❌ INCORRECT (no collapse/expand/pop-out) |
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `docs/claude/start-here.md` | Full validation rhythm + test naming schema |
+| `docs/claude/user-stories/query-control.md` | Master story document with status markers |
+| `frontend/e2e/validation/us-qc-*.spec.ts` | Validation spec files |
 
 ---
 
@@ -49,11 +66,10 @@ User story validation was interrupted when BUG-001 was discovered. The bug is no
 
 ---
 
-## SESSION 71 COMPLETION SUMMARY
+## SESSION 72 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Committed BUG-001 fix that was missed by Session 70's /exit
-2. ✅ Updated /exit command to check fix loop results before ending
-3. ✅ Added fix loop runtime artifacts to .gitignore
-4. ✅ Recovered and documented validation rhythm from commits `07e3b5c`, `ed33379`, `17afb49`
-5. ✅ Updated `docs/claude/start-here.md` with complete validation process
+1. ✅ Renamed all ~140 tests in `query-control-exhaustive.spec.ts` with US-QC-XXX.Y format
+2. ✅ Created 7 validation spec files for Epics 2-8
+3. ✅ Documented test naming schema in `start-here.md`
+4. ✅ Identified multiple incorrect user stories (US-QC-016, 020-027, 040, 070-073)
