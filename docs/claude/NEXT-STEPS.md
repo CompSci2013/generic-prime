@@ -1,57 +1,54 @@
 # Next Steps
 
-**Current Session**: Session 69 - Autonomous Fix Loop Implementation
-**Previous Session**: Session 68 - Merged /bye and /exit Commands
-**Status**: v7.3, Autonomous fix loop infrastructure complete
+**Current Session**: Session 70 - Fix Loop YOLO Mode Integration
+**Previous Session**: Session 69 - Autonomous Fix Loop Implementation
+**Status**: v7.4, YOLO mode integrated for fully unattended operation
 
 ---
 
-## IMMEDIATE ACTION: Test Autonomous Fix Loop with BUG-001
+## IMMEDIATE ACTION: Test Fix Loop with YOLO Mode
 
-**Priority**: HIGH (Testing new infrastructure)
-**Scope**: Run unattended bug fix session
+**Priority**: HIGH (Validate unattended operation)
+**Scope**: Run fully autonomous bug fix session
 
-### Prerequisites
+### Steps
 
-1. **Restart Claude Code** (required for new permissions to take effect)
-
-### Steps to Run Autonomous Fix Loop
-
-1. **Initialize the fix session**:
+1. **Revert the bug fix** (if not already reverted):
    ```bash
+   git checkout frontend/src/framework/components/query-control/query-control.component.ts
+   ```
+
+2. **Initialize the fix session**:
+   ```bash
+   cd ~/projects/generic-prime
    .claude/scripts/init-fix.sh BUG-001 e2e/regression/bug-001-keyboard-selection.spec.ts
    ```
 
-2. **Start Claude with the fix prompt**:
+3. **Run the YOLO mode command** (output by init-fix.sh):
+   ```bash
+   cd /home/odin/projects/generic-prime && claude --dangerously-skip-permissions -p "Fix the bug described in .claude/fix-state.json. The regression test at frontend/e2e/regression/bug-001-keyboard-selection.spec.ts must pass. Use strategy: local (attempt 1)."
    ```
-   Fix the bug described in .claude/fix-state.json. The regression test at e2e/regression/bug-001-keyboard-selection.spec.ts must pass. Use strategy: local (attempt 1).
-   ```
 
-3. **Walk away** - The loop will:
-   - Attempt 1: Local code analysis → fix → test runs automatically
-   - If fail → Attempt 2: Web search for solutions → fix → test runs
-   - If fail → Attempt 3: Deep investigation → fix → test runs
-   - If fail → Mark DEFERRED and stop
+4. **Walk away** - No permission prompts, fully autonomous
 
-### The Bug to Fix
+### Expected Behavior
 
-**BUG-001**: Keyboard selection broken in filter dropdown
-- **Location**: `frontend/src/framework/components/query-control/query-control.component.ts:233`
-- **Issue**: Uses PrimeNG 20 selector (`.p-select-items .p-highlight`)
-- **Fix**: Change to PrimeNG 21 selector (`.p-select-overlay .p-select-option.p-focus`)
+- Claude runs without any permission prompts
+- Stop hook runs tests after each attempt
+- Loop continues through 3 attempts (local → web_search → deep_investigation)
+- Ends with status FIXED or DEFERRED
 
 ### Verifying Results
 
-After the session ends:
 ```bash
-cat .claude/fix-state.json  # Check status (FIXED or DEFERRED)
-cat .claude/fix-log.txt     # View detailed log
-ls .claude/fix-archive/     # View archived sessions
+cat .claude/fix-state.json   # Check final status
+cat .claude/fix-log.txt      # View attempt history
+ls .claude/fix-archive/      # View archived sessions
 ```
 
 ---
 
-## ALTERNATIVE: IdP Phase 1 (If Fix Loop Works)
+## ALTERNATIVE: IdP Phase 1 (If Fix Loop Validated)
 
 **Priority**: HIGH (Architecture)
 **Scope**: Deploy Keycloak to K3s
@@ -66,11 +63,11 @@ ls .claude/fix-archive/     # View archived sessions
 
 ---
 
-## SESSION 69 COMPLETION SUMMARY
+## SESSION 70 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Validated Query Control user stories (Epic 1)
-2. ✅ Discovered and documented BUG-001 (keyboard selection)
-3. ✅ Implemented autonomous fix loop (Option B: Stop Hook + State File)
-4. ✅ Configured permissions for unattended operation
-5. ✅ Created regression test for BUG-001
+1. ✅ Debugged fix loop infrastructure (dev server, directory, permissions)
+2. ✅ Enhanced init-fix.sh with dev server management
+3. ✅ Enhanced end-fix.sh with cleanup
+4. ✅ Discovered and integrated YOLO mode (`--dangerously-skip-permissions`)
+5. ✅ Updated permissions in settings.json for comprehensive coverage
