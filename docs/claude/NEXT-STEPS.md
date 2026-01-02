@@ -1,8 +1,8 @@
 # Next Steps
 
-**Current Session**: Session 71 - Exit Protocol Fix
+**Current Session**: Session 71 - Exit Protocol Fix & Validation Rhythm Recovery
 **Previous Session**: Session 70 - Fix Loop YOLO Mode Integration
-**Status**: v7.5, BUG-001 committed, /exit updated
+**Status**: v7.6, BUG-001 committed, validation rhythm documented
 
 ---
 
@@ -15,25 +15,20 @@
 
 User story validation was interrupted when BUG-001 was discovered. The bug is now fixed and committed. Resume validation at **US-QC-010: View Multiselect Options** (Epic 2).
 
-### Files
+### Validation Rhythm (from Session 69)
 
-- **User Stories**: `docs/claude/user-stories/query-control.md`
-- **Test Suite**: `frontend/e2e/components/query-control-exhaustive.spec.ts`
-- **Session Summary**: `docs/claude/start-here.md`
+1. Create validation spec in `frontend/e2e/validation/us-qc-010-016.spec.ts`
+2. Run: `npx playwright test e2e/validation/us-qc-010-016.spec.ts --reporter=list`
+3. Review screenshots at `frontend/test-results/validation/epic-2/`
+4. Update `docs/claude/user-stories/query-control.md` with markers
 
-### Steps
+### Key Files
 
-1. **Run multiselect dialog tests**:
-   ```bash
-   cd ~/projects/generic-prime/frontend
-   npx playwright test e2e/components/query-control-exhaustive.spec.ts -g "3.1|3.2" --reporter=list
-   ```
-
-2. **Map test results to acceptance criteria** in US-QC-010 through US-QC-016
-
-3. **Update user story document** with VERIFIED/BUG/INCORRECT markers
-
-4. **Continue through remaining Epics** (3-12)
+| File | Purpose |
+|------|---------|
+| `docs/claude/start-here.md` | Full validation rhythm documentation |
+| `frontend/e2e/validation/us-qc-001-003.spec.ts` | Epic 1 validation (reference) |
+| `docs/claude/user-stories/query-control.md` | User story status tracking |
 
 ### Validation Progress
 
@@ -52,12 +47,6 @@ User story validation was interrupted when BUG-001 was discovered. The bug is no
 
 **Reference**: `docs/infrastructure/idp/IDENTITY-STRATEGY.md`
 
-**Steps**:
-1. Create K3s manifests for Postgres in `platform` namespace
-2. Create K3s manifests for Keycloak
-3. Configure Ingress for `auth.minilab`
-4. Create test users (Bob/SuperAdmin, Alice/AutoAdmin, Frank/Viewer)
-
 ---
 
 ## SESSION 71 COMPLETION SUMMARY
@@ -66,5 +55,5 @@ User story validation was interrupted when BUG-001 was discovered. The bug is no
 1. ✅ Committed BUG-001 fix that was missed by Session 70's /exit
 2. ✅ Updated /exit command to check fix loop results before ending
 3. ✅ Added fix loop runtime artifacts to .gitignore
-4. ✅ Created start-here.md session summary
-5. ✅ Reviewed QA documentation for context
+4. ✅ Recovered and documented validation rhythm from commits `07e3b5c`, `ed33379`, `17afb49`
+5. ✅ Updated `docs/claude/start-here.md` with complete validation process
