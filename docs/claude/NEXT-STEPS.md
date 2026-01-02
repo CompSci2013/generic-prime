@@ -1,17 +1,60 @@
 # Next Steps
 
-**Current Session**: Session 68 - Merged /bye and /exit Commands
-**Previous Session**: Session 67 - QA E2E Test Suite Implementation
-**Status**: v21.1.0 deployed, `/exit` command updated with two-commit workflow
+**Current Session**: Session 69 - Autonomous Fix Loop Implementation
+**Previous Session**: Session 68 - Merged /bye and /exit Commands
+**Status**: v7.3, Autonomous fix loop infrastructure complete
 
 ---
 
-## IMMEDIATE ACTION 1: Infrastructure (IdP Phase 1)
+## IMMEDIATE ACTION: Test Autonomous Fix Loop with BUG-001
+
+**Priority**: HIGH (Testing new infrastructure)
+**Scope**: Run unattended bug fix session
+
+### Prerequisites
+
+1. **Restart Claude Code** (required for new permissions to take effect)
+
+### Steps to Run Autonomous Fix Loop
+
+1. **Initialize the fix session**:
+   ```bash
+   .claude/scripts/init-fix.sh BUG-001 e2e/regression/bug-001-keyboard-selection.spec.ts
+   ```
+
+2. **Start Claude with the fix prompt**:
+   ```
+   Fix the bug described in .claude/fix-state.json. The regression test at e2e/regression/bug-001-keyboard-selection.spec.ts must pass. Use strategy: local (attempt 1).
+   ```
+
+3. **Walk away** - The loop will:
+   - Attempt 1: Local code analysis → fix → test runs automatically
+   - If fail → Attempt 2: Web search for solutions → fix → test runs
+   - If fail → Attempt 3: Deep investigation → fix → test runs
+   - If fail → Mark DEFERRED and stop
+
+### The Bug to Fix
+
+**BUG-001**: Keyboard selection broken in filter dropdown
+- **Location**: `frontend/src/framework/components/query-control/query-control.component.ts:233`
+- **Issue**: Uses PrimeNG 20 selector (`.p-select-items .p-highlight`)
+- **Fix**: Change to PrimeNG 21 selector (`.p-select-overlay .p-select-option.p-focus`)
+
+### Verifying Results
+
+After the session ends:
+```bash
+cat .claude/fix-state.json  # Check status (FIXED or DEFERRED)
+cat .claude/fix-log.txt     # View detailed log
+ls .claude/fix-archive/     # View archived sessions
+```
+
+---
+
+## ALTERNATIVE: IdP Phase 1 (If Fix Loop Works)
 
 **Priority**: HIGH (Architecture)
 **Scope**: Deploy Keycloak to K3s
-
-This is the next major architectural milestone.
 
 **Reference**: `docs/infrastructure/idp/IDENTITY-STRATEGY.md`
 
@@ -23,52 +66,11 @@ This is the next major architectural milestone.
 
 ---
 
-## IMMEDIATE ACTION 2: Expand E2E Test Coverage (Optional)
-
-**Priority**: MEDIUM
-**Scope**: Add more tests to existing categories
-
-The current 60 tests cover the core functionality. Additional tests could be added for:
-- Multi-filter combinations (more complex scenarios)
-- Pop-out window stress tests
-- Cross-domain testing (if other domains get added)
-
-**Reference**: `QUALITY-ASSURANCE.md` - Part 5: E2E Test Categories
-
----
-
-## REMAINING MODERNIZATION (Optional)
-
-**Priority**: LOW (Technical Debt)
-**Scope**: Signal-based inputs/outputs (identified in GEMINI-ANALYSIS.md)
-
-**Not Yet Migrated**:
-- 18 `@Input()` decorators → `input()` signal
-- 7 `@Output()` decorators → `output()`
-- 5 `@ViewChild()` decorators → `viewChild()` signal
-- 34 files with constructor DI → `inject()`
-
-These are functional but would prepare for zoneless Angular.
-
----
-
-## DEFERRED: Pop-out Re-rendering Bug
-
-**Priority**: MEDIUM (Deferred from Session 62)
-**Scope**: Pop-out BasicResultsTable doesn't re-render after STATE_UPDATE
-
-**Context**:
-- Sort/pagination in pop-out correctly sends message to main window
-- Main window URL updates correctly, triggers API call
-- Main window broadcasts STATE_UPDATE back to pop-out
-- Pop-out receives STATE_UPDATE but table doesn't re-render with new data
-
----
-
-## SESSION 68 COMPLETION SUMMARY
+## SESSION 69 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Merged `/bye` and `/exit` into single `/exit` command
-2. ✅ Implemented two-commit workflow (docs first, then remaining)
-3. ✅ Added explicit `date -Iseconds` timestamp requirement
-4. ✅ Removed STATUS-HISTORY.md archival (git history is the record)
+1. ✅ Validated Query Control user stories (Epic 1)
+2. ✅ Discovered and documented BUG-001 (keyboard selection)
+3. ✅ Implemented autonomous fix loop (Option B: Stop Hook + State File)
+4. ✅ Configured permissions for unattended operation
+5. ✅ Created regression test for BUG-001
