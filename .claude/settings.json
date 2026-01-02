@@ -4,9 +4,17 @@
       "WebSearch",
       "WebFetch",
       "Edit(frontend/src/**)",
+      "Edit(src/**)",
+      "Edit(.claude/**)",
       "Read(frontend/src/**)",
+      "Read(src/**)",
+      "Read(.claude/**)",
+      "Read(frontend/e2e/**)",
+      "Edit(frontend/e2e/**)",
       "Grep",
-      "Glob"
+      "Glob",
+      "Bash(cd /home/odin/projects/generic-prime/frontend && npx playwright test:*)",
+      "Bash(npx playwright test:*)"
     ]
   },
   "hooks": {
