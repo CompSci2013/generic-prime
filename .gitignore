@@ -29,3 +29,9 @@ frontend/documents/
 frontend/playwright-report/
 frontend/test-results/
 frontend/test-results.json
+
+# Claude fix loop runtime artifacts
+.claude/fix-log.txt
+.claude/fix-state.json
+.claude/dev-server.log
+.claude/fix-archive/

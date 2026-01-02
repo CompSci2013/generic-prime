@@ -24,23 +24,39 @@ Execute the following steps to properly end the session:
 
 ---
 
-### 2. Commit Changes (Two Commits)
+### 2. Check for Fix Loop Results
 
-3. **First commit** - Documentation updates:
+3. **Check if fix loop produced a successful fix**:
+   - Read `.claude/fix-state.json` if it exists
+   - If `status` is `"FIXED"`, the fix loop successfully fixed a bug
+   - The fixed code MUST be committed before the session ends
+   - Example: If BUG-001 was fixed, commit the changed source files with message like `fix: BUG-001 - [description]`
+
+---
+
+### 3. Commit Changes (Two or Three Commits)
+
+4. **First commit** - Fix loop results (if applicable):
+   - If `.claude/fix-state.json` shows `status: "FIXED"`, commit the fixed source files
+   - Commit message: `fix: [BUG-ID] - [brief description of fix]`
+   - Skip if no fix loop was run or fix was not successful
+
+5. **Second commit** - Documentation updates:
    - Run `git add docs/claude/`
    - Commit: `docs: session [Version] summary - [Brief Description]`
 
-4. **Second commit** - Remaining changes (if any):
-   - Run `git add .`
+6. **Third commit** - Remaining changes (if any):
+   - Run `git add .` (excludes files in .gitignore)
    - Review staged files with `git status`
+   - **DO NOT commit**: `.claude/fix-log.txt`, `.claude/fix-state.json`, `.claude/dev-server.log` (runtime artifacts)
    - Commit with appropriate message based on changes (e.g., `feat:`, `fix:`, `chore:`)
    - Skip if no remaining changes
 
 ---
 
-### 3. Final Message
+### 4. Final Message
 
-5. **Provide**:
+7. **Provide**:
    - Summary of what was accomplished this session
    - Next session action: What immediate work is needed?
    - Confirmation: All changes committed to git
