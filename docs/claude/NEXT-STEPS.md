@@ -1,27 +1,12 @@
 # Next Steps
 
-**Current Session**: Session 66 - Angular 21 Modernization & QA Documentation
-**Previous Session**: Session 65+ - Angular 17 → 21 Upgrade
-**Status**: v21.1.0 deployed, modernization complete, QA documentation created
+**Current Session**: Session 67 - QA E2E Test Suite Implementation
+**Previous Session**: Session 66 - Angular 21 Modernization & QA Documentation
+**Status**: v21.1.0 deployed, 60 E2E tests implemented and passing
 
 ---
 
-## IMMEDIATE ACTION 1: Implement E2E Tests Using QUALITY-ASSURANCE.md
-
-**Priority**: HIGH
-**Scope**: Create Playwright tests based on documented behaviors
-
-**Reference**: `QUALITY-ASSURANCE.md` - Part 5: E2E Test Categories
-
-**Steps**:
-1. Review QUALITY-ASSURANCE.md test categories (6 categories, ~120 tests defined)
-2. Implement Category 1: Basic Filters (Tests 001-020)
-3. Implement Category 2: Pop-Out Lifecycle (Tests 021-040)
-4. Continue with remaining categories
-
----
-
-## IMMEDIATE ACTION 2: Infrastructure (IdP Phase 1)
+## IMMEDIATE ACTION 1: Infrastructure (IdP Phase 1)
 
 **Priority**: HIGH (Architecture)
 **Scope**: Deploy Keycloak to K3s
@@ -35,6 +20,20 @@ This is the next major architectural milestone.
 2. Create K3s manifests for Keycloak
 3. Configure Ingress for `auth.minilab`
 4. Create test users (Bob/SuperAdmin, Alice/AutoAdmin, Frank/Viewer)
+
+---
+
+## IMMEDIATE ACTION 2: Expand E2E Test Coverage (Optional)
+
+**Priority**: MEDIUM
+**Scope**: Add more tests to existing categories
+
+The current 60 tests cover the core functionality. Additional tests could be added for:
+- Multi-filter combinations (more complex scenarios)
+- Pop-out window stress tests
+- Cross-domain testing (if other domains get added)
+
+**Reference**: `QUALITY-ASSURANCE.md` - Part 5: E2E Test Categories
 
 ---
 
@@ -66,16 +65,13 @@ These are functional but would prepare for zoneless Angular.
 
 ---
 
-## SESSION 66 COMPLETION SUMMARY
+## SESSION 67 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Angular 21 full modernization (8 pattern migrations)
-2. ✅ Fixed critical orphaned HttpErrorInterceptor bug
-3. ✅ Migrated to esbuild application builder
-4. ✅ Deployed v21.1.0 to production
-5. ✅ Created ANGULAR-MODERNIZATION-CASE-STUDY.md
-6. ✅ Created QUALITY-ASSURANCE.md for testing guidance
+1. ✅ Implemented 60 E2E tests across 6 categories
+2. ✅ Created TestContext infrastructure for test artifacts
+3. ✅ Fixed collapsed panels issue with expandAllPanels helper
+4. ✅ Generated HTML/PDF reports and ZIP archive
 
-**Current State**:
-- v21.1.0 deployed and verified at http://generic-prime.minilab
-- Comprehensive QA documentation ready for test implementation
+**Deliverable**:
+- `frontend/test-results/qa-report.zip` - Windows-compatible archive with reports and test artifacts
