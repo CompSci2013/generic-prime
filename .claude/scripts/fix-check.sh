@@ -98,6 +98,8 @@ fi
 case $NEXT_ATTEMPT in
   2) NEXT_STRATEGY="web_search" ;;
   3) NEXT_STRATEGY="deep_investigation" ;;
+  4) NEXT_STRATEGY="alternative_approach" ;;
+  5) NEXT_STRATEGY="minimal_fix" ;;
   *) NEXT_STRATEGY="local" ;;
 esac
 
@@ -157,6 +159,38 @@ log "RETRY: Attempt $NEXT_ATTEMPT with strategy $NEXT_STRATEGY"
       echo "   - Check if the component API offers keyboard handling options"
       echo ""
       echo "Apply the most promising solution and the test will run again."
+      ;;
+    "alternative_approach")
+      echo "INSTRUCTIONS FOR ATTEMPT 4 (Alternative Approach):"
+      echo ""
+      echo "Previous strategies failed. Try a completely different approach:"
+      echo ""
+      echo "1. RECONSIDER THE PROBLEM"
+      echo "   - Re-read the bug description and test expectations"
+      echo "   - Maybe the fix needs to be in a different file entirely"
+      echo "   - Consider if a workaround is acceptable"
+      echo ""
+      echo "2. CHECK SIMILAR COMPONENTS"
+      echo "   - How do other components in this codebase solve similar problems?"
+      echo "   - Can you copy a pattern that already works?"
+      echo ""
+      echo "3. SIMPLIFY"
+      echo "   - Remove any complex fixes from previous attempts"
+      echo "   - Try the simplest possible solution"
+      echo ""
+      echo "Apply a fresh approach and the test will run again."
+      ;;
+    "minimal_fix")
+      echo "INSTRUCTIONS FOR ATTEMPT 5 (Minimal Fix - LAST CHANCE):"
+      echo ""
+      echo "This is your FINAL attempt. Focus on the absolute minimum fix:"
+      echo ""
+      echo "1. REVERT any complex changes from previous attempts"
+      echo "2. Make the SMALLEST possible change to pass the test"
+      echo "3. Don't worry about elegance - just make it work"
+      echo "4. If the test expects specific behavior, implement EXACTLY that"
+      echo ""
+      echo "This is your last chance before the bug is marked DEFERRED."
       ;;
     *)
       echo "INSTRUCTIONS FOR ATTEMPT 1 (Local Analysis):"
