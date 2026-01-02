@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { PHYSICS_KNOWLEDGE_PATH, PhysicsNode, SyllabusItem } from './physics-knowledge-path';
+
 
 /**
  * Physics Domain Landing Component
@@ -100,9 +101,10 @@ import { PHYSICS_KNOWLEDGE_PATH, PhysicsNode, SyllabusItem } from './physics-kno
  * @since 1.0.0 (Added as part of multi-domain framework expansion)
  */
 @Component({
-  selector: 'app-physics',
-  templateUrl: './physics.component.html',
-  styleUrls: ['./physics.component.scss']
+    selector: 'app-physics',
+    templateUrl: './physics.component.html',
+    styleUrls: ['./physics.component.scss'],
+    imports: [RouterLink]
 })
 export class PhysicsComponent {
   /**

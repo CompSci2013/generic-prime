@@ -1,12 +1,41 @@
 # Next Steps
 
-**Current Session**: Session 62 - Pop-out BasicResultsTable Debugging
-**Previous Session**: Session 61 - Query Panel UX Refinement
-**Status**: Pop-out sort message flow verified. Re-rendering issue deferred.
+**Current Session**: Session 65+ - Angular 17 → 21 Upgrade
+**Previous Session**: Session 64 - Angular 14 → 17 Upgrade
+**Status**: Angular 21 upgrade verified, version 21.0.0
 
 ---
 
-## IMMEDIATE ACTION 1: Investigate Pop-out Re-rendering Bug
+## IMMEDIATE ACTION 1: Merge Angular 21 Branch
+
+**Priority**: HIGH
+**Scope**: Merge feature branch to main
+
+**Steps**:
+1. Verify build/test suite passes locally (ng build, npx playwright test)
+2. Merge `feature/angular-21-upgrade` to `main`
+3. Push to origin
+
+---
+
+## IMMEDIATE ACTION 2: Infrastructure (IdP Phase 1)
+
+**Priority**: HIGH (Architecture)
+**Scope**: Deploy Keycloak to K3s
+
+This is the next major architectural milestone.
+
+**Reference**: `docs/infrastructure/idp/IDENTITY-STRATEGY.md`
+
+**Steps**:
+1. Create K3s manifests for Postgres in `platform` namespace
+2. Create K3s manifests for Keycloak
+3. Configure Ingress for `auth.minilab`
+4. Create test users (Bob/SuperAdmin, Alice/AutoAdmin, Frank/Viewer)
+
+---
+
+## DEFERRED: Pop-out Re-rendering Bug
 
 **Priority**: MEDIUM (Deferred from Session 62)
 **Scope**: Pop-out BasicResultsTable doesn't re-render after STATE_UPDATE
@@ -17,48 +46,22 @@
 - Main window broadcasts STATE_UPDATE back to pop-out
 - Pop-out receives STATE_UPDATE but table doesn't re-render with new data
 
-**Hypothesis**: OnPush change detection issue. Possible causes:
-1. `syncStateFromExternal()` not triggering observable emissions
-2. `markForCheck()` insufficient - need `detectChanges()`
-3. Zone.js timing issue with BroadcastChannel callback
-
-**Investigation Steps**:
-1. Add logging to `resourceService.syncStateFromExternal()` to verify it's called
-2. Check if `results$` observable emits new value after sync
-3. Compare with QueryControl pop-out (which works correctly)
-4. Try `detectChanges()` instead of `markForCheck()` in subscription
-
-**Debug Logging Locations** (added this session):
+**Debug Logging Locations** (to remove later):
 - `basic-results-table.component.ts:182-189` - onSort
 - `panel-popout.component.ts:203,211` - onUrlParamsChange
 - `discover.component.ts` - BroadcastChannel and handlePopOutMessage
 
 ---
 
-## IMMEDIATE ACTION 2: Infrastructure (IdP Phase 1) - RESUME
-
-**Priority**: HIGH (Architecture)
-**Scope**: Deploy Keycloak to K3s
-
-This remains the next major architectural milestone once pop-out bugs are resolved.
-
-**Reference**: `docs/infrastructure/idp/IDENTITY-STRATEGY.md`
-
----
-
-## SESSION 62 COMPLETION SUMMARY
+## SESSION 65 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Fixed "Unknown panel type" error for BasicResultsTable pop-out (v1.2.1)
-2. ✅ Added urlParamsChange output for sort/pagination communication (v1.2.2)
-3. ✅ Verified BroadcastChannel message flow is working correctly
-4. 🔶 Deferred: Pop-out re-rendering issue (change detection hypothesis)
+1. ✅ Verified Angular 21 upgrade
+2. ✅ Updated project documentation
 
 **Commits This Session**:
-- Pending commit for session documentation
+- (Pending) docs: Update project status for Angular 21 upgrade
 
 **Current State**:
-- Pop-out BasicResultsTable renders correctly
-- Sort/pagination messages flow correctly to main window
-- Main window URL updates work
-- Issue: Pop-out doesn't re-render with updated data (deferred)
+- Angular 21.0.0 verified locally
+- Documentation updated to reflect v6.0 status

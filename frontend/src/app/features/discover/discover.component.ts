@@ -9,7 +9,7 @@ import {
   OnInit
 } from '@angular/core';
 import { Params } from '@angular/router';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -26,6 +26,15 @@ import { PopOutContextService } from '../../../framework/services/popout-context
 import { ResourceManagementService } from '../../../framework/services/resource-management.service';
 import { UrlStateService } from '../../../framework/services/url-state.service';
 import { UserPreferencesService } from '../../../framework/services/user-preferences.service';
+import { BasicResultsTableComponent } from '../../../framework/components/basic-results-table/basic-results-table.component';
+import { ResultsTableComponent } from '../../../framework/components/results-table/results-table.component';
+import { StatisticsPanelComponent } from '../../../framework/components/statistics-panel/statistics-panel.component';
+import { BasePickerComponent } from '../../../framework/components/base-picker/base-picker.component';
+import { QueryPanelComponent } from '../../../framework/components/query-panel/query-panel.component';
+import { QueryControlComponent } from '../../../framework/components/query-control/query-control.component';
+import { TooltipModule } from 'primeng/tooltip';
+import { ButtonModule } from 'primeng/button';
+
 
 /**
  * Discover Component - Core discovery interface orchestrator
@@ -100,11 +109,12 @@ import { UserPreferencesService } from '../../../framework/services/user-prefere
  * ```
  */
 @Component({
-  selector: 'app-discover',
-  templateUrl: './discover.component.html',
-  styleUrls: ['./discover.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [ResourceManagementService]
+    selector: 'app-discover',
+    templateUrl: './discover.component.html',
+    styleUrls: ['./discover.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [ResourceManagementService],
+    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, BasicResultsTableComponent]
 })
 export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

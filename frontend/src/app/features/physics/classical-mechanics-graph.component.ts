@@ -43,7 +43,8 @@
 
 import { Component, OnInit } from '@angular/core';
 import { CLASSICAL_MECHANICS_GRAPH } from './classical-mechanics-graph';
-import { KnowledgeGraphData } from './knowledge-graph.component';
+import { KnowledgeGraphData, KnowledgeGraphComponent as KnowledgeGraphComponent_1 } from './knowledge-graph.component';
+
 
 /**
  * Classical Mechanics Knowledge Graph Display Component
@@ -52,16 +53,18 @@ import { KnowledgeGraphData } from './knowledge-graph.component';
  * using the generic KnowledgeGraphComponent.
  */
 @Component({
-  selector: 'app-classical-mechanics-graph',
-  template: `
-    <app-knowledge-graph
-      *ngIf="graphData"
-      [graphData]="graphData"
-      [title]="'Classical Mechanics Knowledge Graph'"
-      [subtitle]="'Topic relationships and dependencies'"
-      [backRoute]="'/physics'">
-    </app-knowledge-graph>
-  `
+    selector: 'app-classical-mechanics-graph',
+    template: `
+    @if (graphData) {
+      <app-knowledge-graph
+        [graphData]="graphData"
+        [title]="'Classical Mechanics Knowledge Graph'"
+        [subtitle]="'Topic relationships and dependencies'"
+        [backRoute]="'/physics'">
+      </app-knowledge-graph>
+    }
+    `,
+    imports: [KnowledgeGraphComponent_1]
 })
 export class ClassicalMechanicsGraphComponent implements OnInit {
   /**

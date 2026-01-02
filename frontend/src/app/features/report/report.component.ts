@@ -15,8 +15,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
  * 3. The report will automatically load the latest test results
  */
 @Component({
-  selector: 'app-report',
-  template: `
+    selector: 'app-report',
+    template: `
     <div class="report-container">
       <iframe
         [src]="reportUrl"
@@ -25,7 +25,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
       </iframe>
     </div>
   `,
-  styles: [`
+    styles: [`
     .report-container {
       display: flex;
       width: 100%;
@@ -40,7 +40,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
       height: 100%;
       border: none;
     }
-  `]
+  `],
+    standalone: true
 })
 export class ReportComponent implements OnInit {
   /**

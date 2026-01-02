@@ -16,6 +16,15 @@ import { DomainConfig, FilterDefinition, FilterOption } from '../../models/domai
 import { ResourceManagementService } from '../../services/resource-management.service';
 import { PopOutContextService } from '../../services/popout-context.service';
 import { PopOutMessageType } from '../../models/popout.interface';
+import { CheckboxModule } from 'primeng/checkbox';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+
 
 /**
  * Query Panel Component
@@ -47,10 +56,12 @@ import { PopOutMessageType } from '../../models/popout.interface';
  * ```
  */
 @Component({
-  selector: 'app-query-panel',
-  templateUrl: './query-panel.component.html',
-  styleUrls: ['./query-panel.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-query-panel',
+    templateUrl: './query-panel.component.html',
+    styleUrls: ['./query-panel.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [FormsModule, InputTextModule, InputNumberModule, ButtonModule, SelectModule, MultiSelectModule, AutoCompleteModule, CheckboxModule]
 })
 export class QueryPanelComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

@@ -2,15 +2,16 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   EventEmitter,
+  inject,
   Input,
-  OnDestroy,
   OnInit,
   Output,
   ViewChild
 } from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil, filter } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { DomainConfig } from '../../models/domain-config.interface';
 import {
@@ -21,6 +22,18 @@ import { ApiService } from '../../services/api.service';
 import { UrlStateService } from '../../services/url-state.service';
 import { PopOutContextService } from '../../services/popout-context.service';
 import { PopOutMessageType } from '../../models/popout.interface';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { InputTextModule } from 'primeng/inputtext';
+import { SharedModule } from 'primeng/api';
+import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
+import { ChipModule } from 'primeng/chip';
+
+import { ButtonModule } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { SelectModule } from 'primeng/select';
 
 /**
  * Active filter representation
@@ -79,153 +92,68 @@ interface ActiveFilter {
  * ```
  */
 @Component({
-  selector: 'app-query-control',
-  templateUrl: './query-control.component.html',
-  styleUrls: ['./query-control.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-query-control',
+    templateUrl: './query-control.component.html',
+    styleUrls: ['./query-control.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [SelectModule, FormsModule, ButtonModule, ChipModule, TooltipModule, DialogModule, SharedModule, InputTextModule, ProgressSpinnerModule, CheckboxModule, InputNumberModule]
 })
 export class QueryControlComponent<TFilters = any, TData = any, TStatistics = any>
-  implements OnInit, OnDestroy {
+  implements OnInit {
 
-  /**
-   * Environment configuration for conditional test-id rendering
-   */
+  // ============================================================================
+  // Dependency Injection (Angular 17 inject() pattern)
+  // ============================================================================
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly apiService = inject(ApiService);
+  private readonly urlState = inject(UrlStateService);
+  private readonly popOutContext = inject(PopOutContextService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  // ============================================================================
+  // Configuration
+  // ============================================================================
+
   readonly environment = environment;
 
-  /**
-   * Domain configuration with filter definitions for this query control instance
-   */
   @Input() domainConfig!: DomainConfig<TFilters, TData, TStatistics>;
 
-  /**
-   * Emits when URL parameters should be updated with new filter values or other query parameters
-   */
   @Output() urlParamsChange = new EventEmitter<{ [key: string]: any }>();
-
-  /**
-   * Emits when all filters should be cleared (parent should call urlState.clearParams())
-   */
   @Output() clearAllFilters = new EventEmitter<void>();
 
-  /**
-   * Template reference to search input in multiselect dialog
-   */
   @ViewChild('searchInput') searchInput: any;
 
   // ==================== Dropdown State ====================
 
-  /**
-   * Filter field options for dropdown, built from domainConfig.queryControlFilters
-   */
   filterFieldOptions: { label: string; value: FilterDefinition }[] = [];
-
-  /**
-   * Currently selected field in the dropdown (temporary selection before dialog opens)
-   */
   selectedField: FilterDefinition | null = null;
-
-  /**
-   * Whether we're currently editing a highlight filter (vs regular filter)
-   */
   isHighlightFilter = false;
 
   // ==================== Active Filters ====================
 
-  /**
-   * List of currently active filters applied by the user
-   */
   activeFilters: ActiveFilter[] = [];
-
-  /**
-   * List of currently active highlight filters applied by the user
-   */
   activeHighlights: ActiveFilter[] = [];
-
-  /**
-   * Currently active filter definition used by dialogs (multiselect or range)
-   */
   currentFilterDef: FilterDefinition | null = null;
 
   // ==================== Multiselect Dialog State ====================
 
-  /**
-   * Whether multiselect dialog is currently visible
-   */
   showMultiselectDialog = false;
-
-  /**
-   * Title displayed in the multiselect dialog header
-   */
   multiselectDialogTitle = '';
-
-  /**
-   * Subtitle displayed in the multiselect dialog
-   */
   multiselectDialogSubtitle = '';
-
-  /**
-   * Whether options are currently loading from the API
-   */
   loadingOptions = false;
-
-  /**
-   * Error message shown if options fail to load from the API
-   */
   optionsError: string | null = null;
-
-  /**
-   * All available options fetched from the API for multiselect filters
-   */
   allOptions: FilterOption[] = [];
-
-  /**
-   * Filtered options based on the user's search query in multiselect dialog
-   */
   filteredOptions: FilterOption[] = [];
-
-  /**
-   * Currently selected options in the multiselect dialog before applying
-   */
   selectedOptions: (string | number)[] = [];
-
-  /**
-   * Current search query text for filtering multiselect options
-   */
   searchQuery = '';
 
   // ==================== Year Range Dialog State ====================
 
-  /**
-   * Whether year range dialog is currently visible
-   */
   showYearRangeDialog = false;
-
-  /**
-   * Selected minimum year value in the year range dialog
-   */
   yearMin: number | null = null;
-
-  /**
-   * Selected maximum year value in the year range dialog
-   */
   yearMax: number | null = null;
-
-  /**
-   * Available year range from API showing min and max years for range filters
-   */
   availableYearRange: { min: number; max: number } = { min: 1900, max: new Date().getFullYear() };
-
-  /**
-   * RxJS Subject to signal component destruction and unsubscribe from observables
-   */
-  private destroy$ = new Subject<void>();
-
-  constructor(
-    private cdr: ChangeDetectorRef,
-    private apiService: ApiService,
-    private urlState: UrlStateService,
-    private popOutContext: PopOutContextService
-  ) {}
 
   ngOnInit(): void {
     // Initialize filter field options from domain config
@@ -242,9 +170,9 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
         .getMessages$()
         .pipe(
           filter(msg => msg.type === PopOutMessageType.STATE_UPDATE),
-          takeUntil(this.destroy$)
+          takeUntilDestroyed(this.destroyRef)
         )
-        .subscribe(message => {
+        .subscribe((message: any) => {
           if (message.payload && message.payload.state) {
             // Extract filters from the state object and render them
             this.syncFiltersFromPopoutState(message.payload.state);
@@ -253,16 +181,11 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
         });
     } else {
       // In main window: Sync from URL state on init and on changes
-      this.urlState.params$.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      this.urlState.params$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
         this.syncFiltersFromUrl(params);
         this.cdr.markForCheck();
       });
     }
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
   
   /**
@@ -305,9 +228,9 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     // we need to manually trigger the selection since PrimeNG's filter input
     // will capture the spacebar for typing
 
-    // Check if there's a currently highlighted/focused option in the dropdown
-    // PrimeNG 14 uses the 'p-highlight' CSS class for highlighted options
-    const highlightedOption = document.querySelector('.p-dropdown-items .p-highlight');
+    // Check if there's a currently highlighted/focused option in the select
+    // PrimeNG 20 uses the 'p-highlight' CSS class for highlighted options
+    const highlightedOption = document.querySelector('.p-select-items .p-highlight');
 
     if (highlightedOption) {
       // Prevent the key from being processed elsewhere

@@ -71,12 +71,15 @@
 // PrimeNG table overrides
 ::ng-deep {
   .p-datatable {
+    // Use a more visible border color for dark theme
+    --table-border-color: #4b5563; // Tailwind gray-600
+
     .p-datatable-thead > tr > th {
       background: var(--surface-section);
       color: var(--text-color);
       font-weight: 600;
       padding: 0.75rem 1rem;
-      border: 1px solid var(--surface-border);
+      border: 1px solid var(--table-border-color);
     }
 
     .p-datatable-tbody > tr {
@@ -89,30 +92,30 @@
 
       > td {
         padding: 0.75rem 1rem;
-        border: 1px solid var(--surface-border);
+        border: 1px solid var(--table-border-color);
       }
     }
 
     .p-paginator {
       background: var(--surface-section);
       color: var(--text-color);
-      border: 1px solid var(--surface-border);
+      border: 1px solid var(--table-border-color);
       padding: 0.5rem 1rem;
     }
   }
 
+  // PrimeNG 19 checkbox styling for dark theme visibility
   .p-checkbox {
     .p-checkbox-box {
-      border: 2px solid var(--surface-border);
-      background: var(--surface-card);
+      border: 2px solid #6b7280; // Gray-500, visible on dark backgrounds
 
       &.p-highlight {
-        border-color: var(--primary-color);
-        background: var(--primary-color);
+        border-color: var(--p-primary-color, #34d399);
+        background: var(--p-primary-color, #34d399);
       }
 
       &:not(.p-disabled):hover {
-        border-color: var(--primary-color);
+        border-color: var(--p-primary-color, #34d399);
       }
     }
   }

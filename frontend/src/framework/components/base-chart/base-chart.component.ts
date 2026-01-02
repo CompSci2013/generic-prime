@@ -22,6 +22,8 @@ import {
   HostListener
 } from '@angular/core';
 import { Subject } from 'rxjs';
+import { ButtonModule } from 'primeng/button';
+
 
 /**
  * Plotly.js graph visualization library
@@ -30,10 +32,8 @@ import { Subject } from 'rxjs';
  * Provides declarative charting for creating statistical charts with support for
  * interactive features like click events, box selection, lasso selection, and hover tooltips.
  *
- * @constant {Object} Plotly
  * @remarks
  * Using plotly.js-dist-min (minified distribution) for reduced bundle size.
- * Imported via require() to avoid TypeScript module resolution issues.
  * Used in BaseChartComponent for rendering reactive charts based on statistics data.
  *
  * Features:
@@ -46,7 +46,7 @@ import { Subject } from 'rxjs';
  * @see {@link https://plotly.com/javascript/} Official Plotly.js documentation
  * @see BaseChartComponent - Component that uses Plotly
  */
-const Plotly = require('plotly.js-dist-min');
+import * as Plotly from 'plotly.js-dist-min';
 
 /**
  * Extended HTMLElement interface for Plotly charts
@@ -181,10 +181,11 @@ export abstract class ChartDataSource<TStatistics = any> {
  * ```
  */
 @Component({
-  selector: 'app-base-chart',
-  templateUrl: './base-chart.component.html',
-  styleUrls: ['./base-chart.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-base-chart',
+    templateUrl: './base-chart.component.html',
+    styleUrls: ['./base-chart.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [ButtonModule]
 })
 export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
   /**

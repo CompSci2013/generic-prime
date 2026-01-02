@@ -2,7 +2,7 @@
 <p-panel
   [toggleable]="true"
   [(collapsed)]="panelCollapsed"
-  [style]="{'margin-bottom': '1rem'}"
+  styleClass="mb-3"
   [attr.data-testid]="environment.includeTestIds ? 'statistics-panel' : null">
 
   <ng-template pTemplate="header">
@@ -13,29 +13,34 @@
     </div>
   </ng-template>
 
-  <div class="statistics-content" *ngIf="!panelCollapsed">
-    <!-- No data message -->
-    <div class="no-data-message" *ngIf="!statistics">
-      <i class="pi pi-info-circle"></i>
-      <p>No statistics available. Add filters or select data to view distributions.</p>
+  @if (!panelCollapsed) {
+    <div class="statistics-content">
+      <!-- No data message -->
+      @if (!statistics()) {
+        <div class="no-data-message">
+          <i class="pi pi-info-circle"></i>
+          <p>No statistics available. Add filters or select data to view distributions.</p>
+        </div>
+      }
+      <!-- Charts grid -->
+      @if (statistics()) {
+        <div class="charts-grid">
+          @for (item of visibleCharts; track trackByChartId($index, item)) {
+            <div
+              class="chart-container"
+              [attr.data-testid]="environment.includeTestIds ? ('chart-' + item.config.id) : null">
+              <div class="chart-title">{{ item.config.title }}</div>
+              <app-base-chart
+                [dataSource]="item.dataSource"
+                [statistics]="statistics()"
+                [highlights]="highlights()"
+                [selectedValue]="null"
+                (chartClick)="onChartClick($event, item.config.id)">
+              </app-base-chart>
+            </div>
+          }
+        </div>
+      }
     </div>
-
-    <!-- Charts grid -->
-    <div class="charts-grid" *ngIf="statistics">
-      <div
-        *ngFor="let item of visibleCharts; trackBy: trackByChartId"
-        class="chart-container"
-        [attr.data-testid]="environment.includeTestIds ? ('chart-' + item.config.id) : null">
-
-        <div class="chart-title">{{ item.config.title }}</div>
-        <app-base-chart
-          [dataSource]="item.dataSource"
-          [statistics]="statistics"
-          [highlights]="highlights"
-          [selectedValue]="null"
-          (chartClick)="onChartClick($event, item.config.id)">
-        </app-base-chart>
-      </div>
-    </div>
-  </div>
+  }
 </p-panel>

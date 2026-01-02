@@ -16,7 +16,6 @@ Dialog files in `.dialog/` follow a turn-based script format (like a play):
 
 ```
 CLAUDE:<timestamp>
-(Use system time/Thor's time for <timestamp>)
 Claude's output goes here. Can be multiple lines.
 This continues until the next speaker marker.
 
@@ -27,6 +26,8 @@ Gemini provides reality checks, findings, or instructions.
 DEVELOPER:<timestamp>
 Developer input when human intervention is needed.
 ```
+
+**IMPORTANT**: All timestamps MUST use Thor's system time. Before writing any timestamp, Claude MUST run `date -Iseconds` to get the current time from Thor. Never use estimated or hardcoded timestamps.
 
 **Turn Indicator**: The LAST line of the file indicates whose turn it is next:
 - `CLAUDE:<timestamp>` → Claude should respond
@@ -231,10 +232,11 @@ When `/monsterwatch` is invoked:
    - If last line is `GEMINI:<timestamp>` or `DEVELOPER:<timestamp>` → Wait and monitor
 
 5. **When it's Claude's turn**:
+   - Run `date -Iseconds` to get Thor's current system time
    - Parse the content above the turn marker for instructions
    - Execute any requested commands/tasks
-   - Write response to the dialog file
-   - End with appropriate turn marker (`GEMINI:<timestamp>` or `DEVELOPER:<timestamp>`)
+   - Write response to the dialog file (using Thor's timestamp)
+   - End with appropriate turn marker (`GEMINI:<timestamp>` or `DEVELOPER:<timestamp>`) using Thor's time
 
 6. **Continue monitoring**
    - Poll every 2 seconds for file changes
@@ -269,9 +271,9 @@ When `/monsterwatch` is stopped:
 
 ---
 
-**Version**: 2.1
+**Version**: 2.2
 **Created**: 2025-12-25
-**Updated**: 2025-12-25 (Added Session Dialog Rotation at 1,000 lines with 65% compaction)
+**Updated**: 2025-12-27 (Enforced Thor's system time for all timestamps via `date -Iseconds`)
 **Purpose**: Enable real-time Brain-Body collaboration with turn-based dialog monitoring
 **Audience**: Claude-Gemini Monster Protocol sessions
 

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 /**
  * Agriculture Component - Agricultural Domain Page
@@ -18,9 +19,10 @@ import { Component } from '@angular/core';
  * within the domain selector navigation structure.
  */
 @Component({
-  selector: 'app-agriculture',
-  templateUrl: './agriculture.component.html',
-  styleUrls: ['./agriculture.component.scss']
+    selector: 'app-agriculture',
+    templateUrl: './agriculture.component.html',
+    styleUrls: ['./agriculture.component.scss'],
+    imports: [RouterLink]
 })
 export class AgricultureComponent {
 

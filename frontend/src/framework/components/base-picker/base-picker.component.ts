@@ -23,6 +23,15 @@ import {
 import { PickerConfigRegistry } from '../../services/picker-config-registry.service';
 import { ResourceManagementService } from '../../services/resource-management.service';
 import { UrlStateService } from '../../services/url-state.service';
+import { MessageModule } from 'primeng/message';
+import { SkeletonModule } from 'primeng/skeleton';
+import { FormsModule } from '@angular/forms';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { SharedModule } from 'primeng/api';
+import { TableModule } from 'primeng/table';
+import { NgStyle } from '@angular/common';
 
 /**
  * Base Picker Component
@@ -48,10 +57,11 @@ import { UrlStateService } from '../../services/url-state.service';
  * ```
  */
 @Component({
-  selector: 'app-base-picker',
-  templateUrl: './base-picker.component.html',
-  styleUrls: ['./base-picker.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-base-picker',
+    templateUrl: './base-picker.component.html',
+    styleUrls: ['./base-picker.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [TableModule, SharedModule, InputTextModule, ButtonModule, CheckboxModule, FormsModule, NgStyle, SkeletonModule, MessageModule]
 })
 export class BasePickerComponent<T> implements OnInit, OnDestroy {
   /**
@@ -337,7 +347,8 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
     }
 
     this.cdr.markForCheck();
-    this.emitSelectionChange();
+    // Don't emit on every checkbox click - wait for "Apply" button
+    // This prevents layout shifts from Query Control expanding with Active Filters
   }
 
   /**
@@ -368,7 +379,8 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
     }
 
     this.cdr.markForCheck();
-    this.emitSelectionChange();
+    // Don't emit on every checkbox click - wait for "Apply" button
+    // This prevents layout shifts from Query Control expanding with Active Filters
   }
 
   /**

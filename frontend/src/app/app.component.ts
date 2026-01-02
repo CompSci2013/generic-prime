@@ -1,6 +1,9 @@
-import { Component, Injector, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject, Injector } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterOutlet, RouterLink, ActivatedRoute } from '@angular/router';
 import { MenuItem } from 'primeng/api';
+import { TieredMenuModule } from 'primeng/tieredmenu';
+import { ToastModule } from 'primeng/toast';
 import { DomainConfigRegistry } from '../framework/services';
 import { DOMAIN_PROVIDERS } from '../domain-config/domain-providers';
 import packageJson from '../../package.json';
@@ -41,9 +44,10 @@ import packageJson from '../../package.json';
  * @see MenuItem - PrimeNG menu item structure
  */
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    imports: [RouterOutlet, RouterLink, TieredMenuModule, ToastModule],
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   /**
@@ -131,23 +135,19 @@ export class AppComponent {
     }
   ];
 
-  /**
-   * Initialize AppComponent with domain configuration registry
-   *
-   * @param {DomainConfigRegistry} domainConfigRegistry - Service for managing domain configurations
-   * @param {Injector} injector - Angular injector for dependency resolution
-   * @param {ActivatedRoute} route - ActivatedRoute for detecting query parameters
-   */
-  constructor(
-    private domainConfigRegistry: DomainConfigRegistry,
-    private injector: Injector,
-    private route: ActivatedRoute
-  ) {
+  // ============================================================================
+  // Dependency Injection (Angular 17+ inject() pattern)
+  // ============================================================================
+  private readonly domainConfigRegistry = inject(DomainConfigRegistry);
+  private readonly injector = inject(Injector);
+  private readonly route = inject(ActivatedRoute);
+
+  constructor() {
     this.domainConfigRegistry.registerDomainProviders(DOMAIN_PROVIDERS, this.injector);
 
     // Detect if this is a pop-out window by checking for ?popout query parameter
     // Pop-out windows hide the header and show only the router-outlet with panel content
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed()).subscribe(params => {
       this.isPopOut = !!params['popout'];
     });
   }

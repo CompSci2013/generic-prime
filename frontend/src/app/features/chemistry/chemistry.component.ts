@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 /**
  * Chemistry Domain Landing Component
@@ -72,9 +73,10 @@ import { Component } from '@angular/core';
  * @since 1.0.0 (Added as part of multi-domain framework expansion)
  */
 @Component({
-  selector: 'app-chemistry',
-  templateUrl: './chemistry.component.html',
-  styleUrls: ['./chemistry.component.scss']
+    selector: 'app-chemistry',
+    templateUrl: './chemistry.component.html',
+    styleUrls: ['./chemistry.component.scss'],
+    imports: [RouterLink]
 })
 export class ChemistryComponent {
   /**

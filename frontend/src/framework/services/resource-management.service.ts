@@ -1,12 +1,18 @@
-import { Inject, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
 import {
-  catchError,
-  distinctUntilChanged,
-  finalize,
-  map,
-  takeUntil
-} from 'rxjs/operators';
+  computed,
+  DestroyRef,
+  inject,
+  Injectable,
+  Injector,
+  NgZone,
+  OnDestroy,
+  signal,
+  Signal,
+  WritableSignal
+} from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { Observable, of, Subject } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { DomainConfig } from '../models/domain-config.interface';
 import {
   ResourceManagementConfig,
@@ -18,7 +24,32 @@ import { UrlStateService } from './url-state.service';
 import { IS_POPOUT_TOKEN } from '../tokens/popout.token';
 
 /**
+ * Deep equality check for filter objects
+ * Replaces JSON.stringify comparison with proper structural equality
+ */
+function deepEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (a == null || b == null) return a === b;
+  if (typeof a !== typeof b) return false;
+  if (typeof a !== 'object') return a === b;
+
+  const aObj = a as Record<string, unknown>;
+  const bObj = b as Record<string, unknown>;
+  const aKeys = Object.keys(aObj);
+  const bKeys = Object.keys(bObj);
+
+  if (aKeys.length !== bKeys.length) return false;
+
+  return aKeys.every(key => deepEqual(aObj[key], bObj[key]));
+}
+
+/**
  * Generic resource management service - Core state orchestrator for URL-first architecture
+ *
+ * **Angular 17 Signals Architecture**:
+ * This service uses Angular Signals for fine-grained reactivity and zoneless-ready state management.
+ * State is stored in WritableSignals, with computed() for derived values and toObservable() for
+ * backward-compatible Observable streams.
  *
  * **Purpose**: Manages application state with URL as single source of truth.
  * Coordinates filter changes, API calls, state updates, and cross-window synchronization.
@@ -27,11 +58,12 @@ import { IS_POPOUT_TOKEN } from '../tokens/popout.token';
  *
  * **Key Features**:
  * - URL-first design: URL parameters are the single source of truth
+ * - Signal-based state: WritableSignal for state, computed() for derived values
+ * - Observable interop: toObservable() provides backward-compatible streams
  * - Domain-agnostic: Works with any domain via DOMAIN_CONFIG injection
- * - Component-level injection: New instance per component (e.g., DiscoverComponent, PanelPopoutComponent)
+ * - Component-level injection: New instance per component
  * - Pop-out aware: Automatically disables API calls in pop-out windows
- * - Highlight support: Filters with h_ prefix for highlighted results
- * - Observable streams: filters$, results$, statistics$, loading$, error$
+ * - inject() pattern: Modern Angular 17 dependency injection
  *
  * **State Flow**:
  * ```
@@ -41,309 +73,237 @@ import { IS_POPOUT_TOKEN } from '../tokens/popout.token';
  *    ↓
  * 3. filterMapper.fromUrlParams() converts URL → TFilters
  *    ↓
- * 4. updateState() updates internal BehaviorSubject
+ * 4. state.set() updates Signal
  *    ↓
- * 5. Components subscribe to filters$, results$, etc. → re-render
+ * 5. Components read signals (filters(), results()) → re-render
  *    ↓
  * 6. If autoFetch=true: fetchData() calls API
  *    ↓
- * 7. API response → updateState() → components re-render
+ * 7. API response → state.update() → components re-render
  * ```
- *
- * **Pop-Out Architecture**:
- * - Main window: URL change → fetchData() → API → updateState()
- * - Main window: Broadcasts state via BroadcastChannel
- * - Pop-out window: Receives state via syncStateFromExternal() → NO API call
- * - Pop-out window: Components use same observable streams (filters$, results$, etc.)
- *
- * **Configuration via DOMAIN_CONFIG**:
- * - filterMapper: Converts between URL params ↔ TFilters objects
- * - apiAdapter: Calls API with filters/highlights, returns results
- * - cacheKeyBuilder: Generates cache keys (not currently used)
- * - defaultFilters: Initial filter values when no URL params present
  *
  * @template TFilters - The shape of filter objects (e.g., AutoSearchFilters)
  * @template TData - The shape of individual data items (e.g., VehicleResult)
  * @template TStatistics - The shape of statistics objects (e.g., VehicleStatistics)
- *
- * @example
- * ```typescript
- * // In DiscoverComponent
- * @Component({
- *   providers: [ResourceManagementService] // New instance per component
- * })
- * export class DiscoverComponent {
- *   constructor(
- *     @Inject(DOMAIN_CONFIG) domainConfig: DomainConfig<...>,
- *     public resourceService: ResourceManagementService<...>
- *   ) {}
- *
- *   ngOnInit() {
- *     // Subscribe to state changes
- *     this.resourceService.filters$.subscribe(filters => {
- *       // Re-render filter UI
- *     });
- *
- *     this.resourceService.results$.subscribe(results => {
- *       // Re-render results table
- *     });
- *   }
- * }
- * ```
  */
 @Injectable()
 export class ResourceManagementService<TFilters, TData, TStatistics = any>
   implements OnDestroy {
-  /**
-   * Internal state BehaviorSubject
-   *
-   * Single source of truth for all service state (filters, results, loading, error, statistics).
-   * All public observable streams (state$, filters$, results$, etc.) are derived from this subject.
-   * Updated by updateState() when URL changes or API calls complete.
-   *
-   * @private
-   */
-  private stateSubject: BehaviorSubject<
-    ResourceState<TFilters, TData, TStatistics>
-  >;
+
+  // ============================================================================
+  // Dependency Injection (Angular 17 inject() pattern)
+  // ============================================================================
+  private readonly urlState = inject(UrlStateService);
+  private readonly domainConfig = inject<DomainConfig<TFilters, TData, TStatistics>>(DOMAIN_CONFIG);
+  private readonly popOutContext = inject(PopOutContextService);
+  private readonly ngZone = inject(NgZone);
+  private readonly injector = inject(Injector);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly isPopOutToken = inject(IS_POPOUT_TOKEN, { optional: true }) ?? false;
+
+  // ============================================================================
+  // Internal State
+  // ============================================================================
 
   /**
    * RxJS Subject for component destruction cleanup
-   *
-   * Emits when ngOnDestroy is called, signaling all subscribers to
-   * unsubscribe. Used with takeUntil() in internal subscriptions.
-   *
-   * @private
+   * Used with takeUntil() in internal subscriptions.
    */
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   /**
    * Service configuration from DOMAIN_CONFIG
-   *
-   * Merged configuration containing:
-   * - filterMapper: URL ↔ filter object conversion
-   * - apiAdapter: API calls for this domain
-   * - defaultFilters: Initial filter values
-   * - autoFetch: Whether to call API (disabled in pop-outs)
-   *
-   * @private
    */
-  private config: ResourceManagementConfig<TFilters, TData, TStatistics>;
+  private readonly config: ResourceManagementConfig<TFilters, TData, TStatistics>;
+
+  // ============================================================================
+  // Signal-Based State (Angular 17)
+  // ============================================================================
 
   /**
-   * Observable of complete state
+   * Primary state signal - single source of truth
+   * All other signals are computed from this.
    */
-  public state$: Observable<ResourceState<TFilters, TData, TStatistics>>;
+  private readonly state: WritableSignal<ResourceState<TFilters, TData, TStatistics>>;
+
+  /**
+   * Computed signal for current filters
+   * Uses deepEqual for change detection instead of JSON.stringify
+   */
+  public readonly filters: Signal<TFilters> = computed(
+    () => this.state().filters,
+    { equal: deepEqual }
+  );
+
+  /**
+   * Computed signal for data results
+   */
+  public readonly results: Signal<TData[]> = computed(
+    () => this.state().results
+  );
+
+  /**
+   * Computed signal for total results count
+   */
+  public readonly totalResults: Signal<number> = computed(
+    () => this.state().totalResults
+  );
+
+  /**
+   * Computed signal for loading state
+   */
+  public readonly loading: Signal<boolean> = computed(
+    () => this.state().loading
+  );
+
+  /**
+   * Computed signal for error state
+   */
+  public readonly error: Signal<Error | null> = computed(
+    () => this.state().error
+  );
+
+  /**
+   * Computed signal for statistics
+   */
+  public readonly statistics: Signal<TStatistics | undefined> = computed(
+    () => this.state().statistics
+  );
+
+  /**
+   * Computed signal for highlight filters
+   */
+  public readonly highlights: Signal<any> = computed(
+    () => this.state().highlights ?? {},
+    { equal: deepEqual }
+  );
+
+  // ============================================================================
+  // Observable Streams (Backward Compatibility)
+  // ============================================================================
+
+  /**
+   * Observable of complete state (for existing subscribers)
+   */
+  public readonly state$: Observable<ResourceState<TFilters, TData, TStatistics>>;
 
   /**
    * Observable of current filters
    */
-  public filters$: Observable<TFilters>;
+  public readonly filters$: Observable<TFilters>;
 
   /**
    * Observable of data results
    */
-  public results$: Observable<TData[]>;
+  public readonly results$: Observable<TData[]>;
 
   /**
    * Observable of total results count
    */
-  public totalResults$: Observable<number>;
+  public readonly totalResults$: Observable<number>;
 
   /**
    * Observable of loading state
    */
-  public loading$: Observable<boolean>;
+  public readonly loading$: Observable<boolean>;
 
   /**
    * Observable of error state
    */
-  public error$: Observable<Error | null>;
+  public readonly error$: Observable<Error | null>;
 
   /**
    * Observable of statistics
    */
-  public statistics$: Observable<TStatistics | undefined>;
+  public readonly statistics$: Observable<TStatistics | undefined>;
 
   /**
    * Observable of highlight filters
    */
-  public highlights$: Observable<any>;
+  public readonly highlights$: Observable<any>;
 
-  /**
-   * Constructor for dependency injection
-   *
-   * Initializes service with domain configuration and sets up state management,
-   * observable streams, and URL/pop-out synchronization.
-   *
-   * @param urlState - UrlStateService for URL parameter synchronization
-   * @param domainConfig - Domain configuration with filter mappers and API adapters (injected)
-   * @param popOutContext - PopOutContextService for pop-out window detection
-   * @param ngZone - Angular NgZone
-   * @param isPopOutToken - Optional injection token to explicitly signal pop-out context
-   */
-  constructor(
-    private urlState: UrlStateService,
-    @Inject(DOMAIN_CONFIG)
-    private domainConfig: DomainConfig<TFilters, TData, TStatistics>,
-    private popOutContext: PopOutContextService,
-    private ngZone: NgZone,
-    @Optional() @Inject(IS_POPOUT_TOKEN) private isPopOutToken: boolean
-  ) {
+  // ============================================================================
+  // Constructor
+  // ============================================================================
+
+  constructor() {
     // STEP 1: Extract configuration from domain config
-    // The domain config contains domain-specific implementations that work with generic types.
-    // We wrap them in a ResourceManagementConfig for consistent internal usage.
     this.config = {
-      filterMapper: this.domainConfig.urlMapper,     // Converts URL params ↔ filter objects
-      apiAdapter: this.domainConfig.apiAdapter,       // API client for this domain
+      filterMapper: this.domainConfig.urlMapper,
+      apiAdapter: this.domainConfig.apiAdapter,
       cacheKeyBuilder: this.domainConfig.cacheKeyBuilder,
       defaultFilters: (this.domainConfig.defaultFilters || {}) as TFilters,
       supportsHighlights: this.domainConfig.features?.highlights ?? false,
       highlightPrefix: 'h_',
-      // **Pop-out aware**: Service disables API calls when running in pop-out windows.
-      // Pop-outs receive state from main window via BroadcastChannel (syncStateFromExternal).
-      // This prevents duplicate API calls and ensures state consistency.
-      // We check both the injected token (robust) and the service context (fallback).
       autoFetch: this.isPopOutToken ? false : !this.popOutContext.isInPopOut()
     };
 
-    // STEP 2: Initialize internal state BehaviorSubject
-    // This is the single source of truth for all state within this service instance.
-    // Every component will subscribe to streams derived from this subject.
-    this.stateSubject = new BehaviorSubject<
-      ResourceState<TFilters, TData, TStatistics>
-    >({
-      filters: this.config.defaultFilters,  // Start with domain defaults
-      results: [],                           // Empty until first fetch
+    // STEP 2: Initialize state signal with default values
+    this.state = signal<ResourceState<TFilters, TData, TStatistics>>({
+      filters: this.config.defaultFilters,
+      results: [],
       totalResults: 0,
       loading: false,
       error: null,
       statistics: undefined
     });
 
-    // STEP 3: Create observable streams for component consumption
-    // Components subscribe to these observables, not the BehaviorSubject directly.
-    // Each stream uses RxJS operators to:
-    // - Extract specific state properties (map)
-    // - Skip unchanged values (distinctUntilChanged)
-    // - Allow proper change detection and subscriptions
-    this.state$ = this.stateSubject.asObservable();
-
-    // Stream for filter changes (used by QueryControl, Pickers, etc.)
-    this.filters$ = this.state$.pipe(
-      map(state => state.filters),
-      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
-    );
-
-    // Stream for results data (used by ResultsTable)
-    this.results$ = this.state$.pipe(
-      map(state => state.results),
-      distinctUntilChanged()
-    );
-
-    // Stream for total result count (used for pagination)
-    this.totalResults$ = this.state$.pipe(
-      map(state => state.totalResults),
-      distinctUntilChanged()
-    );
-
-    // Stream for loading indicator (used by spinner components)
-    this.loading$ = this.state$.pipe(
-      map(state => state.loading),
-      distinctUntilChanged()
-    );
-
-    // Stream for error state (used for error messages)
-    this.error$ = this.state$.pipe(
-      map(state => state.error),
-      distinctUntilChanged()
-    );
-
-    // Stream for statistics/aggregations (used by StatisticsPanel)
-    this.statistics$ = this.state$.pipe(
-      map(state => state.statistics),
-      distinctUntilChanged()
-    );
-
-    // Stream for highlight filters (h_ prefixed params)
-    this.highlights$ = this.state$.pipe(
-      map(state => state.highlights || {}),
-      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
-    );
+    // STEP 3: Create Observable streams from Signals (backward compatibility)
+    // toObservable() converts Signal → Observable for existing subscribers
+    this.state$ = toObservable(this.state, { injector: this.injector });
+    this.filters$ = toObservable(this.filters, { injector: this.injector });
+    this.results$ = toObservable(this.results, { injector: this.injector });
+    this.totalResults$ = toObservable(this.totalResults, { injector: this.injector });
+    this.loading$ = toObservable(this.loading, { injector: this.injector });
+    this.error$ = toObservable(this.error, { injector: this.injector });
+    this.statistics$ = toObservable(this.statistics, { injector: this.injector });
+    this.highlights$ = toObservable(this.highlights, { injector: this.injector });
 
     // STEP 4: Bootstrap state management
-    // - Initialize filters from current URL (before fetchData)
-    // - Watch for future URL changes and react accordingly
     this.initializeFromUrl();
     this.watchUrlChanges();
+
+    // STEP 5: Register cleanup with DestroyRef (Angular 17 pattern)
+    this.destroyRef.onDestroy(() => {
+      this.destroy$.next();
+      this.destroy$.complete();
+    });
   }
+
+  // ============================================================================
+  // Public API
+  // ============================================================================
 
   /**
    * Update filters (triggers URL update → data fetch in main window)
-   *
-   * Flow: updateFilters() → filterMapper.toUrlParams() → setParams() → URL change →
-   * watchUrlChanges() → fetchData() (if autoFetch) → updateState() → observables emit
-   *
-   * **Note on undefined/null values**: Pass undefined or null to remove a filter parameter.
-   * Example: `updateFilters({ search: undefined })` removes the search param from URL.
-   *
-   * @param partial - Partial filter updates (undefined/null values remove keys)
-   *
-   * @example
-   * ```typescript
-   * // Add/update filters
-   * this.resourceService.updateFilters({ manufacturer: 'Toyota', year: 2020 });
-   * // URL becomes: ?manufacturer=Toyota&year=2020
-   *
-   * // Remove a filter
-   * this.resourceService.updateFilters({ year: undefined });
-   * // URL becomes: ?manufacturer=Toyota (year param removed)
-   *
-   * // Clear all filters by resetting to defaults
-   * this.resourceService.clearFilters();
-   * ```
    */
   updateFilters(partial: Partial<TFilters>): void {
-    const currentFilters = this.stateSubject.value.filters;
+    const currentFilters = this.state().filters;
     const merged = { ...currentFilters, ...partial };
 
-    // Step 1: Clean up filters (remove empty values)
-    // Filter objects may have undefined/null/empty strings which should not go to URL
+    // Clean up filters (remove empty values)
     const newFilters: Record<string, any> = {};
     for (const key of Object.keys(merged)) {
       const value = (merged as Record<string, any>)[key];
-      // Keep only truthy values (exclude undefined, null, and empty strings)
       if (value !== undefined && value !== null && value !== '') {
         newFilters[key] = value;
       }
     }
 
-    // Step 2: Convert filter objects to URL parameters
-    // filterMapper.toUrlParams() uses domain-specific logic to serialize filters
-    // Example: { manufacturer: 'Toyota', models: ['Camry', 'Corolla'] }
-    //          → { manufacturer: 'Toyota', models: 'Camry,Corolla' }
-    const newUrlParams = this.config.filterMapper.toUrlParams(
-      newFilters as TFilters
-    );
+    // Convert filter objects to URL parameters
+    const newUrlParams = this.config.filterMapper.toUrlParams(newFilters as TFilters);
 
-    // Step 3: Get current URL params to identify which ones need to be removed
-    // We need to explicitly set removed params to null so UrlStateService removes them from URL
+    // Get current URL params to identify which ones need to be removed
     const currentUrlParams = this.config.filterMapper.toUrlParams(currentFilters);
 
-    // Step 4: Build final params object with null values for removed params
-    // Angular Router will ignore null values when navigating, effectively removing them
+    // Build final params object with null values for removed params
     const finalParams: Record<string, any> = { ...newUrlParams };
     for (const key of Object.keys(currentUrlParams)) {
       if (!(key in newUrlParams)) {
-        // This param was present before but not now - mark for removal by setting to null
         finalParams[key] = null;
       }
     }
 
-    // Step 5: Update URL
-    // This triggers Router navigation, which causes Angular to emit NavigationEnd event.
-    // watchUrlChanges() listens for these events and updates state accordingly.
-    // If autoFetch=true, fetchData() is called to get new results from API.
     this.urlState.setParams(finalParams);
   }
 
@@ -351,16 +311,10 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
    * Clear all filters (reset to defaults)
    */
   clearFilters(): void {
-    // Get current URL params to find which ones need to be removed
-    const currentFilters = this.stateSubject.value.filters;
+    const currentFilters = this.state().filters;
     const currentUrlParams = this.config.filterMapper.toUrlParams(currentFilters);
+    const defaultUrlParams = this.config.filterMapper.toUrlParams(this.config.defaultFilters);
 
-    // Get default URL params
-    const defaultUrlParams = this.config.filterMapper.toUrlParams(
-      this.config.defaultFilters
-    );
-
-    // Build final params: default params + null for removed params
     const finalParams: Record<string, any> = { ...defaultUrlParams };
     for (const key of Object.keys(currentUrlParams)) {
       if (!(key in defaultUrlParams)) {
@@ -368,46 +322,48 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
       }
     }
 
-    this.urlState.setParams(finalParams, true); // Replace history entry
+    this.urlState.setParams(finalParams, true);
   }
 
   /**
    * Refresh data with current filters
    */
   refresh(): void {
-    const currentFilters = this.stateSubject.value.filters;
-    this.fetchData(currentFilters);
+    this.fetchData(this.state().filters);
   }
 
   /**
    * Get current state snapshot
-   *
-   * @returns Current state
    */
   getCurrentState(): ResourceState<TFilters, TData, TStatistics> {
-    return this.stateSubject.value;
+    return this.state();
   }
 
   /**
    * Get current filters snapshot
-   *
-   * @returns Current filters
    */
   getCurrentFilters(): TFilters {
-    return this.stateSubject.value.filters;
+    return this.state().filters;
   }
 
   /**
+   * Sync state from external source (e.g., pop-out receiving state from main window)
+   */
+  public syncStateFromExternal(
+    externalState: ResourceState<TFilters, TData, TStatistics>
+  ): void {
+    // Ensure state update happens inside Angular zone for proper change detection
+    this.ngZone.run(() => {
+      this.state.set(externalState);
+    });
+  }
+
+  // ============================================================================
+  // Private Methods
+  // ============================================================================
+
+  /**
    * Extract highlight filters from URL parameters
-   *
-   * Delegates to the domain-specific IFilterUrlMapper.extractHighlights() method.
-   * This decouples the Framework from domain-specific URL parameter conventions.
-   *
-   * If the mapper doesn't implement extractHighlights(), falls back to legacy
-   * behavior using supportsHighlights/highlightPrefix config (deprecated).
-   *
-   * @param urlParams - URL parameters
-   * @returns Highlight filters object
    */
   private extractHighlights(urlParams: Record<string, any>): any {
     // Preferred: Use domain-specific mapper strategy
@@ -428,8 +384,6 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
         const highlightKey = key.substring(prefix.length);
         let value = urlParams[key];
 
-        // Normalize separators: Convert pipes to commas for backend compatibility
-        // Supports both h_manufacturer=Ford,Buick and h_manufacturer=Ford|Buick
         if (typeof value === 'string' && value.includes('|')) {
           value = value.replace(/\|/g, ',');
         }
@@ -443,19 +397,13 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
 
   /**
    * Initialize filters from current URL
-   *
-   * IMPORTANT: Only syncs filters from URL, does NOT fetch data.
-   * Data fetching is handled by watchUrlChanges() subscription which fires
-   * immediately after this initialization completes. Fetching here would cause
-   * duplicate API calls (one from init, one from watch subscription).
    */
   private initializeFromUrl(): void {
     const urlParams = this.urlState.getParams();
     const filters = this.config.filterMapper.fromUrlParams(urlParams);
     const highlights = this.extractHighlights(urlParams);
 
-    this.updateState({ filters, highlights });
-    // Note: Do NOT call fetchData() here - watchUrlChanges() handles initial fetch
+    this.state.update(s => ({ ...s, filters, highlights }));
   }
 
   /**
@@ -468,9 +416,8 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
       .subscribe(urlParams => {
         const filters = this.config.filterMapper.fromUrlParams(urlParams);
         const highlights = this.extractHighlights(urlParams);
-        this.updateState({ filters, highlights });
+        this.state.update(s => ({ ...s, filters, highlights }));
 
-        // Fetch data if auto-fetch is enabled
         if (this.config.autoFetch) {
           this.fetchData(filters);
         }
@@ -478,25 +425,11 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
   }
 
   /**
-   * Fetch data from API (called when URL changes and autoFetch=true)
-   *
-   * Flow: Called by watchUrlChanges() when URL params change.
-   * Only executes in main window (autoFetch=false in pop-outs).
-   * Pop-outs receive state via syncStateFromExternal() from BroadcastChannel.
-   *
-   * @param filters - The current TFilters object (already extracted from URL)
-   *
-   * **Process**:
-   * 1. Set loading=true to show spinner
-   * 2. Call apiAdapter.fetchData() with filters + highlights
-   * 3. Handle errors by setting error state and clearing results
-   * 4. On success: extract results, total, statistics → updateState()
-   * 5. Always ensure loading=false in finally block
-   * 6. Unsubscribe on destroy via takeUntil(destroy$)
+   * Fetch data from API
    */
   private fetchData(filters: TFilters): void {
-    // Step 1: Set loading state to show spinners/loaders to user
-    this.updateState({ loading: true, error: null });
+    this.state.update(s => ({ ...s, loading: true, error: null }));
+
     const fetchStartTime = Date.now();
     const fetchId = Math.random().toString(36).substring(7);
     console.log(`[ResourceManagementService] FETCH START [${fetchId}]`, {
@@ -504,49 +437,32 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
       timestamp: new Date().toISOString()
     });
 
-    // Step 2: Get current highlights from state
-    // Highlights are h_ prefixed params used for secondary filtering/highlighting
-    const highlights = this.stateSubject.value.highlights;
+    const highlights = this.state().highlights;
 
-    // Step 3: Call domain-specific API adapter
-    // apiAdapter.fetchData() is implemented per-domain and knows how to:
-    // - Serialize TFilters to API query parameters
-    // - Call the correct API endpoint
-    // - Deserialize JSON response to ApiResponse<TData[]>
-    // Example: AutomobileApiAdapter calls GET /api/specs/v1/vehicles/details?manufacturer=...
     this.config.apiAdapter
       .fetchData(filters, highlights)
       .pipe(
-        // Unsubscribe when this service is destroyed (component cleanup)
         takeUntil(this.destroy$),
-
-        // Error handling: convert errors to user-friendly state
         catchError(error => {
           console.error(`[ResourceManagementService] FETCH ERROR [${fetchId}]:`, error);
-          // Update state with error message, clear results
-          this.updateState({
+          this.state.update(s => ({
+            ...s,
             loading: false,
             error: error instanceof Error ? error : new Error(String(error)),
-            results: [],    // Clear stale results
+            results: [],
             totalResults: 0
-          });
-          // Return null (empty observable) to continue chain
+          }));
           return of(null);
         }),
-
-        // Ensure loading is always set to false, even on error
-        // This prevents spinner from staying on screen if error occurs
         finalize(() => {
           const duration = Date.now() - fetchStartTime;
           console.log(`[ResourceManagementService] FETCH FINALIZE [${fetchId}] - Duration: ${duration}ms`);
-          const currentState = this.stateSubject.value;
-          if (currentState.loading) {
-            this.updateState({ loading: false });
+          if (this.state().loading) {
+            this.state.update(s => ({ ...s, loading: false }));
           }
         })
       )
       .subscribe(response => {
-        // Step 4: On success, extract data and update state
         const duration = Date.now() - fetchStartTime;
         console.log(`[ResourceManagementService] FETCH COMPLETE [${fetchId}] - Duration: ${duration}ms`, {
           resultCount: response?.results?.length ?? 0,
@@ -554,76 +470,21 @@ export class ResourceManagementService<TFilters, TData, TStatistics = any>
           timestamp: new Date().toISOString()
         });
         if (response) {
-          this.updateState({
-            results: response.results,           // Array of TData items (e.g., VehicleResult[])
-            totalResults: response.total,        // Total count for pagination
-            statistics: response.statistics,     // Aggregations (e.g., VehicleStatistics)
+          this.state.update(s => ({
+            ...s,
+            results: response.results,
+            totalResults: response.total,
+            statistics: response.statistics,
             loading: false,
             error: null
-          });
+          }));
         }
       });
   }
 
-  /**
-   * Update state (partial update)
-   *
-   * @param partial - Partial state update
-   */
-  private updateState(
-    partial: Partial<ResourceState<TFilters, TData, TStatistics>>
-  ): void {
-    const currentState = this.stateSubject.value;
-    const newState = { ...currentState, ...partial };
-    this.stateSubject.next(newState);
-  }
-
-  /**
-   * Sync state from external source (e.g., pop-out receiving state from main window)
-   *
-   * **Pop-Out Architecture**:
-   * This method is the bridge between main window and pop-out windows.
-   * Main window calls this method (via BroadcastChannel message) to push state to pop-outs.
-   *
-   * Flow:
-   * 1. Main window: URL changes → fetchData() → updateState() → state$
-   * 2. DiscoverComponent listens to state$ and broadcasts via BroadcastChannel
-   * 3. PanelPopoutComponent receives message via PopOutContextService
-   * 4. PanelPopoutComponent calls: this.resourceService.syncStateFromExternal(state)
-   * 5. Pop-out's ResourceManagementService updates its BehaviorSubject
-   * 6. Components in pop-out subscribe to same observables (results$, filters$, etc.)
-   * 7. Components re-render with synchronized state
-   *
-   * **Important**: No API call happens in pop-out. State is received from main window.
-   * This prevents duplicate requests and ensures consistency across windows.
-   *
-   * @param externalState - Complete ResourceState object from main window
-   *
-   * @example
-   * ```typescript
-   * // In PanelPopoutComponent, receiving STATE_UPDATE from main window
-   * this.popOutContext.getMessages$()
-   *   .subscribe(msg => {
-   *     if (msg.type === PopOutMessageType.STATE_UPDATE) {
-   *       // Main window sent new state
-   *       this.resourceService.syncStateFromExternal(msg.payload.state);
-   *     }
-   *   });
-   * ```
-   */
-  public syncStateFromExternal(
-    externalState: ResourceState<TFilters, TData, TStatistics>
-  ): void {
-    // Ensure state emission happens inside Angular zone so that all observable
-    // subscriptions (in child components) trigger change detection properly.
-    // This is critical for pop-out windows where BroadcastChannel messages arrive outside the zone.
-    this.ngZone.run(() => {
-      // Emit the external state through our BehaviorSubject.
-      // All subscribed observables (results$, filters$, etc.) will automatically
-      // emit new values to components, triggering change detection and re-renders.
-      this.stateSubject.next(externalState);
-    });
-  }
+  // ============================================================================
+  // Lifecycle
+  // ============================================================================
 
   /**
    * Clean up subscriptions on component destroy
