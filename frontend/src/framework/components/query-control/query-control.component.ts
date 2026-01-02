@@ -217,6 +217,10 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    * in the filtered DOM list doesn't match the index in the unfiltered array.
    * Instead, we extract the label from the highlighted element and find the
    * matching option by label.
+   *
+   * BUG-001 Fix: When Enter is pressed and no option is explicitly highlighted,
+   * but there's exactly one visible option after filtering, select that option.
+   * This allows users to type a filter and press Enter without needing ArrowDown.
    */
   onDropdownKeydown(event: KeyboardEvent): void {
     // Handle spacebar or Enter for selection
@@ -229,10 +233,21 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     // will capture the spacebar for typing
 
     // Check if there's a currently highlighted/focused option in the select
-    // PrimeNG 20 uses the 'p-highlight' CSS class for highlighted options
-    const highlightedOption = document.querySelector('.p-select-items .p-highlight');
+    // PrimeNG 21 uses 'p-focus' CSS class for highlighted options in the overlay
+    const highlightedOption = document.querySelector('.p-select-overlay .p-select-option.p-focus');
 
-    if (highlightedOption) {
+    let optionToSelect: HTMLElement | null = highlightedOption as HTMLElement;
+
+    // BUG-001 Fix: If no option is highlighted but Enter is pressed,
+    // check if there's exactly one visible option and select it
+    if (!optionToSelect && event.key === 'Enter') {
+      const visibleOptions = document.querySelectorAll('.p-select-overlay .p-select-option:not([style*="display: none"])');
+      if (visibleOptions.length === 1) {
+        optionToSelect = visibleOptions[0] as HTMLElement;
+      }
+    }
+
+    if (optionToSelect) {
       // Prevent the key from being processed elsewhere
       event.preventDefault();
       event.stopPropagation();
@@ -240,12 +255,12 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
       // Bug #15 Fix: Get the label text from the highlighted element and find
       // the matching option by label, not by index. This works correctly even
       // when the dropdown list is filtered.
-      const highlightedLabel = highlightedOption.textContent?.trim();
+      const optionLabel = optionToSelect.textContent?.trim();
 
-      if (highlightedLabel) {
+      if (optionLabel) {
         // Find the option with matching label
         const matchingOption = this.filterFieldOptions.find(
-          opt => opt.label === highlightedLabel
+          opt => opt.label === optionLabel
         );
 
         if (matchingOption) {
