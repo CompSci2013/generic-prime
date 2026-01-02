@@ -14,7 +14,9 @@ import {
   EventEmitter,
   OnInit,
   OnDestroy,
+  OnChanges,
   AfterViewInit,
+  SimpleChanges,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   ElementRef,
@@ -187,7 +189,7 @@ export abstract class ChartDataSource<TStatistics = any> {
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [ButtonModule]
 })
-export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
+export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
   /**
    * Reference to the chart container HTML div element where Plotly chart is rendered
    */
@@ -213,6 +215,11 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
    * Currently selected value to be highlighted or emphasized in the chart
    */
   @Input() selectedValue: string | null = null;
+
+  /**
+   * Whether to hide the chart title (useful when embedding in containers with their own headers)
+   */
+  @Input() hideTitle = false;
 
   /**
    * Emits when user clicks on a data point or completes a selection (box/lasso) in the chart
@@ -363,7 +370,9 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
    * @see selectedValue - Selected value input
    */
   ngOnChanges(): void {
-    if (this.plotlyElement) {
+    // Render if we have the container (ngAfterViewInit has run)
+    // This handles both initial render and updates
+    if (this.chartContainer) {
       this.renderChart();
     }
   }
@@ -453,6 +462,24 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
+      // Add title to layout if not hidden
+      const layout: Record<string, any> = { ...chartData.layout };
+      if (!this.hideTitle && this.chartTitle) {
+        layout['title'] = {
+          text: this.chartTitle,
+          font: { size: 14, color: '#ffffff' },
+          x: 0.01,
+          xanchor: 'left',
+          y: 0.97,
+          yanchor: 'top'
+        };
+        // Adjust top margin to accommodate title
+        layout['margin'] = {
+          ...layout['margin'],
+          t: (layout['margin']?.t || 30) + 20
+        };
+      }
+
       // Plotly configuration
       const config: Partial<any> = {
         responsive: true,
@@ -464,10 +491,10 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy {
       // Render or update chart
       if (this.plotlyElement) {
         // Update existing chart
-        Plotly.react(this.plotlyElement, chartData.traces, chartData.layout, config);
+        Plotly.react(this.plotlyElement, chartData.traces, layout, config);
       } else {
         // Create new chart
-        Plotly.newPlot(element, chartData.traces, chartData.layout, config)
+        Plotly.newPlot(element, chartData.traces, layout, config)
           .then((gd: PlotlyHTMLElement) => {
             this.plotlyElement = gd;
             this.attachEventHandlers(gd);

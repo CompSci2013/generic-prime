@@ -1,17 +1,5 @@
 <!-- Base Chart Component Template -->
 <div class="chart-wrapper">
-  <!-- Chart title -->
-  @if (chartTitle) {
-    <div class="chart-header">
-      <h3 class="chart-title">{{ chartTitle }}</h3>
-      @if (isHighlightModeActive) {
-        <span class="highlight-indicator">
-          Highlight Mode Active
-        </span>
-      }
-    </div>
-  }
-
   <!-- Error boundary fallback -->
   @if (hasError) {
     <div class="chart-error">
