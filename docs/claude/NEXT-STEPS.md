@@ -1,8 +1,8 @@
 # Next Steps
 
-**Current Session**: Session 67 - QA E2E Test Suite Implementation
-**Previous Session**: Session 66 - Angular 21 Modernization & QA Documentation
-**Status**: v21.1.0 deployed, 60 E2E tests implemented and passing
+**Current Session**: Session 68 - Merged /bye and /exit Commands
+**Previous Session**: Session 67 - QA E2E Test Suite Implementation
+**Status**: v21.1.0 deployed, `/exit` command updated with two-commit workflow
 
 ---
 
@@ -65,13 +65,10 @@ These are functional but would prepare for zoneless Angular.
 
 ---
 
-## SESSION 67 COMPLETION SUMMARY
+## SESSION 68 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Implemented 60 E2E tests across 6 categories
-2. ✅ Created TestContext infrastructure for test artifacts
-3. ✅ Fixed collapsed panels issue with expandAllPanels helper
-4. ✅ Generated HTML/PDF reports and ZIP archive
-
-**Deliverable**:
-- `frontend/test-results/qa-report.zip` - Windows-compatible archive with reports and test artifacts
+1. ✅ Merged `/bye` and `/exit` into single `/exit` command
+2. ✅ Implemented two-commit workflow (docs first, then remaining)
+3. ✅ Added explicit `date -Iseconds` timestamp requirement
+4. ✅ Removed STATUS-HISTORY.md archival (git history is the record)
