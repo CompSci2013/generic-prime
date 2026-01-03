@@ -1,53 +1,23 @@
-<!--
-  Chemistry Domain Landing Page Template
-
-  Purpose: Renders the chemistry domain landing page with feature showcase, CTA, and dataset information
-
-  Template Structure:
-  1. Header Section: Domain branding with title and subtitle
-  2. Features Grid: Four cards showcasing chemistry capabilities
-  3. CTA Section: Call-to-action buttons for discovery and reports
-  4. Info Section: Dataset information and quick tips
-  5. Back Link: Navigation to domain selector
-
-  Styling: Uses dark theme with cyan accents (#64c8ff, #4ba3d9)
-  Animations: fadeInDown (header), fadeInUp (sections), pulse (icon)
-  Responsive: Mobile breakpoint at 768px
-
-  Component Reference: {@link ChemistryComponent}
--->
 <div class="chemistry-container">
-  <!-- Header Section: Domain title, icon, and subtitle -->
-  <div class="header">
-    <div class="header-icon">⚛️</div>
-    <h1>Chemistry Domain</h1>
-    <p class="subtitle">Chemical Data Discovery & Molecular Analysis</p>
-  </div>
-
-  <!-- Features Grid: Four-column responsive grid (240px-1200px) showcasing chemistry domain capabilities -->
+  <!-- Features Grid -->
   <div class="features-section">
-    <h2>Explore Chemical Data</h2>
-    <!-- Auto-fit responsive grid with four feature cards -->
+    <h2><span class="section-icon">🧪</span> Explore Chemical Data</h2>
     <div class="features-grid">
-      <!-- Feature Card 1: Molecular Composition -->
-      <div class="feature-card">
+      <a routerLink="/chemistry/discover" class="feature-card feature-card-link">
         <div class="feature-icon">🧪</div>
         <h3>Molecular Composition</h3>
         <p>Analyze molecular structures, formulas, and chemical compositions</p>
-      </div>
-      <!-- Feature Card 2: Reaction Data -->
+      </a>
       <div class="feature-card">
         <div class="feature-icon">⚗️</div>
         <h3>Reaction Data</h3>
         <p>Explore chemical reactions, mechanisms, and reaction conditions</p>
       </div>
-      <!-- Feature Card 3: Element Properties -->
       <div class="feature-card">
         <div class="feature-icon">🔬</div>
         <h3>Element Properties</h3>
         <p>Review periodic table data and element characteristics</p>
       </div>
-      <!-- Feature Card 4: Chemical Analytics -->
       <div class="feature-card">
         <div class="feature-icon">📊</div>
         <h3>Chemical Analytics</h3>
@@ -56,28 +26,12 @@
     </div>
   </div>
 
-  <!-- CTA Section: Call-to-action with primary (discovery) and secondary (reports) buttons -->
-  <div class="cta-section">
-    <h2>Ready to Explore?</h2>
-    <p>Start discovering chemical data with our powerful discovery interface</p>
-    <!-- CTA Button Group: Flex layout with responsive wrapping -->
-    <div class="cta-button-group">
-      <!-- Primary CTA: Launch discovery interface (navigates to /chemistry/discover route) -->
-      <a routerLink="/chemistry" class="cta-button">
-        <span class="button-icon">🚀</span>
-        <span>Launch Discovery Interface</span>
-      </a>
-      <!-- Secondary CTA: View Playwright test reports (opens in new tab) -->
-      <a href="playwright-report/index.html" class="cta-button cta-button-secondary" target="_blank">
-        <span class="button-icon">📋</span>
-        <span>View Test Reports</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- Info Section: Two-column grid with dataset info and quick tips cards -->
+  <!-- Info Section -->
   <div class="info-section">
-    <!-- Dataset Information Card: Describes available chemistry data and scope -->
+    <div class="info-card info-card-coming-soon">
+      <h3>Coming Soon</h3>
+      <p>New features and capabilities are on the way</p>
+    </div>
     <div class="info-card">
       <h3>Dataset Information</h3>
       <ul>
@@ -87,7 +41,6 @@
         <li><strong>Scope:</strong> Academic and industrial chemistry</li>
       </ul>
     </div>
-    <!-- Quick Tips Card: Provides user guidance for exploring chemistry data -->
     <div class="info-card">
       <h3>Quick Tips</h3>
       <ul>
@@ -99,9 +52,4 @@
     </div>
   </div>
 
-  <!-- Back Link: Navigation button to return to domain selector (/home) -->
-  <div class="back-link">
-    <!-- Routes back to domain selector on click -->
-    <a routerLink="/" class="back-button">← Back to Domain Selection</a>
-  </div>
 </div>

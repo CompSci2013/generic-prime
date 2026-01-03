@@ -1,110 +1,26 @@
-/**
- * Chemistry Component Styles
- *
- * Purpose: Provides dark theme styling for the chemistry domain landing page
- * Theme: Dark mode with cyan accents (#64c8ff, #4ba3d9)
- * Color Palette:
- *   - Primary accent: #64c8ff (cyan)
- *   - Secondary accent: #4ba3d9 (darker cyan)
- *   - Text primary: #ffffff (white)
- *   - Text secondary: #b0b0b0 (light gray)
- *   - Text tertiary: #888 (medium gray)
- *   - Background dark: #1a1a1a, #2d2d2d (dark gradients)
- *   - Card backgrounds: Transparent overlays of cyan/blue
- *
- * Responsive Design:
- *   - Default: Desktop layout with full spacing
- *   - Mobile (768px breakpoint): Single column, reduced padding, responsive grids
- *
- * Animations:
- *   - fadeInDown: Header entrance (0.8s)
- *   - fadeInUp: Section entrances (0.8s with 0.2s-0.8s staggered delays)
- *   - pulse: Icon breathing effect (2s infinite)
- *   - transform transitions: Hover states (0.3s)
- *
- * Layout Grids:
- *   - Features Grid: Auto-fit columns (240px-1200px range)
- *   - Info Grid: Auto-fit columns (300px-1000px range)
- *   - CTA Button Group: Flex with responsive wrapping
- */
-
-/**
- * Main Container: Full-height scrollable viewport
- * - min-height: 100vh ensures full vertical coverage
- * - Background: Dark gradient for visual depth
- * - Padding: 4rem vertical, 2rem horizontal (desktop); 2rem/1rem (mobile)
- */
 .chemistry-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   padding: 4rem 2rem;
   overflow-y: auto;
 
-  /**
-   * Header Section: Branding and domain introduction
-   * - Centered layout with animated entrance
-   * - fadeInDown animation: Slides down from top
-   * - Includes icon, title, and subtitle
-   */
-  .header {
-    text-align: center;
-    margin-bottom: 4rem;
-    animation: fadeInDown 0.8s ease-out;
-
-    /** Domain icon with breathing animation */
-    .header-icon {
-      font-size: 5rem;
-      display: block;
-      margin-bottom: 1rem;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    /** Domain title: Large, bold, with text shadow depth */
-    h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin: 0 0 0.5rem 0;
-      letter-spacing: -0.5px;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    /** Domain subtitle: Light gray text describing the domain */
-    .subtitle {
-      font-size: 1.2rem;
-      color: #b0b0b0;
-      margin: 0;
-      font-weight: 300;
-    }
-  }
-
-  /**
-   * Features Section: Showcase of domain capabilities
-   * - Four-card responsive grid (240px-1200px columns)
-   * - fadeInUp animation with 0.2s delay
-   * - Staggered entrance for visual flow
-   */
+  /* Features Section */
   .features-section {
     margin-bottom: 5rem;
     animation: fadeInUp 0.8s ease-out 0.2s both;
 
-    /** Section heading */
     h2 {
       text-align: center;
       font-size: 2rem;
       color: #ffffff;
       margin: 0 0 3rem 0;
       font-weight: 600;
+
+      .section-icon {
+        margin-right: 0.5rem;
+      }
     }
 
-    /**
-     * Features Grid: Responsive auto-fit grid
-     * - Columns: 240px minimum, 1fr flexible
-     * - Auto-fit: Reflows based on available width
-     * - Max-width: 1200px for reading comfort
-     * - Gap: 2rem spacing between cards
-     * - Behavior: Single column on mobile, multi-column on desktop
-     */
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -112,13 +28,6 @@
       max-width: 1200px;
       margin: 0 auto;
 
-      /**
-       * Feature Card: Interactive capability showcase
-       * - Background: Cyan gradient with 8-15% opacity
-       * - Hover: Elevation (+8px), border highlight, enhanced shadow
-       * - Icon hover: Scale 1.2x with 5deg rotation
-       * - Border top: Animated scale on hover (0% → 100%)
-       */
       .feature-card {
         background: linear-gradient(135deg, rgba(100, 200, 255, 0.08) 0%, rgba(75, 163, 217, 0.04) 100%);
         border-radius: 12px;
@@ -130,7 +39,11 @@
         position: relative;
         overflow: hidden;
 
-        /** Top border accent: Animated gradient on hover */
+        &.feature-card-link {
+          text-decoration: none;
+          display: block;
+        }
+
         &::before {
           content: '';
           position: absolute;
@@ -144,7 +57,6 @@
           transform-origin: center;
         }
 
-        /** Hover state: Lift card, brighten, expand shadow */
         &:hover {
           transform: translateY(-8px);
           border-color: rgba(100, 200, 255, 0.3);
@@ -160,7 +72,6 @@
           }
         }
 
-        /** Feature icon: Large emoji with smooth transform */
         .feature-icon {
           font-size: 3rem;
           display: block;
@@ -168,7 +79,6 @@
           transition: transform 0.3s ease;
         }
 
-        /** Feature title: Bold, white text */
         h3 {
           font-size: 1.3rem;
           color: #ffffff;
@@ -176,7 +86,6 @@
           font-weight: 600;
         }
 
-        /** Feature description: Secondary text color */
         p {
           color: #888;
           font-size: 0.95rem;
@@ -187,139 +96,15 @@
     }
   }
 
-  /**
-   * CTA Section: Call-to-action container with primary buttons
-   * - Background: Darker gradient with cyan border
-   * - Animation: fadeInUp with 0.4s delay
-   * - Contains two buttons: primary (solid) and secondary (outlined)
-   */
-  .cta-section {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1f1f2e 100%);
-    border-radius: 16px;
-    padding: 4rem 2rem;
-    text-align: center;
-    margin-bottom: 5rem;
-    border: 1px solid rgba(100, 200, 255, 0.2);
-    animation: fadeInUp 0.8s ease-out 0.4s both;
-
-    /** CTA Section heading */
-    h2 {
-      font-size: 2.2rem;
-      color: #ffffff;
-      margin: 0 0 1rem 0;
-      font-weight: 700;
-    }
-
-    /** CTA Section description text */
-    p {
-      color: #b0b0b0;
-      font-size: 1.1rem;
-      margin: 0 0 2rem 0;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /**
-     * CTA Button Group: Flex layout with responsive wrapping
-     * - Gap: 1rem between buttons
-     * - Wrap: Stacks on mobile
-     * - Centered alignment
-     */
-    .cta-button-group {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 0;
-    }
-
-    /**
-     * CTA Button: Interactive action button
-     * - Primary: Solid gradient background with shadow
-     * - Secondary: Outlined with transparent background
-     * - Hover: Elevation (+3px), shadow expansion, icon lift
-     * - Active: No elevation (pressed state)
-     */
-    .cta-button {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.8rem;
-      background: linear-gradient(135deg, #64c8ff 0%, #4ba3d9 100%);
-      color: #ffffff;
-      padding: 1.2rem 2.8rem;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 1.1rem;
-      transition: all 0.3s ease;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 8px 25px rgba(100, 200, 255, 0.3);
-
-      /** Button icon: Emoji with elevation animation on hover */
-      .button-icon {
-        font-size: 1.5rem;
-        transition: transform 0.3s ease;
-      }
-
-      /** Button hover state: Elevation and enhanced shadow */
-      &:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 35px rgba(100, 200, 255, 0.4);
-
-        .button-icon {
-          transform: translateY(-3px) scale(1.2);
-        }
-      }
-
-      /** Button active state: No elevation (pressed appearance) */
-      &:active {
-        transform: translateY(0);
-      }
-
-      /**
-       * Secondary Button Variant: Outlined style
-       * - Background: Transparent with border
-       * - Border: 2px cyan outline
-       * - Hover: Light background with enhanced shadow
-       */
-      &.cta-button-secondary {
-        background: transparent;
-        color: #64c8ff;
-        border: 2px solid #64c8ff;
-        box-shadow: none;
-
-        &:hover {
-          background: rgba(100, 200, 255, 0.1);
-          border-color: #4ba3d9;
-          box-shadow: 0 8px 25px rgba(100, 200, 255, 0.2);
-        }
-      }
-    }
-  }
-
-  /**
-   * Info Section: Two-column grid with dataset info and tips
-   * - Grid: Auto-fit columns (300px-1000px)
-   * - Animation: fadeInUp with 0.6s delay
-   * - Two cards: dataset info and quick tips
-   */
+  /* Info Section */
   .info-section {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 2rem;
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto 5rem auto;
     animation: fadeInUp 0.8s ease-out 0.6s both;
 
-    /**
-     * Info Card: Content card with hover elevation
-     * - Background: Subtle white gradient
-     * - Border: Thin white border
-     * - Hover: Cyan gradient background, enhanced shadow, elevation
-     * - Title: Includes left gradient accent bar
-     */
     .info-card {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
       border-radius: 12px;
@@ -327,7 +112,17 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       transition: all 0.3s ease;
 
-      /** Info card hover: Cyan theme, shadow, elevation */
+      &.info-card-coming-soon {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        h3 {
+          justify-content: center;
+        }
+      }
+
       &:hover {
         border-color: rgba(100, 200, 255, 0.2);
         background: linear-gradient(135deg, rgba(100, 200, 255, 0.08) 0%, rgba(75, 163, 217, 0.04) 100%);
@@ -335,7 +130,6 @@
         transform: translateY(-4px);
       }
 
-      /** Card heading with gradient left accent bar */
       h3 {
         font-size: 1.4rem;
         color: #ffffff;
@@ -345,7 +139,6 @@
         align-items: center;
         gap: 0.8rem;
 
-        /** Left accent bar: Gradient from cyan to darker cyan */
         &::before {
           content: '';
           display: block;
@@ -356,13 +149,18 @@
         }
       }
 
-      /** List styling: Remove default bullets, custom spacing */
+      p {
+        color: #b0b0b0;
+        font-size: 0.95rem;
+        margin: 0;
+        line-height: 1.6;
+      }
+
       ul {
         list-style: none;
         padding: 0;
         margin: 0;
 
-        /** List item: Secondary text color */
         li {
           color: #b0b0b0;
           font-size: 0.95rem;
@@ -374,7 +172,6 @@
             margin-bottom: 0;
           }
 
-          /** Label text: Emphasized in white */
           strong {
             color: #ffffff;
             font-weight: 600;
@@ -383,70 +180,9 @@
       }
     }
   }
-
-  /**
-   * Back Link: Navigation link to domain selector
-   * - Centered layout
-   * - Animation: fadeInUp with 0.8s delay
-   */
-  .back-link {
-    text-align: center;
-    margin-top: 3rem;
-    animation: fadeInUp 0.8s ease-out 0.8s both;
-
-    /**
-     * Back Button: Navigation link with hover effects
-     * - Color: Cyan accent
-     * - Hover: Light background, enhanced border, left slide
-     * - Transition: 0.3s ease
-     */
-    .back-button {
-      display: inline-block;
-      color: #64c8ff;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 1rem;
-      padding: 0.8rem 1.5rem;
-      border: 1px solid rgba(100, 200, 255, 0.3);
-      border-radius: 8px;
-      transition: all 0.3s ease;
-
-      /** Back button hover: Light background, enhanced border, left slide */
-      &:hover {
-        background: rgba(100, 200, 255, 0.1);
-        border-color: rgba(100, 200, 255, 0.5);
-        transform: translateX(-2px);
-      }
-    }
-  }
 }
 
-/**
- * ANIMATIONS
- * Smooth entrance effects for page sections and elements
- */
-
-/**
- * fadeInDown: Slide down from top while fading in
- * Duration: 0.8s, Timing: ease-out
- * Used for: Header section
- */
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/**
- * fadeInUp: Slide up from bottom while fading in
- * Duration: 0.8s, Timing: ease-out, Delay: varies (0.2s-0.8s)
- * Used for: Features section, CTA section, info section, back link (staggered)
- */
+/* Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -458,48 +194,12 @@
   }
 }
 
-/**
- * pulse: Gentle breathing animation for icons
- * Duration: 2s infinite, Timing: ease-in-out
- * Used for: Header icon (⚛️)
- * Effect: Scales 1.0 → 1.05 while opacity transitions 1.0 → 0.8
- */
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.8;
-  }
-}
-
-/**
- * RESPONSIVE DESIGN
- * Mobile breakpoint: 768px
- * - Reduces padding
- * - Reflows grids to single column
- * - Adjusts font sizes and button sizes
- */
+/* Responsive Design */
 @media (max-width: 768px) {
   .chemistry-container {
-    /** Mobile container: Reduced padding */
     padding: 2rem 1rem;
 
-    .header {
-      /** Mobile header: Smaller font sizes */
-      h1 {
-        font-size: 2rem;
-      }
-
-      .header-icon {
-        font-size: 3rem;
-      }
-    }
-
     .features-section {
-      /** Mobile features: Single column layout */
       h2 {
         font-size: 1.5rem;
       }
@@ -510,29 +210,7 @@
       }
     }
 
-    .cta-section {
-      /** Mobile CTA: Reduced padding, stacked buttons */
-      padding: 2rem 1rem;
-
-      h2 {
-        font-size: 1.5rem;
-      }
-
-      .cta-button-group {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .cta-button {
-        padding: 1rem 2rem;
-        font-size: 1rem;
-        width: 100%;
-        justify-content: center;
-      }
-    }
-
     .info-section {
-      /** Mobile info: Single column layout */
       grid-template-columns: 1fr;
     }
   }
