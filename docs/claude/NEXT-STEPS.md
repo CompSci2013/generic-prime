@@ -1,46 +1,40 @@
 # Next Steps
 
-**Current Session**: Session 77 - Statistics-2 Panel Implementation
-**Previous Session**: Session 76 - Abstraction Leak Fixes & CDK Research
-**Status**: v7.12, Statistics-2 panel complete, legacy panel removed
+**Current Session**: Session 78 - Domain Landing Page UI Simplification
+**Previous Session**: Session 77 - Statistics-2 Panel Implementation
+**Status**: v7.14, UI simplification complete, feature/ai branch created
 
 ---
 
-## IMMEDIATE ACTION: Continue User Story Validation
+## IMMEDIATE ACTION: AI Integration Planning
 
 **Priority**: HIGH
-**Scope**: Create validation tests for remaining components
+**Branch**: `feature/ai`
+**Scope**: Plan and implement natural language to Elasticsearch query translation
 
 ### Context
 
-Session 75 created user stories and validation tests for Query Panel (38 tests passing).
-Session 77 implemented Statistics-2 panel with CDK mixed orientation.
+Session 78 created the `feature/ai` branch for AI integration work. The goal is to allow users to type natural language queries that get translated to Elasticsearch queries.
 
-Next: Continue user story validation for remaining components.
+### Recommended LLM
 
-### Components to Validate
+For self-hosted LLM on Mac Studio M3 256GB:
+- **Primary choice**: `llama3.1:70b` - Best balance of capability and performance for NL-to-ES translation
 
-| Component | User Stories | Validation Tests |
-|-----------|-------------|------------------|
-| Query Panel | ✅ Complete | ✅ 38 tests |
-| **Results Table** | Pending | Pending |
-| **Statistics Panel (Statistics-2)** | Pending | Pending |
-| **Base Picker** | Pending | Pending |
+### Planning Steps
 
-### Steps
+1. Design the AI integration architecture
+2. Create a service to interface with Ollama/local LLM
+3. Build prompt templates for NL → Elasticsearch DSL translation
+4. Integrate with Query Panel UI
+5. Test with automobile domain queries
 
-1. Create user stories for Results Table component
-2. Write validation tests based on user stories
-3. Repeat for Statistics Panel and Base Picker
-4. Ensure all tests pass
+### Key Considerations
 
-### Key Files
-
-| File | Purpose |
-|------|---------|
-| `frontend/e2e/validation/` | Validation test files |
-| `docs/claude/user-stories/` | User story documentation |
-| `frontend/src/framework/components/` | Component source files |
+- Local LLM via Ollama for privacy and speed
+- Domain-specific prompt engineering (field names, data types)
+- Fallback to manual query if AI translation fails
+- Show generated query for user review before execution
 
 ---
 
@@ -48,20 +42,19 @@ Next: Continue user story validation for remaining components.
 
 | Task | Priority | Notes |
 |------|----------|-------|
+| Continue User Story Validation | HIGH | Results Table, Statistics-2, Base Picker |
 | IdP Phase 1 (Keycloak) | HIGH | Next major milestone |
 | Fix Bug #7 (multiselect visual state) | Medium | Low priority |
-| Remove component-level ResourceManagementService provider | Low | Architecture cleanup |
 
 ---
 
-## SESSION 77 COMPLETION SUMMARY
+## SESSION 78 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Created Statistics-2 component with CDK `cdkDropListOrientation="mixed"`
-2. ✅ Integrated into discover page with pop-out support
-3. ✅ Fixed panel preferences to add new panels and remove deleted ones
-4. ✅ Removed legacy StatisticsPanelComponent
-5. ✅ Fixed pop-out scrollbar issues
-6. ✅ Merged feature/statistics-2 to main
+1. ✅ Simplified all domain landing pages (Automobile, Agriculture, Chemistry, Math)
+2. ✅ Unified home page with 5-tile domain grid
+3. ✅ Bumped version 21.2.0 → 21.2.1
+4. ✅ Created `feature/ai` branch for AI integration work
+5. ✅ Pushed all changes to GitHub and GitLab
 
 ---
