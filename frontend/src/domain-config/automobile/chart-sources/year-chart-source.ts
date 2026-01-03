@@ -153,4 +153,22 @@ export class YearChartDataSource extends ChartDataSource<VehicleStatistics> {
     }
     return null;
   }
+
+  /**
+   * Convert clicked value to URL parameters
+   *
+   * Handles both single year and year range (min|max format).
+   */
+  toUrlParams(value: string, isHighlightMode: boolean): Record<string, any> {
+    if (value.includes('|')) {
+      // Year range: split into min/max params
+      const [min, max] = value.split('|');
+      return isHighlightMode
+        ? { h_yearMin: min, h_yearMax: max }
+        : { yearMin: min, yearMax: max };
+    }
+    // Single year
+    const paramName = isHighlightMode ? 'h_year' : 'year';
+    return { [paramName]: value };
+  }
 }

@@ -134,4 +134,83 @@
       </div>
     }
   </div>
+
+  <!-- Individual charts for testing -->
+  <div class="standalone-charts">
+    <div class="standalone-chart">
+      @if (!isPanelPoppedOut('chart-manufacturer')) {
+        <app-base-chart
+          [dataSource]="domainConfig.chartDataSources?.['manufacturer']"
+          [statistics]="resourceService.statistics()"
+          [highlights]="resourceService.highlights()"
+          [selectedValue]="null"
+          [canPopOut]="true"
+          (popOutClick)="onChartPopOut('manufacturer')"
+          (chartClick)="onStandaloneChartClick($event, domainConfig.chartDataSources?.['manufacturer'])">
+        </app-base-chart>
+      } @else {
+        <div class="popout-placeholder">
+          <i class="pi pi-external-link"></i>
+          <span>Chart is open in a separate window</span>
+        </div>
+      }
+    </div>
+
+    <div class="standalone-chart">
+      @if (!isPanelPoppedOut('chart-top-models')) {
+        <app-base-chart
+          [dataSource]="domainConfig.chartDataSources?.['top-models']"
+          [statistics]="resourceService.statistics()"
+          [highlights]="resourceService.highlights()"
+          [selectedValue]="null"
+          [canPopOut]="true"
+          (popOutClick)="onChartPopOut('top-models')"
+          (chartClick)="onStandaloneChartClick($event, domainConfig.chartDataSources?.['top-models'])">
+        </app-base-chart>
+      } @else {
+        <div class="popout-placeholder">
+          <i class="pi pi-external-link"></i>
+          <span>Chart is open in a separate window</span>
+        </div>
+      }
+    </div>
+
+    <div class="standalone-chart">
+      @if (!isPanelPoppedOut('chart-year')) {
+        <app-base-chart
+          [dataSource]="domainConfig.chartDataSources?.['year']"
+          [statistics]="resourceService.statistics()"
+          [highlights]="resourceService.highlights()"
+          [selectedValue]="null"
+          [canPopOut]="true"
+          (popOutClick)="onChartPopOut('year')"
+          (chartClick)="onStandaloneChartClick($event, domainConfig.chartDataSources?.['year'])">
+        </app-base-chart>
+      } @else {
+        <div class="popout-placeholder">
+          <i class="pi pi-external-link"></i>
+          <span>Chart is open in a separate window</span>
+        </div>
+      }
+    </div>
+
+    <div class="standalone-chart">
+      @if (!isPanelPoppedOut('chart-body-class')) {
+        <app-base-chart
+          [dataSource]="domainConfig.chartDataSources?.['body-class']"
+          [statistics]="resourceService.statistics()"
+          [highlights]="resourceService.highlights()"
+          [selectedValue]="null"
+          [canPopOut]="true"
+          (popOutClick)="onChartPopOut('body-class')"
+          (chartClick)="onStandaloneChartClick($event, domainConfig.chartDataSources?.['body-class'])">
+        </app-base-chart>
+      } @else {
+        <div class="popout-placeholder">
+          <i class="pi pi-external-link"></i>
+          <span>Chart is open in a separate window</span>
+        </div>
+      }
+    </div>
+  </div>
 </div>

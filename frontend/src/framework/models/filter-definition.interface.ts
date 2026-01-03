@@ -6,6 +6,108 @@
  */
 
 /**
+ * Configuration for range-type filters
+ *
+ * Supports integer, decimal, and datetime ranges with flexible formatting.
+ *
+ * @interface RangeConfig
+ *
+ * @property {('integer'|'decimal'|'datetime')} valueType - The type of values in the range.
+ *           - 'integer': Whole numbers (years, counts, etc.)
+ *           - 'decimal': Floating point numbers (prices, measurements, etc.)
+ *           - 'datetime': Date/time values (ISO 8601 format)
+ *
+ * @property {string} minLabel - Label for the minimum value input (e.g., "Start Year", "Min Price")
+ *
+ * @property {string} maxLabel - Label for the maximum value input (e.g., "End Year", "Max Price")
+ *
+ * @property {string} [minPlaceholder] - Optional placeholder text for min input (e.g., "e.g., 1980")
+ *
+ * @property {string} [maxPlaceholder] - Optional placeholder text for max input (e.g., "e.g., 2023")
+ *
+ * @property {number} [step] - Step increment for numeric inputs (default: 1 for integer, 0.01 for decimal)
+ *
+ * @property {number} [decimalPlaces] - Number of decimal places for 'decimal' type (default: 2)
+ *
+ * @property {boolean} [useGrouping] - Whether to use thousand separators (default: false)
+ *
+ * @property {Object} [defaultRange] - Default min/max values when API doesn't provide them
+ *
+ * @example
+ * ```typescript
+ * // Year range (integer)
+ * rangeConfig: {
+ *   valueType: 'integer',
+ *   minLabel: 'Start Year',
+ *   maxLabel: 'End Year',
+ *   minPlaceholder: 'e.g., 1980',
+ *   maxPlaceholder: 'e.g., 2023',
+ *   step: 1,
+ *   defaultRange: { min: 1900, max: new Date().getFullYear() }
+ * }
+ *
+ * // Price range (decimal)
+ * rangeConfig: {
+ *   valueType: 'decimal',
+ *   minLabel: 'Min Price',
+ *   maxLabel: 'Max Price',
+ *   minPlaceholder: 'e.g., 0.00',
+ *   maxPlaceholder: 'e.g., 100000.00',
+ *   step: 0.01,
+ *   decimalPlaces: 2,
+ *   useGrouping: true,
+ *   defaultRange: { min: 0, max: 1000000 }
+ * }
+ * ```
+ */
+export interface RangeConfig {
+  /**
+   * The type of values in the range
+   */
+  valueType: 'integer' | 'decimal' | 'datetime';
+
+  /**
+   * Label for the minimum value input
+   */
+  minLabel: string;
+
+  /**
+   * Label for the maximum value input
+   */
+  maxLabel: string;
+
+  /**
+   * Optional placeholder text for min input
+   */
+  minPlaceholder?: string;
+
+  /**
+   * Optional placeholder text for max input
+   */
+  maxPlaceholder?: string;
+
+  /**
+   * Step increment for numeric inputs (default: 1 for integer, 0.01 for decimal)
+   */
+  step?: number;
+
+  /**
+   * Number of decimal places for 'decimal' type (default: 2)
+   */
+  decimalPlaces?: number;
+
+  /**
+   * Whether to use thousand separators (default: false)
+   */
+  useGrouping?: boolean;
+
+  /**
+   * Default min/max values when API doesn't provide them
+   */
+  defaultRange?: { min: number; max: number };
+}
+
+/**
  * Defines a filterable field in the domain
  *
  * @interface FilterDefinition
@@ -26,6 +128,10 @@
  * @property {string} [searchPlaceholder] - Optional placeholder text displayed in the search box.
  *
  * @property {string} [dialogSubtitle] - Optional subtitle text shown in the filter dialog/modal.
+ *
+ * @property {string} [dialogTitle] - Optional title for the filter dialog (default: "Select {label}")
+ *
+ * @property {RangeConfig} [rangeConfig] - Required configuration for type='range' filters.
  *
  * @remarks
  * **Usage in Domain Config**:
@@ -84,6 +190,17 @@ export interface FilterDefinition<T = any> {
    * Optional subtitle text shown in the filter dialog/modal
    */
   dialogSubtitle?: string;
+
+  /**
+   * Optional title for the filter dialog (default: "Select {label}")
+   */
+  dialogTitle?: string;
+
+  /**
+   * Configuration for type='range' filters
+   * Required when type is 'range'
+   */
+  rangeConfig?: RangeConfig;
 }
 
 /**

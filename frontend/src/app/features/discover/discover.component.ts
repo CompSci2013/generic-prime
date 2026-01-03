@@ -32,6 +32,7 @@ import { StatisticsPanelComponent } from '../../../framework/components/statisti
 import { BasePickerComponent } from '../../../framework/components/base-picker/base-picker.component';
 import { QueryPanelComponent } from '../../../framework/components/query-panel/query-panel.component';
 import { QueryControlComponent } from '../../../framework/components/query-control/query-control.component';
+import { BaseChartComponent, ChartDataSource } from '../../../framework/components/base-chart/base-chart.component';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
 
@@ -114,7 +115,7 @@ import { ButtonModule } from 'primeng/button';
     styleUrls: ['./discover.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ResourceManagementService],
-    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, BasicResultsTableComponent]
+    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, BasicResultsTableComponent, BaseChartComponent]
 })
 export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {
@@ -564,6 +565,19 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
         // Pop-out requested to clear all highlights - remove highlights from URL
         await this.urlStateService.setParams({ highlights: null });
         break;
+
+      case PopOutMessageType.CHART_CLICK:
+        // Pop-out chart was clicked - update main window URL
+        // Payload: { chartId: string, value: string, isHighlightMode: boolean }
+        if (message.payload) {
+          // Look up the dataSource by chartId
+          const dataSource = this.domainConfig.chartDataSources?.[message.payload.chartId];
+          await this.onStandaloneChartClick(
+            { value: message.payload.value, isHighlightMode: message.payload.isHighlightMode },
+            dataSource
+          );
+        }
+        break;
     }
   }
 
@@ -606,6 +620,49 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    */
   async onClearAllFilters(): Promise<void> {
     await this.urlStateService.clearParams();
+  }
+
+  /**
+   * Handle chart pop-out request from standalone charts
+   *
+   * @param chartId - Chart identifier (e.g., 'manufacturer', 'top-models', 'year', 'body-class')
+   */
+  onChartPopOut(chartId: string): void {
+    // Use existing popOutPanel infrastructure with chart-specific panel ID
+    const panelId = `chart-${chartId}`;
+    const panelType = 'chart';
+    this.popOutPanel(panelId, panelType);
+  }
+
+  /**
+   * Handle chart click from standalone charts
+   *
+   * Delegates URL param generation to the chart's data source.
+   * This keeps domain-specific mappings in the domain layer (data sources)
+   * rather than in the feature layer (this component).
+   *
+   * @param event - Chart click event with value and highlight mode
+   * @param dataSource - The chart's data source (handles URL param mapping)
+   */
+  async onStandaloneChartClick(
+    event: { value: string; isHighlightMode: boolean },
+    dataSource: ChartDataSource | undefined
+  ): Promise<void> {
+    if (!dataSource) {
+      return;
+    }
+
+    // Delegate URL param generation to the data source
+    const newParams = dataSource.toUrlParams(event.value, event.isHighlightMode);
+
+    // Reset pagination when filtering (not highlighting)
+    if (!event.isHighlightMode) {
+      newParams['page'] = 1;
+    }
+
+    if (Object.keys(newParams).length > 0) {
+      await this.urlStateService.setParams(newParams);
+    }
   }
 
   /**

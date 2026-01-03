@@ -16,7 +16,8 @@ import { environment } from '../../../environments/environment';
 import { DomainConfig } from '../../models/domain-config.interface';
 import {
   FilterDefinition,
-  FilterOption
+  FilterOption,
+  RangeConfig
 } from '../../models/filter-definition.interface';
 import { ApiService } from '../../services/api.service';
 import { UrlStateService } from '../../services/url-state.service';
@@ -156,12 +157,13 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   selectedOptions: (string | number)[] = [];
   searchQuery = '';
 
-  // ==================== Year Range Dialog State ====================
+  // ==================== Range Dialog State ====================
 
-  showYearRangeDialog = false;
-  yearMin: number | null = null;
-  yearMax: number | null = null;
-  availableYearRange: { min: number; max: number } = { min: 1900, max: new Date().getFullYear() };
+  showRangeDialog = false;
+  rangeMin: number | null = null;
+  rangeMax: number | null = null;
+  availableRange: { min: number; max: number } = { min: 0, max: Number.MAX_SAFE_INTEGER };
+  currentRangeConfig: RangeConfig | null = null;
 
   ngOnInit(): void {
     // Initialize filter field options from domain config
@@ -350,7 +352,7 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     // Close any currently open dialogs before opening a new one
     // This prevents multiple dialogs from being open simultaneously
     this.showMultiselectDialog = false;
-    this.showYearRangeDialog = false;
+    this.showRangeDialog = false;
 
     this.currentFilterDef = filterDef;
 
@@ -360,7 +362,7 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     if (filterDef.type === 'multiselect') {
       this.openMultiselectDialog(filterDef);
     } else if (filterDef.type === 'range') {
-      this.openYearRangeDialog(filterDef);
+      this.openRangeDialog(filterDef);
     }
 
     // Reset dropdown selection
@@ -482,15 +484,27 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     this.cdr.detectChanges(); // Force immediate update instead of markForCheck()
   }
 
-  // ==================== Year Range Dialog ====================
+  // ==================== Range Dialog ====================
 
   /**
-   * Open year range dialog
+   * Open range dialog with config-driven settings
+   *
+   * Uses FilterDefinition.rangeConfig for labels, placeholders, step, etc.
+   * Falls back to sensible defaults if rangeConfig is not provided.
    */
-  private openYearRangeDialog(filterDef: FilterDefinition): void {
-    this.showYearRangeDialog = true;
-    this.yearMin = null;
-    this.yearMax = null;
+  private openRangeDialog(filterDef: FilterDefinition): void {
+    this.showRangeDialog = true;
+    this.rangeMin = null;
+    this.rangeMax = null;
+    this.currentRangeConfig = filterDef.rangeConfig || null;
+
+    // Set default available range from config or use safe defaults
+    if (filterDef.rangeConfig?.defaultRange) {
+      this.availableRange = { ...filterDef.rangeConfig.defaultRange };
+    } else {
+      this.availableRange = { min: 0, max: Number.MAX_SAFE_INTEGER };
+    }
+
     this.cdr.markForCheck();
 
     // Check if editing existing filter
@@ -498,18 +512,18 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     const urlParamsConfig = filterDef.urlParams as { min: string; max: string };
 
     if (params[urlParamsConfig.min]) {
-      this.yearMin = parseInt(params[urlParamsConfig.min], 10);
+      this.rangeMin = this.parseRangeValue(params[urlParamsConfig.min], filterDef.rangeConfig);
     }
     if (params[urlParamsConfig.max]) {
-      this.yearMax = parseInt(params[urlParamsConfig.max], 10);
+      this.rangeMax = this.parseRangeValue(params[urlParamsConfig.max], filterDef.rangeConfig);
     }
 
-    // Load available year range from API if endpoint provided
+    // Load available range from API if endpoint provided
     if (filterDef.optionsEndpoint) {
       this.apiService.get(filterDef.optionsEndpoint).subscribe({
         next: (response: any) => {
-          if (response && response.min && response.max) {
-            this.availableYearRange = { min: response.min, max: response.max };
+          if (response && response.min !== undefined && response.max !== undefined) {
+            this.availableRange = { min: response.min, max: response.max };
           }
           this.cdr.markForCheck();
         },
@@ -522,10 +536,54 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   }
 
   /**
-   * Handle year range dialog show event - shift focus to the dialog
+   * Parse a range value based on the range config type
+   */
+  private parseRangeValue(value: string, config: RangeConfig | undefined): number {
+    if (!config || config.valueType === 'integer') {
+      return parseInt(value, 10);
+    } else if (config.valueType === 'decimal') {
+      return parseFloat(value);
+    }
+    // For datetime, we still parse as number (timestamp) for now
+    return parseInt(value, 10);
+  }
+
+  /**
+   * Get the step value for range inputs based on config
+   */
+  getRangeStep(): number {
+    if (!this.currentRangeConfig) {
+      return 1;
+    }
+    if (this.currentRangeConfig.step !== undefined) {
+      return this.currentRangeConfig.step;
+    }
+    // Default steps based on value type
+    return this.currentRangeConfig.valueType === 'decimal' ? 0.01 : 1;
+  }
+
+  /**
+   * Get whether to use grouping (thousand separators) for range inputs
+   */
+  getRangeUseGrouping(): boolean {
+    return this.currentRangeConfig?.useGrouping ?? false;
+  }
+
+  /**
+   * Get the number of decimal places for range inputs
+   */
+  getRangeDecimalPlaces(): number | undefined {
+    if (!this.currentRangeConfig || this.currentRangeConfig.valueType !== 'decimal') {
+      return undefined;
+    }
+    return this.currentRangeConfig.decimalPlaces ?? 2;
+  }
+
+  /**
+   * Handle range dialog show event - shift focus to the dialog
    * This is called by PrimeNG's (onShow) event after dialog is fully rendered
    */
-  onYearRangeDialogShow(): void {
+  onRangeDialogShow(): void {
     // Shift focus to the first focusable element in the dialog (usually the first input)
     const dialogElement = document.querySelector('.p-dialog-content input, .p-dialog-content button, .p-dialog-content');
     if (dialogElement) {
@@ -534,30 +592,31 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
   }
 
   /**
-   * Apply year range filter
+   * Apply range filter
    */
-  applyYearRange(): void {
+  applyRange(): void {
     if (!this.currentFilterDef) {
       return;
     }
 
     const urlParamsConfig = this.currentFilterDef.urlParams as { min: string; max: string };
     const params: any = {
-      page: 1 // Reset to first page when year range changes (1-indexed)
+      page: 1 // Reset to first page when range changes (1-indexed)
     };
 
-    if (this.yearMin !== null) {
-      params[urlParamsConfig.min] = this.yearMin.toString();
+    if (this.rangeMin !== null) {
+      params[urlParamsConfig.min] = this.rangeMin.toString();
     }
-    if (this.yearMax !== null) {
-      params[urlParamsConfig.max] = this.yearMax.toString();
+    if (this.rangeMax !== null) {
+      params[urlParamsConfig.max] = this.rangeMax.toString();
     }
 
     // Emit URL params (page reset is always included)
     this.urlParamsChange.emit(params);
 
-    this.showYearRangeDialog = false;
+    this.showRangeDialog = false;
     this.currentFilterDef = null;
+    this.currentRangeConfig = null;
     this.resetFilterDropdown();
     this.cdr.detectChanges();
   }
@@ -569,12 +628,13 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    */
   cancelDialog(): void {
     this.showMultiselectDialog = false;
-    this.showYearRangeDialog = false;
+    this.showRangeDialog = false;
     this.currentFilterDef = null;
+    this.currentRangeConfig = null;
     this.selectedOptions = [];
     this.searchQuery = '';
-    this.yearMin = null;
-    this.yearMax = null;
+    this.rangeMin = null;
+    this.rangeMax = null;
     this.optionsError = null;
     this.resetFilterDropdown();
     this.cdr.detectChanges();
@@ -594,8 +654,9 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
    */
   onDialogHide(): void {
     this.showMultiselectDialog = false;
-    this.showYearRangeDialog = false;
+    this.showRangeDialog = false;
     this.currentFilterDef = null;
+    this.currentRangeConfig = null;
     this.optionsError = null;
     this.resetFilterDropdown();
     this.cdr.detectChanges();
@@ -690,7 +751,7 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     if (filter.definition.type === 'multiselect') {
       this.openMultiselectDialog(filter.definition);
     } else if (filter.definition.type === 'range') {
-      this.openYearRangeDialog(filter.definition);
+      this.openRangeDialog(filter.definition);
     }
   }
 
@@ -704,7 +765,7 @@ export class QueryControlComponent<TFilters = any, TData = any, TStatistics = an
     if (filter.definition.type === 'multiselect') {
       this.openMultiselectDialog(filter.definition);
     } else if (filter.definition.type === 'range') {
-      this.openYearRangeDialog(filter.definition);
+      this.openRangeDialog(filter.definition);
     }
   }
 

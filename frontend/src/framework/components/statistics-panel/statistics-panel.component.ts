@@ -132,82 +132,27 @@ export class StatisticsPanelComponent implements OnInit {
   // Event Handlers
   // ============================================================================
 
-  onChartClick(event: { value: string; isHighlightMode: boolean }, chartId: string): void {
-    if (event.isHighlightMode) {
-      // Highlight mode: Add h_* URL parameter based on chart type
-      const newParams: Record<string, any> = {};
+  /**
+   * Handle chart click events
+   *
+   * Delegates URL param generation to the chart's data source.
+   * This keeps domain-specific mappings in the domain layer (data sources)
+   * rather than in the framework layer (this component).
+   */
+  onChartClick(event: { value: string; isHighlightMode: boolean }, dataSource: ChartDataSource): void {
+    // Delegate URL param generation to the data source
+    const newParams = dataSource.toUrlParams(event.value, event.isHighlightMode);
 
-      // Handle range selections (value contains min|max)
-      if (chartId === 'year-distribution' && event.value.includes('|')) {
-        const [min, max] = event.value.split('|');
-        newParams['h_yearMin'] = min;
-        newParams['h_yearMax'] = max;
-      } else {
-        // Single value or other chart types
-        const paramName = this.getHighlightParamName(chartId);
-        if (paramName) {
-          newParams[paramName] = event.value;
-        }
-      }
-
-      // Only update URL in main window (not in pop-out)
-      if (this.popOutContext.isInPopOut()) {
-        this.popOutContext.sendMessage({
-          type: PopOutMessageType.URL_PARAMS_CHANGED,
-          payload: { params: newParams },
-          timestamp: Date.now()
-        });
-      } else {
-        this.urlState.setParams(newParams);
-      }
+    // Update URL (either directly or via pop-out message)
+    if (this.popOutContext.isInPopOut()) {
+      this.popOutContext.sendMessage({
+        type: PopOutMessageType.URL_PARAMS_CHANGED,
+        payload: { params: newParams },
+        timestamp: Date.now()
+      });
     } else {
-      // Normal mode: Add filter URL parameter (non-highlight)
-      const newParams: Record<string, any> = {};
-
-      // Handle range selections (value contains min|max)
-      if (chartId === 'year-distribution' && event.value.includes('|')) {
-        const [min, max] = event.value.split('|');
-        newParams['yearMin'] = min;
-        newParams['yearMax'] = max;
-      } else {
-        // Single value or other chart types
-        const paramName = this.getFilterParamName(chartId);
-        if (paramName) {
-          newParams[paramName] = event.value;
-        }
-      }
-
-      // Only update URL in main window (not in pop-out)
-      if (this.popOutContext.isInPopOut()) {
-        this.popOutContext.sendMessage({
-          type: PopOutMessageType.URL_PARAMS_CHANGED,
-          payload: { params: newParams },
-          timestamp: Date.now()
-        });
-      } else {
-        this.urlState.setParams(newParams);
-      }
+      this.urlState.setParams(newParams);
     }
-  }
-
-  private getHighlightParamName(chartId: string): string | null {
-    const mapping: Record<string, string> = {
-      'manufacturer-distribution': 'h_manufacturer',
-      'top-models': 'h_modelCombos',
-      'body-class-distribution': 'h_bodyClass'
-    };
-
-    return mapping[chartId] || null;
-  }
-
-  private getFilterParamName(chartId: string): string | null {
-    const mapping: Record<string, string> = {
-      'manufacturer-distribution': 'manufacturer',
-      'top-models': 'modelCombos',
-      'body-class-distribution': 'bodyClass'
-    };
-
-    return mapping[chartId] || null;
   }
 
   trackByChartId(index: number, item: { config: ChartConfig }): string {

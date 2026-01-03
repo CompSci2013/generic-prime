@@ -163,6 +163,26 @@ export abstract class ChartDataSource<TStatistics = any> {
    * @returns Clicked value or null
    */
   abstract handleClick(event: any): string | null;
+
+  /**
+   * Convert clicked value to URL parameters
+   *
+   * Maps the chart's clicked value to the appropriate URL query parameters.
+   * Handles both filter mode (regular params) and highlight mode (h_* params).
+   *
+   * @param value - The clicked value from handleClick()
+   * @param isHighlightMode - Whether highlight mode is active (h key held)
+   * @returns URL parameters object to merge into the query string
+   *
+   * @example
+   * // ManufacturerChartDataSource
+   * toUrlParams('Toyota', false) // { manufacturer: 'Toyota' }
+   * toUrlParams('Toyota', true)  // { h_manufacturer: 'Toyota' }
+   *
+   * // YearChartDataSource (range selection)
+   * toUrlParams('1990|2000', false) // { yearMin: '1990', yearMax: '2000' }
+   */
+  abstract toUrlParams(value: string, isHighlightMode: boolean): Record<string, any>;
 }
 
 /**
@@ -222,12 +242,22 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy, OnC
   @Input() hideTitle = false;
 
   /**
+   * Whether to show pop-out button in the mode bar
+   */
+  @Input() canPopOut = false;
+
+  /**
    * Emits when user clicks on a data point or completes a selection (box/lasso) in the chart
    */
   @Output() chartClick = new EventEmitter<{
     value: string;
     isHighlightMode: boolean;
   }>();
+
+  /**
+   * Emits when user clicks the pop-out button in the mode bar
+   */
+  @Output() popOutClick = new EventEmitter<void>();
 
   /**
    * Flag indicating whether highlight mode is currently active (toggled by 'h' key)
@@ -485,7 +515,19 @@ export class BaseChartComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         responsive: true,
         displayModeBar: true,
         displaylogo: false,
-        modeBarButtonsToRemove: ['sendDataToCloud', 'lasso2d']
+        scrollZoom: false,
+        modeBarButtonsToRemove: ['sendDataToCloud', 'lasso2d'],
+        modeBarButtonsToAdd: this.canPopOut ? [{
+          name: 'popout',
+          title: 'Pop out to separate window',
+          icon: {
+            width: 1024,
+            height: 1024,
+            path: 'M896 0H640c-35.3 0-64 28.7-64 64s28.7 64 64 64h146.7L544 370.7c-25 25-25 65.5 0 90.5s65.5 25 90.5 0L877.3 218.3V384c0 35.3 28.7 64 64 64s64-28.7 64-64V128c0-70.7-57.3-128-128-128zM128 128c-70.7 0-128 57.3-128 128v640c0 70.7 57.3 128 128 128h640c70.7 0 128-57.3 128-128V640c0-35.3-28.7-64-64-64s-64 28.7-64 64v256H128V256h256c35.3 0 64-28.7 64-64s-28.7-64-64-64H128z',
+            transform: 'matrix(1 0 0 -1 0 1024)'
+          },
+          click: () => this.popOutClick.emit()
+        }] : []
       };
 
       // Render or update chart

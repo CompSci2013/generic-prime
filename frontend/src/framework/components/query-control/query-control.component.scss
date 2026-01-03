@@ -204,8 +204,8 @@
   }
 }
 
-// Year Range Dialog Styles
-.year-inputs {
+// Range Dialog Styles (generic - supports integer, decimal, datetime)
+.range-inputs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;

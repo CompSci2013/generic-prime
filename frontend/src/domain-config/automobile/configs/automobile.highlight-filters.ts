@@ -126,6 +126,17 @@ export const AUTOMOBILE_HIGHLIGHT_FILTERS: FilterDefinition<HighlightFilters>[] 
     type: 'range',
     optionsEndpoint: `${environment.apiBaseUrl}/filters/year-range`,
     urlParams: { min: 'h_yearMin', max: 'h_yearMax' },
-    dialogSubtitle: 'Select a year range to highlight in charts. You can select just a start year, end year, or both.'
+    dialogTitle: 'Highlight Year Range',
+    dialogSubtitle: 'Select a year range to highlight in charts. You can select just a start year, end year, or both.',
+    rangeConfig: {
+      valueType: 'integer',
+      minLabel: 'Start Year',
+      maxLabel: 'End Year',
+      minPlaceholder: 'e.g., 1980',
+      maxPlaceholder: 'e.g., 2023',
+      step: 1,
+      useGrouping: false,
+      defaultRange: { min: 1900, max: new Date().getFullYear() }
+    }
   }
 ];

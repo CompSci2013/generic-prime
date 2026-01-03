@@ -153,4 +153,12 @@ export class ManufacturerChartDataSource extends ChartDataSource<VehicleStatisti
     }
     return null;
   }
+
+  /**
+   * Convert clicked value to URL parameters
+   */
+  toUrlParams(value: string, isHighlightMode: boolean): Record<string, any> {
+    const paramName = isHighlightMode ? 'h_manufacturer' : 'manufacturer';
+    return { [paramName]: value };
+  }
 }

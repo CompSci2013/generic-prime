@@ -176,48 +176,52 @@
     </ng-template>
   </p-dialog>
 
-  <!-- Year Range Filter Dialog -->
+  <!-- Range Filter Dialog (Generic - supports integer, decimal, datetime) -->
   <p-dialog
-    #yearRangeDialog
-    [(visible)]="showYearRangeDialog"
-    header="Select Year Range"
+    #rangeDialog
+    [(visible)]="showRangeDialog"
+    [header]="currentFilterDef?.dialogTitle || ('Select ' + (currentFilterDef?.label || 'Range'))"
     [modal]="true"
     [style]="{width: '500px'}"
     [closable]="true"
     [closeOnEscape]="true"
     [draggable]="false"
     [resizable]="false"
-    (onShow)="onYearRangeDialogShow()"
+    (onShow)="onRangeDialogShow()"
     (onHide)="onDialogHide()">
 
-    <p class="dialog-subtitle">Select a year range to filter results. You can select just a start year, end year, or both.</p>
+    <p class="dialog-subtitle">{{ currentFilterDef?.dialogSubtitle || 'Select a range to filter results.' }}</p>
 
-    <!-- Year Inputs (MVP - simple number inputs) -->
-    <div class="year-inputs">
+    <!-- Range Inputs (config-driven labels and formatting) -->
+    <div class="range-inputs">
       <div class="p-field">
-        <label for="yearMin">Start Year</label>
+        <label for="rangeMin">{{ currentRangeConfig?.minLabel || 'Minimum' }}</label>
         <p-inputNumber
-          id="yearMin"
-          [(ngModel)]="yearMin"
-          [min]="availableYearRange.min"
-          [max]="availableYearRange.max"
-          [useGrouping]="false"
-          placeholder="e.g., 1980"
+          id="rangeMin"
+          [(ngModel)]="rangeMin"
+          [min]="availableRange.min"
+          [max]="availableRange.max"
+          [useGrouping]="getRangeUseGrouping()"
+          [placeholder]="currentRangeConfig?.minPlaceholder || ''"
           [showButtons]="true"
-          [step]="1">
+          [step]="getRangeStep()"
+          [minFractionDigits]="getRangeDecimalPlaces()"
+          [maxFractionDigits]="getRangeDecimalPlaces()">
         </p-inputNumber>
       </div>
       <div class="p-field">
-        <label for="yearMax">End Year</label>
+        <label for="rangeMax">{{ currentRangeConfig?.maxLabel || 'Maximum' }}</label>
         <p-inputNumber
-          id="yearMax"
-          [(ngModel)]="yearMax"
-          [min]="yearMin || availableYearRange.min"
-          [max]="availableYearRange.max"
-          [useGrouping]="false"
-          placeholder="e.g., 2003"
+          id="rangeMax"
+          [(ngModel)]="rangeMax"
+          [min]="rangeMin || availableRange.min"
+          [max]="availableRange.max"
+          [useGrouping]="getRangeUseGrouping()"
+          [placeholder]="currentRangeConfig?.maxPlaceholder || ''"
           [showButtons]="true"
-          [step]="1">
+          [step]="getRangeStep()"
+          [minFractionDigits]="getRangeDecimalPlaces()"
+          [maxFractionDigits]="getRangeDecimalPlaces()">
         </p-inputNumber>
       </div>
     </div>
@@ -230,9 +234,9 @@
       </p-button>
       <p-button
         label="Apply"
-        (onClick)="applyYearRange()"
+        (onClick)="applyRange()"
         styleClass="p-button-primary"
-        [disabled]="!yearMin && !yearMax">
+        [disabled]="rangeMin === null && rangeMax === null">
       </p-button>
     </ng-template>
   </p-dialog>

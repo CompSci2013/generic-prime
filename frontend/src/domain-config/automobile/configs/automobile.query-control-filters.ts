@@ -101,7 +101,18 @@ export const AUTOMOBILE_QUERY_CONTROL_FILTERS: FilterDefinition<AutoSearchFilter
     type: 'range',
     optionsEndpoint: `${environment.apiBaseUrl}/filters/year-range`,
     urlParams: { min: 'yearMin', max: 'yearMax' },
-    dialogSubtitle: 'Select a year range to filter results. You can select just a start year, end year, or both.'
+    dialogTitle: 'Select Year Range',
+    dialogSubtitle: 'Select a year range to filter results. You can select just a start year, end year, or both.',
+    rangeConfig: {
+      valueType: 'integer',
+      minLabel: 'Start Year',
+      maxLabel: 'End Year',
+      minPlaceholder: 'e.g., 1980',
+      maxPlaceholder: 'e.g., 2023',
+      step: 1,
+      useGrouping: false,
+      defaultRange: { min: 1900, max: new Date().getFullYear() }
+    }
   },
 
   /**

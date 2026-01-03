@@ -160,4 +160,12 @@ export class TopModelsChartDataSource extends ChartDataSource<VehicleStatistics>
     }
     return null;
   }
+
+  /**
+   * Convert clicked value to URL parameters
+   */
+  toUrlParams(value: string, isHighlightMode: boolean): Record<string, any> {
+    const paramName = isHighlightMode ? 'h_modelCombos' : 'modelCombos';
+    return { [paramName]: value };
+  }
 }
