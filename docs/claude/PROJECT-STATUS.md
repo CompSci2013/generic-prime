@@ -1,8 +1,55 @@
 # Project Status
 
-**Version**: 7.10
-**Timestamp**: 2026-01-02T17:33:45-05:00
-**Updated By**: Claude - Session 75
+**Version**: 7.11
+**Timestamp**: 2026-01-02T21:14:34-05:00
+**Updated By**: Claude - Session 76
+
+---
+
+## Session 76 Summary: Abstraction Leak Fixes & CDK Research
+
+**Status**: ✅ **COMPLETE** - Fixed abstraction leaks, researched Angular CDK drag-drop
+
+### What Was Accomplished
+
+1. ✅ **Fixed Chart Click Abstraction Leak**
+   - Added `toUrlParams()` abstract method to `ChartDataSource` class
+   - Implemented in all 4 chart data sources (manufacturer, top-models, year, body-class)
+   - Removed ~60 lines of duplicate domain-specific code from StatisticsPanelComponent and DiscoverComponent
+   - URL param generation now lives in domain config, not framework components
+
+2. ✅ **Fixed QueryControlComponent Abstraction Leak**
+   - Created generic `RangeConfig` interface (supports integer, decimal, datetime)
+   - Renamed year-specific properties to generic range properties
+   - Dialog labels, placeholders, step values now driven by FilterDefinition config
+   - Backend API params unchanged (yearMin/yearMax still work)
+
+3. ✅ **Documented UserPreferencesService Abstraction Leaks**
+   - Added to TANGENTS.md as future work item
+   - Identified 3 hardcoded domain-specific values
+   - Recommended fixes for when multi-domain support is needed
+
+4. ✅ **Researched Angular CDK Drag-Drop (v14 → v21)**
+   - Current implementation already uses best practices
+   - New feature available: `cdkDropListOrientation="mixed"` for grid layouts
+   - Documented in TANGENTS.md for future exploration
+
+5. ✅ **Version Bump**
+   - Bumped to v21.1.2 in package.json
+
+### Files Modified
+
+| File | Description |
+|------|-------------|
+| `filter-definition.interface.ts` | Added RangeConfig interface |
+| `query-control.component.ts/html/scss` | Generic range dialog |
+| `base-chart.component.ts` | Added toUrlParams() abstract method |
+| `*-chart-source.ts` (4 files) | Implemented toUrlParams() |
+| `statistics-panel.component.ts/html` | Simplified to use toUrlParams() |
+| `discover.component.ts/html` | Simplified to use toUrlParams() |
+| `automobile.query-control-filters.ts` | Added rangeConfig |
+| `automobile.highlight-filters.ts` | Added rangeConfig |
+| `TANGENTS.md` | Added UserPreferencesService leaks, CDK research |
 
 ---
 
@@ -10,106 +57,11 @@
 
 **Status**: ✅ **COMPLETE** - User stories documented, 38 validation tests created and passing
 
-### What Was Accomplished
-
-1. ✅ **Created Query Panel User Stories**
-   - [docs/claude/user-stories/query-panel.md](docs/claude/user-stories/query-panel.md) with 48 stories across 8 epics
-   - Follows same format as verified Query Control stories
-
-2. ✅ **Created 38 Playwright Validation Tests**
-   - Epic 1: Panel Layout (3 tests)
-   - Epic 2: Autocomplete Filters (7 tests)
-   - Epic 3: Year Range Filter (8 tests)
-   - Epic 4: Body Class Multiselect (5 tests)
-   - Epic 5: VIN Count Range (4 tests)
-   - Epic 6: Clear All Filters (3 tests)
-   - Epic 7: URL State Synchronization (3 tests)
-   - Epic 8: Panel Behavior (5 tests)
-
-3. ✅ **Fixed Test Infrastructure Issues**
-   - Resolved race conditions with parallel test execution
-   - Fixed localStorage persistence between tests
-   - Handled backend preferences API persisting panel state
-
-### Files Created
-
-| File | Description |
-|------|-------------|
-| `docs/claude/user-stories/query-panel.md` | User stories for Query Panel component |
-| `frontend/e2e/validation/us-qp-001-003.spec.ts` | Epic 1: Panel Layout tests |
-| `frontend/e2e/validation/us-qp-010-016.spec.ts` | Epic 2: Autocomplete tests |
-| `frontend/e2e/validation/us-qp-020-027.spec.ts` | Epic 3: Year Range tests |
-| `frontend/e2e/validation/us-qp-030-034.spec.ts` | Epic 4: Body Class tests |
-| `frontend/e2e/validation/us-qp-040-043.spec.ts` | Epic 5: VIN Count tests |
-| `frontend/e2e/validation/us-qp-050-052.spec.ts` | Epic 6: Clear Filters tests |
-| `frontend/e2e/validation/us-qp-060-062.spec.ts` | Epic 7: URL State tests |
-| `frontend/e2e/validation/us-qp-070-074.spec.ts` | Epic 8: Panel Behavior tests |
-
 ---
 
 ## Session 74 Summary: Autonomous Bug Fix Loop - All 5 Bugs Fixed
 
 **Status**: ✅ **COMPLETE** - All 5 bugs fixed via autonomous test-fix loop
-
-### What Was Accomplished
-
-1. ✅ **Created Regression Tests for All Open Bugs**
-   - `bug-002-escape-close-dialog.spec.ts` (3 tests)
-   - `bug-003-year-range-sync.spec.ts` (2 tests)
-   - `bug-004-same-field-reselection.spec.ts` (3 tests)
-   - `bug-005-highlight-chip-contrast.spec.ts` (2 tests)
-   - `bug-006-x-button-propagation.spec.ts` (4 tests)
-
-2. ✅ **Enhanced Autonomous Fix Loop Infrastructure**
-   - Updated `fix-check.sh` to support 5 attempts (was 3)
-   - Added strategies for attempts 4 and 5: `alternative_approach`, `minimal_fix`
-   - Created `fix-all-bugs.sh` (semi-automated batch runner)
-   - Created `fix-all-bugs-auto.sh` (fully automated batch runner)
-
-3. ✅ **Ran Autonomous Fix Loop - All 5 Bugs Fixed**
-   - BUG-002: Added `[closeOnEscape]="true"` to dialogs (PrimeNG best practice)
-   - BUG-003: Query Panel now syncs year range from URL state
-   - BUG-004: Added `Select.clear()` to reset dropdown for reselection
-   - BUG-005: Fixed highlight chip contrast (18.95:1 ratio - exceeds WCAG AAA)
-   - BUG-006: Added `stopPropagation()` on chip X button click
-
-4. ✅ **Verified All Fixes Against Architecture Rubric**
-   - URL-First: All state changes via UrlStateService ✓
-   - OnPush: Proper change detection patterns ✓
-   - PrimeNG: Correct v21 component APIs ✓
-   - Minimal: No over-engineering ✓
-
-5. ✅ **Programmatic Verification**
-   - Ran all 14 regression tests - 100% pass rate
-   - Manual verification confirmed by user
-
-### Files Modified
-
-| File | Description |
-|------|-------------|
-| `query-control.component.html` | Added closeOnEscape, stopPropagation fixes |
-| `query-control.component.ts` | Added chip click handlers, dropdown reset logic |
-| `query-control.component.scss` | Fixed highlight chip contrast styling |
-| `automobile.filter-definitions.ts` | Minor adjustments for year range sync |
-| `.claude/scripts/fix-check.sh` | Extended to 5 attempts with new strategies |
-
----
-
-## Session 73 Summary: Fix INCORRECT User Stories
-
-**Status**: ✅ **COMPLETE** - All INCORRECT stories fixed, 5 new bugs discovered
-
----
-
-## Session 72 Summary: User Story Validation & Test Naming
-
-**Status**: ✅ **COMPLETE** - Exhaustive tests renamed, validation specs created
-
----
-
-## Session 71 Summary: Exit Protocol Fix & Validation Rhythm Recovery
-
-**Status**: ✅ **COMPLETE** - Fixed /exit, documented validation rhythm
 
 ---
 
@@ -133,8 +85,8 @@
 
 | Phase | Work | Priority | Status |
 |-------|------|----------|--------|
-| **1** | **Verify User Stories for Query Panel** | **HIGH** | ✅ **Session 75** |
-| **2** | **Continue User Story Validation (remaining components)** | **HIGH** | **Next Session** |
+| **1** | **Explore CDK Mixed Orientation for Panel Grid** | Medium | Next Session |
+| **2** | **Continue User Story Validation (remaining components)** | HIGH | Pending |
 | **3** | **IdP Phase 1: Deploy Keycloak Infrastructure** | **HIGH** | Next major task |
 | **4** | **IdP Phase 2: Frontend OIDC Integration** | **HIGH** | Pending Phase 1 |
 | 5 | Fix Bug #7 (multiselect visual state) | Medium | Pending |
@@ -142,4 +94,4 @@
 
 ---
 
-**Last Updated**: 2026-01-02T17:33:45-05:00
+**Last Updated**: 2026-01-02T21:14:34-05:00

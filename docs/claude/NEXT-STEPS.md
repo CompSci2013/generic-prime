@@ -1,58 +1,57 @@
 # Next Steps
 
-**Current Session**: Session 75 - Query Panel User Stories & Validation
-**Previous Session**: Session 74 - Autonomous Bug Fix Loop
-**Status**: v7.10, Query Panel user stories verified with 38 passing tests
+**Current Session**: Session 76 - Abstraction Leak Fixes & CDK Research
+**Previous Session**: Session 75 - Query Panel User Stories
+**Status**: v7.11, Abstraction leaks fixed, CDK research documented
 
 ---
 
-## IMMEDIATE ACTION: Continue User Story Validation
+## IMMEDIATE ACTION: Explore CDK Mixed Orientation for Panel Grid
 
-**Priority**: HIGH
-**Scope**: Verify user stories for remaining components
+**Priority**: Medium
+**Scope**: Evaluate if panel grid layout would improve UX
 
 ### Context
 
-Query Panel user stories are now documented and validated with 38 Playwright tests. All tests pass with `--workers=1`.
+User requested research on Angular CDK drag-drop improvements after v14 → v21 upgrade. Research found:
+- Current implementation already uses best practices
+- New feature: `cdkDropListOrientation="mixed"` available since Angular Material v18.1.0
+- Enables flex-wrap grid layouts with drag-drop reordering
 
-### Next Components to Verify
+### Implementation Pattern
 
-1. **Results Table** - Display of query results
-2. **Statistics Panel** - Aggregation displays
-3. **Manufacturer-Model Picker** - Hierarchical selection UI
+```html
+<div cdkDropList cdkDropListOrientation="mixed" class="panel-grid">
+  @for (panel of panelOrder; track panel) {
+    <div cdkDrag>{{ panel }}</div>
+  }
+</div>
+```
+
+```scss
+.panel-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+```
+
+**Caveat**: Mixed orientation disables sorting animations (DOM manipulation instead of CSS transforms).
 
 ### Steps
 
-1. **Generate User Stories**
-   - Create `docs/claude/user-stories/results-table.md`
-   - Follow same format as query-panel.md
-
-2. **Create Validation Tests**
-   - Create `frontend/e2e/validation/us-rt-*.spec.ts` files
-   - Use same beforeEach pattern (goto, clear localStorage, reload)
-
-3. **Verify Each Story**
-   - Run tests with `--workers=1` to avoid race conditions
-   - Mark as VERIFIED, PARTIAL, INCORRECT, or BUG
+1. Evaluate if grid layout benefits discover page UX
+2. If yes, modify discover.component.html to use `cdkDropListOrientation="mixed"`
+3. Update SCSS to use flex-wrap layout
+4. Test drag-drop behavior in new layout
 
 ### Key Files
 
 | File | Purpose |
 |------|---------|
-| `frontend/src/framework/components/results-table/` | Results Table source |
-| `docs/claude/user-stories/query-panel.md` | Reference format |
-| `frontend/e2e/validation/us-qp-*.spec.ts` | Reference test structure |
-
----
-
-## SESSION 75 COMPLETION SUMMARY
-
-**Primary Accomplishments**:
-1. ✅ Created Query Panel user stories (48 stories, 8 epics)
-2. ✅ Created 38 Playwright validation tests
-3. ✅ Fixed test infrastructure issues (parallelization, localStorage persistence)
-4. ✅ All 38 tests passing with `--workers=1`
-5. ✅ Bumped version to 7.10
+| `frontend/src/app/features/discover/discover.component.html` | Panel container |
+| `frontend/src/app/features/discover/discover.component.scss` | Panel styling |
+| `docs/claude/TANGENTS.md` | Full research notes (Tangent #5) |
 
 ---
 
@@ -60,5 +59,20 @@ Query Panel user stories are now documented and validated with 38 Playwright tes
 
 | Task | Priority | Notes |
 |------|----------|-------|
+| Continue User Story Validation | HIGH | Results Table, Statistics Panel, Picker |
 | Fix Bug #7 (multiselect visual state) | Medium | Low priority |
 | IdP Phase 1 (Keycloak) | HIGH | Next major milestone |
+
+---
+
+## SESSION 76 COMPLETION SUMMARY
+
+**Primary Accomplishments**:
+1. ✅ Fixed chart click abstraction leak (toUrlParams() on ChartDataSource)
+2. ✅ Fixed QueryControlComponent abstraction leak (generic RangeConfig)
+3. ✅ Documented UserPreferencesService leaks in TANGENTS.md
+4. ✅ Researched Angular CDK drag-drop v18+ features
+5. ✅ Documented CDK mixed orientation in TANGENTS.md
+6. ✅ Bumped version to 21.1.2
+
+---
