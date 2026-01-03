@@ -20,8 +20,8 @@ import { ChartConfig } from '../../../framework/models/domain-config.interface';
  *
  * @example
  * ```typescript
- * <app-statistics-panel [chartConfigs]="AUTOMOBILE_CHART_CONFIGS">
- * </app-statistics-panel>
+ * <app-statistics-panel-2 [domainConfig]="domainConfig">
+ * </app-statistics-panel-2>
  * ```
  */
 export const AUTOMOBILE_CHART_CONFIGS: ChartConfig[] = [

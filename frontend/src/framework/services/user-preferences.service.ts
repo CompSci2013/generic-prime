@@ -20,8 +20,8 @@ import { catchError, timeout } from 'rxjs/operators';
  *
  * **Storage Format**:
  * ```
- * localStorage['prefs:automobiles:panelOrder'] = ['query-control', 'statistics-panel', ...]
- * localStorage['prefs:automobiles:collapsedPanels'] = ['query-control', 'statistics-panel']
+ * localStorage['prefs:automobiles:panelOrder'] = ['query-control', 'statistics-panel-2', ...]
+ * localStorage['prefs:automobiles:collapsedPanels'] = ['query-control', 'statistics-panel-2']
  * ```
  *
  * @example
@@ -55,7 +55,7 @@ export class UserPreferencesService {
     'query-control',
     'query-panel',
     'manufacturer-model-picker',
-    'statistics-panel',
+    'statistics-panel-2',
     'basic-results-table'
   ];
 
@@ -247,7 +247,9 @@ export class UserPreferencesService {
         const parsed = JSON.parse(stored);
         // Validate it's an array
         if (Array.isArray(parsed)) {
-          return parsed;
+          // Merge any new panels from defaults that aren't in stored order
+          // New panels are appended at their default position relative to existing panels
+          return this.mergePanelOrder(parsed, this.DEFAULT_PANEL_ORDER);
         }
       }
     } catch (e) {
@@ -255,6 +257,48 @@ export class UserPreferencesService {
     }
 
     return this.DEFAULT_PANEL_ORDER;
+  }
+
+  /**
+   * Merge stored panel order with default order to include new panels
+   * and remove panels that no longer exist in defaults.
+   * New panels are inserted at their relative position from defaults.
+   *
+   * @private
+   * @param stored - User's stored panel order
+   * @param defaults - Default panel order (source of truth for valid panels)
+   * @returns Merged panel order
+   */
+  private mergePanelOrder(stored: string[], defaults: string[]): string[] {
+    const defaultsSet = new Set(defaults);
+
+    // Filter out panels that no longer exist in defaults
+    const result = stored.filter(panelId => defaultsSet.has(panelId));
+    const resultSet = new Set(result);
+
+    // Find new panels that aren't in stored order
+    for (let i = 0; i < defaults.length; i++) {
+      const panelId = defaults[i];
+      if (!resultSet.has(panelId)) {
+        // Find the best insertion position based on neighboring panels in defaults
+        let insertIndex = result.length; // Default to end
+
+        // Look for the previous panel in defaults that exists in result
+        for (let j = i - 1; j >= 0; j--) {
+          const prevPanel = defaults[j];
+          const prevIndex = result.indexOf(prevPanel);
+          if (prevIndex !== -1) {
+            insertIndex = prevIndex + 1;
+            break;
+          }
+        }
+
+        result.splice(insertIndex, 0, panelId);
+        resultSet.add(panelId);
+      }
+    }
+
+    return result;
   }
 
   /**
@@ -390,7 +434,12 @@ export class UserPreferencesService {
     const domainPrefs = prefs[domain];
 
     if (domainPrefs) {
-      this.panelOrderSubject.next(domainPrefs.panelOrder || this.DEFAULT_PANEL_ORDER);
+      // Merge stored panel order with defaults to include any new panels
+      const storedOrder = domainPrefs.panelOrder;
+      const mergedOrder = storedOrder
+        ? this.mergePanelOrder(storedOrder, this.DEFAULT_PANEL_ORDER)
+        : this.DEFAULT_PANEL_ORDER;
+      this.panelOrderSubject.next(mergedOrder);
       this.collapsedPanelsSubject.next(domainPrefs.collapsedPanels || this.DEFAULT_COLLAPSED_PANELS);
     } else {
       this.panelOrderSubject.next(this.DEFAULT_PANEL_ORDER);

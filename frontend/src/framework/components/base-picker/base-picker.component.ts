@@ -58,6 +58,7 @@ import { NgStyle } from '@angular/common';
  */
 @Component({
     selector: 'app-base-picker',
+    standalone: true,
     templateUrl: './base-picker.component.html',
     styleUrls: ['./base-picker.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,

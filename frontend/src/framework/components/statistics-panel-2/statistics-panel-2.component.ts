@@ -1,20 +1,24 @@
 /**
- * Statistics Panel Component - Angular 17 Signals Architecture
+ * Statistics Panel 2 Component - CDK Mixed Orientation Chart Grid
  *
- * Domain-agnostic container for rendering statistical charts.
- * Uses Angular Signals for reactive state management.
+ * Domain-agnostic container for rendering statistical charts in a
+ * draggable grid layout using CDK mixed orientation.
  *
  * Framework Component
  */
 
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
+  EventEmitter,
   inject,
   Input,
   OnInit,
+  Output,
   Signal
 } from '@angular/core';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { environment } from '../../../environments/environment';
 import { ChartConfig, DomainConfig } from '../../models/domain-config.interface';
 import { PopOutMessageType } from '../../models/popout.interface';
@@ -23,43 +27,39 @@ import { ResourceManagementService } from '../../services/resource-management.se
 import { UrlStateService } from '../../services/url-state.service';
 import { ChartDataSource, BaseChartComponent } from '../base-chart/base-chart.component';
 
-import { SharedModule } from 'primeng/api';
-import { PanelModule } from 'primeng/panel';
 
 /**
- * Statistics Panel Component
+ * Statistics Panel 2 Component
  *
- * Renders statistical charts for a domain.
- * Uses BaseChartComponent for each chart.
- *
- * **Angular 17 Patterns**:
- * - `inject()` for dependency injection
- * - Direct Signal access from ResourceManagementService
- * - `DestroyRef` + `takeUntilDestroyed()` for cleanup
+ * Renders statistical charts in a CDK mixed orientation drag-drop grid.
+ * Charts can be reordered by dragging.
  *
  * @example
  * ```html
- * <app-statistics-panel
- *   [domainConfig]="domainConfig">
- * </app-statistics-panel>
+ * <app-statistics-panel-2
+ *   [domainConfig]="domainConfig"
+ *   (chartPopOut)="onChartPopOut($event)"
+ *   (chartClick)="onChartClick($event)">
+ * </app-statistics-panel-2>
  * ```
  */
 @Component({
-    selector: 'app-statistics-panel',
+    selector: 'app-statistics-panel-2',
     standalone: true,
-    templateUrl: './statistics-panel.component.html',
-    styleUrls: ['./statistics-panel.component.scss'],
+    templateUrl: './statistics-panel-2.component.html',
+    styleUrls: ['./statistics-panel-2.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [PanelModule, SharedModule, BaseChartComponent]
+    imports: [BaseChartComponent, CdkDropList, CdkDrag, CdkDragHandle]
 })
-export class StatisticsPanelComponent implements OnInit {
+export class StatisticsPanel2Component implements OnInit {
 
   // ============================================================================
-  // Dependency Injection (Angular 17 inject() pattern)
+  // Dependency Injection
   // ============================================================================
   private readonly resourceService = inject<ResourceManagementService<any, any, any>>(ResourceManagementService);
   private readonly urlState = inject(UrlStateService);
   private readonly popOutContext = inject(PopOutContextService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // ============================================================================
   // Configuration
@@ -69,8 +69,21 @@ export class StatisticsPanelComponent implements OnInit {
 
   @Input() domainConfig!: DomainConfig<any, any, any>;
 
+  /**
+   * Function to check if a chart is popped out
+   * Provided by parent component (DiscoverComponent)
+   */
+  @Input() isPanelPoppedOut: (panelId: string) => boolean = () => false;
+
   // ============================================================================
-  // Signal-Based State (Direct from ResourceManagementService)
+  // Outputs
+  // ============================================================================
+
+  @Output() chartPopOut = new EventEmitter<string>();
+  @Output() chartClicked = new EventEmitter<{ event: { value: string; isHighlightMode: boolean }; dataSource: ChartDataSource }>();
+
+  // ============================================================================
+  // Signal-Based State
   // ============================================================================
 
   get statistics(): Signal<any | undefined> {
@@ -81,16 +94,22 @@ export class StatisticsPanelComponent implements OnInit {
     return this.resourceService.highlights;
   }
 
+  /**
+   * Check if this component is running inside a pop-out window
+   * Used to disable individual chart pop-outs when already in pop-out
+   */
+  get isInPopOut(): boolean {
+    return this.popOutContext.isInPopOut();
+  }
+
   // ============================================================================
   // Component-Local State
   // ============================================================================
 
-  visibleCharts: Array<{
-    config: ChartConfig;
-    dataSource: ChartDataSource;
-  }> = [];
-
-  panelCollapsed = false;
+  /**
+   * Ordered list of chart IDs for the grid
+   */
+  chartOrder: string[] = [];
 
   // ============================================================================
   // Lifecycle
@@ -98,35 +117,14 @@ export class StatisticsPanelComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.domainConfig) {
-      console.error('StatisticsPanelComponent: domainConfig is required');
+      console.error('StatisticsPanel2Component: domainConfig is required');
       return;
     }
 
-    // Filter visible charts and map to data sources
-    this.visibleCharts = (this.domainConfig.charts || [])
-      .filter(chart => chart.visible !== false)
-      .map(chart => ({
-        config: chart,
-        dataSource: this.getDataSource(chart.dataSourceId)
-      }))
-      .filter(item => item.dataSource !== null);
-  }
-
-  // ============================================================================
-  // Private Methods
-  // ============================================================================
-
-  private getDataSource(dataSourceId: string): ChartDataSource {
-    if (!this.domainConfig.chartDataSources) {
-      return null as any;
+    // Initialize chart order from domain config
+    if (this.domainConfig.chartDataSources) {
+      this.chartOrder = Object.keys(this.domainConfig.chartDataSources);
     }
-
-    const dataSource = this.domainConfig.chartDataSources[dataSourceId];
-    if (!dataSource) {
-      return null as any;
-    }
-
-    return dataSource;
   }
 
   // ============================================================================
@@ -134,13 +132,27 @@ export class StatisticsPanelComponent implements OnInit {
   // ============================================================================
 
   /**
-   * Handle chart click events
-   *
-   * Delegates URL param generation to the chart's data source.
-   * This keeps domain-specific mappings in the domain layer (data sources)
-   * rather than in the framework layer (this component).
+   * Handle chart drag-drop to reorder
    */
-  onChartClick(event: { value: string; isHighlightMode: boolean }, dataSource: ChartDataSource): void {
+  onChartDrop(event: CdkDragDrop<string[]>): void {
+    moveItemInArray(this.chartOrder, event.previousIndex, event.currentIndex);
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Handle chart pop-out request
+   */
+  onChartPopOut(chartId: string): void {
+    this.chartPopOut.emit(chartId);
+  }
+
+  /**
+   * Handle chart click
+   */
+  onChartClick(event: { value: string; isHighlightMode: boolean }, chartId: string): void {
+    const dataSource = this.domainConfig.chartDataSources?.[chartId];
+    if (!dataSource) return;
+
     // Delegate URL param generation to the data source
     const newParams = dataSource.toUrlParams(event.value, event.isHighlightMode);
 
@@ -156,7 +168,10 @@ export class StatisticsPanelComponent implements OnInit {
     }
   }
 
-  trackByChartId(index: number, item: { config: ChartConfig }): string {
-    return item.config.id;
+  /**
+   * Get data source for a chart ID
+   */
+  getDataSource(chartId: string): ChartDataSource | undefined {
+    return this.domainConfig.chartDataSources?.[chartId];
   }
 }

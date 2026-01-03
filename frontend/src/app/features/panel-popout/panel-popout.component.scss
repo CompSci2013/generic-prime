@@ -26,6 +26,32 @@
       }
     }
   }
+
+  // Statistics-2 popout: hide header, no scrollbar
+  &.statistics-2-popout {
+    padding: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    .popout-header {
+      display: none;
+    }
+
+    .popout-content {
+      padding-top: 0;
+      overflow: hidden;
+
+      app-statistics-panel-2 {
+        display: block;
+        overflow: hidden;
+
+        .statistics-content,
+        .chart-grid {
+          overflow: hidden;
+        }
+      }
+    }
+  }
 }
 
 .popout-header {

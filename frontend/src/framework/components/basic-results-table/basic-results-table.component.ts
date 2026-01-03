@@ -41,6 +41,7 @@ import { TableModule } from 'primeng/table';
  */
 @Component({
     selector: 'app-basic-results-table',
+    standalone: true,
     templateUrl: './basic-results-table.component.html',
     styleUrls: ['./basic-results-table.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,

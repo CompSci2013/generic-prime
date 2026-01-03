@@ -25,7 +25,7 @@ import { IS_POPOUT_TOKEN } from '../../../framework/tokens/popout.token';
 import { BasicResultsTableComponent } from '../../../framework/components/basic-results-table/basic-results-table.component';
 import { QueryPanelComponent } from '../../../framework/components/query-panel/query-panel.component';
 import { ResultsTableComponent } from '../../../framework/components/results-table/results-table.component';
-import { StatisticsPanelComponent } from '../../../framework/components/statistics-panel/statistics-panel.component';
+import { StatisticsPanel2Component } from '../../../framework/components/statistics-panel-2/statistics-panel-2.component';
 import { BasePickerComponent } from '../../../framework/components/base-picker/base-picker.component';
 import { QueryControlComponent } from '../../../framework/components/query-control/query-control.component';
 import { BaseChartComponent } from '../../../framework/components/base-chart/base-chart.component';
@@ -61,6 +61,7 @@ import { BaseChartComponent } from '../../../framework/components/base-chart/bas
  */
 @Component({
     selector: 'app-panel-popout',
+    standalone: true,
     templateUrl: './panel-popout.component.html',
     styleUrls: ['./panel-popout.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -68,7 +69,7 @@ import { BaseChartComponent } from '../../../framework/components/base-chart/bas
         ResourceManagementService,
         { provide: IS_POPOUT_TOKEN, useValue: true }
     ],
-    imports: [QueryControlComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, QueryPanelComponent, BasicResultsTableComponent, BaseChartComponent]
+    imports: [QueryControlComponent, BasePickerComponent, StatisticsPanel2Component, ResultsTableComponent, QueryPanelComponent, BasicResultsTableComponent, BaseChartComponent]
 })
 export class PanelPopoutComponent implements OnInit, OnDestroy {
   /**
@@ -123,8 +124,8 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       // Initialize as pop-out
       this.popOutContext.initializeAsPopOut(this.panelId);
 
-      // For chart pop-outs, add class to body and html to hide scrollbars
-      if (this.panelType === 'chart') {
+      // For chart and statistics-2 pop-outs, add class to body and html to hide scrollbars
+      if (this.panelType === 'chart' || this.panelType === 'statistics-2') {
         document.documentElement.classList.add('chart-popout-html');
         document.body.classList.add('chart-popout-body');
       }
@@ -191,7 +192,7 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       'query-control': 'Query Control',
       'query-panel': 'Query Panel',
       'manufacturer-model-picker': 'Manufacturer-Model Picker',
-      'statistics-panel': 'Statistics',
+      'statistics-panel-2': 'Statistics',
       'results-table': 'Results',
       'basic-results-table': 'Results Table'
     };
