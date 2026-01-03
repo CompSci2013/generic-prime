@@ -261,25 +261,29 @@ export class UserPreferencesService {
 
   /**
    * Merge stored panel order with default order to include new panels
-   * New panels are inserted at their relative position from defaults
+   * and remove panels that no longer exist in defaults.
+   * New panels are inserted at their relative position from defaults.
    *
    * @private
    * @param stored - User's stored panel order
-   * @param defaults - Default panel order with potentially new panels
+   * @param defaults - Default panel order (source of truth for valid panels)
    * @returns Merged panel order
    */
   private mergePanelOrder(stored: string[], defaults: string[]): string[] {
-    const result = [...stored];
-    const storedSet = new Set(stored);
+    const defaultsSet = new Set(defaults);
+
+    // Filter out panels that no longer exist in defaults
+    const result = stored.filter(panelId => defaultsSet.has(panelId));
+    const resultSet = new Set(result);
 
     // Find new panels that aren't in stored order
     for (let i = 0; i < defaults.length; i++) {
       const panelId = defaults[i];
-      if (!storedSet.has(panelId)) {
+      if (!resultSet.has(panelId)) {
         // Find the best insertion position based on neighboring panels in defaults
         let insertIndex = result.length; // Default to end
 
-        // Look for the previous panel in defaults that exists in stored
+        // Look for the previous panel in defaults that exists in result
         for (let j = i - 1; j >= 0; j--) {
           const prevPanel = defaults[j];
           const prevIndex = result.indexOf(prevPanel);
@@ -290,7 +294,7 @@ export class UserPreferencesService {
         }
 
         result.splice(insertIndex, 0, panelId);
-        storedSet.add(panelId);
+        resultSet.add(panelId);
       }
     }
 
