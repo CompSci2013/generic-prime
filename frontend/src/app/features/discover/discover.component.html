@@ -2,6 +2,7 @@
   <!-- Header -->
   <div class="discover-header">
     <h1>{{ domainConfig.domainLabel }}</h1>
+    <span class="results-count">{{ resourceService.totalResults() }} {{ resourceService.totalResults() === 1 ? 'result' : 'results' }}</span>
   </div>
 
   <!-- Draggable Panels Container -->

@@ -99,8 +99,13 @@
     .p-paginator {
       background: var(--surface-section);
       color: var(--text-color);
-      border: 1px solid var(--table-border-color);
+      border: none;
       padding: 0.5rem 1rem;
+    }
+
+    // Ensure table wrapper allows horizontal scroll when columns are expanded
+    .p-datatable-table-container {
+      overflow-x: auto;
     }
   }
 

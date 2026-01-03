@@ -1,8 +1,10 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   DestroyRef,
+  ElementRef,
   inject,
   Input,
   OnInit,
@@ -54,7 +56,7 @@ import { NgClass, NgStyle } from '@angular/common';
     imports: [NgClass, FormsModule, InputTextModule, InputNumberModule, ButtonModule, SelectModule, MultiSelectModule, CheckboxModule, TableModule, SharedModule, NgStyle, RippleModule, SkeletonModule]
 })
 export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = any>
-  implements OnInit {
+  implements OnInit, AfterViewInit {
 
   // ============================================================================
   // Dependency Injection (Angular 17 inject() pattern)
@@ -64,6 +66,7 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
   private readonly http = inject(HttpClient);
   private readonly popOutContext = inject(PopOutContextService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly elementRef = inject(ElementRef);
 
   // ============================================================================
   // Configuration
@@ -319,5 +322,29 @@ export class ResultsTableComponent<TFilters = any, TData = any, TStatistics = an
           }
         });
     });
+  }
+
+  /**
+   * Sync paginator width to match table width
+   * This ensures the paginator stays aligned with the table when columns are resized
+   */
+  private syncPaginatorWidth(): void {
+    const nativeEl = this.elementRef.nativeElement;
+    const table = nativeEl.querySelector('.p-datatable-table') as HTMLElement;
+    const paginator = nativeEl.querySelector('.p-paginator') as HTMLElement;
+
+    if (table && paginator) {
+      const tableWidth = table.offsetWidth;
+      paginator.style.width = `${tableWidth}px`;
+    }
+  }
+
+  // ============================================================================
+  // Lifecycle - AfterViewInit
+  // ============================================================================
+
+  ngAfterViewInit(): void {
+    // Initial sync of paginator width to table width
+    this.syncPaginatorWidth();
   }
 }

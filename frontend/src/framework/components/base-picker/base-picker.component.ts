@@ -1,7 +1,9 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   Inject,
   Input,
@@ -64,7 +66,7 @@ import { NgStyle } from '@angular/common';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [TableModule, SharedModule, InputTextModule, ButtonModule, CheckboxModule, FormsModule, NgStyle, SkeletonModule, MessageModule]
 })
-export class BasePickerComponent<T> implements OnInit, OnDestroy {
+export class BasePickerComponent<T> implements OnInit, OnDestroy, AfterViewInit {
   /**
    * Environment configuration for conditional test-id rendering
    */
@@ -104,6 +106,7 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
     private registry: PickerConfigRegistry,
     private urlState: UrlStateService,
     private cdr: ChangeDetectorRef,
+    private elementRef: ElementRef,
     @Optional() private resourceService?: ResourceManagementService<any, any, any>
   ) {}
 
@@ -130,6 +133,26 @@ export class BasePickerComponent<T> implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  ngAfterViewInit(): void {
+    // Initial sync of paginator width to table width
+    this.syncPaginatorWidth();
+  }
+
+  /**
+   * Sync paginator width to match table width
+   * This ensures the paginator stays aligned with the table when columns are resized
+   */
+  private syncPaginatorWidth(): void {
+    const nativeEl = this.elementRef.nativeElement;
+    const table = nativeEl.querySelector('.p-datatable-table') as HTMLElement;
+    const paginator = nativeEl.querySelector('.p-paginator') as HTMLElement;
+
+    if (table && paginator) {
+      const tableWidth = table.offsetWidth;
+      paginator.style.width = `${tableWidth}px`;
+    }
   }
 
   /**

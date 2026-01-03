@@ -26,15 +26,6 @@
       [currentPageReportTemplate]="'Showing {first} to {last} of {totalRecords} results'"
       [attr.data-testid]="environment.includeTestIds ? 'dynamic-results-table' : null">
 
-      <!-- Caption with result count -->
-      <ng-template pTemplate="caption">
-        <div class="table-caption">
-          <span class="caption-count">
-            {{ totalResults() }} result(s)
-          </span>
-        </div>
-      </ng-template>
-
       <!-- Header with reorderable/resizable columns -->
       <ng-template pTemplate="header" let-columns>
         <tr>

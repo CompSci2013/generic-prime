@@ -102,6 +102,16 @@
       .p-datatable-table {
         border: 1px solid var(--table-border-color);
       }
+
+      // Paginator - remove border
+      .p-paginator {
+        border: none;
+      }
+
+      // Ensure table wrapper allows horizontal scroll when columns are expanded
+      .p-datatable-table-container {
+        overflow-x: auto;
+      }
     }
 
     .table-caption {
