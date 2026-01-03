@@ -90,20 +90,7 @@
                 </div>
               }
             }
-            <!-- Statistics Panel -->
-            @if (panelId === 'statistics-panel') {
-              @if (!isPanelPoppedOut('statistics-panel')) {
-                <div>
-                  <app-statistics-panel [domainConfig]="domainConfig"></app-statistics-panel>
-                </div>
-              } @else {
-                <div class="popout-placeholder">
-                  <i class="pi pi-external-link"></i>
-                  <span>Statistics Panel is open in a separate window</span>
-                </div>
-              }
-            }
-            <!-- Statistics Panel 2 (CDK Mixed Orientation Chart Grid) -->
+            <!-- Statistics Panel (CDK Mixed Orientation Chart Grid) -->
             @if (panelId === 'statistics-panel-2') {
               @if (!isPanelPoppedOut('statistics-panel-2')) {
                 <div>

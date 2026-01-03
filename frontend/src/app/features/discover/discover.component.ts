@@ -28,7 +28,6 @@ import { UrlStateService } from '../../../framework/services/url-state.service';
 import { UserPreferencesService } from '../../../framework/services/user-preferences.service';
 import { BasicResultsTableComponent } from '../../../framework/components/basic-results-table/basic-results-table.component';
 import { ResultsTableComponent } from '../../../framework/components/results-table/results-table.component';
-import { StatisticsPanelComponent } from '../../../framework/components/statistics-panel/statistics-panel.component';
 import { StatisticsPanel2Component } from '../../../framework/components/statistics-panel-2/statistics-panel-2.component';
 import { BasePickerComponent } from '../../../framework/components/base-picker/base-picker.component';
 import { QueryPanelComponent } from '../../../framework/components/query-panel/query-panel.component';
@@ -117,7 +116,7 @@ import { ButtonModule } from 'primeng/button';
     styleUrls: ['./discover.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ResourceManagementService],
-    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanelComponent, StatisticsPanel2Component, ResultsTableComponent, BasicResultsTableComponent]
+    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanel2Component, ResultsTableComponent, BasicResultsTableComponent]
 })
 export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {
@@ -144,7 +143,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     'query-control',
     'query-panel',
     'manufacturer-model-picker',
-    'statistics-panel',
     'statistics-panel-2',
     'basic-results-table'
   ];
@@ -369,8 +367,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       'query-control': 'Query Control',
       'query-panel': 'Query Panel',
       'manufacturer-model-picker': 'Manufacturer-Model Picker',
-      'statistics-panel': 'Statistics',
-      'statistics-panel-2': 'Statistics 2 (Draggable Grid)',
+      'statistics-panel-2': 'Statistics',
       'results-table': 'Results',
       'basic-results-table': 'Results Table'
     };
@@ -388,7 +385,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       'query-control': 'query-control',
       'query-panel': 'query-panel',
       'manufacturer-model-picker': 'picker',
-      'statistics-panel': 'statistics',
       'statistics-panel-2': 'statistics-2',
       'results-table': 'results',
       'basic-results-table': 'basic-results'

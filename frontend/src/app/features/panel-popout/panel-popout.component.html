@@ -22,13 +22,7 @@
           (selectionChange)="onPickerSelectionChange($event)">
         </app-base-picker>
       }
-      <!-- Statistics Panel -->
-      @case ('statistics') {
-        <app-statistics-panel
-          [domainConfig]="domainConfig">
-        </app-statistics-panel>
-      }
-      <!-- Statistics Panel 2 (CDK Mixed Orientation Chart Grid) -->
+      <!-- Statistics Panel (CDK Mixed Orientation Chart Grid) -->
       @case ('statistics-2') {
         <app-statistics-panel-2
           [domainConfig]="domainConfig">

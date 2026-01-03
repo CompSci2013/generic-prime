@@ -20,8 +20,8 @@ import { catchError, timeout } from 'rxjs/operators';
  *
  * **Storage Format**:
  * ```
- * localStorage['prefs:automobiles:panelOrder'] = ['query-control', 'statistics-panel', ...]
- * localStorage['prefs:automobiles:collapsedPanels'] = ['query-control', 'statistics-panel']
+ * localStorage['prefs:automobiles:panelOrder'] = ['query-control', 'statistics-panel-2', ...]
+ * localStorage['prefs:automobiles:collapsedPanels'] = ['query-control', 'statistics-panel-2']
  * ```
  *
  * @example
@@ -55,7 +55,6 @@ export class UserPreferencesService {
     'query-control',
     'query-panel',
     'manufacturer-model-picker',
-    'statistics-panel',
     'statistics-panel-2',
     'basic-results-table'
   ];

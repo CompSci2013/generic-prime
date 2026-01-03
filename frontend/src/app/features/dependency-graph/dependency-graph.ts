@@ -392,8 +392,8 @@ const FRAMEWORK_COMPONENTS: DependencyNode[] = [
     description: 'Filter control panel with dynamic form controls', color: '#F8B195' },
   { id: 'comp-base-chart', label: 'BaseChartComponent', category: 'framework-component',
     description: 'Generic Plotly.js chart wrapper', color: '#F8B195' },
-  { id: 'comp-statistics-panel', label: 'StatisticsPanelComponent', category: 'framework-component',
-    description: 'Statistics aggregation and display', color: '#F8B195' },
+  { id: 'comp-statistics-panel-2', label: 'StatisticsPanel2Component', category: 'framework-component',
+    description: 'Statistics panel with CDK mixed orientation chart grid', color: '#F8B195' },
 ];
 
 /**
@@ -632,7 +632,7 @@ export const ALL_DEPENDENCY_EDGES: DependencyEdge[] = [
   { source: 'comp-results-table', target: 'svc-resource-mgmt', type: 'uses' },
   { source: 'comp-query-control', target: 'svc-resource-mgmt', type: 'uses' },
   { source: 'comp-base-chart', target: 'npm-plotly', type: 'uses' },
-  { source: 'comp-statistics-panel', target: 'svc-resource-mgmt', type: 'uses' },
+  { source: 'comp-statistics-panel-2', target: 'svc-resource-mgmt', type: 'uses' },
 
   // Framework Components → Angular & PrimeNG
   { source: 'comp-base-picker', target: 'npm-primeng', type: 'uses' },
@@ -675,7 +675,7 @@ export const ALL_DEPENDENCY_EDGES: DependencyEdge[] = [
   { source: 'comp-discover', target: 'comp-results-table', type: 'uses' },
   { source: 'comp-discover', target: 'comp-query-control', type: 'uses' },
   { source: 'comp-discover', target: 'comp-base-chart', type: 'uses' },
-  { source: 'comp-discover', target: 'comp-statistics-panel', type: 'uses' },
+  { source: 'comp-discover', target: 'comp-statistics-panel-2', type: 'uses' },
   { source: 'comp-panel-popout', target: 'comp-base-picker', type: 'uses' },
   { source: 'comp-panel-popout', target: 'comp-results-table', type: 'uses' },
   { source: 'comp-panel-popout', target: 'comp-query-control', type: 'uses' },
