@@ -1,55 +1,65 @@
 # Project Status
 
-**Version**: 7.11
-**Timestamp**: 2026-01-02T21:14:34-05:00
-**Updated By**: Claude - Session 76
+**Version**: 7.12
+**Timestamp**: 2026-01-02T22:46:18-05:00
+**Updated By**: Claude - Session 77
+
+---
+
+## Session 77 Summary: Statistics-2 Panel with CDK Mixed Orientation
+
+**Status**: ✅ **COMPLETE** - Implemented Statistics-2 panel with CDK drag-drop chart grid
+
+### What Was Accomplished
+
+1. ✅ **Created Statistics-2 Panel Component**
+   - New component using CDK `cdkDropListOrientation="mixed"` for flex-wrap chart grid
+   - Charts can be reordered by dragging within the panel
+   - Individual chart pop-out support from within the grid
+   - Full panel pop-out support with proper styling (no header, no scrollbars)
+
+2. ✅ **Integrated into Discover Page**
+   - Added Statistics-2 panel to panel order
+   - Pop-out placeholder when panel is popped out
+   - Individual chart placeholders when charts are popped out
+
+3. ✅ **Panel Preference Merge Logic**
+   - `mergePanelOrder()` now adds new panels and removes deleted ones
+   - User preferences automatically cleaned up when panels are removed
+
+4. ✅ **Removed Legacy StatisticsPanelComponent**
+   - Deleted statistics-panel component files
+   - Updated all imports and references
+   - Updated dependency graph documentation
+
+5. ✅ **Pop-Out Styling Fixes**
+   - Statistics-2 pop-out hides header label
+   - Added html/body overflow:hidden for Statistics-2 pop-outs
+   - Eliminated window-level scrollbars
+
+### Files Modified
+
+| File | Description |
+|------|-------------|
+| `statistics-panel-2/*` (3 files) | New component with CDK mixed orientation |
+| `discover.component.ts/html` | Statistics-2 integration |
+| `panel-popout.component.ts/html/scss` | Pop-out support |
+| `user-preferences.service.ts` | Panel merge logic (add new, remove deleted) |
+| `dependency-graph.ts` | Updated component references |
+| `base-picker.component.ts` | Added standalone: true |
+| `basic-results-table.component.ts` | Added standalone: true |
+| `automobile.chart-configs.ts` | Updated documentation comments |
+
+### Branch Merged
+
+- **Branch**: `feature/statistics-2` merged to `main`
+- **Merge Commit**: `74da313`
 
 ---
 
 ## Session 76 Summary: Abstraction Leak Fixes & CDK Research
 
 **Status**: ✅ **COMPLETE** - Fixed abstraction leaks, researched Angular CDK drag-drop
-
-### What Was Accomplished
-
-1. ✅ **Fixed Chart Click Abstraction Leak**
-   - Added `toUrlParams()` abstract method to `ChartDataSource` class
-   - Implemented in all 4 chart data sources (manufacturer, top-models, year, body-class)
-   - Removed ~60 lines of duplicate domain-specific code from StatisticsPanelComponent and DiscoverComponent
-   - URL param generation now lives in domain config, not framework components
-
-2. ✅ **Fixed QueryControlComponent Abstraction Leak**
-   - Created generic `RangeConfig` interface (supports integer, decimal, datetime)
-   - Renamed year-specific properties to generic range properties
-   - Dialog labels, placeholders, step values now driven by FilterDefinition config
-   - Backend API params unchanged (yearMin/yearMax still work)
-
-3. ✅ **Documented UserPreferencesService Abstraction Leaks**
-   - Added to TANGENTS.md as future work item
-   - Identified 3 hardcoded domain-specific values
-   - Recommended fixes for when multi-domain support is needed
-
-4. ✅ **Researched Angular CDK Drag-Drop (v14 → v21)**
-   - Current implementation already uses best practices
-   - New feature available: `cdkDropListOrientation="mixed"` for grid layouts
-   - Documented in TANGENTS.md for future exploration
-
-5. ✅ **Version Bump**
-   - Bumped to v21.1.2 in package.json
-
-### Files Modified
-
-| File | Description |
-|------|-------------|
-| `filter-definition.interface.ts` | Added RangeConfig interface |
-| `query-control.component.ts/html/scss` | Generic range dialog |
-| `base-chart.component.ts` | Added toUrlParams() abstract method |
-| `*-chart-source.ts` (4 files) | Implemented toUrlParams() |
-| `statistics-panel.component.ts/html` | Simplified to use toUrlParams() |
-| `discover.component.ts/html` | Simplified to use toUrlParams() |
-| `automobile.query-control-filters.ts` | Added rangeConfig |
-| `automobile.highlight-filters.ts` | Added rangeConfig |
-| `TANGENTS.md` | Added UserPreferencesService leaks, CDK research |
 
 ---
 
@@ -85,13 +95,12 @@
 
 | Phase | Work | Priority | Status |
 |-------|------|----------|--------|
-| **1** | **Explore CDK Mixed Orientation for Panel Grid** | Medium | Next Session |
-| **2** | **Continue User Story Validation (remaining components)** | HIGH | Pending |
-| **3** | **IdP Phase 1: Deploy Keycloak Infrastructure** | **HIGH** | Next major task |
-| **4** | **IdP Phase 2: Frontend OIDC Integration** | **HIGH** | Pending Phase 1 |
-| 5 | Fix Bug #7 (multiselect visual state) | Medium | Pending |
-| 6 | Remove component-level ResourceManagementService provider | Low | Pending |
+| **1** | **Continue User Story Validation (remaining components)** | HIGH | Next Session |
+| **2** | **IdP Phase 1: Deploy Keycloak Infrastructure** | **HIGH** | Next major task |
+| **3** | **IdP Phase 2: Frontend OIDC Integration** | **HIGH** | Pending Phase 1 |
+| 4 | Fix Bug #7 (multiselect visual state) | Medium | Pending |
+| 5 | Remove component-level ResourceManagementService provider | Low | Pending |
 
 ---
 
-**Last Updated**: 2026-01-02T21:14:34-05:00
+**Last Updated**: 2026-01-02T22:46:18-05:00

@@ -1,57 +1,46 @@
 # Next Steps
 
-**Current Session**: Session 76 - Abstraction Leak Fixes & CDK Research
-**Previous Session**: Session 75 - Query Panel User Stories
-**Status**: v7.11, Abstraction leaks fixed, CDK research documented
+**Current Session**: Session 77 - Statistics-2 Panel Implementation
+**Previous Session**: Session 76 - Abstraction Leak Fixes & CDK Research
+**Status**: v7.12, Statistics-2 panel complete, legacy panel removed
 
 ---
 
-## IMMEDIATE ACTION: Explore CDK Mixed Orientation for Panel Grid
+## IMMEDIATE ACTION: Continue User Story Validation
 
-**Priority**: Medium
-**Scope**: Evaluate if panel grid layout would improve UX
+**Priority**: HIGH
+**Scope**: Create validation tests for remaining components
 
 ### Context
 
-User requested research on Angular CDK drag-drop improvements after v14 → v21 upgrade. Research found:
-- Current implementation already uses best practices
-- New feature: `cdkDropListOrientation="mixed"` available since Angular Material v18.1.0
-- Enables flex-wrap grid layouts with drag-drop reordering
+Session 75 created user stories and validation tests for Query Panel (38 tests passing).
+Session 77 implemented Statistics-2 panel with CDK mixed orientation.
 
-### Implementation Pattern
+Next: Continue user story validation for remaining components.
 
-```html
-<div cdkDropList cdkDropListOrientation="mixed" class="panel-grid">
-  @for (panel of panelOrder; track panel) {
-    <div cdkDrag>{{ panel }}</div>
-  }
-</div>
-```
+### Components to Validate
 
-```scss
-.panel-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-```
-
-**Caveat**: Mixed orientation disables sorting animations (DOM manipulation instead of CSS transforms).
+| Component | User Stories | Validation Tests |
+|-----------|-------------|------------------|
+| Query Panel | ✅ Complete | ✅ 38 tests |
+| **Results Table** | Pending | Pending |
+| **Statistics Panel (Statistics-2)** | Pending | Pending |
+| **Base Picker** | Pending | Pending |
 
 ### Steps
 
-1. Evaluate if grid layout benefits discover page UX
-2. If yes, modify discover.component.html to use `cdkDropListOrientation="mixed"`
-3. Update SCSS to use flex-wrap layout
-4. Test drag-drop behavior in new layout
+1. Create user stories for Results Table component
+2. Write validation tests based on user stories
+3. Repeat for Statistics Panel and Base Picker
+4. Ensure all tests pass
 
 ### Key Files
 
 | File | Purpose |
 |------|---------|
-| `frontend/src/app/features/discover/discover.component.html` | Panel container |
-| `frontend/src/app/features/discover/discover.component.scss` | Panel styling |
-| `docs/claude/TANGENTS.md` | Full research notes (Tangent #5) |
+| `frontend/e2e/validation/` | Validation test files |
+| `docs/claude/user-stories/` | User story documentation |
+| `frontend/src/framework/components/` | Component source files |
 
 ---
 
@@ -59,20 +48,20 @@ User requested research on Angular CDK drag-drop improvements after v14 → v21 
 
 | Task | Priority | Notes |
 |------|----------|-------|
-| Continue User Story Validation | HIGH | Results Table, Statistics Panel, Picker |
-| Fix Bug #7 (multiselect visual state) | Medium | Low priority |
 | IdP Phase 1 (Keycloak) | HIGH | Next major milestone |
+| Fix Bug #7 (multiselect visual state) | Medium | Low priority |
+| Remove component-level ResourceManagementService provider | Low | Architecture cleanup |
 
 ---
 
-## SESSION 76 COMPLETION SUMMARY
+## SESSION 77 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Fixed chart click abstraction leak (toUrlParams() on ChartDataSource)
-2. ✅ Fixed QueryControlComponent abstraction leak (generic RangeConfig)
-3. ✅ Documented UserPreferencesService leaks in TANGENTS.md
-4. ✅ Researched Angular CDK drag-drop v18+ features
-5. ✅ Documented CDK mixed orientation in TANGENTS.md
-6. ✅ Bumped version to 21.1.2
+1. ✅ Created Statistics-2 component with CDK `cdkDropListOrientation="mixed"`
+2. ✅ Integrated into discover page with pop-out support
+3. ✅ Fixed panel preferences to add new panels and remove deleted ones
+4. ✅ Removed legacy StatisticsPanelComponent
+5. ✅ Fixed pop-out scrollbar issues
+6. ✅ Merged feature/statistics-2 to main
 
 ---
