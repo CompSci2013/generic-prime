@@ -13,21 +13,21 @@ body {
   background-color: #3c3c3c; // Dark gray background (VS theme)
   color: #ffffff; // White text for better readability
 
-  // Chart pop-out: no scrollbars, fill viewport
-  &.chart-popout-body {
+  // Pop-out windows: no scrollbars, fill viewport
+  &.popout-body {
     overflow: hidden;
     height: 100vh;
     width: 100vw;
   }
 }
 
-// Also target html for chart pop-outs
-html.chart-popout-html {
+// Pop-out windows: hide scrollbars at html level
+html.popout-html {
   overflow: hidden;
   height: 100vh;
   width: 100vw;
 
-  // Override app-content overflow for chart pop-outs
+  // Override app-content overflow for pop-outs
   .app-content {
     overflow: hidden !important;
     height: 100vh !important;

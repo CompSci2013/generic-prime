@@ -124,11 +124,9 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       // Initialize as pop-out
       this.popOutContext.initializeAsPopOut(this.panelId);
 
-      // For chart and statistics-2 pop-outs, add class to body and html to hide scrollbars
-      if (this.panelType === 'chart' || this.panelType === 'statistics-2') {
-        document.documentElement.classList.add('chart-popout-html');
-        document.body.classList.add('chart-popout-body');
-      }
+      // Add class to body and html to hide scrollbars for all pop-outs
+      document.documentElement.classList.add('popout-html');
+      document.body.classList.add('popout-body');
 
       // Trigger change detection
       this.cdr.markForCheck();
@@ -180,31 +178,6 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
         // Unknown message type - silently ignore
         break;
     }
-  }
-
-  /**
-   * Get panel title for display
-   *
-   * @returns Panel title
-   */
-  getPanelTitle(): string {
-    const titleMap: { [key: string]: string } = {
-      'query-control': 'Query Control',
-      'query-panel': 'Query Panel',
-      'manufacturer-model-picker': 'Manufacturer-Model Picker',
-      'statistics-panel-2': 'Statistics',
-      'results-table': 'Results',
-      'basic-results-table': 'Results Table'
-    };
-
-    // For chart panels, extract chart ID and get title from data source
-    if (this.panelId.startsWith('chart-')) {
-      const chartId = this.panelId.replace('chart-', '');
-      const dataSource = this.domainConfig.chartDataSources?.[chartId];
-      return dataSource?.title || chartId;
-    }
-
-    return titleMap[this.panelId] || this.panelId;
   }
 
   /**
