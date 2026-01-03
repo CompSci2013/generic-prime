@@ -160,6 +160,57 @@ Hovering on "Automobiles" shows flyout:
 
 ---
 
+### 4. UserPreferencesService Abstraction Leaks
+**Date Raised**: 2026-01-02
+**Status**: Documented - Awaiting Future Work
+**Summary**:
+- During Session 76 refactoring of QueryControlComponent, identified abstraction leaks in UserPreferencesService
+- The service is a framework component but contains hardcoded domain-specific values
+- These leaks should be fixed when multi-domain support is actually needed
+
+**Abstraction Leaks Identified**:
+
+1. **Hardcoded Panel Names** (`user-preferences.service.ts:54-60`):
+   ```typescript
+   private readonly DEFAULT_PANEL_ORDER = [
+     'query-control',
+     'query-panel',
+     'manufacturer-model-picker',  // ← Automobile-specific
+     'statistics-panel',
+     'basic-results-table'
+   ];
+   ```
+
+2. **Hardcoded Domain List** (`user-preferences.service.ts:338`):
+   ```typescript
+   ['automobiles', 'physics', 'agriculture', 'chemistry', 'math'].forEach(domain => {
+   ```
+   Adding a new domain requires modifying framework code.
+
+3. **Default Domain Fallback** (`user-preferences.service.ts:469-470`):
+   ```typescript
+   // Default to 'automobiles' if extraction fails
+   return 'automobiles';
+   ```
+
+**Recommended Fixes**:
+1. **Panel Order**: Get from `DomainConfig.defaultPanelOrder` property
+2. **Domain List**: Inject from routing config or domain registry
+3. **Default Domain**: Make configurable via environment/app config
+
+**Priority**: Low - service works correctly, just needs refactoring before adding second domain
+
+**Related Files**:
+- `frontend/src/framework/services/user-preferences.service.ts`
+- `cruft/specs/10-user-preferences-service.md` (full specification, 1500+ lines)
+
+**Related Context**:
+- The full UserPreferences spec in `cruft/specs/` describes file-based preferences with backend API
+- Current implementation uses localStorage as interim solution
+- Backend API described but not yet implemented
+
+---
+
 ## Historical Tangents (Resolved)
 
 None yet - this is the first document.
