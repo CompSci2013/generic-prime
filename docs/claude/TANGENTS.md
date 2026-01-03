@@ -211,6 +211,53 @@ Hovering on "Automobiles" shows flyout:
 
 ---
 
+### 5. CDK Mixed Orientation for Panel Grid Layout
+**Date Raised**: 2026-01-02
+**Status**: Research Complete - Ready for Implementation
+**Summary**:
+- User asked about Angular CDK drag-drop improvements after upgrading from Angular 14 to 21
+- Research found current panel drag-drop implementation is already using best practices
+- New feature available: `cdkDropListOrientation="mixed"` for grid/wrapped layouts (available since Angular Material v18.1.0)
+
+**Current Implementation** (works correctly):
+- `frontend/src/app/features/discover/discover.component.ts` uses `CdkDropList`, `CdkDrag`, `CdkDragHandle`
+- Vertical panel list with `moveItemInArray()` utility
+- Persists to UserPreferencesService
+
+**New Option for Grid Layout**:
+```html
+<div cdkDropList cdkDropListOrientation="mixed" class="panel-grid">
+  @for (panel of panelOrder; track panel) {
+    <div cdkDrag>{{ panel }}</div>
+  }
+</div>
+```
+
+```scss
+.panel-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+```
+
+**Caveat**: Mixed orientation disables sorting animations (elements move via DOM manipulation instead of CSS transforms).
+
+**Research Sources**:
+- [Angular Drag and Drop Guide](https://angular.dev/guide/drag-drop)
+- [Angular CDK Drag-Drop API](https://material.angular.dev/cdk/drag-drop/api)
+- [Mixed Orientation Support Issue #13372](https://github.com/angular/components/issues/13372)
+
+**Related Files**:
+- `frontend/src/app/features/discover/discover.component.ts`
+- `frontend/src/app/features/discover/discover.component.html`
+
+**Next Steps**:
+- Explore if grid layout would benefit the discover page UX
+- If yes, switch to `cdkDropListOrientation="mixed"` with flex-wrap styling
+
+---
+
 ## Historical Tangents (Resolved)
 
 None yet - this is the first document.
