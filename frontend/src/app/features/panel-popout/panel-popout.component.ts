@@ -22,7 +22,7 @@ import { PickerConfigRegistry } from '../../../framework/services/picker-config-
 import { PopOutContextService } from '../../../framework/services/popout-context.service';
 import { ResourceManagementService } from '../../../framework/services/resource-management.service';
 import { IS_POPOUT_TOKEN } from '../../../framework/tokens/popout.token';
-import { BasicResultsTableComponent } from '../../../framework/components/basic-results-table/basic-results-table.component';
+import { DynamicResultsTableComponent } from '../../../framework/components/dynamic-results-table/dynamic-results-table.component';
 import { QueryPanelComponent } from '../../../framework/components/query-panel/query-panel.component';
 import { ResultsTableComponent } from '../../../framework/components/results-table/results-table.component';
 import { StatisticsPanel2Component } from '../../../framework/components/statistics-panel-2/statistics-panel-2.component';
@@ -69,7 +69,7 @@ import { BaseChartComponent } from '../../../framework/components/base-chart/bas
         ResourceManagementService,
         { provide: IS_POPOUT_TOKEN, useValue: true }
     ],
-    imports: [QueryControlComponent, BasePickerComponent, StatisticsPanel2Component, ResultsTableComponent, QueryPanelComponent, BasicResultsTableComponent, BaseChartComponent]
+    imports: [QueryControlComponent, BasePickerComponent, StatisticsPanel2Component, ResultsTableComponent, QueryPanelComponent, DynamicResultsTableComponent, BaseChartComponent]
 })
 export class PanelPopoutComponent implements OnInit, OnDestroy {
   /**

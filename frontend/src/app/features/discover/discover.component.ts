@@ -26,7 +26,7 @@ import { PopOutContextService } from '../../../framework/services/popout-context
 import { ResourceManagementService } from '../../../framework/services/resource-management.service';
 import { UrlStateService } from '../../../framework/services/url-state.service';
 import { UserPreferencesService } from '../../../framework/services/user-preferences.service';
-import { BasicResultsTableComponent } from '../../../framework/components/basic-results-table/basic-results-table.component';
+import { DynamicResultsTableComponent } from '../../../framework/components/dynamic-results-table/dynamic-results-table.component';
 import { ResultsTableComponent } from '../../../framework/components/results-table/results-table.component';
 import { StatisticsPanel2Component } from '../../../framework/components/statistics-panel-2/statistics-panel-2.component';
 import { BasePickerComponent } from '../../../framework/components/base-picker/base-picker.component';
@@ -116,7 +116,7 @@ import { ButtonModule } from 'primeng/button';
     styleUrls: ['./discover.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ResourceManagementService],
-    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanel2Component, ResultsTableComponent, BasicResultsTableComponent]
+    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanel2Component, ResultsTableComponent, DynamicResultsTableComponent]
 })
 export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

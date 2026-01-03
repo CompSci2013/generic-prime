@@ -120,11 +120,11 @@
                 </div>
               }
             }
-            <!-- Basic Results Table (new - table only, no filters) -->
+            <!-- Dynamic Results Table (drag-drop columns, resizable widths) -->
             @if (panelId === 'basic-results-table') {
               @if (!isPanelPoppedOut('basic-results-table')) {
                 <div>
-                  <app-basic-results-table [domainConfig]="domainConfig"></app-basic-results-table>
+                  <app-dynamic-results-table [domainConfig]="domainConfig"></app-dynamic-results-table>
                 </div>
               } @else {
                 <div class="popout-placeholder">
