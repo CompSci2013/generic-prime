@@ -26,6 +26,7 @@ import { BasicResultsTableComponent } from '../../../framework/components/basic-
 import { QueryPanelComponent } from '../../../framework/components/query-panel/query-panel.component';
 import { ResultsTableComponent } from '../../../framework/components/results-table/results-table.component';
 import { StatisticsPanelComponent } from '../../../framework/components/statistics-panel/statistics-panel.component';
+import { StatisticsPanel2Component } from '../../../framework/components/statistics-panel-2/statistics-panel-2.component';
 import { BasePickerComponent } from '../../../framework/components/base-picker/base-picker.component';
 import { QueryControlComponent } from '../../../framework/components/query-control/query-control.component';
 import { BaseChartComponent } from '../../../framework/components/base-chart/base-chart.component';
@@ -61,6 +62,7 @@ import { BaseChartComponent } from '../../../framework/components/base-chart/bas
  */
 @Component({
     selector: 'app-panel-popout',
+    standalone: true,
     templateUrl: './panel-popout.component.html',
     styleUrls: ['./panel-popout.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -68,7 +70,7 @@ import { BaseChartComponent } from '../../../framework/components/base-chart/bas
         ResourceManagementService,
         { provide: IS_POPOUT_TOKEN, useValue: true }
     ],
-    imports: [QueryControlComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, QueryPanelComponent, BasicResultsTableComponent, BaseChartComponent]
+    imports: [QueryControlComponent, BasePickerComponent, StatisticsPanelComponent, StatisticsPanel2Component, ResultsTableComponent, QueryPanelComponent, BasicResultsTableComponent, BaseChartComponent]
 })
 export class PanelPopoutComponent implements OnInit, OnDestroy {
   /**

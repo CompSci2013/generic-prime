@@ -26,6 +26,22 @@
       }
     }
   }
+
+  // Statistics-2 popout: hide header, no scrollbar
+  &.statistics-2-popout {
+    padding: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    .popout-header {
+      display: none;
+    }
+
+    .popout-content {
+      padding-top: 0;
+      overflow: hidden;
+    }
+  }
 }
 
 .popout-header {

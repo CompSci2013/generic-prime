@@ -103,6 +103,23 @@
                 </div>
               }
             }
+            <!-- Statistics Panel 2 (CDK Mixed Orientation Chart Grid) -->
+            @if (panelId === 'statistics-panel-2') {
+              @if (!isPanelPoppedOut('statistics-panel-2')) {
+                <div>
+                  <app-statistics-panel-2
+                    [domainConfig]="domainConfig"
+                    [isPanelPoppedOut]="isPanelPoppedOut.bind(this)"
+                    (chartPopOut)="onChartPopOut($event)">
+                  </app-statistics-panel-2>
+                </div>
+              } @else {
+                <div class="popout-placeholder">
+                  <i class="pi pi-external-link"></i>
+                  <span>Statistics Panel 2 is open in a separate window</span>
+                </div>
+              }
+            }
             <!-- Results Table (legacy - kept for backwards compatibility) -->
             @if (panelId === 'results-table') {
               @if (!isPanelPoppedOut('results-table')) {
@@ -129,38 +146,6 @@
                 </div>
               }
             }
-          </div>
-        }
-      </div>
-    }
-  </div>
-
-  <!-- Chart Grid with CDK Mixed Orientation Drag-Drop -->
-  <div
-    cdkDropList
-    cdkDropListOrientation="mixed"
-    (cdkDropListDropped)="onChartDrop($event)"
-    class="chart-grid">
-    @for (chartId of chartOrder; track chartId) {
-      <div class="chart-box" cdkDrag>
-        <!-- Drag Handle -->
-        <div class="chart-drag-handle" cdkDragHandle>
-          <i class="pi pi-bars"></i>
-        </div>
-        @if (!isPanelPoppedOut('chart-' + chartId)) {
-          <app-base-chart
-            [dataSource]="domainConfig.chartDataSources?.[chartId]"
-            [statistics]="resourceService.statistics()"
-            [highlights]="resourceService.highlights()"
-            [selectedValue]="null"
-            [canPopOut]="true"
-            (popOutClick)="onChartPopOut(chartId)"
-            (chartClick)="onStandaloneChartClick($event, domainConfig.chartDataSources?.[chartId])">
-          </app-base-chart>
-        } @else {
-          <div class="popout-placeholder">
-            <i class="pi pi-external-link"></i>
-            <span>Chart is open in a separate window</span>
           </div>
         }
       </div>

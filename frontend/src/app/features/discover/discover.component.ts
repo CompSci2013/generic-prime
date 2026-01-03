@@ -29,6 +29,7 @@ import { UserPreferencesService } from '../../../framework/services/user-prefere
 import { BasicResultsTableComponent } from '../../../framework/components/basic-results-table/basic-results-table.component';
 import { ResultsTableComponent } from '../../../framework/components/results-table/results-table.component';
 import { StatisticsPanelComponent } from '../../../framework/components/statistics-panel/statistics-panel.component';
+import { StatisticsPanel2Component } from '../../../framework/components/statistics-panel-2/statistics-panel-2.component';
 import { BasePickerComponent } from '../../../framework/components/base-picker/base-picker.component';
 import { QueryPanelComponent } from '../../../framework/components/query-panel/query-panel.component';
 import { QueryControlComponent } from '../../../framework/components/query-control/query-control.component';
@@ -111,11 +112,12 @@ import { ButtonModule } from 'primeng/button';
  */
 @Component({
     selector: 'app-discover',
+    standalone: true,
     templateUrl: './discover.component.html',
     styleUrls: ['./discover.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ResourceManagementService],
-    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, BasicResultsTableComponent, BaseChartComponent]
+    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanelComponent, StatisticsPanel2Component, ResultsTableComponent, BasicResultsTableComponent]
 })
 export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {
@@ -143,18 +145,8 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     'query-panel',
     'manufacturer-model-picker',
     'statistics-panel',
+    'statistics-panel-2',
     'basic-results-table'
-  ];
-
-  /**
-   * Ordered list of chart IDs for the standalone chart grid
-   * Used with CDK drag-drop mixed orientation
-   */
-  chartOrder: string[] = [
-    'manufacturer',
-    'top-models',
-    'year',
-    'body-class'
   ];
 
   /**
@@ -367,17 +359,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   }
 
   /**
-   * Handle chart drag-drop to reorder charts in the grid
-   * Uses CDK mixed orientation for flex-wrap grid layout
-   *
-   * @param event - CDK drag-drop event
-   */
-  onChartDrop(event: CdkDragDrop<string[]>): void {
-    moveItemInArray(this.chartOrder, event.previousIndex, event.currentIndex);
-    this.cdr.markForCheck();
-  }
-
-  /**
    * Get panel title by panel ID
    *
    * @param panelId - Panel identifier
@@ -389,6 +370,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       'query-panel': 'Query Panel',
       'manufacturer-model-picker': 'Manufacturer-Model Picker',
       'statistics-panel': 'Statistics',
+      'statistics-panel-2': 'Statistics 2 (Draggable Grid)',
       'results-table': 'Results',
       'basic-results-table': 'Results Table'
     };
@@ -407,6 +389,7 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
       'query-panel': 'query-panel',
       'manufacturer-model-picker': 'picker',
       'statistics-panel': 'statistics',
+      'statistics-panel-2': 'statistics-2',
       'results-table': 'results',
       'basic-results-table': 'basic-results'
     };
