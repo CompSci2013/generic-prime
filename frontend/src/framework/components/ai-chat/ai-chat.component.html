@@ -1,0 +1,137 @@
+<div class="ai-chat-container" [class.collapsed]="!isExpanded()">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="header-left">
+      <i class="pi pi-comments"></i>
+      <span class="header-title">AI Assistant</span>
+      @if (connectionStatus() === 'connected') {
+        <span class="status-indicator connected" pTooltip="Connected to Mimir"></span>
+      } @else if (connectionStatus() === 'checking') {
+        <span class="status-indicator checking" pTooltip="Checking connection..."></span>
+      } @else {
+        <span class="status-indicator disconnected" pTooltip="Disconnected - Click to retry" (click)="retryConnection()"></span>
+      }
+    </div>
+    <div class="header-actions">
+      <button
+        pButton
+        type="button"
+        [icon]="apiContextEnabled() ? 'pi pi-database' : 'pi pi-comment'"
+        [pTooltip]="apiContextEnabled() ? 'API Mode (Phase 2)' : 'Chat Mode (Phase 1)'"
+        class="p-button-text p-button-sm"
+        [class.api-mode]="apiContextEnabled()"
+        (click)="toggleApiContext()">
+      </button>
+      @if (hasMessages()) {
+        <button
+          pButton
+          type="button"
+          icon="pi pi-trash"
+          pTooltip="Clear chat"
+          class="p-button-text p-button-sm"
+          (click)="clearChat()">
+        </button>
+      }
+      <button
+        pButton
+        type="button"
+        [icon]="isExpanded() ? 'pi pi-chevron-down' : 'pi pi-chevron-up'"
+        pTooltip="Toggle panel"
+        class="p-button-text p-button-sm"
+        (click)="toggleExpanded()">
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat Body (collapsible) -->
+  @if (isExpanded()) {
+    <div class="chat-body">
+      <!-- Messages Area -->
+      <div class="messages-area" #messagesContainer>
+        @if (!hasMessages() && !isLoading()) {
+          <div class="welcome-message">
+            <i class="pi pi-sparkles"></i>
+            <h3>Welcome to AI Assistant</h3>
+            @if (apiContextEnabled()) {
+              <p>Phase 2: I can help you query vehicle data. Try asking:</p>
+              <ul class="example-queries">
+                <li>"Show me all Toyota vehicles from 2020 to 2024"</li>
+                <li>"Find SUVs with more than 100 VIN records"</li>
+                <li>"What Ford models are available?"</li>
+              </ul>
+            } @else {
+              <p>Phase 1: Ask me anything about the application.</p>
+              <ul class="example-queries">
+                <li>"What data is available in this application?"</li>
+                <li>"How do I filter by manufacturer?"</li>
+                <li>"Explain the statistics panel"</li>
+              </ul>
+            }
+          </div>
+        }
+
+        @for (message of messages(); track message.timestamp) {
+          <div [class]="getMessageClass(message)">
+            <div class="message-content">
+              <div class="message-text">{{ message.content }}</div>
+              @if (message.timestamp) {
+                <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (isLoading()) {
+          <div class="message message-assistant loading">
+            <div class="message-content">
+              <p-progressSpinner
+                strokeWidth="3"
+                [style]="{ width: '24px', height: '24px' }">
+              </p-progressSpinner>
+              <span class="loading-text">Thinking...</span>
+            </div>
+          </div>
+        }
+
+        @if (error()) {
+          <div class="error-message">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>{{ error() }}</span>
+            <button pButton type="button" label="Retry" icon="pi pi-refresh" class="p-button-text p-button-sm" (click)="retryConnection()"></button>
+          </div>
+        }
+      </div>
+
+      <!-- Input Area -->
+      <div class="input-area">
+        @if (connectionStatus() === 'disconnected') {
+          <div class="disconnected-notice">
+            <i class="pi pi-wifi"></i>
+            <span>Cannot connect to AI service on Mimir</span>
+            <button pButton type="button" label="Retry" class="p-button-sm" (click)="retryConnection()"></button>
+          </div>
+        } @else {
+          <textarea
+            #messageInput
+            pTextarea
+            [(ngModel)]="userMessage"
+            placeholder="Type your message..."
+            [autoResize]="true"
+            [rows]="1"
+            [disabled]="isLoading() || connectionStatus() !== 'connected'"
+            (keydown)="onKeyDown($event)"
+            class="message-input">
+          </textarea>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-send"
+            class="send-button"
+            [disabled]="!userMessage.trim() || isLoading() || connectionStatus() !== 'connected'"
+            (click)="sendMessage()">
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

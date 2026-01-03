@@ -302,6 +302,89 @@ Hovering on "Automobiles" shows flyout:
 
 ---
 
+### 7. AI Integration - Natural Language Query Interface
+**Date Raised**: 2026-01-03
+**Status**: IN PROGRESS - Implementation Started
+**Branch**: `feature/ai`
+
+**Summary**:
+User requested AI integration to allow natural language queries that get translated to backend API calls and present results in a chat interface.
+
+#### Phase 1: Basic Chat Interface
+- Add a chatbox component to accept user queries
+- Connect to `llama3.1:7b` model running on Mimir (192.168.0.100:11434)
+- Present AI responses in conversational format
+- Simple Q&A without backend integration
+
+#### Phase 2: Backend-Aware AI
+- Provide the LLM with backend API endpoint documentation
+- LLM translates natural language to API parameters
+- Execute API calls using existing adapters
+- Present structured results back to user
+
+**Backend API Reference** (for LLM context):
+
+**Base URL**: `http://generic-prime.minilab/api/specs/v1`
+
+**Primary Endpoint**: `GET /vehicles/details`
+
+| Parameter | Type | Description | Example |
+|-----------|------|-------------|---------|
+| `manufacturer` | string | Exact manufacturer match | `Toyota` |
+| `model` | string | Exact model match | `Camry` |
+| `yearMin` | integer | Minimum year (inclusive) | `2020` |
+| `yearMax` | integer | Maximum year (inclusive) | `2024` |
+| `bodyClass` | string | Body class filter | `Sedan` |
+| `instanceCountMin` | integer | Minimum VIN instances | `10` |
+| `instanceCountMax` | integer | Maximum VIN instances | `1000` |
+| `search` | string | Global search (all fields) | `Toyota Camry` |
+| `models` | string | Comma-separated mfr:model pairs | `Ford:F-150,Toyota:Camry` |
+| `page` | integer | Page number (1-indexed) | `1` |
+| `size` | integer | Results per page (1-100) | `20` |
+| `sortBy` | string | Sort field | `manufacturer` |
+| `sortOrder` | string | Sort direction (asc/desc) | `desc` |
+
+**Response Fields** (`VehicleResult`):
+- `vehicle_id`, `manufacturer`, `model`, `year`, `body_class`
+- `instance_count`, `first_seen`, `last_seen`
+- `drive_type`, `engine`, `transmission`, `fuel_type`, `vehicle_class`
+
+**Filter Endpoints**:
+- `GET /filters/manufacturers` → `{ "manufacturers": [...] }`
+- `GET /filters/models` → `{ "models": [...] }`
+- `GET /filters/body-classes` → `{ "body_classes": [...] }`
+- `GET /filters/year-range` → `{ "min": 1900, "max": 2025 }`
+
+**Validation Rules**:
+- Year: 1900 to current year + 1
+- Instance Count: 0 to 10000
+- Page: >= 1
+- Size: 1 to 100
+
+**LLM Configuration**:
+- Model: `llama3.1:7b`
+- Host: Mimir (192.168.0.100)
+- Port: 11434 (Ollama default)
+- Endpoint: `http://192.168.0.100:11434/api/generate`
+
+**Key Considerations**:
+- Local LLM via Ollama for privacy and speed
+- Domain-specific prompt engineering (field names, data types)
+- Fallback to manual query if AI translation fails
+- Show generated query for user review before execution
+
+**Related Files**:
+- `frontend/src/framework/services/api.service.ts` - HTTP client
+- `frontend/src/domain-config/automobile/adapters/automobile-api.adapter.ts` - API adapter
+- `frontend/src/domain-config/automobile/models/automobile.filters.ts` - Filter model
+
+**Implementation Files** (to be created):
+- `frontend/src/framework/services/ai.service.ts` - Ollama communication
+- `frontend/src/framework/components/ai-chat/` - Chat UI component
+- `frontend/src/framework/models/ai.models.ts` - AI interfaces
+
+---
+
 ## Historical Tangents (Resolved)
 
 None yet - this is the first document.

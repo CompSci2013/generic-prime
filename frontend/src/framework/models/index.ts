@@ -1,6 +1,7 @@
 /**
  * Framework Models - Barrel Exports
  */
+export * from './ai.models';
 export * from './api-response.interface';
 export * from './domain-config.interface';
 export * from './error-notification.interface';

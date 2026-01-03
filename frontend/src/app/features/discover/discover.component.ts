@@ -32,6 +32,7 @@ import { StatisticsPanel2Component } from '../../../framework/components/statist
 import { BasePickerComponent } from '../../../framework/components/base-picker/base-picker.component';
 import { QueryPanelComponent } from '../../../framework/components/query-panel/query-panel.component';
 import { QueryControlComponent } from '../../../framework/components/query-control/query-control.component';
+import { AiChatComponent } from '../../../framework/components/ai-chat/ai-chat.component';
 import { BaseChartComponent, ChartDataSource } from '../../../framework/components/base-chart/base-chart.component';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
@@ -116,7 +117,7 @@ import { ButtonModule } from 'primeng/button';
     styleUrls: ['./discover.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ResourceManagementService],
-    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanel2Component, ResultsTableComponent, DynamicResultsTableComponent]
+    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanel2Component, ResultsTableComponent, DynamicResultsTableComponent, AiChatComponent]
 })
 export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {

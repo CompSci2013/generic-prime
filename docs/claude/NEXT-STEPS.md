@@ -1,40 +1,43 @@
 # Next Steps
 
-**Current Session**: Session 78 - Domain Landing Page UI Simplification
-**Previous Session**: Session 77 - Statistics-2 Panel Implementation
-**Status**: v7.14, UI simplification complete, feature/ai branch created
+**Current Session**: Session 79 - AI Integration Implementation
+**Previous Session**: Session 78 - Domain Landing Page UI Simplification
+**Status**: v7.15, AI chat component implemented on feature/ai branch
 
 ---
 
-## IMMEDIATE ACTION: AI Integration Planning
+## IMMEDIATE ACTION: Test AI Chat Integration
 
 **Priority**: HIGH
 **Branch**: `feature/ai`
-**Scope**: Plan and implement natural language to Elasticsearch query translation
+**Scope**: Verify AI chat works with Ollama on Mimir
 
-### Context
+### Testing Steps
 
-Session 78 created the `feature/ai` branch for AI integration work. The goal is to allow users to type natural language queries that get translated to Elasticsearch queries.
+1. Start the development server
+2. Navigate to `/automobiles/discover`
+3. Verify the AI chat panel appears in bottom-right corner
+4. Check connection status indicator (should show connected if Ollama is running)
+5. Test Phase 1: Send a basic message
+6. Test Phase 2: Toggle API Mode and ask about vehicle data
 
-### Recommended LLM
+### Verification Checklist
 
-For self-hosted LLM on Mac Studio M3 256GB:
-- **Primary choice**: `llama3.1:70b` - Best balance of capability and performance for NL-to-ES translation
+- [ ] Chat panel renders correctly
+- [ ] Connection indicator shows correct status
+- [ ] Messages can be sent and received
+- [ ] Loading spinner appears during AI response
+- [ ] Phase toggle switches between modes
+- [ ] Clear chat button works
+- [ ] Panel collapse/expand works
 
-### Planning Steps
+### Next Development Steps
 
-1. Design the AI integration architecture
-2. Create a service to interface with Ollama/local LLM
-3. Build prompt templates for NL → Elasticsearch DSL translation
-4. Integrate with Query Panel UI
-5. Test with automobile domain queries
-
-### Key Considerations
-
-- Local LLM via Ollama for privacy and speed
-- Domain-specific prompt engineering (field names, data types)
-- Fallback to manual query if AI translation fails
-- Show generated query for user review before execution
+If AI integration works:
+1. Enhance prompt engineering for better query translation
+2. Add ability to execute generated queries directly
+3. Display results in chat panel
+4. Add conversation context persistence
 
 ---
 
@@ -48,13 +51,19 @@ For self-hosted LLM on Mac Studio M3 256GB:
 
 ---
 
-## SESSION 78 COMPLETION SUMMARY
+## SESSION 79 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. ✅ Simplified all domain landing pages (Automobile, Agriculture, Chemistry, Math)
-2. ✅ Unified home page with 5-tile domain grid
-3. ✅ Bumped version 21.2.0 → 21.2.1
-4. ✅ Created `feature/ai` branch for AI integration work
-5. ✅ Pushed all changes to GitHub and GitLab
+1. Created AI models for chat and Ollama API integration
+2. Created AI service for Mimir/Ollama communication
+3. Created AI chat component with floating UI
+4. Integrated chat into discover page
+5. Documented full implementation in TANGENTS.md
+6. Both Phase 1 (basic chat) and Phase 2 (API-aware) implemented
+
+**LLM Configuration**:
+- Model: `llama3.1:7b`
+- Host: Mimir (192.168.0.100:11434)
+- Timeout: 2 minutes
 
 ---

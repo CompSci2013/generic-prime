@@ -5,6 +5,11 @@
     <span class="results-count">{{ resourceService.totalResults() }} {{ resourceService.totalResults() === 1 ? 'result' : 'results' }}</span>
   </div>
 
+  <!-- AI Chat Panel (floating) -->
+  <div class="ai-chat-floating">
+    <app-ai-chat></app-ai-chat>
+  </div>
+
   <!-- Draggable Panels Container -->
   <div cdkDropList (cdkDropListDropped)="onPanelDrop($event)" class="panels-container">
     @for (panelId of panelOrder; track panelId) {
