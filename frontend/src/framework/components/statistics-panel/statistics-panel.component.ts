@@ -46,6 +46,7 @@ import { PanelModule } from 'primeng/panel';
  */
 @Component({
     selector: 'app-statistics-panel',
+    standalone: true,
     templateUrl: './statistics-panel.component.html',
     styleUrls: ['./statistics-panel.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,

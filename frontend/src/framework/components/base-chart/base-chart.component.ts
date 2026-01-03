@@ -204,6 +204,7 @@ export abstract class ChartDataSource<TStatistics = any> {
  */
 @Component({
     selector: 'app-base-chart',
+    standalone: true,
     templateUrl: './base-chart.component.html',
     styleUrls: ['./base-chart.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,

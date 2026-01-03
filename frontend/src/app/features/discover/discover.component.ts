@@ -147,6 +147,17 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   ];
 
   /**
+   * Ordered list of chart IDs for the standalone chart grid
+   * Used with CDK drag-drop mixed orientation
+   */
+  chartOrder: string[] = [
+    'manufacturer',
+    'top-models',
+    'year',
+    'body-class'
+  ];
+
+  /**
    * Map of pop-out windows and their associated channels
    */
   private popoutWindows = new Map<string, PopOutWindowRef>();
@@ -356,6 +367,17 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   }
 
   /**
+   * Handle chart drag-drop to reorder charts in the grid
+   * Uses CDK mixed orientation for flex-wrap grid layout
+   *
+   * @param event - CDK drag-drop event
+   */
+  onChartDrop(event: CdkDragDrop<string[]>): void {
+    moveItemInArray(this.chartOrder, event.previousIndex, event.currentIndex);
+    this.cdr.markForCheck();
+  }
+
+  /**
    * Get panel title by panel ID
    *
    * @param panelId - Panel identifier
@@ -452,9 +474,13 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     };
 
     // Monitor for window close
+    // IMPORTANT: setInterval runs outside Angular zone, so wrap in ngZone.run()
+    // to ensure change detection runs when pop-out is closed
     const checkInterval = window.setInterval(() => {
       if (popoutWindow.closed) {
-        this.onPopOutClosed(panelId, channel, checkInterval);
+        this.ngZone.run(() => {
+          this.onPopOutClosed(panelId, channel, checkInterval);
+        });
       }
     }, 500);
 

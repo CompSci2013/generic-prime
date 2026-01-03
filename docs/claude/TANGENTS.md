@@ -258,6 +258,50 @@ Hovering on "Automobiles" shows flyout:
 
 ---
 
+### 6. Zoneless Change Detection Migration
+**Date Raised**: 2026-01-02
+**Status**: Pending - Future Exploration
+**Summary**:
+- Angular 18+ introduced experimental zoneless change detection, stabilized in Angular 19+
+- Current app still uses zone.js and requires `ngZone.run()` workarounds for browser APIs (setInterval, BroadcastChannel, etc.)
+- Migration to zoneless would eliminate these workarounds and improve performance
+- Codebase already uses signals in many places, which is a good foundation
+
+**Current State**:
+- zone.js is still in package.json
+- No `provideExperimentalZonelessChangeDetection()` configuration
+- Multiple `ngZone.run()` calls exist to handle browser API callbacks
+
+**Migration Requirements**:
+1. Add `provideExperimentalZonelessChangeDetection()` to app config
+2. Remove zone.js from angular.json polyfills
+3. Replace `ngZone.run()` calls with signal-based reactivity or explicit `markForCheck()`
+4. Ensure all state changes use signals for automatic change detection
+5. Test thoroughly - change detection behavior will be different
+
+**Benefits**:
+- Smaller bundle size (no zone.js)
+- Better performance (no automatic dirty checking)
+- Simpler code (no zone workarounds)
+- Aligns with Angular's future direction
+
+**Risks**:
+- Breaking changes to change detection timing
+- Third-party libraries may not be zoneless-compatible
+- Requires careful testing of all async operations
+
+**Related Files**:
+- `frontend/src/app/app.config.ts` (would add zoneless provider)
+- `frontend/angular.json` (would remove zone.js polyfill)
+- `frontend/src/app/features/discover/discover.component.ts` (has ngZone.run() calls)
+
+**Next Steps**:
+- Complete current CDK mixed orientation work first
+- Research PrimeNG zoneless compatibility
+- Create migration plan with incremental steps
+
+---
+
 ## Historical Tangents (Resolved)
 
 None yet - this is the first document.
