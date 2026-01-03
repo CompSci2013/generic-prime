@@ -37,7 +37,9 @@
   flex: 1;
   min-height: 300px;
   width: 100%;
+  overflow: hidden;
 }
+
 
 .no-data-message {
   display: flex;

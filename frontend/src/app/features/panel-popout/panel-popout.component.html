@@ -1,9 +1,8 @@
-<div class="panel-popout-container">
-  <!-- Header -->
+<div class="panel-popout-container" [class.chart-popout]="panelType === 'chart'">
+  <!-- Header (hidden for charts via CSS) -->
   <div class="popout-header">
     <h2>{{ getPanelTitle() }}</h2>
   </div>
-
 
   <!-- Panel Content - Render based on type -->
   <div class="popout-content">
@@ -49,6 +48,16 @@
           [domainConfig]="domainConfig"
           (urlParamsChange)="onUrlParamsChange($event)">
         </app-basic-results-table>
+      }
+      <!-- Individual Chart -->
+      @case ('chart') {
+        <app-base-chart
+          [dataSource]="getChartDataSource()"
+          [statistics]="resourceService.statistics()"
+          [highlights]="resourceService.highlights()"
+          [selectedValue]="null"
+          (chartClick)="onChartClick($event)">
+        </app-base-chart>
       }
       <!-- Unknown panel type -->
       @default {

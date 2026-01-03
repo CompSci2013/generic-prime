@@ -28,6 +28,7 @@ import { ResultsTableComponent } from '../../../framework/components/results-tab
 import { StatisticsPanelComponent } from '../../../framework/components/statistics-panel/statistics-panel.component';
 import { BasePickerComponent } from '../../../framework/components/base-picker/base-picker.component';
 import { QueryControlComponent } from '../../../framework/components/query-control/query-control.component';
+import { BaseChartComponent } from '../../../framework/components/base-chart/base-chart.component';
 
 
 /**
@@ -67,7 +68,7 @@ import { QueryControlComponent } from '../../../framework/components/query-contr
         ResourceManagementService,
         { provide: IS_POPOUT_TOKEN, useValue: true }
     ],
-    imports: [QueryControlComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, QueryPanelComponent, BasicResultsTableComponent]
+    imports: [QueryControlComponent, BasePickerComponent, StatisticsPanelComponent, ResultsTableComponent, QueryPanelComponent, BasicResultsTableComponent, BaseChartComponent]
 })
 export class PanelPopoutComponent implements OnInit, OnDestroy {
   /**
@@ -121,6 +122,12 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
 
       // Initialize as pop-out
       this.popOutContext.initializeAsPopOut(this.panelId);
+
+      // For chart pop-outs, add class to body and html to hide scrollbars
+      if (this.panelType === 'chart') {
+        document.documentElement.classList.add('chart-popout-html');
+        document.body.classList.add('chart-popout-body');
+      }
 
       // Trigger change detection
       this.cdr.markForCheck();
@@ -189,7 +196,28 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       'basic-results-table': 'Results Table'
     };
 
+    // For chart panels, extract chart ID and get title from data source
+    if (this.panelId.startsWith('chart-')) {
+      const chartId = this.panelId.replace('chart-', '');
+      const dataSource = this.domainConfig.chartDataSources?.[chartId];
+      return dataSource?.title || chartId;
+    }
+
     return titleMap[this.panelId] || this.panelId;
+  }
+
+  /**
+   * Get chart data source for chart pop-outs
+   * Extracts chart ID from panel ID (e.g., 'chart-manufacturer' → 'manufacturer')
+   *
+   * @returns Chart data source configuration
+   */
+  getChartDataSource(): any {
+    if (this.panelId.startsWith('chart-')) {
+      const chartId = this.panelId.replace('chart-', '');
+      return this.domainConfig.chartDataSources?.[chartId];
+    }
+    return null;
   }
 
   /**
@@ -246,6 +274,30 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
         timestamp: Date.now()
       });
     }
+  }
+
+  /**
+   * Handle chart click/selection from pop-out chart
+   * Sends message to main window which updates URL based on selection
+   *
+   * @param event - Chart click event with value and highlight mode flag
+   */
+  onChartClick(event: { value: string; isHighlightMode: boolean }): void {
+    // Extract chart ID from panel ID (e.g., 'chart-manufacturer' → 'manufacturer')
+    const chartId = this.panelId.startsWith('chart-')
+      ? this.panelId.replace('chart-', '')
+      : this.panelId;
+
+    // Send chart click to main window
+    this.popOutContext.sendMessage({
+      type: PopOutMessageType.CHART_CLICK,
+      payload: {
+        chartId,
+        value: event.value,
+        isHighlightMode: event.isHighlightMode
+      },
+      timestamp: Date.now()
+    });
   }
 
   ngOnDestroy(): void {

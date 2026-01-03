@@ -239,6 +239,31 @@
     }
   }
 
+  // Standalone charts (outside Statistics Panel)
+  .standalone-charts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+
+    .standalone-chart {
+      background: #252526;
+      border-radius: 4px;
+      padding: 1rem;
+
+      h4 {
+        margin: 0 0 0.5rem 0;
+        color: #ffffff;
+        font-size: 0.9rem;
+      }
+
+      app-base-chart {
+        display: block;
+        height: 300px;
+      }
+    }
+  }
+
   // Statistics Panel
   .statistics-panel {
     margin-top: 1.5rem;

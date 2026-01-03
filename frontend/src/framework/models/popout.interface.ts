@@ -131,6 +131,12 @@ export enum PopOutMessageType {
    * Payload: { params: Params }
    */
   URL_PARAMS_SYNC = 'URL_PARAMS_SYNC',
+
+  /**
+   * Chart click/selection from pop-out
+   * Payload: { chartId: string, value: string, isHighlightMode: boolean }
+   */
+  CHART_CLICK = 'CHART_CLICK',
 }
 
 /**

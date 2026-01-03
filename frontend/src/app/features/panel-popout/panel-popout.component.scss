@@ -4,6 +4,28 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+
+  // Chart-specific: no padding, fill window
+  &.chart-popout {
+    padding: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    .popout-header {
+      display: none;
+    }
+
+    .popout-content {
+      padding-top: 0;
+      overflow: hidden;
+
+      app-base-chart {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
 }
 
 .popout-header {
