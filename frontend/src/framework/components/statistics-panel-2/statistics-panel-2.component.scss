@@ -2,6 +2,23 @@
  * Statistics Panel 2 Component Styles - CDK Mixed Orientation Chart Grid
  */
 
+// When in popout context, hide overflow to prevent scrollbars
+:host-context(.statistics-2-popout) {
+  display: block;
+  overflow: hidden;
+  height: 100%;
+
+  .statistics-content {
+    overflow: hidden;
+    height: 100%;
+  }
+
+  .chart-grid {
+    overflow: hidden;
+    max-height: 100%;
+  }
+}
+
 .panel-header {
   display: flex;
   align-items: center;

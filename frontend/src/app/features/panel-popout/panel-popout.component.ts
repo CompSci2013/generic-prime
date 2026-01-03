@@ -125,8 +125,8 @@ export class PanelPopoutComponent implements OnInit, OnDestroy {
       // Initialize as pop-out
       this.popOutContext.initializeAsPopOut(this.panelId);
 
-      // For chart pop-outs, add class to body and html to hide scrollbars
-      if (this.panelType === 'chart') {
+      // For chart and statistics-2 pop-outs, add class to body and html to hide scrollbars
+      if (this.panelType === 'chart' || this.panelType === 'statistics-2') {
         document.documentElement.classList.add('chart-popout-html');
         document.body.classList.add('chart-popout-body');
       }
