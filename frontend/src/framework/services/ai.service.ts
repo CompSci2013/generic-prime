@@ -33,6 +33,9 @@ export class AiService {
   /** Vision model for image analysis */
   private readonly VISION_MODEL = 'llama4:scout';
 
+  /** DeepSeek reasoning model */
+  private readonly DEEPSEEK_MODEL = 'deepseek-r1:70b-llama-distill-q8_0';
+
   /** Default configuration for Mimir Ollama instance */
   private readonly defaultConfig: AiServiceConfig = {
     host: this.OLLAMA_HOST,
@@ -57,6 +60,9 @@ export class AiService {
   /** Track if models have been preloaded */
   private modelsPreloaded = false;
 
+  /** DeepSeek mode toggle - uses reasoning model instead of default */
+  private deepSeekMode = signal(false);
+
   /** Computed: current messages */
   public messages = computed(() => this.session().messages);
 
@@ -68,6 +74,9 @@ export class AiService {
 
   /** Computed: has API context configured */
   public hasApiContext = computed(() => this.apiContext() !== null);
+
+  /** Computed: is DeepSeek mode enabled */
+  public isDeepSeekMode = computed(() => this.deepSeekMode());
 
   /** Subject for streaming responses (future enhancement) */
   private responseStream$ = new Subject<string>();
@@ -127,10 +136,22 @@ export class AiService {
   }
 
   /**
-   * Select the appropriate model based on whether images are present
+   * Select the appropriate model based on whether images are present and DeepSeek mode
    */
   private selectModel(hasImages: boolean): string {
+    if (this.deepSeekMode()) {
+      return this.DEEPSEEK_MODEL;
+    }
     return hasImages ? this.VISION_MODEL : this.TEXT_MODEL;
+  }
+
+  /**
+   * Get timeout based on current mode (DeepSeek needs extra time)
+   */
+  private getTimeout(): number {
+    const baseTimeout = this.config().timeout || 120000;
+    // Add 2 minutes (120000ms) for DeepSeek - it's a larger, slower model
+    return this.deepSeekMode() ? baseTimeout + 120000 : baseTimeout;
   }
 
   /**
@@ -155,6 +176,14 @@ export class AiService {
    */
   clearApiContext(): void {
     this.apiContext.set(null);
+  }
+
+  /**
+   * Toggle DeepSeek reasoning model mode
+   */
+  toggleDeepSeekMode(): void {
+    this.deepSeekMode.update(v => !v);
+    console.log(`🧠 DeepSeek mode: ${this.deepSeekMode() ? 'ON' : 'OFF'}`);
   }
 
   /**
@@ -215,7 +244,7 @@ export class AiService {
     return this.http
       .post<OllamaChatResponse>(endpoint, request)
       .pipe(
-        timeout(this.config().timeout || 120000),
+        timeout(this.getTimeout()),
         tap(response => {
           const duration = ((performance.now() - startTime) / 1000).toFixed(2);
           console.log('📥 Response received after', duration, 'seconds');
@@ -305,7 +334,7 @@ Do NOT use phrases like "Based on the query" - just state the results directly.`
     return this.http
       .post<OllamaChatResponse>(endpoint, request)
       .pipe(
-        timeout(this.config().timeout || 120000),
+        timeout(this.getTimeout()),
         tap(response => {
           const duration = ((performance.now() - startTime) / 1000).toFixed(2);
           console.log('📥 Summary received after', duration, 'seconds');

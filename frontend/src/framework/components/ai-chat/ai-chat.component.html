@@ -13,6 +13,14 @@
       }
     </div>
     <div class="header-actions">
+      <button
+        pButton
+        type="button"
+        [pTooltip]="isDeepSeekMode() ? 'DeepSeek ON - Click to disable' : 'DeepSeek OFF - Click to enable'"
+        [class]="'p-button-text p-button-sm deepseek-toggle' + (isDeepSeekMode() ? ' active' : '')"
+        (click)="toggleDeepSeek()">
+        <img src="assets/deepseek.png" alt="DeepSeek" class="deepseek-icon" />
+      </button>
       @if (hasMessages()) {
         <button
           pButton

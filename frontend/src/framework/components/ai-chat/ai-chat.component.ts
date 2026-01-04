@@ -88,6 +88,9 @@ export class AiChatComponent implements OnInit, OnDestroy {
   /** Computed: whether API context is active (Automobiles domain) */
   hasApiContext = computed(() => this.aiService.hasApiContext());
 
+  /** Computed: whether DeepSeek mode is enabled */
+  isDeepSeekMode = computed(() => this.aiService.isDeepSeekMode());
+
   /** Output: emits when user closes the chat panel */
   closeChat = output<void>();
 
@@ -238,6 +241,13 @@ export class AiChatComponent implements OnInit, OnDestroy {
    */
   retryConnection(): void {
     this.checkConnection();
+  }
+
+  /**
+   * Toggle DeepSeek reasoning model
+   */
+  toggleDeepSeek(): void {
+    this.aiService.toggleDeepSeekMode();
   }
 
   /**
