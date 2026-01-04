@@ -1,43 +1,37 @@
 # Next Steps
 
-**Current Session**: Session 79 - AI Integration Implementation
-**Previous Session**: Session 78 - Domain Landing Page UI Simplification
-**Status**: v7.15, AI chat component implemented on feature/ai branch
+**Current Session**: Session 80 - AI Chat Global Integration
+**Previous Session**: Session 79 - AI Integration Phase 1 & 2
+**Status**: v7.16, AI chat moved to global header on feature/ai branch
 
 ---
 
-## IMMEDIATE ACTION: Test AI Chat Integration
+## IMMEDIATE ACTION: Test Global AI Chat
 
 **Priority**: HIGH
 **Branch**: `feature/ai`
-**Scope**: Verify AI chat works with Ollama on Mimir
+**Scope**: Verify AI chat works across all pages with domain-aware context
 
 ### Testing Steps
 
 1. Start the development server
-2. Navigate to `/automobiles/discover`
-3. Verify the AI chat panel appears in bottom-right corner
-4. Check connection status indicator (should show connected if Ollama is running)
-5. Test Phase 1: Send a basic message
-6. Test Phase 2: Toggle API Mode and ask about vehicle data
+2. Navigate to home page - verify AI chat toggle in header
+3. Click toggle - verify floating panel appears
+4. Check welcome message shows generic examples
+5. Navigate to `/automobiles/discover`
+6. Verify welcome message changes to vehicle-specific examples
+7. Test chat functionality on both pages
 
 ### Verification Checklist
 
-- [ ] Chat panel renders correctly
-- [ ] Connection indicator shows correct status
-- [ ] Messages can be sent and received
-- [ ] Loading spinner appears during AI response
-- [ ] Phase toggle switches between modes
-- [ ] Clear chat button works
+- [ ] Toggle button appears before version number
+- [ ] Panel opens/closes correctly
+- [ ] Generic welcome on non-Automobiles pages
+- [ ] Vehicle-specific welcome on Automobiles pages
+- [ ] Chat works on home page (generic mode)
+- [ ] Chat works on Automobiles (API-aware mode)
 - [ ] Panel collapse/expand works
-
-### Next Development Steps
-
-If AI integration works:
-1. Enhance prompt engineering for better query translation
-2. Add ability to execute generated queries directly
-3. Display results in chat panel
-4. Add conversation context persistence
+- [ ] Close button works
 
 ---
 
@@ -45,25 +39,21 @@ If AI integration works:
 
 | Task | Priority | Notes |
 |------|----------|-------|
-| Continue User Story Validation | HIGH | Results Table, Statistics-2, Base Picker |
+| AI Query Application | HIGH | Apply extracted queries to filters |
 | IdP Phase 1 (Keycloak) | HIGH | Next major milestone |
 | Fix Bug #7 (multiselect visual state) | Medium | Low priority |
 
 ---
 
-## SESSION 79 COMPLETION SUMMARY
+## SESSION 80 COMPLETION SUMMARY
 
 **Primary Accomplishments**:
-1. Created AI models for chat and Ollama API integration
-2. Created AI service for Mimir/Ollama communication
-3. Created AI chat component with floating UI
-4. Integrated chat into discover page
-5. Documented full implementation in TANGENTS.md
-6. Both Phase 1 (basic chat) and Phase 2 (API-aware) implemented
+1. Moved AI chat from discover component to app header
+2. Toggle button placed before version number
+3. Domain-aware API context (Automobiles only)
+4. Context-appropriate welcome messages
+5. Cleaned up stale fix-state.json
 
-**LLM Configuration**:
-- Model: `llama3.1:7b`
-- Host: Mimir (192.168.0.100:11434)
-- Timeout: 2 minutes
+**Version**: 21.3.1
 
 ---
