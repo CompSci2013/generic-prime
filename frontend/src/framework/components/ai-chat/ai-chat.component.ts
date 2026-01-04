@@ -12,6 +12,7 @@ import {
   output
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ButtonModule } from 'primeng/button';
@@ -19,6 +20,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { TooltipModule } from 'primeng/tooltip';
+import katex from 'katex';
 import { AiService } from '../../services/ai.service';
 import { ChatMessage, ImageAttachment } from '../../models/ai.models';
 
@@ -53,7 +55,11 @@ export class AiChatComponent implements OnInit, OnDestroy {
 
   private readonly aiService = inject(AiService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly sanitizer = inject(DomSanitizer);
   private readonly destroy$ = new Subject<void>();
+
+  /** Cache for rendered LaTeX content to avoid re-rendering */
+  private readonly renderedCache = new Map<string, SafeHtml>();
 
   /** User's current message input (regular property for ngModel binding) */
   userMessage = '';
@@ -259,6 +265,62 @@ export class AiChatComponent implements OnInit, OnDestroy {
   formatTime(timestamp?: Date): string {
     if (!timestamp) return '';
     return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  /**
+   * Render message content with LaTeX support
+   * Converts \[...\] (display) and \(...\) (inline) LaTeX to rendered HTML
+   */
+  renderContent(content: string): SafeHtml {
+    // Check cache first
+    const cached = this.renderedCache.get(content);
+    if (cached) {
+      return cached;
+    }
+
+    let rendered = this.escapeHtml(content);
+
+    // Render display math: \[...\]
+    rendered = rendered.replace(/\\\[([\s\S]*?)\\\]/g, (_, latex) => {
+      try {
+        return katex.renderToString(latex.trim(), {
+          displayMode: true,
+          throwOnError: false,
+          output: 'html'
+        });
+      } catch {
+        return `\\[${latex}\\]`;
+      }
+    });
+
+    // Render inline math: \(...\)
+    rendered = rendered.replace(/\\\(([\s\S]*?)\\\)/g, (_, latex) => {
+      try {
+        return katex.renderToString(latex.trim(), {
+          displayMode: false,
+          throwOnError: false,
+          output: 'html'
+        });
+      } catch {
+        return `\\(${latex}\\)`;
+      }
+    });
+
+    // Convert newlines to <br> for proper display
+    rendered = rendered.replace(/\n/g, '<br>');
+
+    const result = this.sanitizer.bypassSecurityTrustHtml(rendered);
+    this.renderedCache.set(content, result);
+    return result;
+  }
+
+  /**
+   * Escape HTML special characters to prevent XSS
+   */
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   /**

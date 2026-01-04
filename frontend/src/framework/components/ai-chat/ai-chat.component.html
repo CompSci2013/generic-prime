@@ -79,7 +79,7 @@
                   }
                 </div>
               }
-              <div class="message-text">{{ message.content }}</div>
+              <div class="message-text" [innerHTML]="renderContent(message.content)"></div>
               @if (message.timestamp) {
                 <div class="message-time">{{ formatTime(message.timestamp) }}</div>
               }

@@ -93,7 +93,7 @@
 .chat-body {
   display: flex;
   flex-direction: column;
-  height: 400px;
+  height: 600px;
 }
 
 .messages-area {
@@ -388,5 +388,18 @@
   }
   50% {
     opacity: 0.5;
+  }
+}
+
+// KaTeX styles for LaTeX rendering
+:host ::ng-deep {
+  .katex {
+    font-size: 1.1em;
+  }
+
+  .katex-display {
+    margin: 0.75em 0;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 }

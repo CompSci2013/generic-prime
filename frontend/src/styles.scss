@@ -2,6 +2,9 @@
 /* Only primeicons CSS needs to be imported here */
 @import "primeicons/primeicons.css";
 
+/* KaTeX CSS for LaTeX rendering in AI chat */
+@import "katex/dist/katex.min.css";
+
 /* Global Styles */
 * {
   box-sizing: border-box;
