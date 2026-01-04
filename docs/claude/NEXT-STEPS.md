@@ -1,37 +1,37 @@
 # Next Steps
 
-**Current Session**: Session 80 - AI Chat Global Integration
-**Previous Session**: Session 79 - AI Integration Phase 1 & 2
-**Status**: v7.16, AI chat moved to global header on feature/ai branch
+**Current Session**: Session 81
+**Previous Session**: Session 80 - AI Chat Global Integration
+**Status**: v7.17, AI Chat Enhancement complete on feature/ai branch
 
 ---
 
-## IMMEDIATE ACTION: Test Global AI Chat
+## IMMEDIATE ACTION: IdP Phase 1 - Deploy Keycloak Infrastructure
 
 **Priority**: HIGH
-**Branch**: `feature/ai`
-**Scope**: Verify AI chat works across all pages with domain-aware context
+**Branch**: TBD (likely `feature/idp` or `feature/keycloak`)
+**Scope**: Deploy Keycloak to Kubernetes cluster for identity provider infrastructure
 
-### Testing Steps
+### Prerequisites
 
-1. Start the development server
-2. Navigate to home page - verify AI chat toggle in header
-3. Click toggle - verify floating panel appears
-4. Check welcome message shows generic examples
-5. Navigate to `/automobiles/discover`
-6. Verify welcome message changes to vehicle-specific examples
-7. Test chat functionality on both pages
+1. Review existing Keycloak documentation (if any)
+2. Determine deployment strategy (Helm chart vs manual manifests)
+3. Plan namespace and resource allocation
+
+### Implementation Steps
+
+1. Create Keycloak deployment manifests for K8s
+2. Configure persistent storage for Keycloak database
+3. Set up Traefik ingress for Keycloak admin console
+4. Create initial realm configuration
+5. Test admin console access
 
 ### Verification Checklist
 
-- [ ] Toggle button appears before version number
-- [ ] Panel opens/closes correctly
-- [ ] Generic welcome on non-Automobiles pages
-- [ ] Vehicle-specific welcome on Automobiles pages
-- [ ] Chat works on home page (generic mode)
-- [ ] Chat works on Automobiles (API-aware mode)
-- [ ] Panel collapse/expand works
-- [ ] Close button works
+- [ ] Keycloak pods running in cluster
+- [ ] Admin console accessible via ingress
+- [ ] Initial realm created
+- [ ] Database persistence verified
 
 ---
 
@@ -39,21 +39,18 @@
 
 | Task | Priority | Notes |
 |------|----------|-------|
-| AI Query Application | HIGH | Apply extracted queries to filters |
-| IdP Phase 1 (Keycloak) | HIGH | Next major milestone |
+| IdP Phase 2 (Frontend OIDC) | HIGH | Pending Phase 1 completion |
 | Fix Bug #7 (multiselect visual state) | Medium | Low priority |
+| Remove component-level ResourceManagementService provider | Low | Cleanup task |
 
 ---
 
-## SESSION 80 COMPLETION SUMMARY
+## COMPLETED: AI Chat Enhancement
 
-**Primary Accomplishments**:
-1. Moved AI chat from discover component to app header
-2. Toggle button placed before version number
-3. Domain-aware API context (Automobiles only)
-4. Context-appropriate welcome messages
-5. Cleaned up stale fix-state.json
-
-**Version**: 21.3.1
+**Session 80** completed the AI Chat Enhancement work:
+- Moved AI chat to global application header
+- Domain-aware API context (Automobiles only)
+- Context-appropriate welcome messages
+- Toggle button, floating panel, collapse/expand functionality
 
 ---
