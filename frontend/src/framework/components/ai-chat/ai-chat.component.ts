@@ -9,9 +9,7 @@ import {
   inject,
   signal,
   computed,
-  input,
-  output,
-  effect
+  output
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -21,22 +19,18 @@ import { TextareaModule } from 'primeng/textarea';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { TooltipModule } from 'primeng/tooltip';
-import { AiService, createAutomobileApiContext } from '../../services/ai.service';
-import { ChatMessage, ExtractedQuery } from '../../models/ai.models';
-
-/** Results from the data query to feed back to AI */
-export interface QueryResults {
-  totalCount: number;
-  data: any[];
-  query: ExtractedQuery;
-}
+import { AiService } from '../../services/ai.service';
+import { ChatMessage, ImageAttachment } from '../../models/ai.models';
 
 /**
  * AI Chat Component
  *
  * Provides a chat interface for interacting with the Ollama LLM on Mimir.
- * The AI is always aware of the backend API and can translate natural language
- * into database queries automatically.
+ * When on the Automobiles domain, the AI is aware of the backend API and can
+ * translate natural language into database queries. On other domains or pages,
+ * it operates as a general-purpose assistant.
+ *
+ * API context is managed by AppComponent based on the current route.
  */
 @Component({
   selector: 'app-ai-chat',
@@ -64,14 +58,14 @@ export class AiChatComponent implements OnInit, OnDestroy {
   /** User's current message input (regular property for ngModel binding) */
   userMessage = '';
 
+  /** Pending image attachment from clipboard paste */
+  pendingImage = signal<ImageAttachment | null>(null);
+
   /** Whether the chat panel is expanded */
   isExpanded = signal(true);
 
   /** Connection status to Ollama */
   connectionStatus = signal<'checking' | 'connected' | 'disconnected'>('checking');
-
-  /** Input: Query results from parent after Elasticsearch returns data */
-  queryResults = input<QueryResults | null>(null);
 
   /** Computed: messages from service */
   messages = computed(() => this.aiService.messages());
@@ -85,27 +79,14 @@ export class AiChatComponent implements OnInit, OnDestroy {
   /** Computed: has messages */
   hasMessages = computed(() => this.messages().length > 0);
 
-  /** Output: emits when user wants to apply a query to the filters */
-  applyQuery = output<ExtractedQuery>();
+  /** Computed: whether API context is active (Automobiles domain) */
+  hasApiContext = computed(() => this.aiService.hasApiContext());
 
-  /** Track the last processed query to avoid duplicate processing */
-  private lastProcessedQuery: ExtractedQuery | null = null;
-
-  constructor() {
-    // Effect to process query results when they arrive
-    effect(() => {
-      const results = this.queryResults();
-      if (results && results.query !== this.lastProcessedQuery) {
-        this.lastProcessedQuery = results.query;
-        this.processQueryResults(results);
-      }
-    });
-  }
+  /** Output: emits when user closes the chat panel */
+  closeChat = output<void>();
 
   ngOnInit(): void {
-    // Always enable API context - the AI should understand the backend
-    this.aiService.setApiContext(createAutomobileApiContext());
-
+    // API context is now managed by AppComponent based on route
     // Check connection to Ollama
     this.checkConnection();
   }
@@ -132,23 +113,24 @@ export class AiChatComponent implements OnInit, OnDestroy {
    */
   sendMessage(): void {
     const message = this.userMessage.trim();
-    if (!message || this.isLoading()) {
+    const image = this.pendingImage();
+
+    // Must have either message or image
+    if ((!message && !image) || this.isLoading()) {
       return;
     }
 
     this.userMessage = '';
+    const images = image ? [image] : undefined;
+    this.pendingImage.set(null);
 
-    this.aiService.sendMessage(message)
+    this.aiService.sendMessage(message || 'What is in this image?', images)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (assistantMessage) => {
+        next: () => {
           this.scrollToBottom();
-
-          // Auto-apply query if one was extracted
-          if (assistantMessage.extractedQuery && !assistantMessage.extractedQuery.applied) {
-            assistantMessage.extractedQuery.applied = true;
-            this.applyQuery.emit(assistantMessage.extractedQuery);
-          }
+          // Note: Query extraction still works but cannot be auto-applied
+          // since the chat is now global and not tied to a specific page
         },
         error: () => {
           // Error is handled by the service and displayed via error signal
@@ -171,10 +153,71 @@ export class AiChatComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Handle paste events to capture images from clipboard
+   */
+  onPaste(event: ClipboardEvent): void {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith('image/')) {
+        event.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          this.processImageFile(file);
+        }
+        return;
+      }
+    }
+  }
+
+  /**
+   * Process an image file and convert to base64
+   */
+  private processImageFile(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      // Extract base64 data without the data URL prefix
+      const base64Data = dataUrl.split(',')[1];
+      this.pendingImage.set({
+        data: base64Data,
+        mimeType: file.type
+      });
+      this.cdr.markForCheck();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /**
+   * Remove the pending image attachment
+   */
+  clearPendingImage(): void {
+    this.pendingImage.set(null);
+  }
+
+  /**
+   * Get data URL for displaying the pending image
+   */
+  getPendingImageUrl(): string | null {
+    const image = this.pendingImage();
+    if (!image) return null;
+    return `data:${image.mimeType};base64,${image.data}`;
+  }
+
+  /**
    * Clear the chat session
    */
   clearChat(): void {
     this.aiService.clearSession();
+  }
+
+  /**
+   * Close the chat panel completely
+   */
+  close(): void {
+    this.closeChat.emit();
   }
 
   /**
@@ -216,89 +259,6 @@ export class AiChatComponent implements OnInit, OnDestroy {
   formatTime(timestamp?: Date): string {
     if (!timestamp) return '';
     return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-
-  /**
-   * Process query results from Elasticsearch and get AI summary
-   */
-  private processQueryResults(results: QueryResults): void {
-    // Build a summary of the results to send to the AI
-    const resultsSummary = this.buildResultsSummary(results);
-
-    // Send to AI for a human-friendly response
-    this.aiService.summarizeResults(resultsSummary)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.scrollToBottom();
-          this.cdr.markForCheck();
-        },
-        error: () => {
-          this.scrollToBottom();
-        }
-      });
-  }
-
-  /**
-   * Build a summary of query results to send to the AI
-   */
-  private buildResultsSummary(results: QueryResults): string {
-    const { totalCount, data, query } = results;
-
-    if (totalCount === 0) {
-      return `The query "${query.description}" returned no results.`;
-    }
-
-    // Get sample of data for AI to summarize
-    const sampleSize = Math.min(10, data.length);
-    const sample = data.slice(0, sampleSize);
-
-    // Build statistics from the sample
-    const manufacturers = this.countBy(sample, 'manufacturer');
-    const bodyClasses = this.countBy(sample, 'body_class');
-    const years = sample.map(d => d.year).filter(Boolean);
-    const yearRange = years.length > 0
-      ? { min: Math.min(...years), max: Math.max(...years) }
-      : null;
-
-    let summary = `Query "${query.description}" returned ${totalCount} results.\n`;
-    summary += `\nSample breakdown (first ${sampleSize} of ${totalCount}):\n`;
-
-    if (Object.keys(manufacturers).length > 0) {
-      summary += `- Manufacturers: ${this.formatCounts(manufacturers)}\n`;
-    }
-    if (Object.keys(bodyClasses).length > 0) {
-      summary += `- Body types: ${this.formatCounts(bodyClasses)}\n`;
-    }
-    if (yearRange) {
-      summary += `- Year range: ${yearRange.min} to ${yearRange.max}\n`;
-    }
-
-    return summary;
-  }
-
-  /**
-   * Count occurrences of a field value
-   */
-  private countBy(data: any[], field: string): Record<string, number> {
-    return data.reduce((acc, item) => {
-      const value = item[field];
-      if (value) {
-        acc[value] = (acc[value] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
-  }
-
-  /**
-   * Format counts for display
-   */
-  private formatCounts(counts: Record<string, number>): string {
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([name, count]) => `${name} (${count})`)
-      .join(', ');
   }
 
   /**

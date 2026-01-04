@@ -6,14 +6,13 @@ import {
   Injector,
   NgZone,
   OnDestroy,
-  OnInit,
-  signal
+  OnInit
 } from '@angular/core';
 import { Params } from '@angular/router';
 import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { MessageService } from 'primeng/api';
 import { Subject } from 'rxjs';
-import { skip, take, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { createAutomobilePickerConfigs } from '../../../domain-config/automobile/configs/automobile.picker-configs';
 import { DomainConfig } from '../../../framework/models';
 import {
@@ -33,10 +32,7 @@ import { StatisticsPanel2Component } from '../../../framework/components/statist
 import { BasePickerComponent } from '../../../framework/components/base-picker/base-picker.component';
 import { QueryPanelComponent } from '../../../framework/components/query-panel/query-panel.component';
 import { QueryControlComponent } from '../../../framework/components/query-control/query-control.component';
-import { AiChatComponent } from '../../../framework/components/ai-chat/ai-chat.component';
-import { BaseChartComponent, ChartDataSource } from '../../../framework/components/base-chart/base-chart.component';
-import { ExtractedQuery } from '../../../framework/models/ai.models';
-import { QueryResults } from '../../../framework/components/ai-chat/ai-chat.component';
+import { ChartDataSource } from '../../../framework/components/base-chart/base-chart.component';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
 
@@ -120,7 +116,7 @@ import { ButtonModule } from 'primeng/button';
     styleUrls: ['./discover.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ResourceManagementService],
-    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanel2Component, ResultsTableComponent, DynamicResultsTableComponent, AiChatComponent]
+    imports: [CdkDropList, CdkDrag, CdkDragHandle, ButtonModule, TooltipModule, QueryControlComponent, QueryPanelComponent, BasePickerComponent, StatisticsPanel2Component, ResultsTableComponent, DynamicResultsTableComponent]
 })
 export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
   implements OnInit, OnDestroy {
@@ -160,11 +156,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
    * Destroy signal for subscription cleanup
    */
   private destroy$ = new Subject<void>();
-
-  /**
-   * Query results to pass back to AI chat for summarization
-   */
-  aiQueryResults = signal<QueryResults | null>(null);
 
   /**
    * Bound beforeunload handler (needs reference for removeEventListener)
@@ -363,50 +354,6 @@ export class DiscoverComponent<TFilters = any, TData = any, TStatistics = any>
     this.userPreferences.savePanelOrder(this.panelOrder);
 
     this.cdr.markForCheck();
-  }
-
-  /**
-   * Apply AI-generated query to the filters
-   *
-   * Clears existing filters first, then applies only the AI-generated filters.
-   * After data loads, passes results back to AI for summarization.
-   *
-   * @param query - Extracted query from AI response
-   */
-  onApplyAiQuery(query: ExtractedQuery): void {
-    console.log('🚀 Discover: Applying AI query to filters:', query);
-
-    // Clear existing filters first, then apply AI-generated filters
-    this.resourceService.clearFilters();
-
-    // Small delay to ensure clear completes before applying new filters
-    setTimeout(() => {
-      this.resourceService.updateFilters(query.filters as Partial<TFilters>);
-      this.cdr.markForCheck();
-
-      // Listen for the data to load, then pass results to AI for summarization
-      // Skip the first emission (current data), take only the next one (new query result)
-      this.resourceService.results$
-        .pipe(
-          skip(1),
-          take(1),
-          takeUntil(this.destroy$)
-        )
-        .subscribe({
-          next: (data: TData[]) => {
-            const totalCount = this.resourceService.totalResults();
-            console.log('📊 Query results:', { totalCount, sampleSize: data?.length });
-
-            // Pass results to AI chat for summarization
-            this.aiQueryResults.set({
-              totalCount,
-              data: data || [],
-              query
-            });
-            this.cdr.markForCheck();
-          }
-        });
-    }, 50);
   }
 
   /**

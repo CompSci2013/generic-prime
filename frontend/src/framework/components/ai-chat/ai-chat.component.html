@@ -31,6 +31,14 @@
         class="p-button-text p-button-sm"
         (click)="toggleExpanded()">
       </button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-times"
+        pTooltip="Close AI Assistant"
+        class="p-button-text p-button-sm"
+        (click)="close()">
+      </button>
     </div>
   </div>
 
@@ -43,18 +51,34 @@
           <div class="welcome-message">
             <i class="pi pi-sparkles"></i>
             <h3>Welcome to AI Assistant</h3>
-            <p>Ask me anything or search the vehicle database:</p>
-            <ul class="example-queries">
-              <li (click)="useExampleQuery('Show me all Chevrolet vehicles from 2020 to 2024')">Show me all Chevrolet vehicles from 2020 to 2024</li>
-              <li (click)="useExampleQuery('Find Pickup trucks with more than 100 VIN records')">Find Pickup trucks with more than 100 VIN records</li>
-              <li (click)="useExampleQuery('What Ford models are available?')">What Ford models are available?</li>
-            </ul>
+            @if (hasApiContext()) {
+              <p>Ask me anything or search the vehicle database:</p>
+              <ul class="example-queries">
+                <li (click)="useExampleQuery('Show me all Chevrolet vehicles from 2020 to 2024')">Show me all Chevrolet vehicles from 2020 to 2024</li>
+                <li (click)="useExampleQuery('Find Pickup trucks with more than 100 VIN records')">Find Pickup trucks with more than 100 VIN records</li>
+                <li (click)="useExampleQuery('What Ford models are available?')">What Ford models are available?</li>
+              </ul>
+            } @else {
+              <p>Ask me anything:</p>
+              <ul class="example-queries">
+                <li (click)="useExampleQuery('What can you help me with?')">What can you help me with?</li>
+                <li (click)="useExampleQuery('Explain how this application works')">Explain how this application works</li>
+                <li (click)="useExampleQuery('Tell me a fun fact')">Tell me a fun fact</li>
+              </ul>
+            }
           </div>
         }
 
         @for (message of messages(); track message.timestamp) {
           <div [class]="getMessageClass(message)">
             <div class="message-content">
+              @if (message.images?.length) {
+                <div class="message-images">
+                  @for (image of message.images; track $index) {
+                    <img [src]="'data:' + image.mimeType + ';base64,' + image.data" alt="Attached image" class="message-image" />
+                  }
+                </div>
+              }
               <div class="message-text">{{ message.content }}</div>
               @if (message.timestamp) {
                 <div class="message-time">{{ formatTime(message.timestamp) }}</div>
@@ -93,25 +117,42 @@
             <button pButton type="button" label="Retry" class="p-button-sm" (click)="retryConnection()"></button>
           </div>
         } @else {
-          <textarea
-            #messageInput
-            pTextarea
-            [(ngModel)]="userMessage"
-            placeholder="Type your message..."
-            [autoResize]="true"
-            [rows]="1"
-            [disabled]="isLoading() || connectionStatus() !== 'connected'"
-            (keydown)="onKeyDown($event)"
-            class="message-input">
-          </textarea>
-          <button
-            pButton
-            type="button"
-            icon="pi pi-send"
-            class="send-button"
-            [disabled]="!userMessage.trim() || isLoading() || connectionStatus() !== 'connected'"
-            (click)="sendMessage()">
-          </button>
+          <!-- Pending Image Preview -->
+          @if (pendingImage()) {
+            <div class="pending-image-preview">
+              <img [src]="getPendingImageUrl()" alt="Pending attachment" />
+              <button
+                pButton
+                type="button"
+                icon="pi pi-times"
+                class="p-button-rounded p-button-danger p-button-sm remove-image-btn"
+                (click)="clearPendingImage()"
+                pTooltip="Remove image">
+              </button>
+            </div>
+          }
+          <div class="input-row">
+            <textarea
+              #messageInput
+              pTextarea
+              [(ngModel)]="userMessage"
+              placeholder="Type your message or paste an image..."
+              [autoResize]="true"
+              [rows]="1"
+              [disabled]="isLoading() || connectionStatus() !== 'connected'"
+              (keydown)="onKeyDown($event)"
+              (paste)="onPaste($event)"
+              class="message-input">
+            </textarea>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-send"
+              class="send-button"
+              [disabled]="(!userMessage.trim() && !pendingImage()) || isLoading() || connectionStatus() !== 'connected'"
+              (click)="sendMessage()">
+            </button>
+          </div>
         }
       </div>
     </div>

@@ -10,6 +10,16 @@
 export type ChatRole = 'user' | 'assistant' | 'system';
 
 /**
+ * Image attachment for multimodal messages
+ */
+export interface ImageAttachment {
+  /** Base64-encoded image data (without data URL prefix) */
+  data: string;
+  /** MIME type (e.g., 'image/png', 'image/jpeg') */
+  mimeType: string;
+}
+
+/**
  * A single message in a chat conversation
  */
 export interface ChatMessage {
@@ -18,6 +28,8 @@ export interface ChatMessage {
   timestamp?: Date;
   /** Extracted query parameters from AI response (Phase 2) */
   extractedQuery?: ExtractedQuery;
+  /** Image attachments for multimodal messages */
+  images?: ImageAttachment[];
 }
 
 /**
@@ -88,6 +100,8 @@ export interface OllamaChatRequest {
   messages: Array<{
     role: ChatRole;
     content: string;
+    /** Base64-encoded images for multimodal models (e.g., llava) */
+    images?: string[];
   }>;
   stream?: boolean;
   options?: {

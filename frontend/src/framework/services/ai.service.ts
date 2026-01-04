@@ -9,7 +9,8 @@ import {
   OllamaChatResponse,
   AiServiceConfig,
   ApiContext,
-  ExtractedQuery
+  ExtractedQuery,
+  ImageAttachment
 } from '../models/ai.models';
 
 /**
@@ -17,16 +18,26 @@ import {
  *
  * Phase 1: Basic chat functionality
  * Phase 2: Backend-aware query translation
+ * Phase 3: Multimodal support with dynamic model selection
  */
 @Injectable({
   providedIn: 'root'
 })
 export class AiService {
+  /** Ollama host URL */
+  private readonly OLLAMA_HOST = 'http://192.168.0.100:11434';
+
+  /** Default text model for chat queries */
+  private readonly TEXT_MODEL = 'qwen2.5-coder:14b';
+
+  /** Vision model for image analysis */
+  private readonly VISION_MODEL = 'llama4:scout';
+
   /** Default configuration for Mimir Ollama instance */
   private readonly defaultConfig: AiServiceConfig = {
-    host: 'http://192.168.0.100:11434',
-    model: 'llama3.1:70b',
-    timeout: 180000, // 3 minutes (70b model is slower)
+    host: this.OLLAMA_HOST,
+    model: this.TEXT_MODEL,
+    timeout: 120000, // 2 minutes
     temperature: 0.7
   };
 
@@ -43,6 +54,9 @@ export class AiService {
   /** API context for Phase 2 */
   private apiContext = signal<ApiContext | null>(null);
 
+  /** Track if models have been preloaded */
+  private modelsPreloaded = false;
+
   /** Computed: current messages */
   public messages = computed(() => this.session().messages);
 
@@ -58,7 +72,66 @@ export class AiService {
   /** Subject for streaming responses (future enhancement) */
   private responseStream$ = new Subject<string>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    // Preload both models on service initialization
+    this.preloadModels();
+  }
+
+  /**
+   * Preload both text and vision models to keep them warm in memory
+   * This prevents cold-start delays when switching between models
+   */
+  private preloadModels(): void {
+    if (this.modelsPreloaded) return;
+
+    console.log('🔄 Preloading AI models on Mimir...');
+
+    // Preload text model with a minimal request
+    this.preloadModel(this.TEXT_MODEL);
+
+    // Preload vision model with a minimal request
+    this.preloadModel(this.VISION_MODEL);
+
+    this.modelsPreloaded = true;
+  }
+
+  /**
+   * Send a request to load a model and keep it in memory indefinitely
+   * Uses keep_alive: -1 to prevent Ollama from unloading the model
+   */
+  private preloadModel(modelName: string): void {
+    const endpoint = `${this.OLLAMA_HOST}/api/generate`;
+    const request = {
+      model: modelName,
+      prompt: 'hi',
+      stream: false,
+      keep_alive: -1,  // Keep model loaded indefinitely
+      options: {
+        num_predict: 1  // Generate minimal tokens
+      }
+    };
+
+    this.http.post(endpoint, request)
+      .pipe(
+        timeout(120000), // 2 minute timeout for loading large models
+        catchError(error => {
+          console.warn(`⚠️ Failed to preload model ${modelName}:`, error.message || error);
+          return of(null);
+        })
+      )
+      .subscribe(response => {
+        if (response) {
+          console.log(`✅ Model ${modelName} preloaded and pinned in memory`);
+        }
+      });
+  }
+
+  /**
+   * Select the appropriate model based on whether images are present
+   */
+  private selectModel(hasImages: boolean): string {
+    return hasImages ? this.VISION_MODEL : this.TEXT_MODEL;
+  }
 
   /**
    * Configure the AI service
@@ -78,10 +151,19 @@ export class AiService {
   }
 
   /**
-   * Send a message and get a response
+   * Clear API context (reverts to basic chat mode)
    */
-  sendMessage(userMessage: string): Observable<ChatMessage> {
-    if (!userMessage.trim()) {
+  clearApiContext(): void {
+    this.apiContext.set(null);
+  }
+
+  /**
+   * Send a message and get a response
+   * @param userMessage - The text message from the user
+   * @param images - Optional image attachments for multimodal models
+   */
+  sendMessage(userMessage: string, images?: ImageAttachment[]): Observable<ChatMessage> {
+    if (!userMessage.trim() && (!images || images.length === 0)) {
       return throwError(() => new Error('Message cannot be empty'));
     }
 
@@ -91,13 +173,17 @@ export class AiService {
     // Log user question
     console.group(`🤖 AI Chat Request [${requestId}]`);
     console.log('📝 User Question:', userMessage.trim());
+    if (images?.length) {
+      console.log('🖼️ Images attached:', images.length);
+    }
     console.log('⏰ Timestamp:', new Date().toISOString());
 
     // Add user message to session
     const userChatMessage: ChatMessage = {
       role: 'user',
       content: userMessage.trim(),
-      timestamp: new Date()
+      timestamp: new Date(),
+      images: images
     };
 
     this.session.update(s => ({
@@ -108,7 +194,7 @@ export class AiService {
     }));
 
     // Build the request
-    const request = this.buildChatRequest(userMessage);
+    const request = this.buildChatRequest(userMessage, images);
     const endpoint = `${this.config().host}/api/chat`;
 
     // Log request details
@@ -334,10 +420,10 @@ Do NOT use phrases like "Based on the query" - just state the results directly.`
   }
 
   /**
-   * Build the chat request with optional system context
+   * Build the chat request with optional system context and images
    */
-  private buildChatRequest(userMessage: string): OllamaChatRequest {
-    const messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }> = [];
+  private buildChatRequest(userMessage: string, images?: ImageAttachment[]): OllamaChatRequest {
+    const messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string; images?: string[] }> = [];
 
     // Add system message with API context if available (Phase 2)
     const systemPrompt = this.buildSystemPrompt();
@@ -351,20 +437,39 @@ Do NOT use phrases like "Based on the query" - just state the results directly.`
     // Add conversation history (last 10 messages for context)
     const history = this.session().messages.slice(-10);
     for (const msg of history) {
-      messages.push({
+      const historyMsg: { role: 'user' | 'assistant' | 'system'; content: string; images?: string[] } = {
         role: msg.role,
         content: msg.content
-      });
+      };
+      // Include images from history if present
+      if (msg.images?.length) {
+        historyMsg.images = msg.images.map(img => img.data);
+      }
+      messages.push(historyMsg);
     }
 
-    // Add current user message
-    messages.push({
+    // Add current user message with images
+    const userMsg: { role: 'user' | 'assistant' | 'system'; content: string; images?: string[] } = {
       role: 'user',
       content: userMessage
-    });
+    };
+    if (images?.length) {
+      userMsg.images = images.map(img => img.data);
+    }
+    messages.push(userMsg);
+
+    // Select model based on whether images are present
+    const hasImages = !!(images?.length);
+    const selectedModel = this.selectModel(hasImages);
+
+    if (hasImages) {
+      console.log(`🖼️ Using vision model: ${selectedModel}`);
+    } else {
+      console.log(`💬 Using text model: ${selectedModel}`);
+    }
 
     return {
-      model: this.config().model,
+      model: selectedModel,
       messages,
       stream: false,
       options: {
@@ -380,10 +485,10 @@ Do NOT use phrases like "Based on the query" - just state the results directly.`
     const context = this.apiContext();
 
     if (!context) {
-      // Phase 1: Basic assistant without API context
-      return `You are a helpful assistant for the Generic Discovery Framework application.
-This application helps users explore and analyze vehicle data.
-Be concise and helpful in your responses.`;
+      // Generic assistant mode - no domain-specific context
+      return `You are a helpful AI assistant.
+Be concise and helpful in your responses.
+You can answer general questions, help with coding, explain concepts, and have conversations.`;
     }
 
     // API-aware assistant
