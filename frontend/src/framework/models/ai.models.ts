@@ -16,6 +16,20 @@ export interface ChatMessage {
   role: ChatRole;
   content: string;
   timestamp?: Date;
+  /** Extracted query parameters from AI response (Phase 2) */
+  extractedQuery?: ExtractedQuery;
+}
+
+/**
+ * Query parameters extracted from AI response (Phase 2)
+ */
+export interface ExtractedQuery {
+  /** The filter parameters to apply */
+  filters: Record<string, any>;
+  /** Human-readable description of what this query does */
+  description: string;
+  /** Whether the query has been applied */
+  applied?: boolean;
 }
 
 /**

@@ -13,15 +13,6 @@
       }
     </div>
     <div class="header-actions">
-      <button
-        pButton
-        type="button"
-        [icon]="apiContextEnabled() ? 'pi pi-database' : 'pi pi-comment'"
-        [pTooltip]="apiContextEnabled() ? 'API Mode (Phase 2)' : 'Chat Mode (Phase 1)'"
-        class="p-button-text p-button-sm"
-        [class.api-mode]="apiContextEnabled()"
-        (click)="toggleApiContext()">
-      </button>
       @if (hasMessages()) {
         <button
           pButton
@@ -52,21 +43,12 @@
           <div class="welcome-message">
             <i class="pi pi-sparkles"></i>
             <h3>Welcome to AI Assistant</h3>
-            @if (apiContextEnabled()) {
-              <p>Phase 2: I can help you query vehicle data. Try asking:</p>
-              <ul class="example-queries">
-                <li>"Show me all Toyota vehicles from 2020 to 2024"</li>
-                <li>"Find SUVs with more than 100 VIN records"</li>
-                <li>"What Ford models are available?"</li>
-              </ul>
-            } @else {
-              <p>Phase 1: Ask me anything about the application.</p>
-              <ul class="example-queries">
-                <li>"What data is available in this application?"</li>
-                <li>"How do I filter by manufacturer?"</li>
-                <li>"Explain the statistics panel"</li>
-              </ul>
-            }
+            <p>Ask me anything or search the vehicle database:</p>
+            <ul class="example-queries">
+              <li (click)="useExampleQuery('Show me all Chevrolet vehicles from 2020 to 2024')">Show me all Chevrolet vehicles from 2020 to 2024</li>
+              <li (click)="useExampleQuery('Find Pickup trucks with more than 100 VIN records')">Find Pickup trucks with more than 100 VIN records</li>
+              <li (click)="useExampleQuery('What Ford models are available?')">What Ford models are available?</li>
+            </ul>
           </div>
         }
 

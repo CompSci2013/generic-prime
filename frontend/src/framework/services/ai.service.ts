@@ -9,9 +9,7 @@ import {
   OllamaChatResponse,
   AiServiceConfig,
   ApiContext,
-  ApiEndpointInfo,
-  ApiParameterInfo,
-  ApiFieldInfo
+  ExtractedQuery
 } from '../models/ai.models';
 
 /**
@@ -27,8 +25,8 @@ export class AiService {
   /** Default configuration for Mimir Ollama instance */
   private readonly defaultConfig: AiServiceConfig = {
     host: 'http://192.168.0.100:11434',
-    model: 'llama3.1:7b',
-    timeout: 120000, // 2 minutes
+    model: 'llama3.1:70b',
+    timeout: 180000, // 3 minutes (70b model is slower)
     temperature: 0.7
   };
 
@@ -87,6 +85,14 @@ export class AiService {
       return throwError(() => new Error('Message cannot be empty'));
     }
 
+    const requestId = this.generateRequestId();
+    const startTime = performance.now();
+
+    // Log user question
+    console.group(`🤖 AI Chat Request [${requestId}]`);
+    console.log('📝 User Question:', userMessage.trim());
+    console.log('⏰ Timestamp:', new Date().toISOString());
+
     // Add user message to session
     const userChatMessage: ChatMessage = {
       role: 'user',
@@ -103,23 +109,59 @@ export class AiService {
 
     // Build the request
     const request = this.buildChatRequest(userMessage);
+    const endpoint = `${this.config().host}/api/chat`;
+
+    // Log request details
+    console.log('🌐 Endpoint:', endpoint);
+    console.log('📤 Request Payload:', {
+      model: request.model,
+      stream: request.stream,
+      options: request.options,
+      messageCount: request.messages.length,
+      messages: request.messages.map(m => ({
+        role: m.role,
+        contentLength: m.content.length,
+        contentPreview: m.content.substring(0, 100) + (m.content.length > 100 ? '...' : '')
+      }))
+    });
+    console.log('📤 Full Request (for debugging):', JSON.stringify(request, null, 2));
 
     return this.http
-      .post<OllamaChatResponse>(
-        `${this.config().host}/api/chat`,
-        request
-      )
+      .post<OllamaChatResponse>(endpoint, request)
       .pipe(
         timeout(this.config().timeout || 120000),
+        tap(response => {
+          const duration = ((performance.now() - startTime) / 1000).toFixed(2);
+          console.log('📥 Response received after', duration, 'seconds');
+          console.log('📥 Response Data:', {
+            model: response.model,
+            createdAt: response.created_at,
+            totalDuration: response.total_duration,
+            loadDuration: response.load_duration,
+            promptEvalCount: response.prompt_eval_count,
+            evalCount: response.eval_count,
+            messageRole: response.message?.role,
+            messageContentLength: response.message?.content?.length,
+            messagePreview: response.message?.content?.substring(0, 200) + (response.message?.content?.length > 200 ? '...' : '')
+          });
+          console.log('📥 Full Response (for debugging):', JSON.stringify(response, null, 2));
+        }),
         map(response => this.processResponse(response)),
         tap(assistantMessage => {
+          console.log('✅ Assistant Response:', assistantMessage.content);
+          console.groupEnd();
+
           this.session.update(s => ({
             ...s,
             messages: [...s.messages, assistantMessage],
             isLoading: false
           }));
         }),
-        catchError(error => this.handleError(error)),
+        catchError(error => {
+          console.error('❌ Request failed:', error);
+          console.groupEnd();
+          return this.handleError(error);
+        }),
         finalize(() => {
           this.session.update(s => ({
             ...s,
@@ -127,6 +169,110 @@ export class AiService {
           }));
         })
       );
+  }
+
+  /**
+   * Summarize query results with a human-friendly response
+   * This is called after Elasticsearch returns data
+   */
+  summarizeResults(resultsSummary: string): Observable<ChatMessage> {
+    const requestId = this.generateRequestId();
+    const startTime = performance.now();
+
+    console.group(`🤖 AI Results Summary [${requestId}]`);
+    console.log('📊 Results Summary:', resultsSummary);
+
+    // Set loading state
+    this.session.update(s => ({
+      ...s,
+      isLoading: true,
+      error: undefined
+    }));
+
+    // Build request with results context
+    const messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }> = [
+      {
+        role: 'system',
+        content: `You are summarizing database query results for a user.
+Given the query results below, provide a brief, friendly 1-2 sentence summary.
+Focus on the total count and any interesting patterns in the data.
+Do NOT include any JSON or technical details - just a natural language summary.
+Do NOT use phrases like "Based on the query" - just state the results directly.`
+      },
+      {
+        role: 'user',
+        content: resultsSummary
+      }
+    ];
+
+    const request: OllamaChatRequest = {
+      model: this.config().model,
+      messages,
+      stream: false,
+      options: {
+        temperature: 0.7
+      }
+    };
+
+    const endpoint = `${this.config().host}/api/chat`;
+
+    return this.http
+      .post<OllamaChatResponse>(endpoint, request)
+      .pipe(
+        timeout(this.config().timeout || 120000),
+        tap(response => {
+          const duration = ((performance.now() - startTime) / 1000).toFixed(2);
+          console.log('📥 Summary received after', duration, 'seconds');
+        }),
+        map(response => {
+          const content = response.message.content;
+          return {
+            role: 'assistant' as const,
+            content: content.trim(),
+            timestamp: new Date()
+          };
+        }),
+        tap(assistantMessage => {
+          console.log('✅ Summary Response:', assistantMessage.content);
+          console.groupEnd();
+
+          // Replace the last assistant message (which was the placeholder)
+          // with the actual summary
+          this.session.update(s => {
+            const messages = [...s.messages];
+            // Find and update the last assistant message
+            for (let i = messages.length - 1; i >= 0; i--) {
+              if (messages[i].role === 'assistant') {
+                messages[i] = assistantMessage;
+                break;
+              }
+            }
+            return {
+              ...s,
+              messages,
+              isLoading: false
+            };
+          });
+        }),
+        catchError(error => {
+          console.error('❌ Summary request failed:', error);
+          console.groupEnd();
+          return this.handleError(error);
+        }),
+        finalize(() => {
+          this.session.update(s => ({
+            ...s,
+            isLoading: false
+          }));
+        })
+      );
+  }
+
+  /**
+   * Generate a unique request ID for logging
+   */
+  private generateRequestId(): string {
+    return `req-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
   }
 
   /**
@@ -151,12 +297,19 @@ export class AiService {
    * Check if Ollama is available
    */
   checkHealth(): Observable<boolean> {
+    const endpoint = `${this.config().host}/api/tags`;
+    console.log('🔍 AI Health Check:', endpoint);
+
     return this.http
       .get(`${this.config().host}/api/tags`, { responseType: 'json' })
       .pipe(
         timeout(5000),
+        tap(() => console.log('✅ AI Health Check: Connected')),
         map(() => true),
-        catchError(() => of(false))
+        catchError(error => {
+          console.warn('⚠️ AI Health Check: Disconnected', error.message || error);
+          return of(false);
+        })
       );
   }
 
@@ -164,12 +317,19 @@ export class AiService {
    * Get available models from Ollama
    */
   getAvailableModels(): Observable<string[]> {
+    const endpoint = `${this.config().host}/api/tags`;
+    console.log('📋 Fetching available models from:', endpoint);
+
     return this.http
-      .get<{ models: Array<{ name: string }> }>(`${this.config().host}/api/tags`)
+      .get<{ models: Array<{ name: string }> }>(endpoint)
       .pipe(
         timeout(10000),
+        tap(response => console.log('📋 Available models:', response.models.map(m => m.name))),
         map(response => response.models.map(m => m.name)),
-        catchError(() => of([]))
+        catchError(error => {
+          console.warn('⚠️ Failed to fetch models:', error.message || error);
+          return of([]);
+        })
       );
   }
 
@@ -226,51 +386,165 @@ This application helps users explore and analyze vehicle data.
 Be concise and helpful in your responses.`;
     }
 
-    // Phase 2: API-aware assistant
-    return `You are an intelligent assistant for the Generic Discovery Framework.
-You help users query vehicle data by translating natural language into API parameters.
+    // API-aware assistant
+    return `You are an intelligent assistant for a vehicle database application.
+You help users search and explore vehicle data using natural language.
 
-## Available API
+## Available Data
 
-Base URL: ${context.baseUrl}
+The database contains vehicle specifications with these fields:
+${context.fields.map(f => `- ${f.name}: ${f.description}${f.examples ? ` (e.g., ${f.examples.slice(0, 3).join(', ')})` : ''}`).join('\n')}
 
-### Endpoints:
-${context.endpoints.map(ep => this.formatEndpoint(ep)).join('\n\n')}
+## How to Respond
 
-### Data Fields:
-${context.fields.map(f => `- ${f.name} (${f.type}): ${f.description}`).join('\n')}
+When users ask about vehicles, you MUST:
+1. Write a brief, friendly response describing what you're searching for
+2. Include a hidden JSON query block that the system will parse (users won't see this)
 
-## Instructions:
-1. When users ask about vehicles, translate their request into API parameters
-2. Present the parameters as a JSON object that can be used to query the API
-3. If the request is ambiguous, ask clarifying questions
-4. Always explain what the query will return
-5. Be helpful and conversational`;
-  }
+IMPORTANT: Your visible response should be conversational and brief - just 1-2 sentences.
+Do NOT explain the query parameters or show technical details to the user.
 
-  /**
-   * Format an endpoint for the system prompt
-   */
-  private formatEndpoint(ep: ApiEndpointInfo): string {
-    const params = ep.parameters
-      .map(p => `  - ${p.name} (${p.type}${p.required ? ', required' : ''}): ${p.description}`)
-      .join('\n');
+The JSON block format (this will be stripped from the displayed message):
+\`\`\`json:query
+{
+  "filters": {
+    "manufacturer": "value",
+    "yearMin": 2020,
+    "yearMax": 2024,
+    "bodyClass": "value"
+  },
+  "description": "Brief description"
+}
+\`\`\`
 
-    return `${ep.method} ${ep.path}
-${ep.description}
-Parameters:
-${params}`;
+Available filter parameters:
+- manufacturer: Filter by manufacturer name (Chevrolet, Ford, GMC, Buick, etc.)
+- model: Filter by model name
+- yearMin/yearMax: Year range (database spans 1908-2024)
+- bodyClass: Body type (Sedan, SUV, Pickup, Coupe, etc.)
+- instanceCountMin/instanceCountMax: VIN record count range
+- search: Global text search
+
+## Example Responses
+
+User: "Show me Ford trucks from 2020"
+Response: "Searching for Ford trucks from 2020..."
+\`\`\`json:query
+{"filters":{"manufacturer":"Ford","bodyClass":"Pickup","yearMin":2020,"yearMax":2020},"description":"Ford pickup trucks from 2020"}
+\`\`\`
+
+User: "What Chevrolet models are available?"
+Response: "Here are the available Chevrolet models in the database."
+\`\`\`json:query
+{"filters":{"manufacturer":"Chevrolet"},"description":"All Chevrolet vehicles"}
+\`\`\`
+
+Remember: Keep your visible response SHORT. The results will speak for themselves.`;
   }
 
   /**
    * Process the Ollama response
    */
   private processResponse(response: OllamaChatResponse): ChatMessage {
+    const rawContent = response.message.content;
+    const extractedQuery = this.extractQueryFromResponse(rawContent);
+
+    // Strip the JSON query block from the displayed content
+    const displayContent = this.stripQueryBlock(rawContent);
+
+    if (extractedQuery) {
+      console.log('🎯 Extracted Query:', extractedQuery);
+    }
+
     return {
       role: 'assistant',
-      content: response.message.content,
-      timestamp: new Date()
+      content: displayContent,
+      timestamp: new Date(),
+      extractedQuery
     };
+  }
+
+  /**
+   * Strip JSON query blocks from content so users don't see them
+   */
+  private stripQueryBlock(content: string): string {
+    // Remove ```json:query ... ``` blocks
+    let cleaned = content.replace(/```json:query\s*[\s\S]*?```/gi, '');
+
+    // Also remove plain ```json blocks that look like queries
+    cleaned = cleaned.replace(/```json\s*\{[\s\S]*?"filters"[\s\S]*?\}[\s\S]*?```/gi, '');
+
+    // Clean up extra whitespace left behind
+    cleaned = cleaned.replace(/\n{3,}/g, '\n\n').trim();
+
+    return cleaned;
+  }
+
+  /**
+   * Extract JSON query block from AI response (Phase 2)
+   * Looks for ```json:query ... ``` blocks
+   */
+  private extractQueryFromResponse(content: string): ExtractedQuery | undefined {
+    // Match ```json:query ... ``` blocks
+    const queryBlockRegex = /```json:query\s*([\s\S]*?)```/i;
+    const match = content.match(queryBlockRegex);
+
+    if (!match) {
+      // Also try plain ```json blocks as fallback
+      const fallbackRegex = /```json\s*([\s\S]*?)```/i;
+      const fallbackMatch = content.match(fallbackRegex);
+      if (fallbackMatch) {
+        return this.parseQueryJson(fallbackMatch[1]);
+      }
+      return undefined;
+    }
+
+    return this.parseQueryJson(match[1]);
+  }
+
+  /**
+   * Parse and validate query JSON
+   */
+  private parseQueryJson(jsonStr: string): ExtractedQuery | undefined {
+    try {
+      const parsed = JSON.parse(jsonStr.trim());
+
+      // Validate structure
+      if (!parsed.filters || typeof parsed.filters !== 'object') {
+        console.warn('⚠️ Invalid query JSON: missing or invalid filters object');
+        return undefined;
+      }
+
+      // Validate filter keys against known parameters
+      const validKeys = [
+        'manufacturer', 'model', 'yearMin', 'yearMax',
+        'bodyClass', 'instanceCountMin', 'instanceCountMax',
+        'search', 'models', 'page', 'size', 'sortBy', 'sortOrder'
+      ];
+
+      const filters: Record<string, any> = {};
+      for (const [key, value] of Object.entries(parsed.filters)) {
+        if (validKeys.includes(key) && value !== null && value !== undefined && value !== '') {
+          filters[key] = value;
+        } else if (!validKeys.includes(key)) {
+          console.warn(`⚠️ Unknown filter key ignored: ${key}`);
+        }
+      }
+
+      if (Object.keys(filters).length === 0) {
+        console.warn('⚠️ No valid filters found in query JSON');
+        return undefined;
+      }
+
+      return {
+        filters,
+        description: parsed.description || 'Query extracted from AI response',
+        applied: false
+      };
+    } catch (e) {
+      console.warn('⚠️ Failed to parse query JSON:', e);
+      return undefined;
+    }
   }
 
   /**
@@ -315,6 +589,12 @@ ${params}`;
 
 /**
  * Factory function to create API context for the automobile domain
+ *
+ * NOTE: Examples are based on ACTUAL data from the Elasticsearch database.
+ * Data was queried from the backend API:
+ * - Manufacturers: /api/specs/v1/filters/manufacturers
+ * - Body classes: /api/specs/v1/filters/body-classes
+ * - Year range: /api/specs/v1/filters/year-range
  */
 export function createAutomobileApiContext(): ApiContext {
   return {
@@ -325,15 +605,15 @@ export function createAutomobileApiContext(): ApiContext {
         path: '/vehicles/details',
         description: 'Search and retrieve vehicle specifications',
         parameters: [
-          { name: 'manufacturer', type: 'string', required: false, description: 'Filter by manufacturer name', example: 'Toyota' },
-          { name: 'model', type: 'string', required: false, description: 'Filter by model name', example: 'Camry' },
-          { name: 'yearMin', type: 'integer', required: false, description: 'Minimum year (inclusive)', example: 2020, validation: { min: 1900 } },
+          { name: 'manufacturer', type: 'string', required: false, description: 'Filter by manufacturer name', example: 'Ford' },
+          { name: 'model', type: 'string', required: false, description: 'Filter by model name', example: 'F-150' },
+          { name: 'yearMin', type: 'integer', required: false, description: 'Minimum year (inclusive)', example: 2015, validation: { min: 1908 } },
           { name: 'yearMax', type: 'integer', required: false, description: 'Maximum year (inclusive)', example: 2024 },
-          { name: 'bodyClass', type: 'string', required: false, description: 'Filter by body class', example: 'Sedan' },
+          { name: 'bodyClass', type: 'string', required: false, description: 'Filter by body class', example: 'Pickup' },
           { name: 'instanceCountMin', type: 'integer', required: false, description: 'Minimum VIN instances', example: 10, validation: { min: 0, max: 10000 } },
           { name: 'instanceCountMax', type: 'integer', required: false, description: 'Maximum VIN instances', example: 1000, validation: { min: 0, max: 10000 } },
-          { name: 'search', type: 'string', required: false, description: 'Global search across all fields', example: 'Toyota Camry' },
-          { name: 'models', type: 'string', required: false, description: 'Comma-separated manufacturer:model pairs', example: 'Ford:F-150,Toyota:Camry' },
+          { name: 'search', type: 'string', required: false, description: 'Global search across all fields', example: 'Ford F-150' },
+          { name: 'models', type: 'string', required: false, description: 'Comma-separated manufacturer:model pairs', example: 'Ford:F-150,Chevrolet:Silverado' },
           { name: 'page', type: 'integer', required: false, description: 'Page number (1-indexed)', example: 1, validation: { min: 1 } },
           { name: 'size', type: 'integer', required: false, description: 'Results per page', example: 20, validation: { min: 1, max: 100 } },
           { name: 'sortBy', type: 'string', required: false, description: 'Field to sort by', example: 'manufacturer' },
@@ -367,10 +647,30 @@ export function createAutomobileApiContext(): ApiContext {
     ],
     fields: [
       { name: 'vehicle_id', type: 'string', description: 'Unique vehicle identifier' },
-      { name: 'manufacturer', type: 'string', description: 'Vehicle manufacturer (e.g., Toyota, Ford, Honda)', examples: ['Toyota', 'Ford', 'Honda', 'BMW', 'Mercedes-Benz'] },
-      { name: 'model', type: 'string', description: 'Vehicle model name', examples: ['Camry', 'F-150', 'Accord', '3 Series'] },
-      { name: 'year', type: 'integer', description: 'Model year', examples: ['2020', '2021', '2022', '2023', '2024'] },
-      { name: 'body_class', type: 'string', description: 'Vehicle body type', examples: ['Sedan', 'SUV', 'Truck', 'Coupe', 'Wagon'] },
+      {
+        name: 'manufacturer',
+        type: 'string',
+        description: 'Vehicle manufacturer - American brands dominate the database',
+        examples: ['Chevrolet', 'Ford', 'GMC', 'Buick', 'Cadillac', 'Pontiac', 'Dodge', 'Chrysler', 'Jeep', 'Lincoln', 'Ram', 'Tesla', 'Rivian']
+      },
+      {
+        name: 'model',
+        type: 'string',
+        description: 'Vehicle model name',
+        examples: ['F-150', 'Silverado', 'Sierra', 'Camaro', 'Mustang', 'Corvette', 'Model 3', 'Wrangler']
+      },
+      {
+        name: 'year',
+        type: 'integer',
+        description: 'Model year (database spans 1908 to 2024)',
+        examples: ['1908', '1950', '2000', '2020', '2024']
+      },
+      {
+        name: 'body_class',
+        type: 'string',
+        description: 'Vehicle body type classification',
+        examples: ['Sedan', 'SUV', 'Pickup', 'Coupe', 'Hatchback', 'Wagon', 'Van', 'Truck', 'Convertible', 'Sports Car']
+      },
       { name: 'instance_count', type: 'integer', description: 'Number of VIN records for this vehicle configuration' },
       { name: 'drive_type', type: 'string', description: 'Drive configuration', examples: ['FWD', 'RWD', 'AWD', '4WD'] },
       { name: 'engine', type: 'string', description: 'Engine type', examples: ['I4', 'V6', 'V8', 'Electric'] },
